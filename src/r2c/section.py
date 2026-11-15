@@ -88,11 +88,15 @@ class Section:
             st = steels[l.type.lower()]
             self.layers.append(Layer(l.name, l.z, l.area, max(l.num, 1.0), l.db, st,
                                      l.dep - l.thermal, _is_strand(l.bartitle)))
+        # steel ratio for the strain concentration at a crack: all the steel on the layer's
+        # side of the centroid over 0.8 of the gross area
+        above = sum(o.area for o in self.layers if o.z > self.zc) + \
+            0.5 * sum(o.area for o in self.layers if o.z == self.zc)
+        below = sum(o.area for o in self.layers if o.z < self.zc) + \
+            0.5 * sum(o.area for o in self.layers if o.z == self.zc)
         for l in self.layers:
-            # steel ratio for the strain concentration at a crack: the bars within 7.5 db of
-            # the layer over 0.8 of the gross area (fitted to Response: docs/kernel.md)
-            near = sum(o.area for o in self.layers if abs(o.z - l.z) <= 7.5 * l.db + 1e-9)
-            l.rho = near / (0.8 * self.area)
+            ra, rb = above / (0.8 * self.area), below / (0.8 * self.area)
+            l.rho = ra if l.z > self.zc else rb if l.z < self.zc else 0.5 * (ra + rb)
         self.stirrups: list[Stirrup] = []
         for t in inp.trans:
             if t.area <= 0 or t.space <= 0:

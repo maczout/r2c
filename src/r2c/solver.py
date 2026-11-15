@@ -73,7 +73,9 @@ class Analysis:
         self.shape_z = sec.tz.copy()
         self.shape = self._elastic_shape()
         self.max_layers = 220
-        self.ep = np.zeros(len(sec.layers))     # plastic strain of each layer
+        # plastic strain of each layer, from which it unloads elastically
+        self.ep0 = np.zeros(len(sec.layers))
+        self.ep = self.ep0.copy()
         self.dead = np.zeros(len(sec.layers), dtype=bool)   # ruptured at a crack
         self.last_ey = None
 
@@ -140,7 +142,7 @@ class Analysis:
         fs = np.empty(len(es))
         for i, (l, e) in enumerate(zip(sec.layers, es)):
             env = float(l.steel.raw(e))
-            if not math.isnan(env) and not l.steel.prestress:
+            if not math.isnan(env):
                 # a bar that has yielded unloads along its elastic stiffness
                 lin = (e - self.ep[i]) * l.steel.E
                 if env > 0:
@@ -161,7 +163,7 @@ class Analysis:
                                                    l.strand))
                 if math.isnan(cap):
                     self.dead[i] = True      # the bar has ruptured at a crack
-            if math.isnan(fs[i]) or l.steel.prestress:
+            if math.isnan(fs[i]):
                 continue
             ep = es[i] - fs[i] / l.steel.phi / l.steel.E
             if es[i] > 0:
@@ -761,7 +763,7 @@ class Flexure:
     def initial(self) -> Stage:
         """The state under the constant loads alone."""
         an = self.an
-        if an.n0 == 0.0 and an.m0 == 0.0:
+        if an.n0 == 0.0 and an.m0 == 0.0 and not any(l.prestrain for l in self.sec.layers):
             e0, phi = 0.0, 0.0
         else:
             x = np.zeros(2)
@@ -800,21 +802,35 @@ class Flexure:
     def _marks(self, st: Stage):
         d = st.detail
         cracked = bool(d.out.cracked.any())
-        crush = float(np.min(d.ex)) <= -self.sec.conc0.e0
-        return cracked, crush
+        i = int(np.argmin(d.ex))
+        crush = float(d.ex[i]) <= -self.sec.law_at(float(d.z[i])).e0
+        # layers that have ruptured, or would at a crack in this state
+        es, fs = self.an.steel(st.e0, st.phi)
+        gone = 0
+        for l, e, f in zip(self.sec.layers, es, fs):
+            if math.isnan(f):
+                gone += 1
+            elif e > 0 and math.isnan(float(l.steel.crack_capacity(
+                    e - l.prestrain, l.prestrain, l.rho, l.strand))):
+                gone += 1
+        return cracked, crush, gone
 
     def has_event(self, a: Stage, b: Stage) -> str:
-        """What happens between two states: '' (nothing), 'crack' or 'crush'."""
-        ca, ka = self._marks(a)
-        cb, kb = self._marks(b)
+        """What happens between two states: '' (nothing), 'crack', 'crush' or 'rupture'."""
+        ca, ka, ga = self._marks(a)
+        cb, kb, gb = self._marks(b)
         if cb and not ca:
             return "crack"
         if kb and not ka:
             return "crush"
+        if gb > ga:
+            return "rupture"
         return ""
 
     def accept(self, st: Stage):
-        self.an.commit(st.e0, st.phi)
+        if self.stages:
+            # Response starts to track unloading from the first stage after the initial one
+            self.an.commit(st.e0, st.phi)
         self.stages.append(st)
         if self.on_stage:
             self.on_stage(len(self.stages))
@@ -824,7 +840,21 @@ class Flexure:
         happens on the way (first cracking, the extreme fibre reaching its peak strain)."""
         trial = self.solve(target, cur)
         kind = self.has_event(cur, trial)
-        if depth < 2 and kind:
+        if kind == "rupture" and depth == 0:
+            # steel ruptures within the step: take a fifth of it, or a twenty-fifth, if that
+            # stops short of the rupture; otherwise the whole step, rupture included
+            step = target - cur.control
+            for frac in (0.2, 0.04):
+                try:
+                    sub = self.solve(cur.control + frac * step, cur)
+                except SolveError:
+                    continue
+                if self.has_event(cur, sub) != "rupture":
+                    self.accept(sub)
+                    return sub
+            self.accept(trial)
+            return trial
+        if depth < 2 and kind and kind != "rupture":
             for _ in range(14 if (depth == 0 or kind == "crack") else 3):
                 t1 = cur.control + 0.2 * (target - cur.control)
                 if kind == "crack" and abs(t1 - cur.control) < max(
@@ -853,6 +883,7 @@ class Flexure:
             cur = self.advance(cur, c0 + sgn * d0 / 6.0, 2)
             target = c0 + sgn * 7.0 * d0 / 6.0
             peak = 0.0
+            spent = 0
             while len(self.stages) < max_stages:
                 try:
                     cur = self.advance(cur, target, 0)
@@ -874,7 +905,7 @@ class Flexure:
                     target = cur.control
                 lam = cur.lam
                 peak = max(peak, lam)
-                if peak > 0 and lam <= 0.0:
+                if peak > 0 and lam <= 0.01 * peak:
                     self.stages.pop()        # the load has run out: not a load stage
                     break
                 if self.collapsed(cur, peak):
@@ -882,13 +913,22 @@ class Flexure:
                     break
                 if self.crushed(cur):
                     break
-                target = target + sgn * max(d0, 0.1 * abs(target))
+                if self.spent(cur, peak):
+                    spent += 1
+                    if spent >= 2:
+                        break
+                # the next step is sized by the target just tried, from the stage reached
+                target = cur.control + sgn * max(d0, 0.1 * abs(target))
         except SolveError:
             pass
         return self.stages[:max_stages]
 
     def collapsed(self, st: Stage, peak: float) -> bool:
         return False
+
+    def spent(self, st: Stage, peak: float) -> bool:
+        """Steel has ruptured and less than a fifth of the peak load is left."""
+        return bool(self.an.dead.any()) and peak > 0 and st.lam < 0.2 * peak
 
     def crushed(self, st: Stage) -> bool:
         """The response ends once the extreme fibre is strained to four times the strain at
@@ -905,7 +945,7 @@ class Flexure:
         out = [stages[0]]
         added = 0
         saved = self.an.ep.copy()
-        self.an.ep[:] = 0.0
+        self.an.ep[:] = self.an.ep0
         try:
             for i in range(1, len(stages)):
                 if i <= peak and added < room:

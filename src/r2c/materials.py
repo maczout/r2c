@@ -168,13 +168,25 @@ class SteelLaw:
         r = self.src
         self.E, self.fy, self.fu, self.esh, self.eu = r.E, r.fy, r.fu, r.esh, r.eu
         self.prestress = r.prestress
-        # past the strain at peak stress the curve carries on down until the bar ruptures
-        # (the factor is fitted to Response: docs/kernel.md)
-        self.rupture = r.eu if r.prestress else 1.47 * r.eu
-        if not self.prestress and self.eu > self.esh:
-            self.curv = (self.fy - self.fu) / (self.esh - self.eu) ** 2
-        else:
+        if self.prestress:
+            # Response derives the rest from the Ramberg-Osgood curve: the strength is no more
+            # than the curve gives at the rupture strain, and "yield" is 0.9 of the strength
+            with np.errstate(over="ignore"):
+                top = self.E * self.eu * (r.A + (1.0 - r.A) / (1.0 + (r.B * self.eu) ** r.C)
+                                          ** (1.0 / r.C))
+            self.fu = min(self.fu, float(top))
+            self.fy = 0.9 * self.fu
+            self.esh = self.fy / self.E
+            self.rupture = self.eu
             self.curv = 0.0
+        else:
+            self.esh = max(self.esh, self.fy / self.E)
+            self.eu = max(self.eu, self.esh + 1e-6)
+            self.fu = max(self.fu, self.fy)
+            # past the strain at peak stress the curve carries on down, until the bar ruptures
+            # at one and a half times the length of the hardening branch
+            self.rupture = self.esh + 1.5 * (self.eu - self.esh)
+            self.curv = (self.fy - self.fu) / (self.esh - self.eu) ** 2
 
     def raw(self, e):
         """Stress without the material factor; nan once the bar has ruptured."""
@@ -202,19 +214,20 @@ class SteelLaw:
         return self.raw(e) * self.phi
 
     def crack_capacity(self, e, prestrain, rho, strand: bool):
-        """Largest stress the bar can reach at a crack, for an average strain e (thesis 4-5):
-        the bare-bar stress at a concentrated strain, never less than yield."""
+        """Largest stress the steel can reach at a crack, for an average strain e (thesis 4-5):
+        the bare-bar stress at a concentrated strain, never less than yield. nan: the bar
+        ruptures at the crack."""
         e = np.asarray(e, dtype=float)
         base = 0.625 if strand else 1.0
         rho = np.asarray(rho, dtype=float)
         k = np.where(rho > 0, np.maximum(1.0, base * 0.014 / np.maximum(rho, 1e-12)), 2.0)
-        ec = k * e + prestrain + (self.esh - self.fy / self.E if not self.prestress else 0.0)
+        ec = k * e + prestrain + (self.esh - self.fy / self.E)
         s = self.raw(ec)
         avg = e + prestrain
-        inside = np.where(np.isnan(s), self.fu, np.maximum(s, self.fy))
-        # the concentrated strain is past the strain at peak stress: a bar that has yielded on
-        # average follows its curve down, and ruptures at the crack where the curve ends
+        gone = np.isnan(s)
+        inside = np.where(gone, self.fu, np.maximum(s, self.fy))
+        # the concentrated strain is past the strain at peak stress: steel that has yielded on
+        # average follows its curve down and ruptures at the crack where the curve ends
         beyond = np.where(avg >= self.fy / self.E, s, self.fu)
         cap = np.where(ec <= self.eu, inside, beyond)
-        gone = np.isnan(self.raw(avg))
-        return np.where(gone, NOVAL, cap * self.phi)
+        return np.where(np.isnan(self.raw(avg)), NOVAL, cap * self.phi)
