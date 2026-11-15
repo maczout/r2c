@@ -1,0 +1,22 @@
+# Response-2000 itself is never committed
+/[Rr]esponse/
+
+# results
+*.r2x.txt
+!tests/reference/**/*.r2x.txt
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+build/
+dist/
+.pytest_cache/
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
