@@ -23,4 +23,6 @@ r2c = "r2c.cli:main"
 packages = ["src/r2c"]
 
 [tool.pytest.ini_options]
+markers = ["slow: shear cases that take a minute or more (run with -m slow)"]
+addopts = "-m 'not slow'"
 testpaths = ["tests"]

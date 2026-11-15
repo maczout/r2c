@@ -3,3 +3,6 @@
 # Reference exports and inputs are compared byte for byte: git must not touch them.
 tests/reference/** -text
 *.r2t -text
+# Oracle records are r2x-raw files with CRLF line ends and byte counts: keep them byte for byte.
+tests/oracle/** -text
+*.r2x.txt -text

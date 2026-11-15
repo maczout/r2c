@@ -76,6 +76,7 @@ class Analysis:
         # plastic strain of each layer, from which it unloads elastically
         self.ep0 = np.zeros(len(sec.layers))
         self.ep = self.ep0.copy()
+        self.epy = np.zeros(len(sec.tz))        # plastic strain of the stirrups, by depth
         self.dead = np.zeros(len(sec.layers), dtype=bool)   # ruptured at a crack
         self.last_ey = None
 
@@ -153,6 +154,18 @@ class Analysis:
                     env = min(max(lin, env), l.steel.fy)
             fs[i] = float("nan") if self.dead[i] else env * l.steel.phi
         return es, fs
+
+    def commit_stirrups(self, det):
+        """Record the plastic strain of the stirrups over the depth at an accepted stage."""
+        sec = self.sec
+        if not sec.stirrups:
+            return
+        st = sec.stirrups[0].steel
+        z = np.asarray(det.z, dtype=float)
+        ep = np.asarray(det.ey, dtype=float) - np.asarray(det.fsy, dtype=float) / (st.E * st.phi)
+        ep = np.where((np.asarray(det.rhov) > 0) & (ep > 1e-9), ep, 0.0)
+        order = np.argsort(z)
+        self.epy = np.maximum(self.epy, np.interp(sec.tz, z[order], ep[order]))
 
     def commit(self, e0, phi):
         """Record the plastic strain of each bar at an accepted load stage."""
@@ -328,9 +341,10 @@ class Analysis:
                 out.append((st, rho, np.ones_like(zf)))
         return out
 
-    def stirrup_stress(self, sts, ey, rcrit):
+    def stirrup_stress(self, sts, ey, rcrit, epy=None):
         """(total average stress rho fsy, crack reserve f1cy, total ratio). rcrit is the steel
-        ratio that sets the strain concentration at a crack."""
+        ratio that sets the strain concentration at a crack; epy the plastic strain the
+        stirrups unload from."""
         tot = np.zeros_like(ey)
         yld = np.zeros_like(ey)
         capt = np.zeros_like(ey)
@@ -345,6 +359,10 @@ class Analysis:
             e = ey * fac + st.prestrain
             fs = st.steel.stress(e)
             fs = np.where(np.isnan(fs), 0.0, fs)
+            if epy is not None:
+                lin = (e - epy) * st.steel.E * st.steel.phi
+                fs = np.where((fs > 0) & (fs - lin > 1e-6),
+                              np.maximum(lin, -st.steel.fy * st.steel.phi), fs)
             cap = st.steel.crack_capacity(ey * fac, st.prestrain, rcrit, st.strand)
             cap = np.where(np.isnan(cap), fs, cap)
             tot += rho * fs
@@ -363,6 +381,7 @@ class Analysis:
         sec = self.sec
         sts = self.stirrups_at(zf)
         rcrit = sec.tab(sec.t_rhocrit, zf)
+        epy = np.interp(zf, sec.tz, self.epy)
         idx = self.law_index(zf, z)
         n = len(zf)
 
@@ -382,7 +401,7 @@ class Analysis:
                 eyl = eyf[sel].ravel()
                 subs = [(st, np.repeat(rho[sel], k), np.repeat(fac[sel], k))
                         for st, rho, fac in sts]
-                st_tot, st_res, _ = self.stirrup_stress(subs, eyl, rep(rcrit))
+                st_tot, st_res, _ = self.stirrup_stress(subs, eyl, rep(rcrit), rep(epy))
                 o = nodelib.evaluate(law, rep(ex), eyl, rep(g), rep(m), rep(ft), rep(smx),
                                      rep(smt), rep(cx), st_res)
                 tot[sel] = (o.fcy + st_tot).reshape(-1, k)
@@ -523,7 +542,8 @@ class Analysis:
         fsycr = np.zeros(len(sel))
         if self.shear and sec.stirrups:
             tot, _res, rho_t = self.stirrup_stress(self.stirrups_at(zz), ey,
-                                                   sec.tab(sec.t_rhocrit, zz))
+                                                   sec.tab(sec.t_rhocrit, zz),
+                                                   np.interp(zz, sec.tz, self.epy))
             has = rho_t > 0
             fsy[has] = tot[has] / rho_t[has]
             # at a crack the stirrups also carry what the concrete carries between cracks
@@ -609,6 +629,9 @@ class Analysis:
 # ---------------------------------------------------------------------------------------------
 # Solving a load stage and stepping through the response (no shear)
 # ---------------------------------------------------------------------------------------------
+JUMP_TOL = 1e-4
+
+
 def _root(f, x0, dx, tol, maxit=80):
     """A root of the scalar function f near x0. Secant steps first; if they find no change of
     sign, the neighbourhood of x0 is scanned outwards for one (the force of a cracking section
@@ -677,12 +700,17 @@ def _root(f, x0, dx, tol, maxit=80):
         else:
             hi, fhi = x, fx
         if abs(hi - lo) <= 1e-13 * max(abs(dx) * 1e6, abs(lo), abs(hi)):
-            return (lo, True) if abs(flo) < abs(fhi) else (hi, True)
-    return (lo, True) if abs(flo) < abs(fhi) else (hi, True)
+            break
+    # the bracket has closed on a jump: a root only if the jump is small
+    x, fx = (lo, flo) if abs(flo) < abs(fhi) else (hi, fhi)
+    return x, abs(fx) <= JUMP_TOL
 
 
 class Flexure:
     """Full response without shear: axial load and moment."""
+
+    # when no state is found at a target or short of it, Response ends the response
+    search_beyond = False
 
     def __init__(self, an: Analysis, on_stage=None):
         self.an = an
@@ -694,17 +722,18 @@ class Flexure:
         self.nscale = max(sec.conc0.fcp * sec.area, 1.0)
         self.mscale = self.nscale * sec.h
         an_m, an_n = an.dm != 0.0, an.dn != 0.0
-        if an_m:
-            self.mode = "phi"
-            base = 0.2e-3 / sec.h
-            if an.n0 != 0.0 or an_n:
-                base *= 0.5
-            self.step0 = base
-            self.sign = 1.0 if an.dm > 0 else -1.0
-        elif an_n:
+        if an_n:
+            # an axial load increment: Response steps the strain at the centroid
             self.mode = "e0"
             self.step0 = sec.conc0.e0 / 20.0
             self.sign = 1.0 if an.dn > 0 else -1.0
+        elif an_m:
+            self.mode = "phi"
+            base = 0.2e-3 / sec.h
+            if an.n0 != 0.0:
+                base *= 0.5
+            self.step0 = base
+            self.sign = 1.0 if an.dm > 0 else -1.0
         else:
             self.mode = "none"
             self.step0 = 0.0
@@ -727,7 +756,8 @@ class Flexure:
 
         def res(phi):
             n, m, _ = an.forces(e0, phi)
-            return (m - an.m0) / self.mscale
+            lam = (n - an.n0) / an.dn
+            return (m - an.m0 - lam * an.dm) / self.mscale
         x, ok = _root(res, guess, 1e-9, tol)
         return e0, x, ok
 
@@ -831,6 +861,8 @@ class Flexure:
         if self.stages:
             # Response starts to track unloading from the first stage after the initial one
             self.an.commit(st.e0, st.phi)
+            if st.gam != 0.0:
+                self.an.commit_stirrups(st.detail)
         self.stages.append(st)
         if self.on_stage:
             self.on_stage(len(self.stages))
@@ -900,6 +932,19 @@ class Flexure:
                             break
                         except SolveError:
                             continue
+                    if not done and self.search_beyond and (
+                            peak <= 0 or self.stages[-1].lam > 0.95 * peak):
+                        # no state short of the target either: while the load is still at
+                        # its highest, look for one beyond it
+                        t = target
+                        for _ in range(6):
+                            t = t + sgn * max(d0, 0.1 * abs(t))
+                            try:
+                                cur = self.advance(cur, t, 2)
+                                done = True
+                                break
+                            except SolveError:
+                                continue
                     if not done:
                         break
                     target = cur.control
@@ -945,7 +990,9 @@ class Flexure:
         out = [stages[0]]
         added = 0
         saved = self.an.ep.copy()
+        saved_y = self.an.epy.copy()
         self.an.ep[:] = self.an.ep0
+        self.an.epy[:] = 0.0
         try:
             for i in range(1, len(stages)):
                 if i <= peak and added < room:
@@ -959,5 +1006,6 @@ class Flexure:
                 out.append(stages[i])
         finally:
             self.an.ep[:] = saved
+            self.an.epy[:] = saved_y
         newpeak = out.index(stages[peak])
         return out, newpeak

@@ -62,20 +62,20 @@ def _nz(x: float) -> float:
 def control(key: str, stages: list[Stage], u: Units, gam_avg=None) -> bytes:
     ex = [s.e0 * 1e3 for s in stages]
     if key == "moment_ex":
-        return chart("Control : Moment - |e_x", "Axial Strain (mm/m)", f"Moment ({u.l_moment})",
+        return chart("Control : Moment - |e_x", f"Axial Strain ({u.l_strain})", f"Moment ({u.l_moment})",
                      [(0, [(x, _nz(s.m / u.moment)) for x, s in zip(ex, stages)])], 3)
     if key == "moment_phi":
         return chart("Control : Moment - |f", f"Curvature ({u.l_curv})", f"Moment ({u.l_moment})",
                      [(0, [(_nz(s.phi / u.curv), _nz(s.m / u.moment)) for s in stages])], 3)
     if key == "axial_ex":
-        return chart("Control : Axial Load - |e_x", "Axial Strain (mm/m)",
+        return chart("Control : Axial Load - |e_x", f"Axial Strain ({u.l_strain})",
                      f"Axial Load ({u.l_force})",
                      [(0, [(x, s.n / u.force) for x, s in zip(ex, stages)])], 3)
     if key == "shear_gxy":
-        return chart("Control : Shear - |g_x_y", "Shear Strain (mm/m)", f"Shear ({u.l_force})",
+        return chart("Control : Shear - |g_x_y", f"Shear Strain ({u.l_strain})", f"Shear ({u.l_force})",
                      [(0, [(g * 1e3, s.v / u.force) for g, s in zip(gam_avg, stages)])], 3)
     if key == "shear_ex":
-        return chart("Control : Shear - |e_x", "Axial Strain (mm/m)", f"Shear ({u.l_force})",
+        return chart("Control : Shear - |e_x", f"Axial Strain ({u.l_strain})", f"Shear ({u.l_force})",
                      [(0, [(x, s.v / u.force) for x, s in zip(ex, stages)])], 3)
     raise KeyError(key)
 
@@ -145,38 +145,43 @@ class Views:
         for key in keys:
             if key == "longitudinal_strain":
                 r = [(0.0, ytop)] + rows(d.ex * 1e3) + [(0.0, ybot)]
-                made[key] = chart("Longitudinal Strain", "|e_x Strain (mm/m)", depth, [(0, r)], 4)
+                made[key] = chart("Longitudinal Strain", f"|e_x Strain ({u.l_strain})", depth, [(0, r)], 4)
             elif key == "transverse_strain":
                 hi, lo = self.env_t.at(d.z, d.ey)
-                made[key] = chart("Transverse Strain", "|e_t Strain (mm/m)", depth,
+                made[key] = chart("Transverse Strain", f"|e_t Strain ({u.l_strain})", depth,
                                   [(4, rows(hi * 1e3)), (None, rows(lo * 1e3)),
                                    (0, rows(d.ey * 1e3))], 3)
             elif key == "shear_strain":
                 hi, lo = self.env_g.at(d.z, d.gxy)
-                made[key] = chart("Shear Strain", "|g_x_y Strain (mm/m)", depth,
+                made[key] = chart("Shear Strain", f"|g_x_y Strain ({u.l_strain})", depth,
                                   [(4, rows(hi * 1e3)), (4, rows(lo * 1e3)),
                                    (0, rows(d.gxy * 1e3))], 4)
             elif key == "shear_stress":
-                calc = d.vcalc if d.vcalc is not None else o.v
-                made[key] = chart("Shear Stress", f"Shear Stress ({u.l_conc})", depth,
-                                  [(0, rows(o.v / cs)), (2, rows(calc / cs))], 4)
+                lines = [(0, rows(o.v / cs))]
+                if d.vcalc is not None:
+                    lines.append((2, rows(d.vcalc / cs)))     # from longitudinal equilibrium
+                made[key] = chart("Shear Stress", f"Shear Stress ({u.l_conc})", depth, lines, 4)
             elif key == "principal_compressive_stress":
                 made[key] = chart("Principal Compressive Stress", f"f_2 Stress ({u.l_conc})",
                                   depth, [(0, rows(o.f2 / cs)), (1, rows(o.f2max / cs))], 3)
             elif key == "shear_on_crack":
+                lines = [(0, rows(np.abs(o.vci) / cs))]
+                if d.vcalc is not None:
+                    # with shear Response adds the limit, on both sides of zero
+                    lines += [(1, rows(o.vcimax / cs)), (1, rows(-o.vcimax / cs))]
                 made[key] = chart("Shear on Crack", f"|n_c_i shear ({u.l_conc})", depth,
-                                  [(0, rows(np.abs(o.vci) / cs)), (1, rows(o.vcimax / cs))], 4)
+                                  lines, 4)
             elif key == "principal_tensile_stress":
                 made[key] = chart("Principal Tensile Stress", f"f_1 Stress ({u.l_conc})", depth,
                                   [(0, rows(o.f1 / cs)), (1, rows(o.f1lim / cs))], 4)
             elif key == "principal_tensile_strain":
-                made[key] = chart("Principal Tensile Strain", "|e_1 Strain (mm/m)", depth,
+                made[key] = chart("Principal Tensile Strain", f"|e_1 Strain ({u.l_strain})", depth,
                                   [(0, rows(o.e1 * 1e3))], 3)
             elif key == "crack_widths":
                 made[key] = chart("Crack Widths", f"Crack Width ({u.l_len})", depth,
                                   [(0, rows(o.w / ln))], 4)
             elif key == "average_angle":
-                made[key] = chart("Average Angle", "|q Angle (deg.)", depth,
+                made[key] = chart("Average Angle", f"|q Angle ({u.l_deg})", depth,
                                   [(0, rows(np.degrees(o.theta)))], 3)
             elif key == "long_crack_spacing":
                 made[key] = chart("Long. Crack Spacing", f"Spacing ({u.l_len})", depth,
@@ -191,7 +196,7 @@ class Views:
                 made[key] = chart("Long. Reinforcement Stress", f"Stress ({u.l_steel})", depth,
                                   [(0, steps(d.fs / ss))], 3)
             elif key == "long_reinf_stress_at_crack":
-                made[key] = chart("Long. Reinf Stress at Crack", f"f_s_c_r_a_c_k ({u.l_steel})",
+                made[key] = chart("Long. Reinf Stress at Crack", f"f_s_c_r_a_c_k ({u.l_crack_steel})",
                                   depth, [(0, steps(d.fscr / ss))], 3)
             elif key == "long_average_bond":
                 bond = getattr(d, "bond", None)
@@ -214,7 +219,7 @@ class Views:
             elif key == "shrinkage_thermal_strain":
                 yy = np.linspace(ybot, ytop, 101)
                 r = [(0.0, ybot)] + [(0.0, v) for v in yy] + [(0.0, ytop)]
-                made[key] = chart("Shrinkage & Thermal Strain", "strain (mm/m)", depth,
+                made[key] = chart("Shrinkage & Thermal Strain", f"strain ({u.l_strain})", depth,
                                   [(0, r), (4, steps(np.zeros(len(sec.layers))))], 3)
             elif key == "longitudinal_concrete_stress":
                 made[key] = chart("Longitudinal Concrete Stress", f"Stress ({u.l_conc})", depth,

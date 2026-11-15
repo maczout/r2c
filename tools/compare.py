@@ -9,12 +9,14 @@ the two programs are interchangeable on both sides of the comparison.
 What is compared:
 
 * the number of load stages and the stage shown as the peak;
-* every control chart: the peak load, the control value there, and the largest difference in
-  load along the rising part of the curve (the subject interpolated at the reference's control
-  values, as a percentage of the reference's peak load);
+* every control chart: the peak load, the control value there, and how far the reference's
+  rising branch lies from the subject's curve (the largest and the mean distance of its points
+  from the subject's polyline, with the load scaled by the reference's peak load and the control
+  value by its largest value on that branch, as a percentage);
 * with --views, every detail view at the peak: the subject's stage nearest the reference's peak
-  in control value, values interpolated over the depth, largest difference as a percentage of
-  the reference chart's largest value.
+  in control value; for each chart the largest distance of the reference's points from the
+  subject's curve, as a percentage of the chart's largest value (depth scaled by the section
+  depth).
 
 No pass or fail is decided here: the numbers are for an engineer to judge.
 """
@@ -66,14 +68,33 @@ def _curve(rec, key):
     return parse_chart(rec.control(key))[3][0]
 
 
+def curve_distance(a, b, xs, ys):
+    """How far each point of curve a lies from curve b (a polyline), with x scaled by xs and y
+    by ys: the largest and the mean distance. Works for curves that double back or jump."""
+    if len(a) == 0 or len(b) == 0:
+        return float("nan"), float("nan")
+    pa = np.column_stack([a[:, 0] / xs, a[:, 1] / ys])
+    pb = np.column_stack([b[:, 0] / xs, b[:, 1] / ys])
+    if len(pb) == 1:
+        d = np.hypot(*(pa - pb[0]).T)
+        return float(d.max()), float(d.mean())
+    p0, p1 = pb[:-1], pb[1:]
+    seg = p1 - p0
+    len2 = np.maximum(np.sum(seg * seg, axis=1), 1e-30)
+    best = np.full(len(pa), np.inf)
+    for i in range(len(p0)):
+        t = np.clip(((pa - p0[i]) @ seg[i]) / len2[i], 0.0, 1.0)
+        d = np.hypot(*(pa - (p0[i] + t[:, None] * seg[i])).T)
+        best = np.minimum(best, d)
+    return float(best.max()), float(best.mean())
+
+
 def _rising(c):
-    """The curve up to its largest load, ordered by the size of the control value."""
+    """The curve up to its largest load."""
     if len(c) == 0:
         return c, 0
     ip = int(np.argmax(np.abs(c[:, 1])))
-    part = c[: ip + 1]
-    order = np.argsort(np.abs(part[:, 0]), kind="stable")
-    return part[order], ip
+    return c[: ip + 1], ip
 
 
 def compare_control(ref, sub, key):
@@ -87,16 +108,12 @@ def compare_control(ref, sub, key):
     }
     pk = abs(a[ia, 1])
     out["peak_diff_pct"] = float(100.0 * (abs(b[ib, 1]) - pk) / pk) if pk > 0 else 0.0
-    if len(ra) > 1 and len(rb) > 1 and pk > 0:
-        xa, xb = np.abs(ra[:, 0]), np.abs(rb[:, 0])
-        inside = xa <= xb[-1] * (1 + 1e-9)
-        if inside.any():
-            yb = np.interp(xa[inside], xb, rb[:, 1])
-            d = np.abs(yb - ra[inside, 1]) / pk * 100.0
-            out["curve_max_diff_pct"] = float(d.max())
-            out["curve_mean_diff_pct"] = float(d.mean())
-            out["curve_points"] = int(inside.sum())
-            out["curve_covered_pct"] = float(100.0 * inside.sum() / len(xa))
+    xs = float(np.max(np.abs(ra[:, 0]))) if len(ra) else 0.0
+    if len(ra) > 1 and len(rb) > 1 and pk > 0 and xs > 0:
+        # the reference's rising branch against the subject's whole curve
+        dmax, dmean = curve_distance(ra, b, xs, pk)
+        out["curve_max_diff_pct"] = 100.0 * dmax
+        out["curve_mean_diff_pct"] = 100.0 * dmean
     return out
 
 
@@ -125,20 +142,19 @@ def compare_views(ref, sub, ref_stage, sub_stage):
         lb = parse_chart(sb)[3]
         worst = 0.0
         scale = 0.0
+        span = 0.0
+        for a in la:
+            if len(a):
+                scale = max(scale, float(np.max(np.abs(a[:, 0]))))
+                span = max(span, float(np.ptp(a[:, 1])))
         for i, a in enumerate(la):
-            if len(a) == 0:
+            if len(a) == 0 or scale <= 1e-9:
                 continue
-            scale = max(scale, float(np.max(np.abs(a[:, 0]))))
             if i >= len(lb) or len(lb[i]) == 0:
                 worst = max(worst, float(np.max(np.abs(a[:, 0]))))
                 continue
-            b = lb[i]
-            if a.shape == b.shape and np.allclose(a[:, 1], b[:, 1], atol=0.51):
-                d = np.abs(a[:, 0] - b[:, 0])
-            else:
-                order = np.argsort(b[:, 1], kind="stable")
-                d = np.abs(np.interp(a[:, 1], b[order, 1], b[order, 0]) - a[:, 0])
-            worst = max(worst, float(d.max()))
+            dmax, _ = curve_distance(a, lb[i], scale, max(span, 1e-9))
+            worst = max(worst, dmax * scale)
         rows.append({"view": key, "ref_max": scale, "max_diff": worst,
                      "max_diff_pct": float(100.0 * worst / scale) if scale > 1e-9 else 0.0,
                      "lines": [len(la), len(lb)]})
@@ -176,14 +192,14 @@ def render(res) -> str:
         f"subject {s['stage-count']} (peak at {s['peak-stage']})",
         "",
         f"{'control chart':<14}{'ref peak':>11}{'sub peak':>11}{'diff %':>8}"
-        f"{'ref x':>10}{'sub x':>10}{'curve max %':>13}{'mean %':>8}{'covered %':>11}",
+        f"{'ref x':>10}{'sub x':>10}{'curve max %':>13}{'mean %':>8}",
     ]
     for c in res["control"]:
         lines.append(
             f"{c['chart']:<14}{c['ref_peak_load']:>11.2f}{c['sub_peak_load']:>11.2f}"
             f"{c['peak_diff_pct']:>8.2f}{c['ref_peak_x']:>10.3f}{c['sub_peak_x']:>10.3f}"
             + (f"{c['curve_max_diff_pct']:>13.2f}{c['curve_mean_diff_pct']:>8.2f}"
-               f"{c['curve_covered_pct']:>11.0f}" if "curve_max_diff_pct" in c else ""))
+               if "curve_max_diff_pct" in c else ""))
     for k in res["missing_control"]:
         lines.append(f"{k:<14} missing from the subject")
     if "views" in res:

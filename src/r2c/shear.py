@@ -21,14 +21,22 @@ from r2c.solver import Analysis, Flexure, SolveError, Stage, _root
 
 
 class Shear(Flexure):
+    # with shear, r2c's profile iteration fails at some states where Response's does not:
+    # look beyond such a state before ending the response (docs/verification.md)
+    search_beyond = True
+
     def __init__(self, an: Analysis, on_stage=None):
         super().__init__(an, on_stage)
         sec = an.sec
         self.vscale = max(0.2 * math.sqrt(sec.conc0.fcp) * sec.area, 1.0)
-        if an.dm != 0.0:
+        if an.dn != 0.0:
+            self.mode = "e0"
+            self.step0 = sec.conc0.e0 / 20.0
+            self.sign = 1.0 if an.dn > 0 else -1.0
+        elif an.dm != 0.0:
             self.mode = "phi"
             base = 0.08e-3 / sec.h
-            if an.n0 != 0.0 or an.dn != 0.0:
+            if an.n0 != 0.0:
                 base *= 0.5
             self.step0 = base
             self.sign = 1.0 if an.dm > 0 else -1.0
@@ -38,7 +46,7 @@ class Shear(Flexure):
             self.sign = 1.0
         self.profile_tol = 0.01
         self.evals = 0
-        self.budget = 1500
+        self.budget = 600
         self.ratio = 1.2        # reported (force-weighted) shear strain over the plain mean
 
     # -- tangent stiffness and the shear flow ---------------------------------------------------
@@ -57,12 +65,13 @@ class Shear(Flexure):
         idx = an.law_index(zf, z)
         sts = an.stirrups_at(zf)
         rcrit = sec.tab(sec.t_rhocrit, zf)
+        epy = np.interp(zf, sec.tz, an.epy)
 
         def fixed(exv, eyv, gv):
             fx = np.empty(len(zf))
             fy = np.empty(len(zf))
             vv = np.empty(len(zf))
-            tot, res, _ = an.stirrup_stress(sts, eyv, rcrit)
+            tot, res, _ = an.stirrup_stress(sts, eyv, rcrit, epy)
             for j, law in enumerate(sec.laws):
                 k = idx == j
                 if not k.any():
@@ -168,6 +177,14 @@ class Shear(Flexure):
         use_sec = (sec_g > 1e-4 * gc) & (np.abs(vstate) > 1e-6)
         stiff = np.where(use_sec, sec_g, np.maximum(nn, 1e-4 * gc))
         gnew = tau / stiff
+        # keep the step of each node bounded: the same sign as the shear, and no more than
+        # doubled or halved where the node already has a shear strain
+        sgn = 1.0 if float(np.sum(vstate)) >= 0 else -1.0
+        gnew = np.maximum(gnew * sgn, 0.0)
+        gold = g * sgn
+        big = gold > 0.02 * max(float(np.max(gold)), 1e-12)
+        gnew = np.where(big, np.clip(gnew, 0.5 * gold, 2.0 * gold),
+                        np.minimum(gnew, 2.0 * max(float(np.max(gold)), 1e-12))) * sgn
         gnew[0, 0] = 0.0
         gnew[-1, 2] = 0.0
         # how far the calculated stresses are from those of the state: the shear force that
@@ -196,24 +213,32 @@ class Shear(Flexure):
         an = self.an
         if self.mode == "phi":
             e0, gam, phi = x[0], x[1], c
+        elif self.mode == "e0":
+            phi, gam, e0 = x[0], x[1], c
         else:
             e0, phi, gam = x[0], x[1], c / self.ratio
         self.evals += 1
         if self.evals > self.budget:
             raise SolveError("no equilibrium found within the iteration limit")
         n, m, v = an.forces(e0, phi, gam)
+        rn = lambda lam: (n - an.n0 - lam * an.dn) / self.nscale
+        rm = lambda lam: (m - an.m0 - lam * an.dm) / self.mscale
+        rv = lambda lam: (v - an.v0 - lam * an.dv) / self.vscale
         if self.mode == "phi":
             lam = (m - an.m0) / an.dm
-            r = np.array([(n - an.n0 - lam * an.dn) / self.nscale,
-                          (v - an.v0 - lam * an.dv) / self.vscale])
+            r = np.array([rn(lam), rv(lam)])
+        elif self.mode == "e0":
+            lam = (n - an.n0) / an.dn
+            r = np.array([rm(lam), rv(lam)])
         else:
             lam = (v - an.v0) / an.dv
-            r = np.array([(n - an.n0 - lam * an.dn) / self.nscale,
-                          (m - an.m0 - lam * an.dm) / self.mscale])
+            r = np.array([rn(lam), rm(lam)])
         return r, (e0, phi, gam, lam, n, m, v)
 
     def _newton(self, c, x0):
-        sc = np.array([1e-6, 1e-6 if self.mode == "phi" else 1e-6 / self.sec.h])
+        h = self.sec.h
+        sc = {"phi": np.array([1e-6, 1e-6]), "e0": np.array([1e-6 / h, 1e-6]),
+              "gam": np.array([1e-6, 1e-6 / h])}[self.mode]
         x = np.array(x0, dtype=float)
         r, info = self._residual(c, x)
         best = (float(np.max(np.abs(r))), x.copy(), info)
@@ -263,14 +288,15 @@ class Shear(Flexure):
                 state["info"] = info
                 state["r"] = r
                 return float(r[0])
-            e0, ok = _root(inner, state["inner"], 1e-6, 1e-7)
+            e0, ok = _root(inner, state["inner"],
+                           1e-6 / self.sec.h if self.mode == "e0" else 1e-6, 1e-7)
             if ok:
                 state["inner"] = e0
             r, info = self._residual(c, np.array([state["inner"], x1]))
             state["info"] = info
             state["r"] = r
             return float(r[1])
-        dx = 2e-6 if self.mode == "phi" else 2e-6 / self.sec.h
+        dx = 2e-6 / self.sec.h if self.mode == "gam" else 2e-6
         x1, ok = _root(outer, float(x0[1]), dx, 1e-6)
         r1 = outer(x1)
         r = state["r"]
@@ -294,6 +320,8 @@ class Shear(Flexure):
             x = [0.0, 0.0]
         elif self.mode == "phi":
             x = [prev.e0, prev.gam]
+        elif self.mode == "e0":
+            x = [prev.phi, prev.gam]
         else:
             x = [prev.e0, prev.phi]
         an.coarsen()
@@ -317,11 +345,12 @@ class Shear(Flexure):
             if outer < 3 and an.refine(e0, phi, gam):
                 continue
             z, vstate, tau, t, _d = self.shear_flow(e0, phi, gam, v)
-            err, mean = self.update_shape(z, vstate, tau, t, relax=1.0 if outer == 0 else (0.6 if outer < 10 else 0.3))
+            prev_shape = an.shape.copy()
+            err, mean = self.update_shape(z, vstate, tau, t, relax=self.relax(outer))
             if getattr(self, "debug", False):
                 print(f"   outer {outer}: profile err={err:.4f} mean={mean}")
             if best is None or err < best[0]:
-                best = (err, info, an.shape.copy(), tau.copy(), z.copy())
+                best = (err, info, prev_shape, tau.copy(), np.array(x, dtype=float))
             if self.mode == "gam":
                 # keep the reported shear strain at the control value
                 zz_, b_ = t["z"].ravel(), t["b"].ravel()
@@ -337,8 +366,14 @@ class Shear(Flexure):
                         self.ratio = new_ratio
             if err < self.profile_tol:
                 break
-            if mean is not None and self.mode == "phi" and abs(gam) < 1e-12:
+            if mean is not None and self.mode != "gam" and abs(gam) < 1e-12:
                 x = [x[0], mean]
+        if ok and best is not None and err > self.profile_tol and best[0] < err:
+            # not converged: take the closest iterate
+            err, an.shape = best[0], best[2].copy()
+            x, info, ok = self._newton(c, best[4])
+            if not ok:
+                x, info, ok = self._nested(c, best[4])
         if not ok or info is None or err > 0.05:
             an.shape = saved_shape
             self.ratio = saved_ratio
@@ -379,6 +414,9 @@ class Shear(Flexure):
         st.gam_avg = float(num / den) if abs(den) > 1e-9 else 0.0
         st.perr = err
         return st
+
+    def relax(self, outer: int) -> float:
+        return 1.0 if outer == 0 else 0.5
 
     def collapsed(self, st: Stage, peak: float) -> bool:
         """After a shear failure the load falls away: the response ends once less than half of
