@@ -3,7 +3,7 @@
 
 # results
 *.r2x.txt
-!tests/reference/**/*.r2x.txt
+!tests/oracle/*.r2x.txt
 
 # Python
 __pycache__/
