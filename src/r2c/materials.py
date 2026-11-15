@@ -168,7 +168,9 @@ class SteelLaw:
         r = self.src
         self.E, self.fy, self.fu, self.esh, self.eu = r.E, r.fy, r.fu, r.esh, r.eu
         self.prestress = r.prestress
-        self.rupture = r.eu
+        # past the strain at peak stress the curve carries on down until the bar ruptures
+        # (the factor is fitted to Response: docs/kernel.md)
+        self.rupture = r.eu if r.prestress else 1.47 * r.eu
         if not self.prestress and self.eu > self.esh:
             self.curv = (self.fy - self.fu) / (self.esh - self.eu) ** 2
         else:
@@ -204,14 +206,15 @@ class SteelLaw:
         the bare-bar stress at a concentrated strain, never less than yield."""
         e = np.asarray(e, dtype=float)
         base = 0.625 if strand else 1.0
-        k = 2.0 if rho <= 0 else max(1.0, base * 0.014 / rho)
+        rho = np.asarray(rho, dtype=float)
+        k = np.where(rho > 0, np.maximum(1.0, base * 0.014 / np.maximum(rho, 1e-12)), 2.0)
         ec = k * e + prestrain + (self.esh - self.fy / self.E if not self.prestress else 0.0)
         s = self.raw(ec)
         avg = e + prestrain
         inside = np.where(np.isnan(s), self.fu, np.maximum(s, self.fy))
-        # the concentrated strain is past the strain at peak stress: once the bar has yielded
-        # on average it has no reserve left at a crack
-        beyond = np.where(avg >= self.fy / self.E, NOVAL, self.fu)
+        # the concentrated strain is past the strain at peak stress: a bar that has yielded on
+        # average follows its curve down, and ruptures at the crack where the curve ends
+        beyond = np.where(avg >= self.fy / self.E, s, self.fu)
         cap = np.where(ec <= self.eu, inside, beyond)
         gone = np.isnan(self.raw(avg))
         return np.where(gone, NOVAL, cap * self.phi)

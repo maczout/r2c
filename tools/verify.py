@@ -1,0 +1,129 @@
+#!/usr/bin/env python3
+"""Run r2c on every case of a set of reference records and compare.
+
+    python tools/verify.py REFERENCE_DIR --inputs DIR [--out DIR] [--only NAME ...] [--jobs N]
+
+REFERENCE_DIR holds r2x-raw records (NAME.r2x.txt), normally captured from Response-2000 with
+r2x. Each record's header says how it was made (input, units, factors, loads, More Detail);
+r2c is run the same way and the two records are compared with tools/compare.py.
+
+--inputs is where the input files named in the headers are found (for example Response's own
+folder, for its sample files). "File > New" and Newbeam's input.r2t need no file: r2c has that
+section built in.
+
+Results: OUT/NAME.r2x.txt (r2c's record), OUT/NAME.json (the comparison) and OUT/summary.md.
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+import sys
+import time
+from concurrent.futures import ProcessPoolExecutor
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+from r2c import record, run, stages  # noqa: E402
+import compare as cmp  # noqa: E402
+
+BUILT_IN = {"file > new", "input.r2t", "newbeam.r2t"}
+
+
+def options(header: dict) -> dict:
+    fac = [float(x) for x in header["factors"].split(",")]
+    return dict(
+        units=header["units"],
+        factors="none" if fac == [1.0, 1.0, 1.0] else "csa",
+        initial=tuple(float(x) for x in header["initial"].split(",")),
+        increment=tuple(float(x) for x in header["increment"].split(",")),
+        more_detail=int(header.get("more-detail", "0") or 0),
+    )
+
+
+def one(args):
+    ref_path, inputs, out = args
+    name = Path(ref_path).name[: -len(".r2x.txt")]
+    ref = record.read(ref_path)
+    opt = options(ref.header)
+    src = ref.header["input-name"]
+    path = None
+    if src.lower() not in BUILT_IN:
+        path = Path(inputs) / src if inputs else None
+        if path is None or not path.exists():
+            return name, {"skipped": f"input {src} not found"}
+    t = time.time()
+    try:
+        res = run.solve(path, **opt)
+    except Exception as e:  # noqa: BLE001 - reported, not hidden
+        return name, {"failed": f"{type(e).__name__}: {e}"}
+    took = time.time() - t
+    data = res.record_bytes(stages.ALL)
+    out = Path(out)
+    (out / f"{name}.r2x.txt").write_bytes(data)
+    result = cmp.compare(ref, record.decode(data), views=True)
+    result["seconds"] = round(took, 1)
+    (out / f"{name}.json").write_text(json.dumps(result, indent=1))
+    return name, result
+
+
+def summary(results: dict) -> str:
+    rows = ["| case | input | loads (initial; increment) | stages ref / r2c | chart | peak ref | "
+            "peak r2c | diff % | curve max % | time s |",
+            "|---|---|---|---|---|---:|---:|---:|---:|---:|"]
+    for name in sorted(results):
+        r = results[name]
+        if "skipped" in r or "failed" in r:
+            rows.append(f"| {name} | | {r.get('skipped') or r.get('failed')} | | | | | | | |")
+            continue
+        h = r["ref"]
+        extra = ""
+        if h["units"] != "si":
+            extra += f" {h['units']}"
+        if h["factors"] != "1.00,1.00,1.00":
+            extra += " csa"
+        if h["more-detail"] not in (None, "0"):
+            extra += f" more-detail {h['more-detail']}"
+        for i, c in enumerate(r["control"]):
+            lead = (f"| {name} | {h['input-name']}{extra} | {h['initial']}; {h['increment']} | "
+                    f"{h['stage-count']} / {r['sub']['stage-count']} |") if i == 0 else "| | | | |"
+            cm = f"{c['curve_max_diff_pct']:.2f}" if "curve_max_diff_pct" in c else ""
+            rows.append(f"{lead} {c['chart']} | {c['ref_peak_load']:.1f} | "
+                        f"{c['sub_peak_load']:.1f} | {c['peak_diff_pct']:+.2f} | {cm} | "
+                        f"{r['seconds'] if i == 0 else ''} |")
+    return "\n".join(rows) + "\n"
+
+
+def main(argv=None) -> int:
+    ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
+    ap.add_argument("reference_dir")
+    ap.add_argument("--inputs", help="folder with the input files named in the records")
+    ap.add_argument("--out", default="verify-out")
+    ap.add_argument("--only", nargs="*", help="case names to run (default: all)")
+    ap.add_argument("--jobs", type=int, default=1)
+    a = ap.parse_args(argv)
+    out = Path(a.out)
+    out.mkdir(parents=True, exist_ok=True)
+    refs = sorted(Path(a.reference_dir).glob("*.r2x.txt"))
+    if a.only:
+        refs = [p for p in refs if p.name[: -len(".r2x.txt")] in a.only]
+    work = [(str(p), a.inputs, str(out)) for p in refs]
+    results = {}
+    old = out / "results.json"
+    if old.exists():
+        results = json.loads(old.read_text())
+    with ProcessPoolExecutor(max_workers=a.jobs) as ex:
+        for name, res in ex.map(one, work):
+            results[name] = res
+            state = res.get("skipped") or res.get("failed") or f"{res['seconds']} s"
+            print(f"{name}: {state}", flush=True)
+            old.write_text(json.dumps(results, indent=1))
+    (out / "summary.md").write_text(summary(results))
+    print(f"wrote {out / 'summary.md'}")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

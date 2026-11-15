@@ -74,6 +74,8 @@ class Analysis:
         self.shape = self._elastic_shape()
         self.max_layers = 220
         self.ep = np.zeros(len(sec.layers))     # plastic strain of each layer
+        self.dead = np.zeros(len(sec.layers), dtype=bool)   # ruptured at a crack
+        self.last_ey = None
 
     # -- layers ---------------------------------------------------------------------------------
     def _initial_bounds(self) -> np.ndarray:
@@ -147,13 +149,18 @@ class Analysis:
                     env = max(env, -l.steel.fy)
                 elif env < 0:
                     env = min(max(lin, env), l.steel.fy)
-            fs[i] = env * l.steel.phi
+            fs[i] = float("nan") if self.dead[i] else env * l.steel.phi
         return es, fs
 
     def commit(self, e0, phi):
         """Record the plastic strain of each bar at an accepted load stage."""
         es, fs = self.steel(e0, phi)
         for i, l in enumerate(self.sec.layers):
+            if not math.isnan(fs[i]) and es[i] > 0:
+                cap = float(l.steel.crack_capacity(es[i] - l.prestrain, l.prestrain, l.rho,
+                                                   l.strand))
+                if math.isnan(cap):
+                    self.dead[i] = True      # the bar has ruptured at a crack
             if math.isnan(fs[i]) or l.steel.prestress:
                 continue
             ep = es[i] - fs[i] / l.steel.phi / l.steel.E
@@ -263,22 +270,16 @@ class Analysis:
         smt = sec.tab(sec.t_smt, zf)
         cx = f1cx(zf)
         g = gam * np.interp(zf, self.shape_z, self.shape) if gam != 0.0 else np.zeros_like(zf)
+        if self.shear and ey is None:
+            out, eyv = self.transverse(zf, z, ex, g, m, ft, smx, smt, cx)
+            return out, ex, g, smx, smt, eyv
         eyv = np.zeros_like(zf) if ey is None else ey.ravel()
         cy = np.zeros_like(zf)
         if len(sec.laws) == 1:
             out = nodelib.evaluate(sec.laws[0], ex, eyv, g, m, ft, smx, smt, cx, cy)
         else:
-            outs = None
-            # a node on the boundary of two concretes belongs to the layer it was made for:
-            # nudge towards the layer's middle
-            zmid = np.repeat(z.reshape(-1, z.shape[-1])[:, z.shape[-1] // 2], z.shape[-1]) \
-                if z.ndim == 2 else zf
-            zl = zf + 1e-6 * np.sign(zmid - zf)
-            idx = np.zeros(len(zf), dtype=int)
-            for j, law in enumerate(sec.laws):
-                for z1, z2, _, _, lw in sec.segs:
-                    if lw is law:
-                        idx[(zl <= z1) & (zl >= z2)] = j
+            # a node on the boundary of two concretes belongs to the layer it was made for
+            idx = self.law_index(zf, z)
             fields = {}
             for j, law in enumerate(sec.laws):
                 k = idx == j
@@ -289,7 +290,142 @@ class Analysis:
                 for name, val in o.__dict__.items():
                     fields.setdefault(name, np.zeros(len(zf), dtype=val.dtype))[k] = val
             out = nodelib.NodeOut(**fields)
-        return out, ex, g, smx, smt
+        return out, ex, g, smx, smt, eyv
+
+    # -- transverse equilibrium (shear) ---------------------------------------------------------
+    def law_index(self, zf, z):
+        sec = self.sec
+        if len(sec.laws) == 1:
+            return np.zeros(len(zf), dtype=int)
+        zmid = np.repeat(z.reshape(-1, z.shape[-1])[:, z.shape[-1] // 2], z.shape[-1]) \
+            if z.ndim == 2 else zf
+        zl = zf + 1e-6 * np.sign(zmid - zf)
+        idx = np.zeros(len(zf), dtype=int)
+        for j, law in enumerate(sec.laws):
+            for z1, z2, _, _, lw in sec.segs:
+                if lw is law:
+                    idx[(zl <= z1) & (zl >= z2)] = j
+        return idx
+
+    def stirrups_at(self, zf):
+        """For every stirrup type: (ratio by node, strain factor, force factor)."""
+        sec = self.sec
+        bw = np.maximum(sec.width(zf), 1e-6)
+        out = []
+        for st in sec.stirrups:
+            inside = (zf >= st.bot - 1e-9) & (zf <= st.top + 1e-9)
+            rho = np.where(inside, st.area / (bw * st.space), 0.0)
+            if st.pattern == 4:
+                # a hoop: only the part of it across the shear works (thesis 7-6)
+                r = 0.5 * (st.top - st.bot)
+                d = zf - 0.5 * (st.top + st.bot)
+                sin2 = np.clip(1.0 - d * d / (r * r + 1e-4), 0.0, 1.0)
+                sin2 = np.where(sin2 <= 0.0, 1.0, sin2)
+                out.append((st, rho * np.sqrt(sin2), sin2))
+            else:
+                out.append((st, rho, np.ones_like(zf)))
+        return out
+
+    def stirrup_stress(self, sts, ey, rcrit):
+        """(total average stress rho fsy, crack reserve f1cy, total ratio). rcrit is the steel
+        ratio that sets the strain concentration at a crack."""
+        tot = np.zeros_like(ey)
+        yld = np.zeros_like(ey)
+        capt = np.zeros_like(ey)
+        rho_t = np.zeros_like(ey)
+        a_n = np.zeros_like(ey)
+        a_s = np.zeros_like(ey)
+        sec = self.sec
+        for st, rho, fac in sts:
+            if not rho.any():
+                continue
+            inside = rho > 0
+            e = ey * fac + st.prestrain
+            fs = st.steel.stress(e)
+            fs = np.where(np.isnan(fs), 0.0, fs)
+            cap = st.steel.crack_capacity(ey * fac, st.prestrain, rcrit, st.strand)
+            cap = np.where(np.isnan(cap), fs, cap)
+            tot += rho * fs
+            yld += rho * st.steel.fy * st.steel.phi
+            capt += rho * cap
+            rho_t += rho
+            a_n += np.where(inside, st.area / len(sec.stirrups), 0.0)
+            a_s += np.where(inside, st.area / (st.space + 1e-4), 0.0)
+        eff = np.clip(0.5 * (3.0 - a_n / (a_s + 1e-9) / sec.h), 0.0, 1.0)
+        res = eff * (np.maximum(yld, capt) - tot)
+        return tot, res, rho_t
+
+    def transverse(self, zf, z, ex, g, m, ft, smx, smt, cx):
+        """The transverse strain of every node, from the condition that there is no total
+        stress across the member: concrete fcy and the stirrups balance (thesis 7-2)."""
+        sec = self.sec
+        sts = self.stirrups_at(zf)
+        rcrit = sec.tab(sec.t_rhocrit, zf)
+        idx = self.law_index(zf, z)
+        n = len(zf)
+
+        def run(ey):
+            """Total transverse stress for an array ey of shape (n,) or (n, k)."""
+            shp = ey.shape
+            k = 1 if ey.ndim == 1 else shp[1]
+            eyf = ey.reshape(n, k)
+            tot = np.empty((n, k))
+            outs = []
+            for j, law in enumerate(sec.laws):
+                sel = idx == j
+                if not sel.any():
+                    outs.append(None)
+                    continue
+                rep = lambda a: np.repeat(a[sel], k)
+                eyl = eyf[sel].ravel()
+                subs = [(st, np.repeat(rho[sel], k), np.repeat(fac[sel], k))
+                        for st, rho, fac in sts]
+                st_tot, st_res, _ = self.stirrup_stress(subs, eyl, rep(rcrit))
+                o = nodelib.evaluate(law, rep(ex), eyl, rep(g), rep(m), rep(ft), rep(smx),
+                                     rep(smt), rep(cx), st_res)
+                tot[sel] = (o.fcy + st_tot).reshape(-1, k)
+                outs.append(o)
+            return tot.reshape(shp), outs
+
+        # scan a ladder of transverse strains for the first change of sign, then close in
+        mag = 1e-6 * 1.7 ** np.arange(0, 21)
+        ladder = np.concatenate([-mag[::-1][6:], [0.0], mag])
+        f, _ = run(np.broadcast_to(ladder, (n, len(ladder))).copy())
+        pos = f > 0
+        first = np.argmax(pos, axis=1)
+        none = ~pos.any(axis=1)
+        first = np.where(none, len(ladder) - 1, first)
+        first = np.maximum(first, 1)
+        rows = np.arange(n)
+        lo, hi = ladder[first - 1], ladder[first]
+        flo, fhi = f[rows, first - 1], f[rows, first]
+        ok = (flo <= 0) & (fhi > 0)
+        ey = np.where(np.abs(flo) < np.abs(fhi), lo, hi)
+        for it in range(40):
+            with np.errstate(divide="ignore", invalid="ignore"):
+                x = np.where(fhi != flo, lo - flo * (hi - lo) / (fhi - flo), 0.5 * (lo + hi))
+            if it % 3 == 2:
+                x = 0.5 * (lo + hi)
+            x = np.clip(x, np.minimum(lo, hi), np.maximum(lo, hi))
+            fx, _ = run(x)
+            neg = fx <= 0
+            lo = np.where(ok & neg, x, lo)
+            flo = np.where(ok & neg, fx, flo)
+            hi = np.where(ok & ~neg, x, hi)
+            fhi = np.where(ok & ~neg, fx, fhi)
+            ey = np.where(ok, x, ey)
+            if np.max(np.where(ok, np.abs(fx), 0.0)) < 1e-7 or \
+                    np.max(np.where(ok, np.abs(hi - lo), 0.0)) < 1e-12:
+                break
+        _, outs = run(ey)
+        fields = {}
+        for j, o in enumerate(outs):
+            if o is None:
+                continue
+            sel = idx == j
+            for name, val in o.__dict__.items():
+                fields.setdefault(name, np.zeros(n, dtype=val.dtype))[sel] = val
+        return nodelib.NodeOut(**fields), ey
 
     def forces(self, e0, phi, gam=0.0, bounds=None, want_detail=False):
         """(N, M, V) for a strain state on the current layers."""
@@ -297,7 +433,7 @@ class Analysis:
         z, b = self.layer_nodes(bounds)
         es, fs = self.steel(e0, phi)
         f1cx = self.crack_check(e0, phi, es, fs)
-        out, ex, g, smx, smt = self.eval_nodes(e0, phi, gam, z, f1cx)
+        out, ex, g, smx, smt, eyn = self.eval_nodes(e0, phi, gam, z, f1cx)
         fcx = out.fcx.reshape(z.shape)
         vv = out.v.reshape(z.shape)
         dz = z[:, 0] - z[:, 2]
@@ -316,7 +452,7 @@ class Analysis:
                 m -= net * l.area * (l.z - sec.zaxial)
         if not want_detail:
             return n, m, v
-        return n, m, v, (z, b, out, ex, g, smx, smt, es, fs, f1cx)
+        return n, m, v, (z, b, out, ex, g, smx, smt, es, fs, f1cx, eyn)
 
     def refine(self, e0, phi, gam):
         """Dynamic layering: split every layer whose stresses are not interpolated well by a
@@ -368,8 +504,8 @@ class Analysis:
 
     def detail(self, e0, phi, gam) -> Detail:
         sec = self.sec
-        n, m, v, (z, b, out, ex, g, smx, smt, es, fs, f1cx) = self.forces(e0, phi, gam,
-                                                                         want_detail=True)
+        n, m, v, (z, b, out, ex, g, smx, smt, es, fs, f1cx, eyn) = self.forces(
+            e0, phi, gam, want_detail=True)
         # unique nodes from the top down (shared layer boundaries once, unless the concrete or
         # the width changes there: then the upper layer's value is kept)
         zf = z.ravel()
@@ -380,9 +516,24 @@ class Analysis:
         zz = zf[sel]
         fscr = self.steel_at_crack(e0, phi, es, fs, zz, o2, b.ravel()[sel])
         rhov = sec.tab(sec.t_rhov, zz)
-        return Detail(z=zz, b=b.ravel()[sel], ex=ex[sel], ey=np.zeros(len(sel)), gxy=g[sel],
-                      out=o2, smx=smx[sel], smt=smt[sel], fsy=np.zeros(len(sel)),
-                      fsycr=np.zeros(len(sel)), rhov=rhov, fs=fs, fscr=fscr, es=es,
+        ey = eyn[sel]
+        fsy = np.zeros(len(sel))
+        fsycr = np.zeros(len(sel))
+        if self.shear and sec.stirrups:
+            tot, _res, rho_t = self.stirrup_stress(self.stirrups_at(zz), ey,
+                                                   sec.tab(sec.t_rhocrit, zz))
+            has = rho_t > 0
+            fsy[has] = tot[has] / rho_t[has]
+            # at a crack the stirrups also carry what the concrete carries between cracks
+            law = sec.conc0
+            fl = np.maximum(law.ft, np.interp(zz, sec.tz, self.t_ft)) / (1.0 + 250.0 * o2.w) \
+                * law.phi
+            extra = np.maximum(o2.f1 - fl, 0.0) - o2.vci * o2.tan
+            on = has & (o2.w > 0)
+            fsycr[on] = extra[on] / rho_t[on] + fsy[on]
+        return Detail(z=zz, b=b.ravel()[sel], ex=ex[sel], ey=ey, gxy=g[sel],
+                      out=o2, smx=smx[sel], smt=smt[sel], fsy=fsy,
+                      fsycr=fsycr, rhov=rhov, fs=fs, fscr=fscr, es=es,
                       f1cx=f1cx(zz))
 
     def steel_at_crack(self, e0, phi, es, fs, z, out, b):
@@ -456,51 +607,76 @@ class Analysis:
 # ---------------------------------------------------------------------------------------------
 # Solving a load stage and stepping through the response (no shear)
 # ---------------------------------------------------------------------------------------------
-def _root(f, x0, dx, tol, maxit=60):
-    """A root of the scalar function f near x0: secant steps kept inside a bracket once one is
-    found. Returns (x, ok)."""
-    xa, fa = x0, f(x0)
+def _root(f, x0, dx, tol, maxit=80):
+    """A root of the scalar function f near x0. Secant steps first; if they find no change of
+    sign, the neighbourhood of x0 is scanned outwards for one (the force of a cracking section
+    is not monotonic in the strain), and the root is then closed in on inside the bracket.
+    A jump across zero counts as the root. Returns (x, ok)."""
+    fa = f(x0)
     if abs(fa) <= tol:
-        return xa, True
-    xb = x0 + dx
-    fb = f(xb)
-    lo = hi = None
-    if fa * fb < 0:
-        lo, hi = (xa, xb) if fa < 0 else (xb, xa)
-    for it in range(maxit):
+        return x0, True
+    xa = x0
+    xb, fb = x0 + dx, None
+    lo = hi = None          # f(lo) < 0 < f(hi)
+    flo = fhi = None
+    for it in range(8):
+        fb = f(xb)
+        if math.isnan(fb):
+            break
         if abs(fb) <= tol:
             return xb, True
+        if fa * fb < 0:
+            (lo, flo, hi, fhi) = (xa, fa, xb, fb) if fa < 0 else (xb, fb, xa, fa)
+            break
         if fb == fa:
-            xn = xb + dx
-        else:
-            xn = xb - fb * (xb - xa) / (fb - fa)
-        if lo is not None:
-            a, b = min(lo, hi), max(lo, hi)
-            if not (a < xn < b) or it % 8 == 7:
-                xn = 0.5 * (lo + hi)
-        else:
-            # limit the step while hunting for a bracket
-            step = xn - xb
-            lim = 8.0 * max(abs(xb - xa), abs(dx))
-            if abs(step) > lim:
-                xn = xb + math.copysign(lim, step)
-        fn = f(xn)
-        if math.isnan(fn):
-            return xn, False
+            break
+        xn = xb - fb * (xb - xa) / (fb - fa)
+        lim = 6.0 * max(abs(xb - xa), abs(dx))
+        if abs(xn - xb) > lim:
+            xn = xb + math.copysign(lim, xn - xb)
+        xa, fa, xb = xb, fb, xn
+    if lo is None:
+        f0 = f(x0)
+        prev = {1: (x0, f0), -1: (x0, f0)}
+        step = abs(dx)
+        for k in range(70):
+            for sgn in (1, -1):
+                x = x0 + sgn * step
+                fx = f(x)
+                if math.isnan(fx):
+                    continue
+                if abs(fx) <= tol:
+                    return x, True
+                px, pf = prev[sgn]
+                if pf * fx < 0:
+                    (lo, flo, hi, fhi) = (px, pf, x, fx) if pf < 0 else (x, fx, px, pf)
+                    break
+                prev[sgn] = (x, fx)
+            if lo is not None:
+                break
+            step *= 1.5
         if lo is None:
-            if fn * fb < 0:
-                lo, hi = (xb, xn) if fb < 0 else (xn, xb)
-            elif fn * fa < 0:
-                lo, hi = (xa, xn) if fa < 0 else (xn, xa)
+            return x0, False
+    for it in range(maxit):
+        if it % 3 == 2 or flo == fhi:
+            x = 0.5 * (lo + hi)
         else:
-            if fn < 0:
-                lo = xn
-            else:
-                hi = xn
-            if abs(hi - lo) < 1e-15 * max(1.0, abs(lo)):
-                return xn, abs(fn) <= 50 * tol
-        xa, fa, xb, fb = xb, fb, xn, fn
-    return xb, abs(fb) <= 50 * tol
+            x = lo - flo * (hi - lo) / (fhi - flo)
+            w = abs(hi - lo)
+            if abs(x - lo) < 0.01 * w or abs(x - hi) < 0.01 * w:
+                x = 0.5 * (lo + hi)
+        fx = f(x)
+        if math.isnan(fx):
+            return x, False
+        if abs(fx) <= tol:
+            return x, True
+        if fx < 0:
+            lo, flo = x, fx
+        else:
+            hi, fhi = x, fx
+        if abs(hi - lo) <= 1e-13 * max(abs(dx) * 1e6, abs(lo), abs(hi)):
+            return (lo, True) if abs(flo) < abs(fhi) else (hi, True)
+    return (lo, True) if abs(flo) < abs(fhi) else (hi, True)
 
 
 class Flexure:
@@ -627,10 +803,15 @@ class Flexure:
         crush = float(np.min(d.ex)) <= -self.sec.conc0.e0
         return cracked, crush
 
-    def has_event(self, a: Stage, b: Stage) -> bool:
+    def has_event(self, a: Stage, b: Stage) -> str:
+        """What happens between two states: '' (nothing), 'crack' or 'crush'."""
         ca, ka = self._marks(a)
         cb, kb = self._marks(b)
-        return (cb and not ca) or (kb and not ka)
+        if cb and not ca:
+            return "crack"
+        if kb and not ka:
+            return "crush"
+        return ""
 
     def accept(self, st: Stage):
         self.an.commit(st.e0, st.phi)
@@ -642,11 +823,12 @@ class Flexure:
         """Accept a stage at the target, approaching it in geometric steps when something
         happens on the way (first cracking, the extreme fibre reaching its peak strain)."""
         trial = self.solve(target, cur)
-        minstep = 0.0036 * self.step0
-        if depth < 2 and self.has_event(cur, trial) and abs(target - cur.control) > minstep:
-            for _ in range(14):
+        kind = self.has_event(cur, trial)
+        if depth < 2 and kind:
+            for _ in range(14 if (depth == 0 or kind == "crack") else 3):
                 t1 = cur.control + 0.2 * (target - cur.control)
-                if abs(t1 - cur.control) < minstep:
+                if kind == "crack" and abs(t1 - cur.control) < max(
+                        0.004 * abs(cur.control), 0.0036 * self.step0):
                     break
                 sub = self.advance(cur, t1, depth + 1)
                 passed = self.has_event(cur, sub)
@@ -678,6 +860,7 @@ class Flexure:
                     # try to get part of the way before giving up
                     done = False
                     t = target
+                    cur = self.stages[-1]
                     for _ in range(3):
                         t = cur.control + 0.5 * (t - cur.control)
                         try:
@@ -691,7 +874,11 @@ class Flexure:
                     target = cur.control
                 lam = cur.lam
                 peak = max(peak, lam)
-                if peak > 0 and lam < 0.02 * peak:
+                if peak > 0 and lam <= 0.0:
+                    self.stages.pop()        # the load has run out: not a load stage
+                    break
+                if self.collapsed(cur, peak):
+                    self.stages.pop()
                     break
                 if self.crushed(cur):
                     break
@@ -699,6 +886,9 @@ class Flexure:
         except SolveError:
             pass
         return self.stages[:max_stages]
+
+    def collapsed(self, st: Stage, peak: float) -> bool:
+        return False
 
     def crushed(self, st: Stage) -> bool:
         """The response ends once the extreme fibre is strained to four times the strain at

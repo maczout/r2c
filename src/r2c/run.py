@@ -173,6 +173,6 @@ def solve(path: str | Path | None = None, *, units: str | None = None,
     notes = []
     if want != MORE_DETAIL_MAX and presses < int(want):
         notes.append(f"More Detail refined the solve {presses} times, not {want}")
-    gam = [s.gam for s in stages]
+    gam = [getattr(s, "gam_avg", s.gam) for s in stages]
     return Result(name, sha, u, fac, shown_initial, shown_incr, presses, sec, stages, peak, gam,
                   notes)

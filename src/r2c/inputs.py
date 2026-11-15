@@ -170,13 +170,32 @@ def read(path: str | Path) -> SectionInput:
     return parse(data)
 
 
+_TAG = re.compile(r"<[A-Za-z_][^<>]*>")
+_ATTR = re.compile(r"""\s+([A-Za-z_][\w.-]*)\s*=\s*("[^"]*"|'[^']*')""")
+
+
+def _dedupe(text: str) -> str:
+    """Response writes some attributes twice in one element (the area of a stirrup); XML does
+    not allow that. Keep the first of each."""
+    def fix(m):
+        seen = set()
+
+        def keep(a):
+            if a.group(1) in seen:
+                return ""
+            seen.add(a.group(1))
+            return a.group(0)
+        return _ATTR.sub(keep, m.group(0))
+    return _TAG.sub(fix, text)
+
+
 def parse(data: bytes) -> SectionInput:
     text = data.decode("utf-8", errors="replace")
     # the DOCTYPE names r3g.dtd, which need not be beside the input: drop it and apply the
     # schema's defaults here
     text = re.sub(r"<!DOCTYPE[^>]*>", "", text)
     try:
-        root = ET.fromstring(text.encode("utf-8"))
+        root = ET.fromstring(_dedupe(text).encode("utf-8"))
     except ET.ParseError as e:
         if text.lstrip().startswith("//"):
             raise OutOfScope("Response's older text format (Ver_0.8) is not read; save the "

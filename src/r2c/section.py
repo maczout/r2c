@@ -97,7 +97,11 @@ class Section:
         for t in inp.trans:
             if t.area <= 0 or t.space <= 0:
                 continue
-            legs = 1 if t.pattern in (0, 4, 5) else 2
+            if abs(t.disttop - t.distbot) < 1e-6:
+                continue                  # a cross tie: no vertical leg
+            # Response's stirrup types: 1 single leg, 2 open, 3 closed, 4 hoop,
+            # 5 T-headed single leg, 6 interlocking hoops
+            legs = 1 if t.pattern in (0, 1, 5) else 2
             self.stirrups.append(Stirrup(t.name, t.area, t.space, max(t.disttop, t.distbot),
                                          min(t.disttop, t.distbot), t.db,
                                          steels[t.type.lower()], t.dep,
@@ -245,6 +249,24 @@ class Section:
             inside = (self.tz >= s.bot - 1e-9) & (self.tz <= s.top + 1e-9)
             rv += np.where(inside, s.area / (bw * s.space), 0.0)
         self.t_rhov = rv
+        # steel ratio for the strain concentration of the stirrups at a crack: the larger of
+        # the stirrup ratio and a line between the ratios of the bottom and the top bars
+        top = bot = 0.0
+        for l in self.layers:
+            if l.z > self.zc:
+                top = l.rho
+            elif l.z < self.zc:
+                bot = l.rho
+        rh = np.zeros(NTAB)
+        for s in self.stirrups:
+            inside = (self.tz >= s.bot - 1e-9) & (self.tz <= s.top + 1e-9)
+            fac = 1.0
+            if s.pattern == 4:
+                d = self.tz - 0.5 * (s.top + s.bot)
+                v = 1.0 - d * d / (0.25 * (s.top - s.bot) ** 2 + 1e-4)
+                fac = np.where(v > 0, np.sqrt(np.maximum(v, 0.0)), 1.0)
+            rh += np.where(inside, s.area / (bw * s.space) * fac, 0.0)
+        self.t_rhocrit = np.maximum(bot + (self.tz - self.tz[0]) / self.h * (top - bot), rh)
 
     def tab(self, table: np.ndarray, z):
         return np.interp(z, self.tz, table)
