@@ -1,0 +1,26 @@
+# The fast tests and the record checks on every push and pull request. The slow shear tests and
+# the full verification need minutes per case (and Response's sample inputs for some): they are
+# run by hand, on the Framework Desktop, and their results committed as
+# docs/verification-results.md. tools/check.py reports here whether those results are stale.
+name: tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: ["3.11", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0        # check.py compares the results' commit with the kernel's history
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - run: pip install -e '.[dev]'
+      - run: pytest -q
+      - run: python tools/check.py
