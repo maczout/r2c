@@ -144,6 +144,11 @@ multi-layer sections; signed shear on crack; transverse bond. Display-level, exc
 first may hint at a reduced cracking strength under biaxial compression that r2c does not
 apply. No effect seen in the cases compared.
 
+**H. Steel stress at a crack, found 2026-11-17.** At the Newbeam's peak with CSA factors
+Response shows the bottom bar at 340 MPa at a crack and r2c shows 0; the Newbeam with N and M
+differs the same way. Not investigated (see `docs/verification.md`, Detail views). Display or
+kernel: unknown. The peak loads in these cases agree.
+
 **G. End-of-response rules.** r2c's rules after a shear failure and after rupture are its own
 guesses. Depends on what acceptance says about post-peak.
 
