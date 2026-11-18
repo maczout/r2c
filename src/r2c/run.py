@@ -108,10 +108,32 @@ def peak_stage(stages: list[Stage], incr) -> int:
     return int(np.argmax(vals))
 
 
-def solve(path: str | Path | None = None, *, units: str | None = None,
-          factors: str | None = None, initial=None, increment=None, more_detail=0,
-          on_event=None, data: bytes | None = None) -> Result:
-    """Solve one input (or the default section when path is None)."""
+@dataclass
+class Setup:
+    """An input read and an analysis set up, ready to solve: what solve() does before it
+    steps through the load stages. The diagnostic tools (tools/diagnose.py) start here too."""
+    name: str
+    input_sha256: str | None
+    units: Units
+    factors: tuple[float, float, float]
+    initial: tuple[float, float, float]      # in the units in effect
+    increment: tuple[float, float, float]
+    section: Section
+    analysis: Analysis
+
+    def driver(self, on_stage=None):
+        """The load-stepping driver for this analysis: with shear or without."""
+        if self.analysis.shear:
+            from r2c.shear import Shear
+            return Shear(self.analysis, on_stage=on_stage)
+        return Flexure(self.analysis, on_stage=on_stage)
+
+
+def setup(path: str | Path | None = None, *, units: str | None = None,
+          factors: str | None = None, initial=None, increment=None,
+          data: bytes | None = None) -> Setup:
+    """Read an input (or take the default section when path is None) and set up its
+    analysis with the given settings."""
     if path is None and data is None:
         inp = inputs.default_section()
         name, sha = "File > New", None
@@ -141,16 +163,23 @@ def solve(path: str | Path | None = None, *, units: str | None = None,
 
     sec = Section(inp, *fac)
     an = Analysis(sec, const, incr)
+    return Setup(name, sha, u, fac, shown_initial, shown_incr, sec, an)
+
+
+def solve(path: str | Path | None = None, *, units: str | None = None,
+          factors: str | None = None, initial=None, increment=None, more_detail=0,
+          on_event=None, data: bytes | None = None) -> Result:
+    """Solve one input (or the default section when path is None)."""
+    su = setup(path, units=units, factors=factors, initial=initial, increment=increment,
+               data=data)
+    name, sha, u, fac = su.name, su.input_sha256, su.units, su.factors
+    shown_initial, shown_incr, sec = su.initial, su.increment, su.section
 
     def tick(count):
         if on_event:
             on_event("solving", count)
 
-    if an.shear:
-        from r2c.shear import Shear
-        driver = Shear(an, on_stage=tick)
-    else:
-        driver = Flexure(an, on_stage=tick)
+    driver = su.driver(on_stage=tick)
     try:
         stages = driver.run(MAX_STAGES)
     except SolveError as e:
