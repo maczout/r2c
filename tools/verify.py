@@ -11,13 +11,22 @@ r2c is run the same way and the two records are compared with tools/compare.py.
 folder, for its sample files). "File > New" and Newbeam's input.r2t need no file: r2c has that
 section built in.
 
-Results: OUT/NAME.r2x.txt (r2c's record), OUT/NAME.json (the comparison) and OUT/summary.md.
+Results: OUT/NAME.r2x.txt (r2c's record), OUT/NAME.json (the comparison), OUT/summary.md,
+OUT/results.json (every case) and OUT/run.json (what was run, where and when). tools/report.py
+turns results.json and run.json into docs/verification-results.md.
+
+Times are measured: wall-clock seconds per case on the machine named in run.json, with --jobs
+cases at once. They are r2c's alone; nothing here times Response.
 """
 
 from __future__ import annotations
 
 import argparse
+import datetime as dt
 import json
+import os
+import platform
+import subprocess
 import sys
 import time
 from concurrent.futures import ProcessPoolExecutor
@@ -26,7 +35,11 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from r2c import record, run, stages  # noqa: E402
+import numpy as np  # noqa: E402
+
+from r2c import __version__, record, run, stages  # noqa: E402
+
+ROOT = Path(__file__).resolve().parents[1]
 import compare as cmp  # noqa: E402
 
 BUILT_IN = {"file > new", "input.r2t", "newbeam.r2t"}
@@ -96,6 +109,32 @@ def summary(results: dict) -> str:
     return "\n".join(rows) + "\n"
 
 
+def git(*args) -> str:
+    try:
+        return subprocess.run(["git", "-C", str(ROOT), *args], capture_output=True, text=True,
+                              check=True).stdout.strip()
+    except (OSError, subprocess.CalledProcessError):
+        return ""
+
+
+def run_info(a, names) -> dict:
+    """What was run, where and when: enough to tell whether the results are current."""
+    return {
+        "r2c_version": __version__,
+        "commit": git("rev-parse", "HEAD"),
+        "dirty": bool(git("status", "--porcelain", "--", "src", "tools")),
+        "started": dt.datetime.now().astimezone().isoformat(timespec="seconds"),
+        "host": platform.node(),
+        "machine": f"{platform.system()} {platform.machine()}, {os.cpu_count()} cores",
+        "python": platform.python_version(),
+        "numpy": np.__version__,
+        "jobs": a.jobs,
+        "inputs_dir": bool(a.inputs),
+        "reference_dir": str(a.reference_dir),
+        "cases": sorted(names),
+    }
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     ap.add_argument("reference_dir")
@@ -110,12 +149,15 @@ def main(argv=None) -> int:
     if a.only:
         refs = [p for p in refs if p.name[: -len(".r2x.txt")] in a.only]
     work = [(str(p), a.inputs, str(out)) for p in refs]
+    info = run_info(a, [p.name[: -len(".r2x.txt")] for p in refs])
+    (out / "run.json").write_text(json.dumps(info, indent=1))
     results = {}
     old = out / "results.json"
     if old.exists():
         results = json.loads(old.read_text())
     with ProcessPoolExecutor(max_workers=a.jobs) as ex:
         for name, res in ex.map(one, work):
+            res["run"] = info["commit"][:12] + ("+dirty" if info["dirty"] else "")
             results[name] = res
             state = res.get("skipped") or res.get("failed") or f"{res['seconds']} s"
             print(f"{name}: {state}", flush=True)
