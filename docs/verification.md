@@ -74,8 +74,23 @@ What this shows:
 
 ## Detail views
 
-At the peak (r2c's stage nearest Response's peak in control value) the charts agree within a
-few percent of each chart's largest value, with these exceptions:
+At the peak (r2c's stage nearest Response's peak in control value). The 2026-11-15 version of
+this section said the charts agree within a few percent of each chart's largest value apart
+from the exceptions listed below. The generated results of 2026-11-17 show that this was
+incomplete:
+
+* **Long. Reinf Stress at Crack, Newbeam with CSA factors and Newbeam with N and M:** 100 %.
+  At the CSA peak Response shows the bottom bar at 340 MPa at a crack (0.85 × 400 MPa); r2c
+  shows 0 there. Inferred, not checked: r2c prints 0 for a bar it takes to have ruptured at a
+  crack, so either its capacity at a crack is wrong here or its report of it is.
+* **Principal Tensile Stress, Newbeam under axial compression alone:** 371 % (r2c's lines
+  differ from Response's by up to 1.8 MPa where Response's largest value is 0.48 MPa). Probably the same
+  cracking-stress line as below, scaled by a small chart; not checked.
+* **Shear cases that stop short** (M/V = 2 m, 0.5 m, US M/V = 1 ft): the views compare r2c's
+  last stage with Response's peak, which are different states. Meaningless until r2c reaches
+  that peak.
+
+The exceptions known before:
 
 * Principal Tensile Stress: Response draws the cracking-stress line reduced in the compression
   zone; r2c draws it unreduced (20 to 50 % of the chart's largest value there). The stress line
