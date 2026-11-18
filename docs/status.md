@@ -1,15 +1,14 @@
 # r2c: where it stands
 
 The present state of r2c and the options for what comes next. History is in `docs/log/` and
-in git. Moved here on 2026-11-17 from the claude.ai Project doc "r2c record: status,
-performance, options for next steps" (written at the end of the 2026-11-15 build), and
-brought up to date.
+in git. First written at the end of the 2026-11-15 build; kept in the repository since
+2026-11-17.
 
 r2c is the Python clone of Response-2000's sectional analysis; r2x (`maczout/r2x`, branch
 `park`, 0.5.0) drives Response-2000 itself and is the oracle. Version 0.1.0.
 
-Software engineering is Claude's side, structural engineering Jamie's. Items that need a
-structural judgement are marked **(structural)**.
+Roles as in CLAUDE.md: structural engineering is the owner's, software engineering the
+developer's. Items that need a structural judgement are marked **(structural)**.
 
 ---
 
@@ -26,7 +25,7 @@ structural judgement are marked **(structural)**.
 - 25 oracle fixtures in `tests/oracle`; pytest tests (fast set; `-m slow` for two shear cases;
   `R2C_RESPONSE_DIR` for Response's sample inputs).
 - Docs: `kernel.md` (each rule and its source), `verification.md` (what the results mean),
-  `verification-results.md` (generated), `acceptance.md` (Jamie's tolerances; template).
+  `verification-results.md` (generated), `acceptance.md` (the owner's tolerances; template).
 
 ## 2. Against Response-2000 1.9.7
 
@@ -42,8 +41,8 @@ The numbers are in `docs/verification-results.md` and what they mean is in
 | Shear: dm-n1n | 1 | r2c's peak 4.5 % **above** Response's; not explained |
 
 The generated results of 2026-11-17 cover the 18 cases with the built-in Newbeam only; the 7
-cases on Response's sample inputs need those inputs and are to be rerun on the Framework
-Desktop.
+cases on Response's sample inputs need those inputs and are to be rerun on a machine that
+has them.
 
 ### The two shear problems
 
@@ -91,19 +90,19 @@ scratch each time; and numpy call overhead on arrays of about 100 nodes.
   input format.
 - `tools/capture.py` has been dry-run only; it has not yet run against Response.
 
-## 5. Decisions that are Jamie's
+## 5. Decisions that are the owner's
 
-1. **Tolerances (structural).** `docs/acceptance.md` holds the stance (Jamie, 2026-11-17:
+1. **Tolerances (structural).** `docs/acceptance.md` holds the stance (owner, 2026-11-17:
    agreement within tolerance, not mathematical equivalence) and the template; the values are
    not set. Until they are, nothing is assessed.
 2. **What matters (structural)**: which results, post-peak, which sections and loadings first,
-   errs high vs low. Listed in `docs/acceptance.md`. Where it is silent, Claude decides and
-   records the decision in the session log (Jamie, 2026-11-17).
+   errs high vs low. Listed in `docs/acceptance.md`. Where it is silent, the developer decides
+   and records the decision in the session log (owner, 2026-11-17).
 3. **Reverse engineering.** The original brief allowed it "to answer questions but not as the
    primary development approach". The 2026-11-15 build used many rules read from the binary
    (each marked in `docs/kernel.md`). CLAUDE.md now ranks it below acceptance and the thesis,
-   as the means of finding out why r2c misses acceptance (Claude's wording, 2026-11-17, for
-   Jamie to confirm).
+   as the means of finding out why r2c misses acceptance (the developer's wording, 2026-11-17,
+   for the owner to confirm).
 4. **Dependencies.** numpy only. Compiling the node routine (option D4) would add one.
 
 ## 6. Options for next steps
@@ -136,7 +135,7 @@ sections and added tendons; implement curved outline segments (needed for circle
 
 **E. Housekeeping.**
 - E3. Compare the untested combinations in section 4.
-- E4. On the Framework Desktop: build the oracle archive with `tools/capture.py` (checks the
+- E4. On a machine with Response-2000 and its sample inputs: build the oracle archive with `tools/capture.py` (checks the
   fixtures reproduce), then rerun verify with Response's inputs and regenerate the report.
 
 **F. Detail views.** Reduced cracking-stress line in the compression zone; crack spacing on

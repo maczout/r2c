@@ -27,7 +27,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import report  # noqa: E402
 
 LOG_SECTIONS = ("## Goal", "## Done", "## Tried and dropped", "## Decisions",
-                "## Open questions for Jamie")
+                "## Open questions for the owner")
 
 
 def git(*args) -> tuple[int, str]:

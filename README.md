@@ -86,7 +86,7 @@ straight. Negative shear is refused, as in Response.
     docs/acceptance.md     what counts as agreement (tolerances)
     docs/status.md         where the work stands, options for next steps
     docs/log/              one log per working session
-    CLAUDE.md              how work on r2c is done (for people and for Claude)
+    CLAUDE.md              how work on r2c is done (for people and coding agents)
 
 ## Tests
 

@@ -1,6 +1,6 @@
 # YYYY-MM-DD-NN: one line on what the session was for
 
-Who: Claude (where: cloud workspace / Framework Desktop / ...), with Jamie / unattended.
+Who: the developer (person or agent), with the owner / unattended.
 Branch at the end: `branch`.
 
 ## Goal
@@ -17,9 +17,10 @@ What was tried and did not work, and why. This is the section a later session ne
 
 ## Decisions
 
-Each decision, who made it (Jamie, or Claude where acceptance.md was silent), and why.
+Each decision, who made it (the owner, or the developer where acceptance.md was silent), and
+why.
 
-## Open questions for Jamie
+## Open questions for the owner
 
 Structural judgements needed, and anything blocked on one. "None" if none.
 

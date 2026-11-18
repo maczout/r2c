@@ -1,29 +1,29 @@
 # Acceptance: what "agrees with Response-2000" means
 
-**This file is Jamie's.** It sits at the top of the instruction hierarchy in CLAUDE.md: where
-it speaks, it governs. Claude may propose changes; only Jamie makes them.
+**This file is the owner's.** It sits at the top of the instruction hierarchy in CLAUDE.md:
+where it speaks, it governs. The developer may propose changes; only the owner makes them.
 
-Status: **template, 2026-11-17.** The stance below is Jamie's own words, 2026-11-17. The
+Status: **template, 2026-11-17.** The stance below is the owner's own words, 2026-11-17. The
 tolerances are not set yet. Until they are, `tools/report.py` reports every difference and
 assesses none.
 
 ## Stance
 
 > "I have a structural engineer's definition of agreement which includes a tolerance. It
-> [is] not mathematical equivalence." (Jamie, 2026-11-17)
+> [is] not mathematical equivalence." (owner, 2026-11-17)
 
 > "I don't mind the system making those decisions so long as the documentation is clear. I
-> will specify what is important to me." (Jamie, 2026-11-17, on deciding what is done)
+> will specify what is important to me." (owner, 2026-11-17, on deciding what is done)
 
-Claude's reading, for Jamie to confirm: r2c aims to agree with Response-2000 within the
+Reading, for the owner to confirm: r2c aims to agree with Response-2000 within the
 tolerances below, not to reproduce it. Matching Response more closely than the tolerance is
 not a goal in itself. Where r2c is inside tolerance by a route other than Response's, that is
 acceptable, provided `docs/kernel.md` records the route.
 
-## What matters (Jamie to complete)
+## What matters (the owner to complete)
 
-These are the structural judgements that order the work. Claude decides anything not covered
-here and records the decision in the session log.
+These are the structural judgements that order the work. The developer decides anything not
+covered here and records the decision in the session log.
 
 1. **Which results matter.** For example: the peak load; the rising branch of the control
    curve; the state at service load; detail views at the peak; the post-peak response.
