@@ -10,8 +10,9 @@ in for the other in a workflow, and r2x serves as the oracle that r2c is compare
 
 **Status: 0.1.0, a first pass.** Flexure and axial load follow Response closely, stage for
 stage in most cases. Shear follows it up to the peak in the cases tried, and less well after
-it; some shear responses end early. `docs/verification.md` has the numbers, case by case, and
-lists what falls short. Read it before relying on a result.
+it; some shear responses end early. `docs/verification-results.md` has the numbers, case by case, and
+`docs/verification.md` what they mean and what falls short. Read both before relying on a
+result.
 
 r2c is not affiliated with the authors of Response-2000 and does not check designs. Its results
 are its own; the engineer who uses them is responsible for that use.
@@ -44,7 +45,7 @@ Response's own "Copy Chart Data". The options are r2x's: `--units`, `--factors`,
 | `define`, sessions, `setup` | yes | no |
 | `health` | checks Wine and Response | prints the version |
 | Record header | `r2x-version`, Response and Wine identification | `r2c-version`, `kernel: r2c` |
-| Time for a solve | 25 to 75 s | 1 to 20 s without shear; 1.5 to 4 min with shear |
+| Time for a solve | a few seconds, mostly starting Response under Wine (4.3 s for the Newbeam, moment only, peak-only capture); 25 to 75 s with `--stage all`, nearly all of it reading charts | 1 to 20 s without shear; 1.5 to 4 min with shear |
 
 Charts have the same titles, units, number formats and row layout as Response's exports. The
 numbers differ where the kernel differs (docs/verification.md), and the number of load stages
@@ -74,9 +75,18 @@ straight. Negative shear is refused, as in Response.
     tools/compare.py       compare two records (either may be r2x's or r2c's)
     tools/verify.py        run r2c on a set of reference records and compare
     tools/trim.py          cut a record down to a test fixture
+    tools/report.py        write docs/verification-results.md from a verify run
+    tools/diagnose.py      r2c at Response's strain states, and along its control values
+    tools/capture.py       rebuild the archive of full oracle captures with r2x
+    tools/check.py         checks before pushing: results current, docs as generated
     tests/oracle/          records captured from Response-2000 with r2x (control charts, peak)
     docs/kernel.md         what the kernel does and where each rule comes from
-    docs/verification.md   r2c against Response-2000, case by case
+    docs/verification.md   r2c against Response-2000: what the results mean
+    docs/verification-results.md   the results, generated
+    docs/acceptance.md     what counts as agreement (tolerances)
+    docs/status.md         where the work stands, options for next steps
+    docs/log/              one log per working session
+    CLAUDE.md              how work on r2c is done (for people and coding agents)
 
 ## Tests
 
