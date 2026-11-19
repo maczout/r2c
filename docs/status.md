@@ -19,7 +19,8 @@ developer's. Items that need a structural judgement are marked **(structural)**.
 - Kernel in Python (numpy only): MCFT node with crack check, dynamic layering, flexure and axial
   driver, shear by the longitudinal stiffness method.
 - Tools: `compare.py` (any two records), `verify.py` (r2c on a set of oracle records),
-  `report.py` (verification results from a verify run), `trim.py` (record to fixture),
+  `report.py` (verification results from a verify run), `dashboard.py` (the same results as
+  one HTML page of pictures, for the owner's review), `trim.py` (record to fixture),
   `diagnose.py` (r2c at Response's strain states, and along its control values),
   `capture.py` (rebuild the oracle archive with r2x), `check.py` (checks before pushing).
 - 25 oracle fixtures in `tests/oracle`; pytest tests (fast set; `-m slow` for two shear cases;

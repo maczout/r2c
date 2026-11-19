@@ -82,6 +82,7 @@ Not wanted: a changelog, a commit log, or recording commit IDs in files. Git kee
 | Each kernel rule and its source | `docs/kernel.md` |
 | Results against Response (generated) | `docs/verification-results.md` |
 | What the results mean | `docs/verification.md` |
+| The results as pictures, for review | `tools/dashboard.py` (writes one HTML page) |
 | Diagnostics: r2c in Response's states | `tools/diagnose.py` |
 | Rebuild the oracle archive | `tools/capture.py` |
 | Checks before pushing | `tools/check.py`, `pytest` |
