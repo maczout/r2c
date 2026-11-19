@@ -51,17 +51,39 @@ What this shows:
   (often its largest load is one of these, a fraction of a percent above the first), and its
   last one or two stages are states its own iteration did not converge on. r2c stops sooner.
   Stage counts and everything after the peak should not be compared.
-* **Where the section can carry more after the stirrups first yield, r2c stops short** (Newbeam
-  at M/V = 2 m, at M/V = 0.5 m, and in US units at M/V = 1 ft). Response redistributes: the
-  stirrups unload, the shear strain profile changes shape and the load climbs on, to the
-  flexural capacity at M/V = 2 m. r2c's shear profile iteration does not converge on those
-  states and it ends the response at the first plateau: **16 %, 7 % and 10 % below Response's
-  peak** in these three cases. This is the main shortfall. It errs low, but it is not a
-  property to lean on.
-* **dm-n1n: r2c's peak is 4.5 % above Response's.** The curves coincide up
-  to Response's peak
-  (curve distance 0.6 %); there Response's load starts to fall and r2c's keeps rising for
-  three more stages. Not explained. This one errs high.
+* **Where the section can carry more after the stirrups first yield** (Newbeam at
+  M/V = 2 m, at M/V = 0.5 m, and in US units at M/V = 1 ft), r2c stopped at the first plateau
+  until 2026-11-19, 16 %, 7 % and 10 % below Response's peak. The cause was not the profile
+  iteration, as earlier versions of this file said. Two things were found (docs/kernel.md,
+  session log 2026-11-19-02):
+  * *M/V = 2 m.* The bottom bars yield and the load climbs on to the flexural capacity. In
+    Response's own states r2c's forces agreed within 0.2 %, but its calculated shear stress
+    profile was 25 to 50 % off, because it gave a bar on its yield plateau no stiffness.
+    With the stiffness Response's profiles imply, r2c follows Response's control values
+    within 0.5 % to stage 56 of 88 and its peak is **1.8 % below** Response's. It still ends
+    there: from stage 57 its calculated profile is 13 to 35 % off in Response's states, for
+    a reason not found.
+  * *US units, M/V = 1 ft.* Response's stages step in the shear strain once shear governs;
+    its load falls 23 % (52.2 to 40.2), the curvature turns back through zero, and the load
+    recovers to a peak above the first. Stepping in the shear strain, r2c follows that path
+    (falls to 39.5, recovers) and its peak is **0.75 % above** Response's. Response's peak
+    here is on the recovery, after the fall: whether that is the result that matters is the
+    owner's question (docs/acceptance.md, post-peak).
+  * *M/V = 0.5 m.* Response's load reaches 125.9, falls to 110.3 and recovers to its peak of
+    128.5. r2c now reaches 121.9 (**5.2 % below** the peak; 6.9 % before) and loses the path
+    at a shear strain of about 3.7 mm/m, where its calculated profile is 7 to 27 % off in
+    Response's states (the same unexplained difference as at M/V = 2 m). Still short.
+* **dm-n1n: r2c's peak is 3.4 % above Response's** (4.5 % before the closest-iterate limit
+  was tightened). The curves coincide up to Response's peak (curve distance 0.6 %). At the
+  next step Response's shear strain jumps (0.89 to 1.19 mm/m, then 2.64) and its load falls;
+  at nearly the same curvature r2c finds a converged state with less shear strain (0.92 mm/m)
+  and 1.2 % more load than Response's peak, and its last stage, 3.4 % above, is a closest
+  iterate with a profile error of 2.7 %. Two states at one curvature, or a rule r2c lacks:
+  not known. This one errs high. What governs this section's failure is a structural
+  question for the owner.
+* **Liping LB1 moved: 1.8 % above Response's peak** (0.9 % before). After the change to
+  shear strain control r2c finds one more stage, higher than Response's plateau. Not
+  investigated.
 * Shear alone (Newbeam, V only): peak within 0.5 %; r2c ends shortly after the peak, Response
   carries on along a plateau 10 to 20 % lower.
 * A shear solve takes 1.5 to 4 minutes (measured 2026-11-15; per-case times of the latest run
@@ -86,9 +108,10 @@ incomplete:
 * **Principal Tensile Stress, Newbeam under axial compression alone:** 371 % (r2c's lines
   differ from Response's by up to 1.8 MPa where Response's largest value is 0.48 MPa). Probably the same
   cracking-stress line as below, scaled by a small chart; not checked.
-* **Shear cases that stop short** (M/V = 2 m, 0.5 m, US M/V = 1 ft): the views compare r2c's
-  last stage with Response's peak, which are different states. Meaningless until r2c reaches
-  that peak.
+* **Shear cases where r2c ends before Response's peak** (M/V = 2 m, 0.5 m): the views compare
+  r2c's last stage with Response's peak, which are different states. Not meaningful until
+  r2c reaches that peak. The US case at M/V = 1 ft now reaches it; its views have not been
+  looked at beyond the generated numbers.
 
 The sample-input cases, first compared view by view in the run of 2026-11-19, add these
 (measured; none investigated):

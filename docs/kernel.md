@@ -112,10 +112,27 @@ differ by less than 1 % of the shear force. The reported shear strain is the ave
 by the shear stress [O]. Bond charts are the change of bar (or stirrup) force along the member
 over the bar surface; r2c's transverse bond is a numerical derivative and is approximate.
 
-Known weakness: this iteration is r2c's own, with fixed damping, and it does not always
-converge where Response's does, mainly after stirrups have yielded and unloaded. Then r2c
-takes the closest iterate if it is within 5 %, looks for a state further along, and otherwise
-ends the response (docs/verification.md).
+In that calculation a bar on its yield plateau (yielded on average, not yet hardening, not
+unloading) is given the slope of its curve at the start of strain hardening,
+2·(fu − fy)/(εu − εsh), in place of the zero of the plateau [O]. Fitted at Response's own
+states on three steels (`tools/diagnose.py flow --fit-layer`, measured 2026-11-19): Newbeam
+4050 to 4200 MPa against 4301; se100 3440 to 3670 against 3675; Marshall 4850 to 5040 against
+4914 (the same fit gives 190 000 to 197 000 for an elastic bar of 200 000). A fixed share of
+E would not fit all three. Only bars in tension were observed; r2c applies it in compression
+too. Not applied to tendons, nor with material factors in effect (not observed).
+
+The iteration is r2c's own, with fixed damping. When it does not converge r2c takes the
+closest iterate if it is within 3 % [r2c's own; 5 % until 2026-11-19], looks for a state
+further along, and otherwise ends the response.
+
+Known weakness, restated 2026-11-19: where r2c ends short of Response the cause found so far
+is not the iteration but the stiffness the calculation uses. `tools/diagnose.py flow` puts
+r2c in Response's own states: Response's two shear stress lines agree within 1 % there, and
+where r2c's do not, no iteration can settle on that state. The plateau rule above removed one
+such difference. One remains, once the stirrups have yielded over much of the depth (Newbeam
+M/V = 2 m from stage 57, 13 to 35 %; M/V = 0.5 m at stages 37 to 43, 7 to 27 %): there the
+change of shear strain along the member that r2c solves for differs from what Response's
+profile implies. Not resolved (docs/verification.md).
 
 ## Load stages [O, all of it]
 
@@ -123,6 +140,12 @@ Response's stepping is not described in the thesis and was deduced from its outp
 
 * Control variable: the strain at the centroid if the axial load is being increased; else
   the curvature if the moment is; else the shear strain.
+* With moment and shear, once shear governs Response's stages step in the shear strain (about
+  10 % a stage on its Shear - γxy chart) while the curvature stalls or turns back, through
+  zero in one case (Newbeam M/V = 0.5 m from stage 36; US units, M/V = 1 ft, from stage 27).
+  What makes Response change over is not known. r2c's own rule: when no state is found at a
+  larger curvature, nor part of the way, and the stirrups are past half of yield or have
+  yielded before, it carries on in the reported shear strain with the same step rule.
 * First step Δ0: 0.2 mm/m ÷ h in curvature (0.08 with shear; halved with a constant axial
   load); ε0/20 in axial strain; 0.024 mm/m in shear strain. Stages at Δ0/6 and 7Δ0/6, then
   each step is the larger of Δ0 and 10 % of the control value.
@@ -144,6 +167,9 @@ Response's stepping is not described in the thesis and was deduced from its outp
 | Start of unloading tracking | stage 1 | one prestressed case (Cm4) |
 | Stirrup plastic strain kept by depth | yes | one case (Newbeam, M/V = 2 m) |
 | Shear profile tolerance | 1 % of V | Response's accepted stages measure 0 to 1 % |
+| Closest iterate accepted | within 3 % of V | r2c's own; stages it finds on Newbeam M/V = 2 m measure up to 2.6 %, the iterates that carried M/V = 1 m past Response's failure 4 to 5 % |
+| Bar on its yield plateau, in the shear flow | slope at the start of hardening | fitted at Response's states, three steels |
+| Change to shear strain control | no state at a larger curvature; stirrups past 0.5 fy | r2c's own trigger; that Response steps in the shear strain is from two cases |
 | Shear-only control on the weighted strain | 0.024 mm/m | one case |
 | Factored steel capped at fy | yes | one case (CSA factors) |
 

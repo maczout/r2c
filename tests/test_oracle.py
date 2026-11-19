@@ -42,7 +42,7 @@ SLOW = {
     "newbeam-nmv": (0.6, 2.0),
     # r2c ends before Response's peak (bars yielded, stirrups hardening): the curve distance
     # is that of Response's last points from the end of r2c's curve
-    "newbeam-m2v": (2.2, 30.0),
+    "newbeam-m2v": (2.2, 40.0),
     # through Response's load drop and recovery, stepping in the shear strain
     "newbeam-us-mv": (1.2, 5.0),
 }
