@@ -45,6 +45,8 @@ class Shear(Flexure):
             self.step0 = 0.024e-3
             self.sign = 1.0
         self.profile_tol = 0.01
+        # an iteration that does not converge is accepted at its closest iterate within this
+        self.profile_accept = 0.03
         self.evals = 0
         self.budget = 600
         self.ratio = 1.2        # reported (force-weighted) shear strain over the plain mean
@@ -378,7 +380,7 @@ class Shear(Flexure):
             x, info, ok = self._newton(c, best[4])
             if not ok:
                 x, info, ok = self._nested(c, best[4])
-        if not ok or info is None or err > 0.05:
+        if not ok or info is None or err > self.profile_accept:
             an.shape = saved_shape
             self.ratio = saved_ratio
             raise SolveError(f"no equilibrium at control value {c:g}")
