@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
-"""Two diagnostics that separate r2c's kernel from its stepping and its iteration, by putting
+"""Diagnostics that separate r2c's kernel from its stepping and its iteration, by putting
 r2c in Response's own states. They did most of the work of the first build (2026-11-15) and
 were lost with that session's workspace; these are rebuilt from the description in
 docs/status.md.
 
     python tools/diagnose.py states   RECORD [--input FILE] [--stages 5,10,peak] [--views]
     python tools/diagnose.py controls RECORD [--input FILE] [--upto N]
+    python tools/diagnose.py flow     RECORD [--input FILE] [--from N] [--upto N]
+                                      [--fit-layer I --at Y]
 
 RECORD is an r2x-raw record captured from Response-2000 (a fixture in tests/oracle, or a
 capture of every stage from the archive). --input is the section file the record was made
@@ -30,7 +32,21 @@ controls  Solve r2c at Response's own sequence of control values (curvature; str
           history forward stage by stage, and compare the loads. This tests the solve and the
           profile iteration, separated from r2c's choice of steps.
 
-Both print a table; --json writes the numbers. No pass or fail is decided here.
+flow      At each stage of RECORD (a capture of every stage), in Response's own strain state
+          with the history carried: how far r2c's calculated shear stress (the longitudinal
+          stiffness method) is from the shear stress of the state, as a share of the shear
+          force, next to the same measure for the two lines of Response's own Shear Stress
+          chart. Where Response's is small and r2c's is not, r2c's stiffness rules differ
+          from Response's at that state: the profile iteration cannot then settle on
+          Response's state, however it iterates. This is what found the stiffness of a bar
+          on its yield plateau (docs/kernel.md).
+
+          With --fit-layer I --at Y: also the tangent stiffness of steel layer I (0 is the
+          first in the section) that makes r2c's calculated shear stress at height Y (above
+          the centroid, in the record's length unit; pick a point just inside the layer)
+          equal Response's.
+
+All print a table; --json writes the numbers. No pass or fail is decided here.
 """
 
 from __future__ import annotations
@@ -292,6 +308,104 @@ def cmd_controls(a) -> int:
     return 0
 
 
+def _mismatch(z, v, tau, b=None) -> float:
+    """The shear force that the difference of two shear stress profiles amounts to, relative
+    to the shear force of the first."""
+    order = np.argsort(z)
+    z, v, tau = z[order], v[order], tau[order]
+    b = np.ones_like(z) if b is None else b[order]
+    tot = float(np.trapezoid(np.abs(v) * b, z))
+    return float(np.trapezoid(np.abs(tau - v) * b, z)) / tot if tot > 1e-12 else 0.0
+
+
+def _calculated(su, st):
+    """r2c's calculated shear stress at the detail's nodes, for the state of st."""
+    from r2c.shear import Shear
+    drv = Shear(su.analysis)
+    drv.bar_stiffness = dict(getattr(su, "bar_stiffness", {}))
+    z, _vs, tau, _t, _d = drv.shear_flow(st.e0, st.phi, st.gam, st.v)
+    zf = z.ravel()[::-1]
+    zz, ii = np.unique(zf, return_index=True)
+    return np.interp(st.detail.z, zz, tau.ravel()[::-1][ii])
+
+
+def cmd_flow(a) -> int:
+    ref = record.read(a.record)
+    su = _setup(ref, a.input)
+    if not su.analysis.shear:
+        raise SystemExit("no shear in this record")
+    have = ref.stages()
+    if have != list(range(len(have))):
+        raise SystemExit("flow needs a capture of every stage (the archive, not a fixture)")
+    u, sec, an = su.units, su.section, su.analysis
+    last = len(have) - 1 if a.upto is None else min(a.upto, len(have) - 1)
+    fit = a.fit_layer is not None
+    if fit and a.at is None:
+        raise SystemExit("--fit-layer needs --at")
+    rows = []
+    for s in range(last + 1):
+        e0, phi, prof, _resid = strain_state(ref, su, s)
+        st = evaluate(su, e0, phi, prof)
+        d = st.detail
+        if s >= a.first and prof is not None:
+            z = np.asarray(d.z, dtype=float)
+            row = {"stage": s, "v_oracle": oracle_loads(ref, su, s).get("v"),
+                   "v_r2c": st.v / u.force,
+                   "r2c": _mismatch(z, np.asarray(d.out.v), np.asarray(d.vcalc),
+                                    np.asarray(d.b))}
+            lines = [ln for ln in cmp.parse_chart(ref.stage(s, "shear_stress"))[3] if len(ln)]
+            if len(lines) >= 2:
+                y = lines[0][:, 1]
+                o = np.argsort(lines[1][:, 1])
+                other = np.interp(y, lines[1][:, 1][o], lines[1][:, 0][o])
+                row["oracle"] = _mismatch(y, lines[0][:, 0], other)
+            if fit and lines:
+                o = np.argsort(lines[0][:, 1])
+                target = float(np.interp(a.at, lines[0][:, 1][o], lines[0][:, 0][o]))
+                zq = a.at * u.length + sec.zc
+                order = np.argsort(z)
+
+                def at(k):
+                    su.bar_stiffness = {a.fit_layer: k}
+                    vc = _calculated(su, st)
+                    su.bar_stiffness = {}
+                    return float(np.interp(zq, z[order], vc[order])), vc
+                lo_k, hi_k = 0.0, 2.0 * sec.layers[a.fit_layer].steel.E
+                for _ in range(40):
+                    mid = 0.5 * (lo_k + hi_k)
+                    if abs(at(mid)[0]) < abs(target) * u.conc_stress:
+                        lo_k = mid
+                    else:
+                        hi_k = mid
+                _tq, vc = at(mid)
+                lay = sec.layers[a.fit_layer]
+                row["fit_k"] = mid
+                row["fit_mismatch"] = _mismatch(z, np.asarray(d.out.v), vc, np.asarray(d.b))
+                row["layer_strain"] = e0 - phi * (lay.z - sec.zc) + lay.prestrain
+            rows.append(row)
+        if s > 0:
+            an.commit(st.e0, st.phi)
+            if prof is not None:
+                an.commit_stirrups(d)
+    head = f"{'stage':>5} {'V Resp.':>9} {'V r2c':>9} {'r2c %':>7} {'Resp. %':>8}"
+    if fit:
+        head += f" {'strain mm/m':>12} {'fitted k MPa':>13} {'r2c % with k':>13}"
+    print(head)
+    for r in rows:
+        line = (f"{r['stage']:>5} {r['v_oracle'] if r['v_oracle'] is not None else 0.0:9.2f} "
+                f"{r['v_r2c']:9.2f} {100 * r['r2c']:7.1f} "
+                + (f"{100 * r['oracle']:8.1f}" if "oracle" in r else f"{'':>8}"))
+        if fit:
+            line += (f" {r['layer_strain'] * 1e3:12.3f} {r['fit_k']:13.0f} "
+                     f"{100 * r['fit_mismatch']:13.1f}")
+        print(line)
+    print("%: the shear force that the difference between the calculated shear stress and "
+          "the state's amounts to, relative to the shear force.")
+    if a.json:
+        Path(a.json).write_text(json.dumps(rows, indent=1))
+    return 0
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0],
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -310,6 +424,15 @@ def main(argv=None) -> int:
     p.add_argument("--upto", type=int, help="last stage to solve (default: all)")
     p.add_argument("--json")
     p.set_defaults(fn=cmd_controls)
+    p = sub.add_parser("flow", help="r2c's calculated shear stress at Response's states")
+    p.add_argument("record")
+    p.add_argument("--input")
+    p.add_argument("--from", dest="first", type=int, default=0, help="first stage to print")
+    p.add_argument("--upto", type=int, help="last stage (default: all)")
+    p.add_argument("--fit-layer", type=int, help="steel layer whose stiffness to fit")
+    p.add_argument("--at", type=float, help="height above the centroid for the fit")
+    p.add_argument("--json")
+    p.set_defaults(fn=cmd_flow)
     a = ap.parse_args(argv)
     return a.fn(a)
 

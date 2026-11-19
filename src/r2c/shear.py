@@ -45,6 +45,9 @@ class Shear(Flexure):
             self.step0 = 0.024e-3
             self.sign = 1.0
         self.mode0 = self.mode
+        # diagnostics only (tools/diagnose.py flow --fit-layer): a layer's tangent stiffness
+        # in the shear flow, in place of its own
+        self.bar_stiffness: dict[int, float] = {}
         self.profile_tol = 0.01
         # an iteration that does not converge is accepted at its closest iterate within this
         self.profile_accept = 0.03
@@ -133,6 +136,7 @@ class Shear(Flexure):
                 # on its yield plateau (not unloading) a bar keeps the stiffness of the start
                 # of strain hardening
                 et = max(et, l.steel.plateau_stiffness(t["es"][i]))
+            et = self.bar_stiffness.get(i, et)
             jz = float(np.interp(l.z, z.ravel()[::-1], t["j"].ravel()[::-1]))
             ea = (et - jz) * l.area
             yb = l.z - sec.zaxial
