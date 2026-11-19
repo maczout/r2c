@@ -44,6 +44,7 @@ class Shear(Flexure):
             self.mode = "gam"
             self.step0 = 0.024e-3
             self.sign = 1.0
+        self.mode0 = self.mode
         self.profile_tol = 0.01
         # an iteration that does not converge is accepted at its closest iterate within this
         self.profile_accept = 0.03
@@ -413,13 +414,42 @@ class Shear(Flexure):
             fg = np.interp(grid, zu, fu)
             dg = np.abs(np.gradient(fg, grid))
             det.tbond = np.interp(zs, grid, dg) * self.sec.stirrups[0].db / 4.0
-        st = Stage(e0, phi, gam, lam, n, m, v, det, control=c)
+        st = Stage(e0, phi, gam, lam, n, m, v, det, control=c, cmode=self.mode)
         # the shear strain Response reports: weighted by the shear force over the depth
         num = np.trapezoid(det.out.v * det.gxy * det.b, det.z)
         den = np.trapezoid(det.out.v * det.b, det.z)
         st.gam_avg = float(num / den) if abs(den) > 1e-9 else 0.0
         st.perr = err
         return st
+
+    def switch_control(self, st: Stage) -> bool:
+        """From curvature to the shear strain. Where shear governs, the curvature stops
+        growing, or turns back, while the shear strain and the load still rise: Response's
+        stages there step in the shear strain (inferred from its control charts)."""
+        rep = getattr(st, "gam_avg", 0.0)
+        if self.mode != "phi" or self.an.dv == 0.0 or st.gam == 0.0 or rep == 0.0:
+            return False
+        sts = self.sec.stirrups
+        if sts and not float(np.max(self.an.epy)) > 0.0:
+            # only once the stirrups are working hard (past half of yield, or yielded
+            # before): a state missed earlier, at first cracking say, is not shear taking over
+            fy = sts[0].steel.fy * sts[0].steel.phi
+            if float(np.max(np.abs(st.detail.fsy))) < 0.5 * fy:
+                return False
+        self.mode = "gam"
+        self.ratio = rep / st.gam
+        self.sign = 1.0 if rep > 0 else -1.0
+        self.step0 = 0.024e-3
+        st.control = rep
+        st.cmode = "gam"
+        return True
+
+    def more_detail(self, stages, peak, limit):
+        mode, self.mode = self.mode, self.mode0
+        try:
+            return super().more_detail(stages, peak, limit)
+        finally:
+            self.mode = mode
 
     def relax(self, outer: int) -> float:
         return 1.0 if outer == 0 else 0.5
