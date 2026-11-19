@@ -126,6 +126,10 @@ class Shear(Flexure):
             et = (f1 - t["fs"][i]) / de
             if math.isnan(et):
                 continue
+            if abs(t["fs"][i]) >= l.steel.fy * l.steel.phi - 1e-6:
+                # on its yield plateau (not unloading) a bar keeps the stiffness of the start
+                # of strain hardening
+                et = max(et, l.steel.plateau_stiffness(t["es"][i]))
             jz = float(np.interp(l.z, z.ravel()[::-1], t["j"].ravel()[::-1]))
             ea = (et - jz) * l.area
             yb = l.z - sec.zaxial

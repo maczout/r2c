@@ -213,6 +213,18 @@ class SteelLaw:
     def stress(self, e):
         return self.raw(e) * self.phi
 
+    def plateau_stiffness(self, e) -> float:
+        """The stiffness a bar on its yield plateau has in the shear flow calculation: the
+        slope of its curve where strain hardening starts (inferred from Response's output,
+        docs/kernel.md). Zero off the plateau, for tendons, and with material factors in
+        effect (not observed there)."""
+        if self.prestress or self.factored:
+            return 0.0
+        a = abs(float(e))
+        if not (self.fy / self.E < a < self.esh):
+            return 0.0
+        return 2.0 * (self.fu - self.fy) / (self.eu - self.esh) * self.phi
+
     def crack_capacity(self, e, prestrain, rho, strand: bool):
         """Largest stress the steel can reach at a crack, for an average strain e (thesis 4-5):
         the bare-bar stress at a concentrated strain, never less than yield. nan: the bar
