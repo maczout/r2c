@@ -8,11 +8,11 @@ run of `tools/verify.py` and headed by the commit, machine and date of that run.
 numbers below are those of that run; numbers marked "2026-11-15 run" are from the earlier
 comparison.
 
-Transitional note (2026-11-17): the generated results of 2026-11-17 cover the 18 cases on
-Response's built-in Newbeam. The 7 cases on Response's sample inputs (Marshall, Cm4, Liping
-LB1, se100, dm-n1n) need those inputs and have not been regenerated; numbers for them below are
-from the comparison of 2026-11-15 and say so. Whether a difference is acceptable is decided
-against `docs/acceptance.md`, not here.
+The generated results cover all 25 cases, the 7 on Response's sample inputs (Marshall, Cm4,
+Liping LB1, se100, dm-n1n) included (run of 2026-11-19). For those 7 the stage counts, peaks
+and curve distances on the control charts are the same as in the 2026-11-15 comparison, to the
+figure shown; their detail views had not been compared case by case before (see Detail views).
+Whether a difference is acceptable is decided against `docs/acceptance.md`, not here.
 
 Reproduce with `python tools/verify.py tests/oracle --inputs RESPONSE_FOLDER --out OUT`, then
 `python tools/report.py OUT`; compare any two records with
@@ -32,7 +32,7 @@ What this shows:
 * Newbeam in tension: Response stops when the section, bending under the unsymmetric steel,
   reaches zero strain at one face; r2c stops at the same place (no state exists there in
   either), two stages earlier.
-* Cm4 (prestressed, ten steel layers, two concretes; 2026-11-15 run): stage for stage to the
+* Cm4 (prestressed, ten steel layers, two concretes): stage for stage to the
   first strand rupture, peak within 0.04 %. Afterwards the sequence of ruptures is the same but the stages
   differ, and Response ran to its limit of 101 stages where r2c ends at 90.
 * More Detail: same peak; 236 stages against 228 because the unrefined solves differ by two.
@@ -43,7 +43,7 @@ What this shows:
 
 * **Where shear governs and failure follows the first yielding of the stirrups** (Newbeam at
   M/V = 1 m, with and without axial load; Marshall; Liping LB1; se100): the peak is within
-  about 1 % (2026-11-15 run for the last three), the curve within 2 %, and up to the peak most
+  about 1 %, the curve within 2 %, and up to the peak most
   stages coincide. For the Newbeam at
   M/V = 1 m, r2c's stresses at Response's own strain states agree within a few thousandths of
   a MPa at every node, up to the peak.
@@ -58,7 +58,7 @@ What this shows:
   states and it ends the response at the first plateau: **16 %, 7 % and 10 % below Response's
   peak** in these three cases. This is the main shortfall. It errs low, but it is not a
   property to lean on.
-* **dm-n1n: r2c's peak is 4.5 % above Response's** (2026-11-15 run). The curves coincide up
+* **dm-n1n: r2c's peak is 4.5 % above Response's.** The curves coincide up
   to Response's peak
   (curve distance 0.6 %); there Response's load starts to fall and r2c's keeps rising for
   three more stages. Not explained. This one errs high.
@@ -90,14 +90,28 @@ incomplete:
   last stage with Response's peak, which are different states. Meaningless until r2c reaches
   that peak.
 
+The sample-input cases, first compared view by view in the run of 2026-11-19, add these
+(measured; none investigated):
+
+* **Principal Tensile Stress, Marshall under axial compression alone:** 1900 % (Response's
+  largest value 0.10 MPa, r2c's lines differ by up to 1.9 MPa). Same pattern as the Newbeam
+  under axial compression alone, above.
+* **With shear, outside the exceptions known before:** se100, Longitudinal Concrete Stress 15 %
+  and Average Angle 14 %; Liping LB1, Long. Reinf Stress at Crack 18 %; dm-n1n, Long. Reinf
+  Stress at Crack 7 %; Marshall with shear, Shear Stress 8 % and Average Angle 6 %; transverse
+  and shear strain 5 to 8 % on Liping LB1, se100 and Marshall. In these cases r2c's peak and
+  Response's differ by 0.1 to 4.5 %, so the stages compared are not quite the same state;
+  how much of this that accounts for is not known.
+
 The exceptions known before:
 
 * Principal Tensile Stress: Response draws the cracking-stress line reduced in the compression
   zone; r2c draws it unreduced (20 to 50 % of the chart's largest value there). The stress line
   itself agrees.
 * Crack spacing and crack width charts for Cm4 and Liping LB1 (sections with many layers or
-  ties): up to 44 % locally in spacing, 28 % in width. The Newbeam and Marshall charts agree
-  within 2 %.
+  ties): up to 44 % locally in spacing, 28 % in width; on Liping LB1 the diagonal spacing up to
+  38 %. The Newbeam charts agree within 2 %; the Marshall charts within 2.5 % (the 2026-11-15
+  version said 2 %).
 * Transverse Average Bond: approximate in r2c (up to 36 %).
 * Shear on Crack: r2c plots the magnitude; Response plots it signed.
 * Node depths are not identical to Response's, so rows do not line up one for one; the number
@@ -125,4 +139,5 @@ stress and 9.8 otherwise in kg-cm units).
 25 captures, each of every stage, made with `r2x` (worker, `--stage all`) from Response-2000
 1.9.7 (r2k.exe SHA-256 bbf4bc59…4e74) under Wine 9.0. The fixtures in tests/oracle are those
 records cut down to the control charts and the peak stage with tools/trim.py; nothing in them
-is edited. Response's sample inputs are not in this repository.
+is edited. Response's sample inputs are not in this repository. The archive of full captures
+was rebuilt with `tools/capture.py` on 2026-11-19 and every capture matched its fixture.

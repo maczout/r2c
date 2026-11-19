@@ -30,7 +30,7 @@ developer's. Items that need a structural judgement are marked **(structural)**.
 ## 2. Against Response-2000 1.9.7
 
 The numbers are in `docs/verification-results.md` and what they mean is in
-`docs/verification.md`. In short, as of the 2026-11-15 comparison of all 25 cases:
+`docs/verification.md`. In short, for all 25 cases (run of 2026-11-19; the same as the 2026-11-15 comparison):
 
 | Group | Cases | Result |
 |---|---|---|
@@ -40,9 +40,10 @@ The numbers are in `docs/verification-results.md` and what they mean is in
 | Shear, section carries more after first stirrup yield (Newbeam M/V = 2 m, 0.5 m, 1 ft US) | 3 | r2c stops at the first plateau: 16 %, 7 %, 10 % low |
 | Shear: dm-n1n | 1 | r2c's peak 4.5 % **above** Response's; not explained |
 
-The generated results of 2026-11-17 cover the 18 cases with the built-in Newbeam only; the 7
-cases on Response's sample inputs need those inputs and are to be rerun on a machine that
-has them.
+The generated results (run of 2026-11-19) cover all 25 cases, the 7 on Response's sample
+inputs included. The control-chart numbers of all 25 are the same as in the 2026-11-15
+comparison. The detail views of the 7 sample cases, compared for the first time, show
+differences not listed before (finding I in section 6).
 
 ### The two shear problems
 
@@ -88,7 +89,9 @@ scratch each time; and numpy call overhead on arrays of about 100 nodes.
   other than the defaults and those in the samples.
 - Out of scope by design: hollow sections, long-term effects, strain discontinuity, the old text
   input format.
-- `tools/capture.py` has been dry-run only; it has not yet run against Response.
+- `tools/capture.py` has rebuilt the oracle archive against Response (2026-11-19): all 25
+  captures match their fixtures. r2x's clipboard helper can fail transiently (once in 25
+  captures); a rerun of that case on its own then matched.
 
 ## 5. Decisions that are the owner's
 
@@ -135,8 +138,8 @@ sections and added tendons; implement curved outline segments (needed for circle
 
 **E. Housekeeping.**
 - E3. Compare the untested combinations in section 4.
-- E4. On a machine with Response-2000 and its sample inputs: build the oracle archive with `tools/capture.py` (checks the
-  fixtures reproduce), then rerun verify with Response's inputs and regenerate the report.
+- E5. `tools/capture.py` could retry a case once when r2x fails, since the one failure seen was
+  transient. Not done: one failure is not yet a pattern.
 
 **F. Detail views.** Reduced cracking-stress line in the compression zone; crack spacing on
 multi-layer sections; signed shear on crack; transverse bond. Display-level, except that the
@@ -147,6 +150,14 @@ apply. No effect seen in the cases compared.
 Response shows the bottom bar at 340 MPa at a crack and r2c shows 0; the Newbeam with N and M
 differs the same way. Not investigated (see `docs/verification.md`, Detail views). Display or
 kernel: unknown. The peak loads in these cases agree.
+
+**I. Detail views of the sample-input cases, found 2026-11-19.** Not investigated. Marshall
+under axial compression alone: Principal Tensile Stress 1900 % (Response's largest value
+0.10 MPa), like the Newbeam's 371 %. With shear: se100 Longitudinal Concrete Stress 15 % and
+Average Angle 14 %, Liping LB1 Long. Reinf Stress at Crack 18 %, Marshall Shear Stress 8 %,
+strains 5 to 8 %. Part may come from comparing at slightly different states (peaks differ by
+0.1 to 4.5 %). Details in `docs/verification.md`. Whether they matter depends on what
+acceptance says about detail views **(structural)**.
 
 **G. End-of-response rules.** r2c's rules after a shear failure and after rupture are its own
 guesses. Depends on what acceptance says about post-peak.
