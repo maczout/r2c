@@ -7,8 +7,9 @@
 The recipe is the fixtures themselves. Each fixture in tests/oracle is a capture cut down to
 its control charts and peak, and its header records how it was made: the input (by name and
 SHA-256), units, factors, initial load, increment, More Detail and views. For each fixture this
-tool finds the input with that SHA-256 in the --inputs folders, runs r2x's worker with the same
-settings and every stage, and writes ARCHIVE/NAME.r2x.txt.
+tool finds the input with that SHA-256 in the --inputs folders, copies it to ARCHIVE/inputs/
+under the fixture's input name (r2x records the name), runs r2x's worker with the same settings
+and every stage, and writes ARCHIVE/NAME.r2x.txt.
 
 It then checks the capture against the fixture: the capture is cut down the way the fixture was
 (tools/trim.py) and the two must match byte for byte, apart from header lines that identify the
@@ -36,6 +37,7 @@ import hashlib
 import json
 import os
 import shlex
+import shutil
 import subprocess
 import sys
 import time
@@ -141,6 +143,13 @@ def main(argv=None) -> int:
                       f"not found under --inputs: skipped")
                 failures += 1
                 continue
+            # the same bytes can sit under another name (Response's Newbeam.r2t is r2x's
+            # input.r2t), and r2x records the file's name: run it under the fixture's name
+            named = archive / "inputs" / h["input-sha256"][:16] / h["input-name"]
+            if not named.exists():
+                named.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copyfile(inp, named)
+            inp = named
         out = archive / f"{name}.r2x.txt"
         cmd = command(h, inp, out, worker, a.response_dir or "RESPONSE_DIR")
         if a.dry_run:
