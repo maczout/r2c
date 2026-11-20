@@ -20,7 +20,8 @@ developer's. Items that need a structural judgement are marked **(structural)**.
   driver, shear by the longitudinal stiffness method, stepping in curvature and then in the
   shear strain.
 - Tools: `compare.py` (any two records), `verify.py` (r2c on a set of oracle records),
-  `report.py` (verification results from a verify run), `trim.py` (record to fixture),
+  `report.py` (verification results from a verify run), `dashboard.py` (the same results as
+  one HTML page of pictures, for the owner's review), `trim.py` (record to fixture),
   `diagnose.py` (r2c at Response's strain states, along its control values, and its
   calculated shear stress in Response's states),
   `capture.py` (rebuild the oracle archive with r2x), `check.py` (checks before pushing).
@@ -43,7 +44,7 @@ The numbers are in `docs/verification-results.md` and what they mean is in
 | Shear: dm-n1n | 1 | r2c's peak 3.4 % **above** Response's (was 4.5 %); not explained |
 
 No acceptance tolerances are set, so none of this is assessed. The developer's working
-target for the 2026-11-19 step (not acceptance; session log 2026-11-19-02) was: the three
+target for the 2026-11-19 step (not acceptance; session log 2026-11-19-03) was: the three
 cases of the fourth row within 2 % of Response's peak, the six well-matched shear cases moving
 by no more than 0.5 %. Met by M/V = 2 m and the US case; not by M/V = 0.5 m; and Liping LB1
 moved by 0.9 %.
@@ -129,6 +130,11 @@ scratch each time; and numpy call overhead on arrays of about 100 nodes.
 
 Grouped, not ranked. Sizes are rough.
 
+**Before the others: r2c's curves into the results.** The committed results JSON predates
+`report.py` keeping r2c's curves, so the results page draws Response's alone (`tools/check.py`
+warns). Rerun `tools/report.py` on the verify output of 2026-11-19 if it still exists (the
+kernel is unchanged since), or rerun verify and report with Response's sample inputs.
+
 **A. Shear: the stiffness in the shear flow once stirrups have yielded widely**, the main
 shortfall left (section 2).
 - A1. Read how Response does it: the shear distribution routine (`0041e840`) and the driver
@@ -136,7 +142,7 @@ shortfall left (section 2).
   from Response's output) and found two rules that way; the third did not yield to output
   alone. Reading these two routines is now the likely route, and would also say what makes
   Response change to shear strain control. **The owner's decision** (open question in the
-  2026-11-19-02 log).
+  2026-11-19-03 log).
 - A2. More fitting from output with `tools/diagnose.py flow`. Tried for one session on this
   third difference without result; risk of fitting single cases.
 - The test either way: `flow` on newbeam-m2v (stages 57 on) and newbeam-m05v (37 to 43)

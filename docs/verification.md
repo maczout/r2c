@@ -55,7 +55,7 @@ What this shows:
   M/V = 2 m, at M/V = 0.5 m, and in US units at M/V = 1 ft), r2c stopped at the first plateau
   until 2026-11-19, 16 %, 7 % and 10 % below Response's peak. The cause was not the profile
   iteration, as earlier versions of this file said. Two things were found (docs/kernel.md,
-  session log 2026-11-19-02):
+  session log 2026-11-19-03):
   * *M/V = 2 m.* The bottom bars yield and the load climbs on to the flexural capacity. In
     Response's own states r2c's forces agreed within 0.2 %, but its calculated shear stress
     profile was 25 to 50 % off, because it gave a bar on its yield plateau no stiffness.
