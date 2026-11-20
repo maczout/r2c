@@ -130,11 +130,6 @@ scratch each time; and numpy call overhead on arrays of about 100 nodes.
 
 Grouped, not ranked. Sizes are rough.
 
-**Before the others: r2c's curves into the results.** The committed results JSON predates
-`report.py` keeping r2c's curves, so the results page draws Response's alone (`tools/check.py`
-warns). Rerun `tools/report.py` on the verify output of 2026-11-19 if it still exists (the
-kernel is unchanged since), or rerun verify and report with Response's sample inputs.
-
 **A. Shear: the stiffness in the shear flow once stirrups have yielded widely**, the main
 shortfall left (section 2).
 - A1. Read how Response does it: the shear distribution routine (`0041e840`) and the driver
