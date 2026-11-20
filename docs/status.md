@@ -113,6 +113,11 @@ scratch each time; and numpy call overhead on arrays of about 100 nodes.
 
 Grouped, not ranked. Sizes are rough.
 
+**Before the others: r2c's curves into the results.** The committed results JSON predates
+`report.py` keeping r2c's curves, so the results page draws Response's alone (`tools/check.py`
+warns). Rerun `tools/report.py` on the verify output of 2026-11-19 if it still exists (the
+kernel is unchanged since), or rerun verify and report with Response's sample inputs.
+
 **A. Shear profile iteration (accuracy and speed together)**, the main shortfall.
 - A1. Read how Response iterates: the shear distribution routine (`0041e840`) and the driver
   (`00417290`) were never read. Likely the quickest route to matching. Within CLAUDE.md's

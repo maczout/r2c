@@ -10,24 +10,26 @@ case, how the detail views at the peak compare, and what the control curves look
 overlaid.
 
 RESULTS is a folder written by tools/verify.py (results.json and run.json) or the combined
-JSON tools/report.py writes (default: docs/verification-results.json). The curves need r2c's
-records, which verify writes to its output folder (NAME.r2x.txt); --curves names that folder
-and defaults to RESULTS when RESULTS is a folder. Response's curves come from the reference
+JSON tools/report.py writes (default: docs/verification-results.json). r2c's curves come from
+that JSON (report.py keeps them there) or, failing that, from r2c's records in a verify output
+folder (NAME.r2x.txt): --curves names it, and defaults to RESULTS when RESULTS is a folder. Response's curves come from the reference
 records (default: the oracle fixtures). A case whose r2c record was made at a different commit
 from its metrics is marked on its curve panel; a case without a record shows Response's alone.
 
 Like docs/verification-results.md, every number on the page is generated from a run; nothing
 is typed in. Tolerances are read from docs/acceptance.md and drawn only where the owner has
 set them: until then nothing is assessed. The page is one self-contained HTML file (no
-network). It is output, not source: it is not committed.
+network). It is output, not source: it is not committed. CI builds it from the committed
+results on every push to main and publishes it with GitHub Pages
+(.github/workflows/pages.yml), so it follows the results without a step by hand.
 """
 
 from __future__ import annotations
 
 import argparse
-import html
 import json
 import re
+import subprocess
 import sys
 from pathlib import Path
 
@@ -136,6 +138,21 @@ def variants(ref: dict) -> list[str]:
 # ---------------------------------------------------------------- assembling
 
 
+def stale(run: dict) -> str:
+    """Why the results may not describe the kernel at HEAD; empty if they do or git can't tell."""
+    commit = run.get("commit", "")
+    if run.get("dirty"):
+        return "the run was made with uncommitted changes"
+    try:
+        p = subprocess.run(["git", "-C", str(ROOT), "diff", "--name-only", commit, "HEAD", "--",
+                            "src/r2c"], capture_output=True, text=True)
+    except OSError:
+        return ""
+    if p.returncode != 0 or not p.stdout.strip():
+        return ""
+    return "the kernel has changed since the run (" + ", ".join(p.stdout.split()) + ")"
+
+
 def build(run: dict, results: dict, acc: dict, curves_dir: Path | None, ref_dir: Path,
           gaps: list[str]) -> dict:
     cases = []
@@ -185,7 +202,9 @@ def build(run: dict, results: dict, acc: dict, curves_dir: Path | None, ref_dir:
             case["curve"] = {"x": xt, "y": yt, "ref": rc,
                              "ref_peak_stage": int(ref.get("peak-stage") or 0)}
             subp = curves_dir / f"{name}.r2x.txt" if curves_dir else None
-            if subp and subp.exists():
+            if r.get("sub_curve"):
+                case["curve"]["sub"] = r["sub_curve"]
+            elif subp and subp.exists():
                 sub = record.read(subp)
                 case["curve"]["sub"] = curve(sub, c["chart"])[2]
                 case["curve"]["sub_peak_stage"] = int(sub.header.get("peak-stage") or 0)
@@ -200,7 +219,7 @@ def build(run: dict, results: dict, acc: dict, curves_dir: Path | None, ref_dir:
                     if o.get("run") and case["run"] and o["run"] != case["run"] and not same:
                         case["curve"]["other_run"] = o["run"]
         cases.append(case)
-    return {"run": run, "cases": cases, "gaps": gaps,
+    return {"run": run, "cases": cases, "gaps": gaps, "stale": stale(run),
             "acceptance": {g: t for g, t in acc.items() if t}}
 
 
@@ -279,6 +298,8 @@ const run = D.run, when = (run.started||"").replace("T"," ").slice(0,16);
 H += `<h1>r2c against Response-2000</h1>
 <p class="sub">r2c ${esc(run.r2c_version||"")} at <code>${esc((run.commit||"").slice(0,12))}</code>${run.dirty?" (uncommitted changes)":""}
  · run ${esc(when)} UTC on ${esc(run.host||"")} · reference: Response-2000 1.9.7 via r2x (the oracle fixtures)</p>`;
+H += `<p class="note">r2c is an unofficial, work-in-progress clone of Response-2000's sectional analysis, not affiliated with Response-2000's authors. This page compares the two; it does not check designs.</p>`;
+if (D.stale) H += `<div class="warn">These results may be stale: ${esc(D.stale)}.</div>`;
 const accSet = Object.keys(D.acceptance).length;
 H += accSet ? `<p class="note">Tolerances from docs/acceptance.md are drawn in red where set.</p>`
  : `<div class="warn">No tolerances are set in docs/acceptance.md yet, so nothing here is assessed: the page shows differences, not verdicts.</div>`;

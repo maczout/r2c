@@ -11,7 +11,8 @@ in for the other in a workflow, and r2x serves as the oracle that r2c is compare
 **Status: 0.1.0, a first pass.** Flexure and axial load follow Response closely, stage for
 stage in most cases. Shear follows it up to the peak in the cases tried, and less well after
 it; some shear responses end early. `docs/verification-results.md` has the numbers, case by case, and
-`docs/verification.md` what they mean and what falls short. Read both before relying on a
+`docs/verification.md` what they mean and what falls short; https://maczout.github.io/r2c/
+shows the same results as pictures. Read both before relying on a
 result.
 
 r2c is not affiliated with the authors of Response-2000 and does not check designs. Its results
@@ -76,6 +77,7 @@ straight. Negative shear is refused, as in Response.
     tools/verify.py        run r2c on a set of reference records and compare
     tools/trim.py          cut a record down to a test fixture
     tools/report.py        write docs/verification-results.md from a verify run
+    tools/dashboard.py     the results as one HTML page (published by CI with GitHub Pages)
     tools/diagnose.py      r2c at Response's strain states, and along its control values
     tools/capture.py       rebuild the archive of full oracle captures with r2x
     tools/check.py         checks before pushing: results current, docs as generated
