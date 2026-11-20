@@ -8,6 +8,7 @@
    commit its run was made at. If it is stale, it says so (an error with --strict).
 3. docs/verification-results.md has not been edited by hand: it still carries the generated
    marker and matches what tools/report.py writes from its own JSON.
+   Also warns when r2c's curves are missing from the JSON (the dashboard needs them).
 4. Every session log in docs/log has the sections the template asks for.
 
 Exit status 0 when all pass; 1 when one fails (stale results only with --strict).
@@ -70,6 +71,10 @@ def main(argv=None) -> int:
             bad += 1
         else:
             print("ok    verification results: as generated")
+        bare = [n for n, r in data["results"].items() if r.get("control") and "sub_curve" not in r]
+        if bare:
+            print(f"warn  verification results: r2c's curves missing for {len(bare)} case(s), so "
+                  f"the dashboard draws Response's alone (rerun tools/report.py on a verify output)")
         rc, changed = git("diff", "--name-only", commit, "HEAD", "--", "src/r2c")
         if rc != 0:
             print(f"warn  verification results: cannot tell whether current (commit "

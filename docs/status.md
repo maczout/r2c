@@ -19,7 +19,8 @@ developer's. Items that need a structural judgement are marked **(structural)**.
 - Kernel in Python (numpy only): MCFT node with crack check, dynamic layering, flexure and axial
   driver, shear by the longitudinal stiffness method.
 - Tools: `compare.py` (any two records), `verify.py` (r2c on a set of oracle records),
-  `report.py` (verification results from a verify run), `trim.py` (record to fixture),
+  `report.py` (verification results from a verify run), `dashboard.py` (the same results as
+  one HTML page of pictures, for the owner's review), `trim.py` (record to fixture),
   `diagnose.py` (r2c at Response's strain states, and along its control values),
   `capture.py` (rebuild the oracle archive with r2x), `check.py` (checks before pushing).
 - 25 oracle fixtures in `tests/oracle`; pytest tests (fast set; `-m slow` for two shear cases;
@@ -111,6 +112,11 @@ scratch each time; and numpy call overhead on arrays of about 100 nodes.
 ## 6. Options for next steps
 
 Grouped, not ranked. Sizes are rough.
+
+**Before the others: r2c's curves into the results.** The committed results JSON predates
+`report.py` keeping r2c's curves, so the results page draws Response's alone (`tools/check.py`
+warns). Rerun `tools/report.py` on the verify output of 2026-11-19 if it still exists (the
+kernel is unchanged since), or rerun verify and report with Response's sample inputs.
 
 **A. Shear profile iteration (accuracy and speed together)**, the main shortfall.
 - A1. Read how Response iterates: the shear distribution routine (`0041e840`) and the driver
