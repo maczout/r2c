@@ -88,9 +88,8 @@ def main(argv=None) -> int:
         out = Path(tmp) / "out.c"
         cmd = [str(Path(home).expanduser() / "support" / "analyzeHeadless"), str(proj.parent), proj.name,
                "-process", a.program, "-noanalysis", "-readOnly", "-scriptPath", tmp,
-               "-postScript", "R2cDecompile.java", str(out), *a.addresses]
-        if a.calls:
-            cmd.append("--calls")
+               "-postScript", "R2cDecompile.java", str(out)]
+        cmd += (["--calls"] if a.calls else []) + a.addresses
         r = subprocess.run(cmd, capture_output=True, text=True)
         if not out.exists():
             sys.stderr.write(r.stdout[-3000:] + r.stderr[-3000:])
