@@ -17,15 +17,16 @@ developer's. Items that need a structural judgement are marked **(structural)**.
 - `r2c solve` with r2x's options, exit statuses and record format (r2x-raw 1, all views).
   Left out as agreed: `--report`, `define`/sessions, `setup`; `health` prints a version line.
 - Kernel in Python (numpy only): MCFT node with crack check, dynamic layering, flexure and axial
-  driver, shear by the longitudinal stiffness method, stepping in curvature and then in the
-  shear strain.
+  driver, shear by the longitudinal stiffness method with Response's own stiffness rules,
+  stepping in curvature and then in the shear strain.
 - Tools: `compare.py` (any two records), `verify.py` (r2c on a set of oracle records),
   `report.py` (verification results from a verify run), `dashboard.py` (the same results as
   one HTML page of pictures, for the owner's review), `trim.py` (record to fixture),
-  `diagnose.py` (r2c at Response's strain states, along its control values, and its
-  calculated shear stress in Response's states),
+  `diagnose.py` (r2c at Response's strain states, along its control values, its calculated
+  shear stress in Response's states, and its own stages with their profile error),
+  `decompile.py` (a routine of r2k.exe from a Ghidra project kept outside the repository),
   `capture.py` (rebuild the oracle archive with r2x), `check.py` (checks before pushing).
-- 25 oracle fixtures in `tests/oracle`; pytest tests (fast set; `-m slow` for four shear cases;
+- 25 oracle fixtures in `tests/oracle`; pytest tests (fast set; `-m slow` for five shear cases;
   `R2C_RESPONSE_DIR` for Response's sample inputs).
 - Docs: `kernel.md` (each rule and its source), `verification.md` (what the results mean),
   `verification-results.md` (generated), `acceptance.md` (the owner's tolerances; template).
@@ -33,45 +34,50 @@ developer's. Items that need a structural judgement are marked **(structural)**.
 ## 2. Against Response-2000 1.9.7
 
 The numbers are in `docs/verification-results.md` and what they mean is in
-`docs/verification.md`. In short, for all 25 cases (run of 2026-11-19, second of that day):
+`docs/verification.md`. In short, for all 25 cases (run of 2026-11-19, third of that day):
 
 | Group | Cases | Result |
 |---|---|---|
 | No shear | 15 | Peak within 0.3 %, curve within 0.5 % (unchanged) |
-| Shear, failure at first stirrup yield | 5 | Peak within about 1 %, except Liping LB1 at +1.8 % (was +0.9 %) |
+| Shear, failure at first stirrup yield | 5 | Peak within 1 % (Liping LB1 −0.4 %, was +1.8 %) |
 | Shear alone (Newbeam, V only) | 1 | Peak 0.5 % low; r2c ends soon after the peak |
-| Shear, section carries more after first stirrup yield | 3 | M/V = 2 m: 1.8 % low (was 16 %). US, M/V = 1 ft: 0.75 % high (was 10 % low). M/V = 0.5 m: 5.2 % low (was 6.9 %) |
-| Shear: dm-n1n | 1 | r2c's peak 3.4 % **above** Response's (was 4.5 %); not explained |
+| Shear, section carries more after first stirrup yield | 3 | All reach Response's peak. M/V = 0.5 m: +0.5 % (was −5.2 %). US, M/V = 1 ft: +0.9 %. M/V = 2 m: on Response's curve to its end, then carries on where Response ends, +3.7 % |
+| Shear: dm-n1n | 1 | r2c's peak 3.2 % **above** Response's; not explained |
 
-No acceptance tolerances are set, so none of this is assessed. The developer's working
-target for the 2026-11-19 step (not acceptance; session log 2026-11-19-03) was: the three
-cases of the fourth row within 2 % of Response's peak, the six well-matched shear cases moving
-by no more than 0.5 %. Met by M/V = 2 m and the US case; not by M/V = 0.5 m; and Liping LB1
-moved by 0.9 %.
+No acceptance tolerances are set, so none of this is assessed. The owner's ruling for the
+2026-11-19 step (not a tolerance): the three cases of the fourth row at 7 to 16 % below
+Response's peak were outside acceptance. They are no longer below it; M/V = 2 m is now
+3.7 % above, for a different reason (below).
 
-### What is known about the shear shortfall
+### What is known about shear
 
-**It is the stiffness in the shear flow calculation, not the iteration.** `tools/diagnose.py
-flow` puts r2c in Response's own states and compares its calculated shear stress profile with
-the state's. Response's own two lines agree within 1 %. Where r2c's do not, no iteration can
-settle there. Earlier versions of this file blamed the fixed-damping iteration; that was
-wrong.
+**The stiffness in the shear flow calculation was the cause of responses ending short**, and
+is now Response's own, read from the binary (`docs/kernel.md`, "The stiffness in the shear
+flow calculation"). `tools/diagnose.py flow` puts r2c in Response's own states and compares
+its calculated shear stress profile with the state's; Response's own two lines agree within
+1 %. r2c's now do too (within a point of Response's figure) on Marshall, se100, the Newbeam
+at M/V = 1 m with and without axial load, shear alone, M/V = 2 m to stage 78 of 87 and
+M/V = 0.5 m to stage 39.
 
-- *Found and fixed:* a bar on its yield plateau had no stiffness in r2c's calculation;
-  Response's profiles imply the slope at the start of strain hardening (three steels). This
-  took M/V = 2 m from stage 31 to stage 56 of Response's 88.
-- *Found and followed:* once shear governs, Response steps in the shear strain, not the
-  curvature. r2c now changes over (its own trigger). The US case follows Response through a
-  23 % fall of load and the recovery to its peak.
-- *Open:* once stirrups have yielded over much of the depth, r2c's calculated profile in
-  Response's states is 7 to 35 % off (M/V = 2 m from stage 57; M/V = 0.5 m, stages 37 to 43).
-  The change of shear strain along the member that r2c solves for is what differs; leaving it
-  out fits three stages and no others. Not pinned down from output. This is what keeps
-  M/V = 0.5 m at 5.2 % low and ends M/V = 2 m at 1.8 % low.
+*Still different in Response's states:* 3 to 7 % after a fall of load, on the recovery
+(M/V = 0.5 m from stage 41, the US case from 31); 2 to 5 % on Liping LB1 from stage 13; up
+to 2 % at the end of M/V = 2 m. Not explained. The peaks of these cases agree within 1 %
+all the same.
+
+**Where the response ends is r2c's own guess, and now decides two results.**
+- *M/V = 2 m:* Response's stages stand still at a curvature of 39 rad/km and its response
+  ends; r2c goes on to 67 rad/km on closest iterates (profile error 1.8 to 2.7 %), 3.7 %
+  more load.
+- *M/V = 1 m:* with the new stiffness r2c found converged states up to 22 % beyond
+  Response's failure, through its own rule of searching beyond a state it could not find.
+  That rule is removed and r2c ends where Response does. Whether those states are real for
+  the section is a structural question.
+Response's own acceptance of a stage and its step control are in `00418af0` and `00424c60`,
+read in passing and not taken over.
 
 **dm-n1n.** The curves coincide to Response's peak. At the next step Response's shear strain
-jumps and its load falls; r2c finds a converged state at nearly the same curvature with less
-shear strain and 1.2 % more load, then a closest iterate (profile error 2.7 %) at +3.4 %.
+jumps and its load falls; r2c carries on to 3.2 % more. r2c's calculated shear stress in
+Response's states agrees as Response's does, so it is not the stiffness.
 
 ## 3. Performance
 
@@ -87,9 +93,10 @@ start-up plus solve (estimated by subtracting chart reading from all-stage captu
 So: without shear the two are in the same range. With shear r2c is several times slower on the
 stages it finds and roughly 10 to 50 times slower overall (estimated).
 
-Shear cases in the second run of 2026-11-19: 56 to 126 s (8 at a time on 32 cores), against
-50 to 112 s in the first: the cases that now continue take longer. The breakdown below has
-not been measured again.
+Shear cases in the third run of 2026-11-19 (Response's stiffness rules; no search beyond a
+state not found): 25 to 109 s, 12 at a time on 32 cores, against 56 to 126 s in the second
+run (8 at a time). The breakdown below has not been measured again; the failing tail it
+describes is shorter now, by how much was not measured.
 
 Where the shear time goes (measured 2026-11-15): about 90 % after the last stage found,
 retrying smaller steps and looking beyond a target, each attempt running to its iteration
@@ -130,34 +137,25 @@ scratch each time; and numpy call overhead on arrays of about 100 nodes.
 
 Grouped, not ranked. Sizes are rough.
 
-**A. Shear: the stiffness in the shear flow once stirrups have yielded widely**, the main
-shortfall left (section 2).
-- A1. Read how Response does it: the shear distribution routine (`0041e840`) and the driver
-  (`00417290`) were never read. The 2026-11-19 step took the owner's route A2 (r2c's own,
-  from Response's output) and found two rules that way; the third did not yield to output
-  alone. Reading these two routines is now the likely route, and would also say what makes
-  Response change to shear strain control. **The owner's decision** (open question in the
-  2026-11-19-03 log).
-- A2. More fitting from output with `tools/diagnose.py flow`. Tried for one session on this
-  third difference without result; risk of fitting single cases.
-- The test either way: `flow` on newbeam-m2v (stages 57 on) and newbeam-m05v (37 to 43)
-  should come down to Response's 1 %; then `controls`; then full solves. The well-matched
-  cases must not move.
+**A. Shear: where the response ends, and how a stage is accepted.** The stiffness is done
+(section 2). What is left decides M/V = 2 m (+3.7 %) and bears on dm-n1n (B).
+- A3. Read Response's acceptance of a stage and its step control (`00418af0`, `00424c60`,
+  `00420f20`, `004276a0`; `0041e840` for the profile update) and take them over in place of
+  r2c's own iteration, closest-iterate rule and change to shear strain control. Read in
+  passing 2026-11-19: up to 16 passes a stage, converged under 1 %, a stage refused above
+  3 % after 16 passes under a condition not yet understood. This overlaps option G.
+  **Needs the owner's word**: G was out of scope for the 2026-11-19 step.
+- A4. The differences left in Response's states (after a fall of load; Liping LB1 from
+  stage 13): `tools/diagnose.py flow --profile` shows where over the depth.
 
-**B. dm-n1n** (errs high, +3.4 %). First look done 2026-11-19 (section 2). Next: why r2c
-finds a state with less shear strain where Response's jumps. Needs a structural read of what
-governs that section's failure.
-
-**J. Liping LB1 moved to +1.8 %** with the change to shear strain control (2026-11-19). Not
-investigated: whether the extra stage is a state Response steps over or one it would not
-find.
+**B. dm-n1n** (errs high, +3.2 %). Not the stiffness (section 2). Next: Response's stage
+acceptance (A3), then a structural read of what governs that section's failure.
 
 **C. Finish the agreed test set.** Capture and compare the Quick Define T, I and circular
 sections and added tendons; implement curved outline segments (needed for circles).
 
 **D. Performance** (software).
-- D1. Remove the failing tail: follows from A; or cap it harder as a stopgap. Not measured
-  again since the 2026-11-19 changes.
+- D1. The failing tail: shorter since 2026-11-19 (section 3), not measured in detail.
 - D2. Warm-start the transverse equilibrium solve from the previous evaluation.
 - D3. Analytic tangents in place of finite differences.
 - D4. Compile the node routine (numba or a small C extension). Adds a dependency.
@@ -202,7 +200,9 @@ this for every fixture. The Newbeam input (`input.r2t`) is in r2x's
 `tests/reference/newbeam`.
 
 **Routines in r2k.exe 1.9.7 already located** (addresses as the decompiler shows them).
-Internal units in the binary: Pa and m; fc′ stored negative.
+Internal units in the binary: Pa and m; fc′ stored negative. `tools/decompile.py` shows any
+of them (Ghidra 12, headless; the project with r2k.exe analysed is kept outside the
+repository).
 
 | Address | What |
 |---|---|
@@ -218,4 +218,10 @@ Internal units in the binary: Pa and m; fc′ stored negative.
 | `00441d80`, `00440400` | flexural crack check |
 | `004fec60`, `004ff1a0` | bond parameter tables |
 | `00424a90`, `00423e50` | cracking strength table |
-| `0041e840`, `00417290` | shear distribution, driver: **not read** |
+| `0041e840`, `0041fe20` | shear distribution: calculated profile and profile update; the change of strain along the member |
+| `00427cd0`, `0046b940` | condensed stiffness of the nodes; the node's analytic stiffness |
+| `004201e0`, `004a8710` | stiffness of bars and of stirrups in that calculation |
+| `00424da0`, `004252c0`, `00422570` | assembly of the 3 × 3 system and its right-hand side |
+| `00440ea0` | the depth range with stiffness (in the flexural crack check) |
+| `00418af0`, `00424c60`, `00420f20` | load stage control, profile iteration, profile error: read in passing |
+| `00417290` | a secant stiffness of the section ("error in moment calculation"); not the shear driver it was taken for |
