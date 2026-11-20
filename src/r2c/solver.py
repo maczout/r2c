@@ -710,9 +710,6 @@ def _root(f, x0, dx, tol, maxit=80):
 class Flexure:
     """Full response without shear: axial load and moment."""
 
-    # when no state is found at a target or short of it, Response ends the response
-    search_beyond = False
-
     def __init__(self, an: Analysis, on_stage=None):
         self.an = an
         self.sec = an.sec
@@ -940,19 +937,6 @@ class Flexure:
                         sgn, d0 = self.sign, self.step0
                         target = cur.control + sgn * max(d0, 0.1 * abs(cur.control))
                         continue
-                    if not done and self.search_beyond and (
-                            peak <= 0 or self.stages[-1].lam > 0.95 * peak):
-                        # no state short of the target either: while the load is still at
-                        # its highest, look for one beyond it
-                        t = target
-                        for _ in range(6):
-                            t = t + sgn * max(d0, 0.1 * abs(t))
-                            try:
-                                cur = self.advance(cur, t, 2)
-                                done = True
-                                break
-                            except SolveError:
-                                continue
                     if not done:
                         break
                     target = cur.control

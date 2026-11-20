@@ -3,6 +3,9 @@
 Answers: "what does the routine at this address in Response-2000's binary do?", the question
 CLAUDE.md allows the binary to be read for. Prints Ghidra's C for each address given (the
 function containing it), and with --calls the routines it calls and those that call it.
+An argument d:ADDRESS prints the double stored at that address instead (a constant the
+decompiler shows as DAT_...); s:HEX lists the functions with an instruction that uses that
+scalar (to find who writes a field at a known offset).
 
 Needs, none of it in the repository:
 * Ghidra (12.x, headless) at $GHIDRA_HOME, with a JDK 21 on the path;
@@ -46,6 +49,30 @@ public class R2cDecompile extends GhidraScript {
             dec.openProgram(currentProgram);
             for (int i = 1; i < args.length; i++) {
                 if (args[i].equals("--calls")) { calls = true; continue; }
+                if (args[i].startsWith("s:")) {
+                    // functions with an instruction that uses this scalar (a structure offset, say)
+                    long want = Long.parseLong(args[i].substring(2), 16);
+                    java.util.TreeMap<String, Integer> hits = new java.util.TreeMap<>();
+                    ghidra.program.model.listing.InstructionIterator it = currentProgram.getListing().getInstructions(true);
+                    while (it.hasNext()) {
+                        ghidra.program.model.listing.Instruction ins = it.next();
+                        for (int k = 0; k < ins.getNumOperands(); k++)
+                            for (Object o : ins.getOpObjects(k))
+                                if (o instanceof ghidra.program.model.scalar.Scalar
+                                        && ((ghidra.program.model.scalar.Scalar) o).getUnsignedValue() == want) {
+                                    Function g = getFunctionContaining(ins.getAddress());
+                                    String key = (g == null ? "?" : g.getEntryPoint().toString()) + " " + ins.getMnemonicString();
+                                    hits.merge(key, 1, Integer::sum);
+                                }
+                    }
+                    out.println("// scalar 0x" + args[i].substring(2) + " used in: " + hits);
+                    continue;
+                }
+                if (args[i].startsWith("d:")) {
+                    Address d = currentProgram.getAddressFactory().getAddress(args[i].substring(2));
+                    out.println("// double at " + d + " = " + getDouble(d));
+                    continue;
+                }
                 Address a = currentProgram.getAddressFactory().getAddress(args[i]);
                 Function f = getFunctionContaining(a);
                 if (f == null) { out.println("// " + args[i] + ": no function here\n"); continue; }
@@ -72,7 +99,7 @@ public class R2cDecompile extends GhidraScript {
 
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("addresses", nargs="+", help="addresses as the decompiler shows them, e.g. 004ad9c0")
+    ap.add_argument("addresses", nargs="+", help="addresses as the decompiler shows them, e.g. 004ad9c0; d:0052e5b8 for a constant")
     ap.add_argument("--calls", action="store_true", help="also list callees and callers")
     ap.add_argument("--project", default=str(Path.home() / "ghidra-projects" / "r2k"),
                     help="Ghidra project, as folder/name (default ~/ghidra-projects/r2k)")

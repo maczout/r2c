@@ -7,6 +7,7 @@ docs/status.md.
     python tools/diagnose.py states   RECORD [--input FILE] [--stages 5,10,peak] [--views]
     python tools/diagnose.py controls RECORD [--input FILE] [--upto N]
     python tools/diagnose.py flow     RECORD [--input FILE] [--from N] [--upto N]
+    python tools/diagnose.py own      RECORD [--input FILE] [--from N]
                                       [--fit-layer I --at Y]
 
 RECORD is an r2x-raw record captured from Response-2000 (a fixture in tests/oracle, or a
@@ -161,10 +162,16 @@ def evaluate(su, e0, phi, prof):
     st = Stage(e0, phi, gam, 0.0, n, m, v, det)
     if prof is not None:
         from r2c.shear import Shear
-        z, _vs, tau, _t, _d = Shear(an).shear_flow(e0, phi, gam, v)
-        zf = z.ravel()[::-1]
-        zz, ii = np.unique(zf, return_index=True)
-        det.vcalc = np.interp(det.z, zz, tau.ravel()[::-1][ii])
+        from r2c.solver import SolveError
+        try:
+            z, _vs, tau, _t, _d = Shear(an).shear_flow(e0, phi, gam, v)
+        except SolveError:
+            # no stiffness left in this state: no calculated profile
+            det.vcalc = np.zeros(len(det.z))
+        else:
+            zf = z.ravel()[::-1]
+            zz, ii = np.unique(zf, return_index=True)
+            det.vcalc = np.interp(det.z, zz, tau.ravel()[::-1][ii])
     return st
 
 
@@ -329,6 +336,27 @@ def _calculated(su, st):
     return np.interp(st.detail.z, zz, tau.ravel()[::-1][ii])
 
 
+def cmd_own(a) -> int:
+    """r2c's own solve of the record's case, stage by stage: what it stepped in, the state,
+    the loads, and how far the calculated shear stress was from the state's when the stage
+    was accepted (1 % is converged; more is a closest iterate)."""
+    ref = record.decode(Path(a.record).read_bytes())
+    su = _setup(ref, a.input)
+    u = su.units
+    stages = su.driver().run(run.MAX_STAGES)
+    print(f"{'stage':>5} {'by':>4} {'e0 mm/m':>9} {'phi rad/km':>11} {'gxy mm/m':>9} "
+          f"{'N':>9} {'M':>9} {'V':>9} {'profile %':>9}")
+    for i, st in enumerate(stages):
+        if i < a.first:
+            continue
+        perr = getattr(st, "perr", None)
+        print(f"{i:>5} {getattr(st, 'cmode', '') or '':>4} {st.e0 * 1e3:9.4f} "
+              f"{st.phi * 1e6:11.3f} {getattr(st, 'gam_avg', st.gam) * 1e3:9.4f} "
+              f"{st.n / u.force:9.2f} {st.m / u.moment:9.2f} {st.v / u.force:9.2f} "
+              + (f"{100 * perr:9.2f}" if perr is not None else f"{'':>9}"))
+    return 0
+
+
 def cmd_flow(a) -> int:
     ref = record.read(a.record)
     su = _setup(ref, a.input)
@@ -354,6 +382,19 @@ def cmd_flow(a) -> int:
                    "r2c": _mismatch(z, np.asarray(d.out.v), np.asarray(d.vcalc),
                                     np.asarray(d.b))}
             lines = [ln for ln in cmp.parse_chart(ref.stage(s, "shear_stress"))[3] if len(ln)]
+            if a.profile == s and len(lines) >= 2:
+                # over the depth: Response's two lines, r2c's calculated stress, and what
+                # governs the principal tension at r2c's nodes
+                yy = (z - sec.zc) / u.length
+                o0, o1 = (np.argsort(ln[:, 1]) for ln in lines[:2])
+                print(f"stage {s}: {'y':>8} {'Resp. state':>12} {'Resp. calc':>11} "
+                      f"{'r2c calc':>9} {'gov':>4} {'fsy':>7}")
+                for i in np.argsort(-yy):
+                    print(f"          {yy[i]:8.1f} "
+                          f"{np.interp(yy[i], lines[0][:, 1][o0], lines[0][:, 0][o0]):12.3f} "
+                          f"{np.interp(yy[i], lines[1][:, 1][o1], lines[1][:, 0][o1]):11.3f} "
+                          f"{d.vcalc[i] / u.conc_stress:9.3f} {int(d.out.gov[i]):4d} "
+                          f"{float(np.asarray(d.fsy)[i]):7.1f}")
             if len(lines) >= 2:
                 y = lines[0][:, 1]
                 o = np.argsort(lines[1][:, 1])
@@ -424,6 +465,11 @@ def main(argv=None) -> int:
     p.add_argument("--upto", type=int, help="last stage to solve (default: all)")
     p.add_argument("--json")
     p.set_defaults(fn=cmd_controls)
+    p = sub.add_parser("own", help="r2c's own stages for the record's case")
+    p.add_argument("record")
+    p.add_argument("--input")
+    p.add_argument("--from", dest="first", type=int, default=0, help="first stage to print")
+    p.set_defaults(fn=cmd_own)
     p = sub.add_parser("flow", help="r2c's calculated shear stress at Response's states")
     p.add_argument("record")
     p.add_argument("--input")
@@ -431,6 +477,7 @@ def main(argv=None) -> int:
     p.add_argument("--upto", type=int, help="last stage (default: all)")
     p.add_argument("--fit-layer", type=int, help="steel layer whose stiffness to fit")
     p.add_argument("--at", type=float, help="height above the centroid for the fit")
+    p.add_argument("--profile", type=int, help="print the profiles over the depth at this stage")
     p.add_argument("--json")
     p.set_defaults(fn=cmd_flow)
     a = ap.parse_args(argv)
