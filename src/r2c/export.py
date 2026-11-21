@@ -173,7 +173,7 @@ class Views:
                                   lines, 4)
             elif key == "principal_tensile_stress":
                 made[key] = chart("Principal Tensile Stress", f"f_1 Stress ({u.l_conc})", depth,
-                                  [(0, rows(o.f1 / cs)), (1, rows(o.f1lim / cs))], 4)
+                                  [(0, rows(o.f1 / cs)), (1, rows(o.f1draw / cs))], 4)
             elif key == "principal_tensile_strain":
                 made[key] = chart("Principal Tensile Strain", f"|e_1 Strain ({u.l_strain})", depth,
                                   [(0, rows(o.e1 * 1e3))], 3)

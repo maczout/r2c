@@ -34,17 +34,19 @@ on at least one check; the page shows which, one marker per check. Measured, fro
 | Rising | 2 | M/V = 0.5 m (r2c drops back on the way up), US M/V = 1 ft |
 | Post-peak | 6 | Cm4, Newbeam −M, M/V = 1 m and 2 m, M/V = 0.5 m, V alone: how and where the response ends |
 | Shape | 8 | Four shear cases where Response ends with stages standing still at the peak load and r2c stops at it (Marshall, se100, Newbeam N₀ + M/V = 1 m, M/V = 2 m); M/V = 0.5 m and V alone end differently; US M/V = 1 ft has one fall of load fewer in r2c; tension (cracking and a fall of load at one step, read in a different order) |
-| Views | 25 | See below |
+| Views | 23 | See below. 25 before the Principal Tensile Stress line was drawn as Response draws it (second run of 2026-11-21): Marshall and the Newbeam with N₀ = −2000 kN, both without shear, are now inside on every check |
 
 **The detail-view misses are not a matter of precision.** Every view comparison above 5 % was
 checked against Response's printed precision (2026-11-21, on the views at the peak): none
 lies within two units of the last printed digit, so the floor in acceptance.md changes none
 of them. Do not look for a precision explanation.
 
-**Principal tensile stress** misses at 58 of the stages compared, in 23 of the 25 cases, by
-about 1.8 MPa: close to the cracking strength. Inferred: one systematic difference, most
-likely the cracking-stress line that Response reduces in the compression zone and r2c does
-not (status, option F). It alone puts most cases outside on views.
+**Principal tensile stress** missed at 58 of the stages compared, in 23 of the 25 cases, by
+about 1.8 MPa: close to the cracking strength. The cause was looked for on 2026-11-21 and
+is in "Principal tensile stress" below: Response lowers the cracking stress by the
+compression across it, in its node routine. r2c now draws the line that way. It misses at 28
+stages in 18 cases since (measured, second run of 2026-11-21), each explained there; no other
+check changed sides.
 
 **Where the views miss most** (measured, misses above 5 % over comparisons, by the feature of
 Response's curve at which they are compared): at cracking 50 of 462, at a fall of load 33 of
@@ -55,6 +57,67 @@ of 126 where it ends standing still. The last stages are where the two responses
 Views are matched by load and control value together since 2026-11-21 (owner's choice);
 before, by control value alone. The numbers in the sections below that refer to views at the
 peak are from the earlier matching.
+
+## Principal tensile stress (2026-11-21)
+
+The chart has two lines: f1, and the cracking stress it is held under. `tools/viewlines.py`
+prints both programs' lines side by side.
+
+**What the difference was** (measured on the fixtures, then read in the binary, routine
+`0046a960`; the rule is in `docs/kernel.md`, "Cracking under compression"). Response's
+cracking-stress line is the cracking stress times k = 1.05 − f2/f2max, between 0.05 and 1,
+and 0.05 past the strain at peak stress: on the Newbeam at its peak moment the line is 5 %
+of r2c's old one at the compression face. It is not only a drawn line: the same k scales the
+cracking strain of the node and caps f1. Without shear that changes nothing, since there is
+no principal tension where there is compression. With shear it does.
+
+**What r2c does now.** It draws the line lowered and leaves its node alone. Measured
+(`python tools/changes.py BEFORE AFTER` on the runs before and after): 30 of the 58 stages
+come inside target, no check of any kind changes sides otherwise, and the control curves are
+identical.
+
+**Tried: the whole rule in the node** (cracking strain, f1 and the line). Measured on all 25
+cases: the tensile stress stages outside fall to 27 and 16 other view checks come inside,
+most on Liping LB1 at cracking and the US case at its peak; Marshall with shear ends
+standing still as Response does (shape inside). But 15 checks that are inside go outside:
+* 11 on the Newbeam under shear alone at stage 10 (the fall of load at cracking). r2c's load
+  after the fall moves from 185.1 to 184.1 kN (Response 184.7), and the stage matched to
+  Response's stage 10 flips from r2c's stage after the fall to its stage two before it
+  (185.2 kN, uncracked), so every view there compares unlike states. The curves are within
+  0.3 % either way.
+* 4 by a point or two: shear stress on Marshall with shear at the last stage (3.9 to 6.0 %)
+  and on the Newbeam with N₀ at the peak (3.9 to 5.4 %), shear on crack and transverse bond
+  on shear alone at the peak (4.9 to 5.2 %, 4.2 to 5.4 %). On Marshall the difference is
+  within a millimetre of the crack front, where the shear stress steps.
+The increment's condition was that no check goes outside, so the node keeps its own cracking
+and the rule is left as option F1 in `docs/status.md`. With the whole rule the peaks move by up
+to 0.3 points, the US case by 2 (+0.9 to −1.1 %); all stay inside target.
+
+**The 28 stages still outside**, by cause (measured, per stage, from the second run):
+* *One point at the crack front* (10 stages; in the first 8 the only view outside at that
+  stage): the peak
+  of Marshall M (48 %), the Newbeam under M in its five variants (18 %) and −M (24 %), and
+  the last stage of the Newbeam under N (10 %). f1 rises to the cracking stress and
+  falls again within 2 mm of the crack front. Response has nodes every 0.34 mm there, r2c
+  every 0.67 mm (Newbeam) or 1.1 mm (Marshall), so one of Response's points near the tip of
+  that spike lies off r2c's line; both lines agree at the depths they share. Tried, not
+  kept: layers down to h/1024 in place of h/512 bring six of these inside but leave Marshall
+  at 8 % and put the Newbeam's last stage outside (4.2 to 5.8 %); the layering thresholds
+  are r2c's own and Response's were not read. Option F2. The other 2: the last stages of Cm4 (35 %)
+  and of the Newbeam with N and M (7 %).
+* *The states compared differ* (16 stages; in the shear cases other views are outside at
+  the same stage):
+  the Newbeam with N and M at cracking, where Response's stage is just after cracking and
+  the r2c stage nearest in load just before it (52 %); and the shear cases dm-n1n (last
+  stage), Liping LB1 (3), M/V = 0.5 m (3), M/V = 2 m (2, at 5.7 %), M/V = 1 m (last stage),
+  the US case (3), shear alone (2). These follow the differences in the curves and in where
+  the response ends (status, A and B). Liping LB1 at cracking (9.7 %) is one the whole rule in the node brings inside (1.4 %).
+* *f1 above Response's lowered cracking stress* (1 stage): M/V = 1 m at the peak, 7.6 % at
+  three nodes near the crack front; 1.1 % with the whole rule in the node. Option F1.
+* *The crack check after the steel has gone* (1 stage): the Newbeam with CSA factors at its
+  last stage, 11 %. In the cracked zone Response's line is flat at 0.83 MPa and r2c's runs
+  from 0.74 to 1.02. Goes with the steel stress at a crack in that case (status, option H);
+  not investigated.
 
 ## Without shear
 
@@ -151,8 +214,8 @@ incomplete:
   shows 0 there. Inferred, not checked: r2c prints 0 for a bar it takes to have ruptured at a
   crack, so either its capacity at a crack is wrong here or its report of it is.
 * **Principal Tensile Stress, Newbeam under axial compression alone:** 371 % (r2c's lines
-  differ from Response's by up to 1.8 MPa where Response's largest value is 0.48 MPa). Probably the same
-  cracking-stress line as below, scaled by a small chart; not checked.
+  differed from Response's by up to 1.8 MPa where Response's largest value is 0.48 MPa). It was the
+  cracking-stress line: 1.5 % at the peak since 2026-11-21 ("Principal tensile stress" above).
 * **Shear cases that used to end before Response's peak** (M/V = 2 m, 0.5 m, US at 1 ft):
   they now reach it, but the views still show large differences (up to 80 % on some charts).
   For M/V = 2 m r2c's own peak is far beyond Response's last stage, so the stages compared
@@ -162,8 +225,8 @@ The sample-input cases, first compared view by view in the run of 2026-11-19, ad
 (measured; none investigated):
 
 * **Principal Tensile Stress, Marshall under axial compression alone:** 1900 % (Response's
-  largest value 0.10 MPa, r2c's lines differ by up to 1.9 MPa). Same pattern as the Newbeam
-  under axial compression alone, above.
+  largest value 0.10 MPa, r2c's lines differed by up to 1.9 MPa). The same cause as the Newbeam
+  under axial compression alone, above; no difference since 2026-11-21.
 * **With shear, outside the exceptions known before:** se100, Longitudinal Concrete Stress 15 %
   and Average Angle 14 %; Liping LB1, Long. Reinf Stress at Crack 18 %; dm-n1n, Long. Reinf
   Stress at Crack 7 %; Marshall with shear, Shear Stress 8 % and Average Angle 6 %; transverse
@@ -174,8 +237,8 @@ The sample-input cases, first compared view by view in the run of 2026-11-19, ad
 The exceptions known before:
 
 * Principal Tensile Stress: Response draws the cracking-stress line reduced in the compression
-  zone; r2c draws it unreduced (20 to 50 % of the chart's largest value there). The stress line
-  itself agrees.
+  zone; r2c drew it unreduced (20 to 50 % of the chart's largest value there). Drawn as
+  Response's since 2026-11-21; what is left is in "Principal tensile stress" above.
 * Crack spacing and crack width charts for Cm4 and Liping LB1 (sections with many layers or
   ties): up to 44 % locally in spacing, 28 % in width; on Liping LB1 the diagonal spacing up to
   38 %. The Newbeam charts agree within 2 %; the Marshall charts within 2.5 % (the 2026-11-15

@@ -75,6 +75,30 @@ Tables over the depth (100 stations) [B]:
   spacing away; M = 3.6·b·s/(π·db·legs) for stirrups; the lesser governs;
 * the steel ratio for the strain concentration of stirrups at a crack.
 
+### Cracking under compression [B `0046a960`; drawn only]
+
+Response's crack-strain routine, called by the node [`0046aaa0`, `004a7b60`], scales the
+cracking strain and the cracking stress of a node by
+
+    k = 1.05 − f2/f2max, held between 0.05 and 1,
+
+f2 the principal compressive stress and f2max its softened strength at that node; k = 0.05
+once the principal compressive strain (net of shrinkage) is past the strain at peak stress.
+Then (a) the node counts as cracked when ε1 exceeds k·εcr, and the crack width and the floor
+after cracking are measured from k·εcr; (b) f1 is held to k times the cracking stress; (c)
+the line on the Principal Tensile Stress chart is k times the cracking stress where the node
+is uncracked. The rule is on in every analysis r2c covers (a flag, `00569f58`, clears it for
+one code-based analysis type only) and skipped for a concrete type named "steel".
+
+**r2c applies (c) only**: the drawn line (`NodeOut.f1draw`; for a cracked node, the node's
+own limit held under the lowered stress and above the floor). (a) and (b) are not applied:
+the node's cracking strain and f1 are as before. Measured 2026-11-21: with (a) and (b) in
+the node, nothing moves without shear (ε1 is not tensile where there is compression), but
+with shear 15 checks that are inside target go outside while 48 come inside
+(`docs/verification.md`, "Principal tensile stress"); taking it over is option F1 in
+`docs/status.md`. Whether the thesis describes this rule was not checked: the thesis was not
+at hand in the session that read it.
+
 ## Flexural cracking strength [B]
 
 With an automatic ft, each face gets a cracking strength fr = min(0.15·fc′,
@@ -216,6 +240,6 @@ Response's stepping is not described in the thesis and was deduced from its outp
 ## Not implemented
 
 Hollow sections, long-term effects, strain discontinuity, the old text input format, curved
-outline segments, and the reduction Response draws for the cracking stress in the compression
-zone on the Principal Tensile Stress chart (the stress line itself is not affected in the
-cases compared).
+outline segments, and the lowering of the cracking strain and of f1 by compression in the
+node (above, "Cracking under compression": the chart's line is lowered, the node's cracking
+is not).
