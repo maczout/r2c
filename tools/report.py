@@ -87,12 +87,22 @@ def assess(res: dict, acc: dict) -> dict:
 def verdict(checks: dict) -> str:
     oks = [ok for _v, _l, ok in checks.values()]
     if any(ok is False for ok in oks):
-        return "outside"
+        return "outside: " + ", ".join(NAMES.get(k, k) for k, (_v, _l, ok) in checks.items()
+                                       if ok is False)
     if oks and all(ok is True for ok in oks):
         return "within"
     if any(ok is True for ok in oks):
         return "within, partly assessed"
     return "not assessed"
+
+
+NAMES = {"curve": "rising", "post_peak": "post-peak"}
+
+
+def label(ref: dict) -> str:
+    """The case in engineering terms (tools/dashboard.py, label)."""
+    import dashboard
+    return dashboard.label(ref)
 
 
 def cell(check, signed=True) -> str:
@@ -163,7 +173,7 @@ def render(results: dict, run: dict, acc: dict, acc_path: str) -> str:
             if extra:
                 inp += " " + " ".join(extra)
             out.append(
-                f"| {n} | {inp} | {h['initial']}; {h['increment']} | "
+                f"| {n}: {label(h)} | {inp} | {h['initial']}; {h['increment']} | "
                 f"{h['stage-count']} / {r['sub']['stage-count']} | {c['chart']} | "
                 f"{c['ref_peak_load']:.1f} | {c['sub_peak_load']:.1f} | "
                 f"{cell(chk.get('peak'))} | {cell(chk.get('curve'), signed=False)} | "

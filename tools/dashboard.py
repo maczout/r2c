@@ -124,15 +124,26 @@ def variants(ref: dict) -> list[str]:
     md = int(ref.get("more-detail") or 0)
     if md:
         out.append(f"More Detail ×{md}")
+    force, length = UNITS.get(ref["units"], ("", ""))
     n0 = nums(ref["initial"])[0]
     if n0:
-        out.append(f"N₀ = {n0:g}")
+        out.append(f"N₀ = {n0:g} {force}".rstrip())
     n, m, v = nums(ref["increment"])
     if v and m:
-        out.append(f"M/V = {abs(m / v):g}")
+        out.append(f"M/V = {abs(m / v):g} {length}".rstrip())
     if n and m:
-        out.append(f"N/M = {n / m:g}")
+        out.append(f"N/M = {n / m:g}" + (f" /{length}" if length else ""))
     return out
+
+
+# force and length of each unit system, for labels (Response's SI: kN and kN·m; US: kip and
+# kip·ft). kg-cm is left without units: not checked.
+UNITS = {"si": ("kN", "m"), "us": ("kip", "ft")}
+
+
+def label(ref: dict) -> str:
+    """A case in engineering terms, with units: section, loading path, what sets it apart."""
+    return ", ".join([section_name(ref), loading(ref)] + variants(ref))
 
 
 # ---------------------------------------------------------------- assembling
@@ -170,6 +181,8 @@ def build(run: dict, results: dict, acc: dict, curves_dir: Path | None, ref_dir:
             "section": section_name(ref),
             "loading": loading(ref),
             "variants": variants(ref),
+            "label": label(ref),
+            "checks": {k: v[2] for k, v in checks.items()},
             "input": ref["input-name"],
             "initial": ref["initial"], "increment": ref["increment"],
             "stages": [int(ref["stage-count"]), int(r["sub"]["stage-count"])],
@@ -340,7 +353,7 @@ H += `</table></div>`;
 if (D.gaps.length) H += `<details open><summary>Not in the test set (from docs/verification.md)</summary><ul class="gaps">${D.gaps.map(g=>`<li>${esc(g)}</li>`).join("")}</ul></details>`;
 
 function tipCase(c) {
- return `${c.name}\ninput ${c.input}\ninitial ${c.initial}; increment ${c.increment}\npeak ${sg(c.peak_pct)} %, rising ${f(c.curve_pct)} %, post-peak ${f(c.post_pct)} %${c.shape ? "\nshape Response: " + c.shape[0].join(", ") + "\nshape r2c: " + c.shape[1].join(", ") : ""}\nstages Response ${c.stages[0]} / r2c ${c.stages[1]}`;
+ return `${c.label}\n${c.name}\ninput ${c.input}\ninitial ${c.initial}; increment ${c.increment}\npeak ${sg(c.peak_pct)} %, rising ${f(c.curve_pct)} %, post-peak ${f(c.post_pct)} %${c.shape ? "\nshape Response: " + c.shape[0].join(", ") + "\nshape r2c: " + c.shape[1].join(", ") : ""}\nstages Response ${c.stages[0]} / r2c ${c.stages[1]}`;
 }
 
 // ---------- scorecard
@@ -357,6 +370,16 @@ function peakBar(c) {
  if (Math.abs(x) > 1e-9) s += `<rect x="${Math.min(x0,x1)}" y="4" width="${Math.max(2,Math.abs(x1-x0))}" height="8" rx="2" fill="${col}"/>`;
  if (lim != null) for (const t of [-lim, lim]) s += `<line x1="${px(t)}" x2="${px(t)}" y1="0" y2="16" stroke="var(--tol)" stroke-width="1.5"/>`;
  return s + `</svg>`;
+}
+const CHECKS = [["peak","peak"],["curve","rising"],["post_peak","post"],["shape","shape"],["views","views"]];
+function checkChips(c) {
+ return CHECKS.map(([k, l]) => {
+  const ok = c.checks ? c.checks[k] : undefined;
+  if (ok === undefined) return "";
+  const col = ok === true ? "var(--ok, #2a7)" : ok === false ? "var(--high)" : "var(--ink-3)";
+  const mark = ok === true ? "✓" : ok === false ? "✗" : "–";
+  return `<span style="color:${col};margin-right:6px;white-space:nowrap">${mark} ${l}</span>`;
+ }).join("");
 }
 function sameShape(c) { return c.shape && c.shape[0].join() === c.shape[1].join(); }
 function shapeCell(c) {
@@ -388,7 +411,7 @@ H += `<div class="scroll"><table><tr><th class="sticky">Case</th><th>Peak diff %
 for (const g of ["flexure","shear"]) {
  const a = by(g); if (!a.length) continue;
  H += `<tr class="grp"><td class="sticky" colspan="11">${G[g]}</td></tr>`;
- for (const c of a) H += `<tr data-tip="${esc(tipCase(c))}"><td class="sticky">${esc(c.name)}</td><td>${peakBar(c)}</td><td class="num">${sg(c.peak_pct)}</td><td>${curveBar(c)}</td><td class="num">${f(c.curve_pct)}</td><td>${curveBar(c, "post_pct", "post_peak")}</td><td class="num">${f(c.post_pct)}</td><td>${shapeCell(c)}</td><td class="num">${c.stages[0]} / ${c.stages[1]}</td><td>${esc(c.verdict)}</td><td class="num">${c.seconds ?? ""}</td></tr>`;
+ for (const c of a) H += `<tr data-tip="${esc(tipCase(c))}"><td class="sticky">${esc(c.label)}<div class="m">${esc(c.name)}</div></td><td>${peakBar(c)}</td><td class="num">${sg(c.peak_pct)}</td><td>${curveBar(c)}</td><td class="num">${f(c.curve_pct)}</td><td>${curveBar(c, "post_pct", "post_peak")}</td><td class="num">${f(c.post_pct)}</td><td>${shapeCell(c)}</td><td class="num">${c.stages[0]} / ${c.stages[1]}</td><td>${checkChips(c)}</td><td class="num">${c.seconds ?? ""}</td></tr>`;
 }
 H += `</table></div><p class="note">Stage counts are not compared (see docs/verification.md).</p>`;
 
@@ -451,7 +474,7 @@ for (const g of ["flexure","shear"]) for (const c of by(g)) {
  const k = c.curve;
  const note = !k.sub ? `<div class="m">No r2c record for this case in the curves folder: Response only.</div>`
   : k.other_run ? `<div class="m">r2c curve from run ${esc(k.other_run)}, metrics from ${esc(c.run)}.</div>` : "";
- H += `<div class="panel"><h3>${esc(c.name)}</h3><div class="m">${esc(c.section)} · ${esc(c.loading)}${c.variants.length?" · "+esc(c.variants.join(", ")):""} · ${esc(k.y)}<br>peak ${sg(c.peak_pct)} % · rising ${f(c.curve_pct)} % · post-peak ${f(c.post_pct)} %${c.shape && !sameShape(c) ? `<br>shape differs: Response ${esc(c.shape[0].join(", "))}; r2c ${esc(c.shape[1].join(", "))}` : ""}</div>${plot(c)}${note}</div>`;
+ H += `<div class="panel"><h3>${esc(c.label)}</h3><div class="m">${esc(c.name)} · ${esc(k.y)}<br>peak ${sg(c.peak_pct)} % · rising ${f(c.curve_pct)} % · post-peak ${f(c.post_pct)} %${c.shape && !sameShape(c) ? `<br>shape differs: Response ${esc(c.shape[0].join(", "))}; r2c ${esc(c.shape[1].join(", "))}` : ""}</div>${plot(c)}${note}</div>`;
 }
 H += `</div><p class="note">Generated by tools/dashboard.py. Every number comes from the run named at the top; interpretation is in docs/verification.md.</p>`;
 $("#root").innerHTML = H;
