@@ -185,7 +185,7 @@ def render(results: dict, run: dict, acc: dict, acc_path: str) -> str:
             if k not in rows or v["max_diff_pct"] > rows[k][0]:
                 rows[k] = (v["max_diff_pct"], n)
     if rows:
-        out += ["## Detail views at the peak, worst case per view", "",
+        out += ["## Detail views at the features of the curve, worst case per view", "",
                 "| View | Worst % | Case |", "|---|---:|---|"]
         for k in sorted(rows, key=lambda k: -rows[k][0]):
             out.append(f"| {k} | {rows[k][0]:.1f} | {rows[k][1]} |")
@@ -198,7 +198,8 @@ def render(results: dict, run: dict, acc: dict, acc_path: str) -> str:
             "over the whole curve. An r2c point counts as post-peak when its nearest point on "
             "Response's curve is at or after Response's peak, so a response that runs on past "
             "Response's end, or stops short of it, shows as post-peak distance. "
-            "Views: at r2c's stage nearest Response's peak in control value, the largest "
+            "Views: at each feature stage of Response's curve (cracking, falls of load, peak, "
+            "last stage) and r2c's stage nearest it in load and control value, the largest "
             "distance of Response's points from r2c's curve, relative to the chart's largest "
             "value. Shape: the curve's features in order (cracking, falls of load before the "
             "peak, the peak, how the response ends), read alike from both curves; it matches "

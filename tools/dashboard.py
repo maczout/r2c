@@ -6,7 +6,7 @@
 
 Answers, at a glance, for the owner's review: which sections and loadings the test set covers
 (and what it leaves out), how far r2c's peak and rising branch are from Response's in every
-case, how the detail views at the peak compare, and what the control curves look like
+case, how the detail views at the features of the curve compare, and what the control curves look like
 overlaid.
 
 RESULTS is a folder written by tools/verify.py (results.json and run.json) or the combined
@@ -195,7 +195,10 @@ def build(run: dict, results: dict, acc: dict, curves_dir: Path | None, ref_dir:
             if v.get("missing"):
                 case["views"].append({"view": v["view"], "missing": True})
             else:
+                feat = {s["ref_stage"]: s["feature"] for s in r.get("views_stages", [])}
                 case["views"].append({"view": v["view"], "pct": round(v["max_diff_pct"], 3),
+                                      "stage": v.get("ref_stage"),
+                                      "feature": feat.get(v.get("ref_stage"), ""),
                                       "ref_max": v["ref_max"], "diff": v["max_diff"]})
         # curves
         refp = ref_dir / f"{name}.r2x.txt"
@@ -394,8 +397,8 @@ const views = [...new Set(cases.flatMap(c => c.views.map(v => v.view)))];
 const bins = [[1,"<1"],[2,"1–2"],[5,"2–5"],[10,"5–10"],[25,"10–25"],[100,"25–100"],[Infinity,"≥100"]];
 const binOf = p => bins.findIndex(b => p < b[0]);
 const cs = 18, lw = 112, th = 150;
-H += `<h2>Detail views at the peak</h2>
-<p class="sub">Largest difference in each chart, as % of that chart's largest value, at r2c's stage nearest Response's peak. Hatched rows: that stage is more than 5 % away from Response's peak in control value, so the two are different states.</p>
+H += `<h2>Detail views at the features of the curve</h2>
+<p class="sub">Largest difference in each chart, as % of that chart's largest value, over the stages compared: cracking, falls of load, the peak and the last stage of Response's curve, each against r2c's stage nearest it in load and control value (the tooltip names the stage). Hatched rows: at the peak, r2c's nearest stage is more than 5 % away in control value, so the two are different states.</p>
 <div class="legend">${bins.map((b,i)=>`<span><span class="sw" style="background:var(--s${i+1})"></span>${b[1]} %</span>`).join("")}
 <span><span class="sw" style="background:var(--surface);border:1px solid var(--border)"></span>chart all zero</span></div>`;
 let hm = `<svg width="${lw + views.length*cs + 4}" height="${th + cases.length*cs + 4}" role="img" aria-label="heatmap of detail-view differences">
@@ -411,7 +414,7 @@ cases.forEach((c, i) => {
   let fill, tip;
   if (r.missing) { fill = "var(--surface)"; tip = `${c.name} · ${v}\nmissing in r2c`; }
   else if (r.ref_max === 0) { fill = "var(--surface)"; tip = `${c.name} · ${v}\nchart all zero in Response`; }
-  else { fill = `var(--s${binOf(r.pct)+1})`; tip = `${c.name} · ${v}\n${f(r.pct,1)} % (${f(r.diff,3)} of ${f(r.ref_max,3)})${far?`\nstages differ by ${f(c.views_gap_pct,0)} % in control value`:""}`; }
+  else { fill = `var(--s${binOf(r.pct)+1})`; tip = `${c.name} · ${v}\n${f(r.pct,1)} % (${f(r.diff,3)} of ${f(r.ref_max,3)})${r.stage!=null?`\nworst at Response's stage ${r.stage}${r.feature?" ("+r.feature+")":""}`:""}${far?`\nstages differ by ${f(c.views_gap_pct,0)} % in control value`:""}`; }
   hm += `<rect x="${x+1}" y="${y+1}" width="${cs-2}" height="${cs-2}" rx="2" fill="${fill}" stroke="${fill==="var(--surface)"?"var(--border)":"none"}" data-tip="${esc(tip)}"/>`;
   if (r.missing) hm += `<text x="${x+cs/2}" y="${y+11}" text-anchor="middle">×</text>`;
   if (far && !r.missing) hm += `<rect x="${x+1}" y="${y+1}" width="${cs-2}" height="${cs-2}" fill="url(#hatch)" opacity="0.6" pointer-events="none"/>`;

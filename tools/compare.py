@@ -18,9 +18,10 @@ What is compared:
   by its largest value over the whole curve). One-way misses a subject that runs on past the
   reference's end; two-way does not; and the curve's shape: its features in order (cracking,
   falls of load before the peak, the peak, and how the response ends);
-* with --views, every detail view at the peak: the subject's stage nearest the reference's peak
-  in control value; for each chart the largest distance of the reference's points from the
-  subject's curve, as a percentage of the chart's largest value (depth scaled by the section
+* with --views, every detail view at each of the reference's detail stages (the features of
+  its curve: cracking, falls of load, the peak, the last stage; see feature_stages): the
+  subject's stage nearest the reference's in load and control value together; for each
+  chart the largest distance of the reference's points from the subject's curve, as a percentage of the chart's largest value (depth scaled by the section
   depth).
 
 No pass or fail is decided here: the numbers are for an engineer to judge.
@@ -236,13 +237,32 @@ def shape(c, pk, xs):
     return ev
 
 
-def _nearest_stage(sub, key, x):
+def _nearest_stage(sub, key, x, y, xs, ys):
+    """The subject's detail stage nearest the point (x, y) of a control chart, with control
+    value scaled by xs and load by ys (owner, 2026-11-21: views are matched to a state by load
+    and control value together)."""
     c = _curve(sub, key)
-    have = sub.stages()
+    have = [n for n in sub.stages() if n < len(c)]
     if not have:
         return None
-    best = min(have, key=lambda n: abs(c[n, 0] - x) if n < len(c) else float("inf"))
-    return best
+    return min(have, key=lambda n: np.hypot((c[n, 0] - x) / xs, (c[n, 1] - y) / ys))
+
+
+def feature_stages(rec, key=None) -> dict[int, str]:
+    """The stages at the features of a record's control curve (the bottom chart unless key is
+    given), with the peak stage from its header: {stage: feature}. The stages whose detail
+    views are compared (owner, 2026-11-21)."""
+    key = key or control_keys(rec)[-1]
+    c = _curve(rec, key)
+    pk = float(np.max(np.abs(c[:, 1]))) if len(c) else 0.0
+    xs = float(np.max(np.abs(c[:, 0]))) if len(c) else 0.0
+    out: dict[int, str] = {}
+    for f, i in shape(c, pk, xs):
+        out.setdefault(i, f)
+    hp = rec.header.get("peak-stage")
+    if hp not in (None, ""):
+        out.setdefault(int(hp), "peak")
+    return out
 
 
 def compare_views(ref, sub, ref_stage, sub_stage):
@@ -293,14 +313,37 @@ def compare(ref, sub, views=False):
         "missing_control": [k for k in control_keys(ref) if k not in keys],
     }
     if views and keys:
+        key = keys[-1]
+        a = _curve(ref, key)
+        pk = float(np.max(np.abs(a[:, 1]))) if len(a) else 0.0
+        xs = float(np.max(np.abs(a[:, 0]))) if len(a) else 0.0
+        feats = feature_stages(ref, key)
         rp = int(ref.header.get("peak-stage", "0"))
-        if rp in ref.stages():
-            x = _curve(ref, keys[-1])[rp, 0]
-            sp = _nearest_stage(sub, keys[-1], x)
-            if sp is not None:
-                out["views_at"] = {"ref_stage": rp, "sub_stage": sp, "ref_x": float(x),
-                                   "sub_x": float(_curve(sub, keys[-1])[sp, 0])}
-                out["views"] = compare_views(ref, sub, rp, sp)
+        b = _curve(sub, key)
+        worst: dict[str, dict] = {}
+        out["views_stages"] = []
+        for rs in ref.stages():
+            if rs >= len(a):
+                continue
+            x, y = float(a[rs, 0]), float(a[rs, 1])
+            ss = _nearest_stage(sub, key, x, y, xs or 1.0, pk or 1.0)
+            if ss is None:
+                continue
+            at = {"ref_stage": rs, "sub_stage": ss, "feature": feats.get(rs, ""),
+                  "ref_x": x, "ref_y": y, "sub_x": float(b[ss, 0]), "sub_y": float(b[ss, 1])}
+            rows = compare_views(ref, sub, rs, ss)
+            at["views"] = rows
+            out["views_stages"].append(at)
+            if rs == rp:
+                out["views_at"] = {k: at[k] for k in ("ref_stage", "sub_stage", "ref_x", "sub_x")}
+            for row in rows:
+                w = worst.get(row["view"])
+                if (w is None or row.get("missing")
+                        or (not w.get("missing") and row["max_diff_pct"] > w["max_diff_pct"])):
+                    worst[row["view"]] = dict(row, ref_stage=rs)
+        if worst:
+            # each view's worst over the compared stages
+            out["views"] = list(worst.values())
     return out
 
 
@@ -330,12 +373,12 @@ def render(res) -> str:
                          f"subject {', '.join(c['shape_sub'])}")
     for k in res["missing_control"]:
         lines.append(f"{k:<14} missing from the subject")
-    if "views" in res:
-        v = res["views_at"]
-        lines += ["", f"detail views: reference stage {v['ref_stage']} (control value "
-                      f"{v['ref_x']:.3f}), subject stage {v['sub_stage']} ({v['sub_x']:.3f})",
+    for at in res.get("views_stages", []):
+        lines += ["", f"detail views ({at['feature'] or 'stage'}): reference stage "
+                      f"{at['ref_stage']} ({at['ref_x']:.3f}, {at['ref_y']:.1f}), subject stage "
+                      f"{at['sub_stage']} ({at['sub_x']:.3f}, {at['sub_y']:.1f})",
                   f"{'view':<38}{'ref max':>12}{'max diff':>12}{'% of max':>10}"]
-        for row in res["views"]:
+        for row in at["views"]:
             if row.get("missing"):
                 lines.append(f"{row['view']:<38} missing from the subject")
             else:
