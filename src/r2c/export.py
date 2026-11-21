@@ -218,9 +218,10 @@ class Views:
                                   [(0, list(zip(vals, yy)))], 4)
             elif key == "shrinkage_thermal_strain":
                 yy = np.linspace(ybot, ytop, 101)
-                r = [(0.0, ybot)] + [(0.0, v) for v in yy] + [(0.0, ytop)]
+                sh = sec.shrinkage(yy * u.length + sec.zc) * 1e3
+                r = [(0.0, ybot)] + list(zip(sh, yy)) + [(0.0, ytop)]
                 made[key] = chart("Shrinkage & Thermal Strain", f"strain ({u.l_strain})", depth,
-                                  [(0, r), (4, steps(np.zeros(len(sec.layers))))], 3)
+                                  [(0, r), (4, steps([l.thermal * 1e3 for l in sec.layers]))], 3)
             elif key == "longitudinal_concrete_stress":
                 made[key] = chart("Longitudinal Concrete Stress", f"Stress ({u.l_conc})", depth,
                                   [(0, rows(o.fcx / cs))], 3)

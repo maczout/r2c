@@ -302,7 +302,9 @@ class Analysis:
         sec = self.sec
         shp = z.shape
         zf = z.ravel()
-        ex = self.strain(e0, phi, zf)
+        # the concrete's own strain: the section's, less what shrinkage or temperature
+        # would give it unrestrained
+        ex = self.strain(e0, phi, zf) - sec.shrinkage(zf)
         m = sec.tab(sec.t_m, zf)
         ft = np.interp(zf, sec.tz, self.t_ft)
         smx = sec.tab(sec.t_smx, zf)
@@ -821,32 +823,49 @@ class Flexure:
     def initial(self) -> Stage:
         """The state under the constant loads alone."""
         an = self.an
-        if an.n0 == 0.0 and an.m0 == 0.0 and not any(l.prestrain for l in self.sec.layers):
+        if an.n0 == 0.0 and an.m0 == 0.0 and not self.sec.shrink \
+                and not any(l.prestrain for l in self.sec.layers):
             e0, phi = 0.0, 0.0
         else:
-            x = np.zeros(2)
             sc = np.array([1e-4, 1e-4 / self.sec.h])
             ok = False
-            for _ in range(4):
-                for it in range(60):
-                    n, m, _ = an.forces(x[0], x[1])
-                    r = np.array([(n - an.n0) / self.nscale, (m - an.m0) / self.mscale])
-                    if np.max(np.abs(r)) < 1e-8:
-                        ok = True
+            for x in self._initial_guesses():
+                ok = False
+                for _ in range(4):
+                    for it in range(60):
+                        n, m, _ = an.forces(x[0], x[1])
+                        r = np.array([(n - an.n0) / self.nscale, (m - an.m0) / self.mscale])
+                        if np.max(np.abs(r)) < 1e-8:
+                            ok = True
+                            break
+                        jac = np.empty((2, 2))
+                        for j in range(2):
+                            xx = x.copy()
+                            xx[j] += 1e-3 * sc[j]
+                            n2, m2, _ = an.forces(xx[0], xx[1])
+                            jac[:, j] = (np.array([(n2 - an.n0) / self.nscale,
+                                                   (m2 - an.m0) / self.mscale]) - r) \
+                                / (1e-3 * sc[j])
+                        try:
+                            dx = np.linalg.solve(jac, -r)
+                        except np.linalg.LinAlgError:
+                            break
+                        # a section that cracks under its own prestrains or shrinkage has a
+                        # kink in its forces: take the full step only if it brings the
+                        # residual down, else as much of it as does
+                        norm = float(np.max(np.abs(r)))
+                        a = 1.0
+                        for _ in range(12):
+                            xt = x + a * dx
+                            nt, mt, _ = an.forces(xt[0], xt[1])
+                            if max(abs(nt - an.n0) / self.nscale,
+                                   abs(mt - an.m0) / self.mscale) < norm:
+                                break
+                            a *= 0.5
+                        x = x + a * dx
+                    if not ok or not an.refine(x[0], x[1], 0.0):
                         break
-                    jac = np.empty((2, 2))
-                    for j in range(2):
-                        xx = x.copy()
-                        xx[j] += 1e-3 * sc[j]
-                        n2, m2, _ = an.forces(xx[0], xx[1])
-                        jac[:, j] = (np.array([(n2 - an.n0) / self.nscale,
-                                               (m2 - an.m0) / self.mscale]) - r) / (1e-3 * sc[j])
-                    try:
-                        dx = np.linalg.solve(jac, -r)
-                    except np.linalg.LinAlgError:
-                        break
-                    x = x + dx
-                if not ok or not an.refine(x[0], x[1], 0.0):
+                if ok:
                     break
             if not ok:
                 raise SolveError("no equilibrium under the initial loads")
@@ -855,6 +874,31 @@ class Flexure:
         det = an.detail(e0, phi, 0.0)
         c = phi if self.mode == "phi" else e0
         return Stage(e0, phi, 0.0, 0.0, n, m, v, det, control=c)
+
+    def _initial_guesses(self):
+        """Where to start looking for the state under the constant loads: the unstrained
+        section, and, for a section with strains of its own, the plane that fits them (the
+        thesis, 7-3: with shrinkage the first estimate is "a linear fit to those profiles").
+        A section cracked by a bar's thermal strain has no way from the unstrained state to
+        its equilibrium that brings the residual down all the way; from the plane on which
+        the bars carry nothing it has."""
+        sec = self.sec
+        yield np.zeros(2)
+        fits = []
+        if sec.shrink:
+            z = np.linspace(sec.zbot, sec.ztop, 21)
+            fits.append((z, sec.shrinkage(z), np.ones_like(z)))
+        own = [l for l in sec.layers if l.prestrain != 0.0]
+        if own:
+            fits.append((np.array([l.z for l in own]), np.array([-l.prestrain for l in own]),
+                         np.array([l.area for l in own])))
+        for z, e, w in fits:
+            if len(z) > 1 and np.ptp(z) > 1e-9:
+                slope, at0 = np.polyfit(z - sec.zc, e, 1, w=np.sqrt(w))
+            else:
+                slope, at0 = 0.0, float(np.average(e, weights=w))
+            # strain(z) = e0 - phi (z - zc)
+            yield np.array([at0, -slope])
 
     # -- events ---------------------------------------------------------------------------------
     def _marks(self, st: Stage):
