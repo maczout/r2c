@@ -324,15 +324,18 @@ class Shear(Flexure):
         gc = sec.conc0.Ec / 2.0
         use_sec = (sec_g > 1e-4 * gc) & (np.abs(vstate) > 1e-6)
         stiff = np.where(use_sec, sec_g, np.maximum(nn, 1e-4 * gc))
-        gnew = tau / stiff
-        # keep the step of each node bounded: the same sign as the shear, and no more than
-        # doubled or halved where the node already has a shear strain
+        # Response's update [B 0041e840]: where the node carries shear, its shear strain
+        # times the mean of one and (calculated stress / the state's stress), that factor
+        # held within ten either way. Where it carries none yet (r2c's own): the calculated
+        # stress over the tangent stiffness, no more than twice the largest strain so far.
         sgn = 1.0 if float(np.sum(vstate)) >= 0 else -1.0
-        gnew = np.maximum(gnew * sgn, 0.0)
         gold = g * sgn
-        big = gold > 0.02 * max(float(np.max(gold)), 1e-12)
-        gnew = np.where(big, np.clip(gnew, 0.5 * gold, 2.0 * gold),
-                        np.minimum(gnew, 2.0 * max(float(np.max(gold)), 1e-12))) * sgn
+        with np.errstate(divide="ignore", invalid="ignore"):
+            ratio = np.where(use_sec, 0.5 * (tau / np.where(use_sec, vstate, 1.0) + 1.0), 1.0)
+        ratio = np.clip(ratio, -10.0, 10.0)
+        gfree = np.minimum(np.maximum(tau / stiff * sgn, 0.0),
+                           2.0 * max(float(np.max(gold)), 1e-12))
+        gnew = np.where(use_sec, np.maximum(ratio * gold, 0.0), gfree) * sgn
         gnew[0, 0] = 0.0
         gnew[-1, 2] = 0.0
         # how far the calculated stresses are from those of the state: the shear force that
@@ -418,6 +421,7 @@ class Shear(Flexure):
         for it in range(40):
             nr = float(np.max(np.abs(r)))
             if nr < 2e-7:
+                self.unbalance = nr
                 return x, info, True
             jac = np.empty((2, 2))
             for j in range(2):
@@ -448,6 +452,7 @@ class Shear(Flexure):
         nr = float(np.max(np.abs(r)))
         if nr < best[0]:
             best = (nr, x.copy(), info)
+        self.unbalance = best[0]
         return best[1], best[2], best[0] < 2e-5
 
     def _nested(self, c, x0):
@@ -513,10 +518,19 @@ class Shear(Flexure):
         while passes < self.passes:
             x0 = np.array(x, dtype=float)
             x, info, ok = self._newton(c, x0)
+            soft = False
             if not ok:
+                near = (x, info, self.unbalance)
                 x, info, ok = self._nested(c, x0)
-            if not ok:
-                break
+                if not ok:
+                    # Response carries on from a global solution that has not closed
+                    # [B 00418af0, the solve's status -2]: here, the nearest state found,
+                    # if it is out of balance by less than 2 % of the section's scale
+                    x, info, res = near
+                    if info is None or not all(math.isfinite(q) for q in info) or res > 0.02:
+                        ok = False
+                        break
+                    ok = soft = True
             e0, phi, gam, lam, n, m, v = info
             if refines < 3 and an.refine(e0, phi, gam):
                 refines += 1
@@ -528,10 +542,16 @@ class Shear(Flexure):
             passes += 1
             if getattr(self, "debug", False):
                 print(f"   pass {passes}: lam={lam:.4f} profile err={err:.4f}")
+            if soft:
+                if err <= 0.05:
+                    break               # kept as it is
+                continue
             if err < self.profile_tol:
                 break
             if mean is not None and self.mode != "gam" and abs(gam) < 1e-12:
                 x = [x[0], mean]
+        if ok and soft:
+            err = max(err, self.profile_tol)
         if not ok or info is None:
             an.set_profile(saved_shape)
             raise SolveError(f"no equilibrium at control value {c:g}")
@@ -573,6 +593,7 @@ class Shear(Flexure):
         st.gam_avg = float(num / den) if abs(den) > 1e-9 else 0.0
         st.perr = err
         st.passes = passes
+        st.profile = an.profile()        # the profile the stage leaves for the next one
         return st
 
     def more_detail(self, stages, peak, limit):
@@ -584,7 +605,9 @@ class Shear(Flexure):
             self.mode = mode
 
     def relax(self, passes: int) -> float:
-        return 1.0 if passes == 0 else 0.5
+        """The share of the updated profile taken: all of it, the update being Response's,
+        which is damped in itself."""
+        return 1.0
 
     # -- Response's load stage control [B; docs/kernel.md "Response's own load stage control"] ---
     def control_of(self, st: Stage, mode: str | None = None) -> float:
@@ -647,11 +670,13 @@ class Shear(Flexure):
         2 an extreme fibre far past its peak strain; 0 nothing."""
         d, sec = st.detail, self.sec
         o = d.out
+        # the shear on the crack at its limit (what then governs the tension at the node,
+        # docs/kernel.md "The node") where no stirrup crosses
+        slip = (o.gov == nodelib.GOV_VCI_X) | (o.gov == nodelib.GOV_VCI_Y)
         if d.rhov is not None:
-            slip = (np.asarray(d.rhov) <= 0.0) & (o.vcimax > 0.0) \
-                & (np.abs(np.abs(o.vci) - o.vcimax) < 1e-6)
-            if slip.any():
-                return 1
+            slip = slip & (np.asarray(d.rhov) <= 0.0)
+        if slip.any():
+            return 1
         if sec.stirrups:
             lim = max(0.01, max(s.steel.rupture for s in sec.stirrups))
             if float(np.max(d.ey)) > lim:
@@ -745,6 +770,7 @@ class Shear(Flexure):
         self.mode = self.mode0 = self.first_control()
         st0 = self.initial()
         st0.control, st0.cmode = self.control_of(st0), self.mode
+        st0.profile = an.profile()
         self.accept(st0)
         unit = lambda: 1e-3 if self.mode == "phi" else 1.0     # Response's rad/m against rad/mm
         d0 = self.base_step(self.mode)
@@ -765,6 +791,10 @@ class Shear(Flexure):
             try:
                 st = self.solve(target, prev)
                 ok = True
+                if st.lam < 0.0 and len(self.stages) > 1:
+                    # the loads reversed: not a state of this loading (Response's shear is
+                    # never negative, the manual 3-5)
+                    st, ok = None, False
             except SolveError:
                 st, ok = None, False
             code = 0
@@ -778,9 +808,18 @@ class Shear(Flexure):
                     ok = False
                 if code == 3 and st.lam > peak:
                     ok = False
+            if getattr(self, "trace", None) is not None:
+                self.trace.append(dict(
+                    n=len(self.stages), mode=self.mode, target=target, mult=mult, kept=ok,
+                    solved=st is not None, code=code, peak=peak,
+                    lam=None if st is None else st.lam, perr=None if st is None else st.perr,
+                    passes=None if st is None else st.passes))
             if not ok:
                 retries += 1
-                other = self.other_control()
+                # back to the state of the stage before [B 004190a0]
+                if getattr(prev, "profile", None) is not None:
+                    an.set_profile(prev.profile)
+                other = self.other_control() if self.mode0 != "gam" else self.mode
                 if mult < (0.05 if self.mode == "e0" else 0.2) and other != self.mode:
                     # change the control variable [B 004162d0]
                     old = self.mode
@@ -844,11 +883,15 @@ class Shear(Flexure):
                         and len(pending) < 60:
                     pending.append(self.stages.pop())
                     self._uncommit()
+                    if getattr(a, "profile", None) is not None:
+                        an.set_profile(a.profile)
                     target = self.control_of(a) + (0.8 if ev == 2 else 0.2) * gap
                     break
                 if pending:
                     nxt = pending.pop()
                     self.accept(nxt)
+                    if getattr(nxt, "profile", None) is not None:
+                        an.set_profile(nxt.profile)
                     peak = max(peak, nxt.lam)
                     target = nxt.control
                     continue
