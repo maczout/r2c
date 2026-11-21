@@ -184,7 +184,7 @@ class Analysis:
         st = sec.stirrups[0].steel
         z = np.asarray(det.z, dtype=float)
         # in the stirrup's own strain: a hoop is strained by less than the concrete (7-6)
-        fac = self.stirrups_at(z)[0][2]
+        fac = self.stirrups_at(z, det.b)[0][2]
         ep = np.asarray(det.ey, dtype=float) * fac \
             - np.asarray(det.fsy, dtype=float) / (st.E * st.phi)
         ep = np.where((np.asarray(det.rhov) > 0) & (ep > 1e-9), ep, 0.0)
@@ -347,10 +347,16 @@ class Analysis:
                     idx[(zl <= z1) & (zl >= z2)] = j
         return idx
 
-    def stirrups_at(self, zf):
-        """For every stirrup type: (ratio by node, strain factor, force factor)."""
+    def node_width(self, z):
+        """Width at nodes z of shape (L, 3), flattened: on a step in width, the width of the
+        node's own layer."""
+        return self.sec.width(self.profile_z(z).ravel())
+
+    def stirrups_at(self, zf, bw=None):
+        """For every stirrup type: (ratio by node, strain factor, force factor). bw is the
+        width at each node where the caller knows which side of a step the node is on."""
         sec = self.sec
-        bw = np.maximum(sec.width(zf), 1e-6)
+        bw = np.maximum(sec.width(zf) if bw is None else bw, 1e-6)
         out = []
         for st in sec.stirrups:
             inside = (zf >= st.bot - 1e-9) & (zf <= st.top + 1e-9)
@@ -404,7 +410,7 @@ class Analysis:
         """The transverse strain of every node, from the condition that there is no total
         stress across the member: concrete fcy and the stirrups balance (thesis 7-2)."""
         sec = self.sec
-        sts = self.stirrups_at(zf)
+        sts = self.stirrups_at(zf, self.node_width(z))
         rcrit = sec.tab(sec.t_rhocrit, zf)
         epy = np.interp(zf, sec.tz, self.epy)
         idx = self.law_index(zf, z)
@@ -566,7 +572,7 @@ class Analysis:
         fsy = np.zeros(len(sel))
         fsycr = np.zeros(len(sel))
         if self.shear and sec.stirrups:
-            tot, _res, rho_t = self.stirrup_stress(self.stirrups_at(zz), ey,
+            tot, _res, rho_t = self.stirrup_stress(self.stirrups_at(zz, b.ravel()[sel]), ey,
                                                    sec.tab(sec.t_rhocrit, zz),
                                                    np.interp(zz, sec.tz, self.epy))
             has = rho_t > 0
