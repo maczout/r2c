@@ -35,11 +35,13 @@ developer's. Items that need a structural judgement are marked **(structural)**.
   input feature), `variants.py` (inputs derived from present ones by stated text edits),
   `probe.py` (what Response does with an input, through r2x), `scope_cases.py` (the 53
   scope cases and their first capture), `targets.py` (which cases are inside on peak,
-  rising branch and shape), `check.py` (checks before pushing).
+  rising branch and shape), `check.py` (checks before pushing). `decompile.py` also lists
+  a routine's instructions (`a:ADDRESS`).
 - 85 oracle fixtures in `tests/oracle` (32, and the 53 scope cases of increment S since
   2026-11-21), each with the detail views of the feature stages of
   Response's curve (cracking, falls of load, peak, last stage); pytest tests on the first
-  32 (fast set;
+  32 and on the fourteen scope cases without shear (`R2C_SCOPE_DIR` for their inputs), and
+  on the reader and the material rules of increment S (fast set;
   `-m slow` for seven shear cases; `R2C_RESPONSE_DIR` for Response's sample inputs,
   `R2C_DEFINE_DIR` for the Quick Define inputs, which are r2x's:
   `tests/reference/define`).
@@ -62,13 +64,15 @@ post-peak 10, shape 10, views 30. On the 25, no check changed sides against the 
 on peak and rising branch; the five without shear are inside on shape too
 (`docs/verification.md`, "Quick Define sections").
 
-**The 53 scope cases, baseline** (fourth run of 2026-11-21, all 85 cases, the kernel
-unchanged): the 32 are as above, no check changed sides. Of the 53, 17 are inside on peak,
-rising branch and shape, 14 fail (twelve softening models refused; two stop with "no
-equilibrium under the initial loads") and 22 are outside on one of the three, most of them
-at the end of the response (`docs/verification.md`, "The scope cases: the baseline";
-`python tools/targets.py VERIFY_OUT --new`). They are what steps 3 and 4 of increment S
-work on; none is a known deviation yet.
+**The 53 scope cases** (fifth run of 2026-11-21, all 85 cases, after step 3 of increment
+S): no case fails or is refused; the first 32 are as above, no check changed sides. Of the
+53, 21 are inside on peak, rising branch and shape (17 in the baseline before anything was
+built) and 32 are outside, **every one on the shape, at the end of the response**: 11 of
+them also on the peak, where r2c carries on past the point where Response's response ends
+(+5 to +22 %), 5 on the rising branch. None is outside for its feature's own rule: in
+Response's own peak states r2c's moment is within 0.4 % and its shear within 1 to 3 %
+(`docs/verification.md`, "The scope cases after step 3"; `python tools/targets.py
+VERIFY_OUT --new`). They are what step 4 works on; none is recorded as a known deviation yet.
 
 **Known deviation, shear cases (the last stage).** Response's response to moment and shear
 often ends on a collapsed stage, at 4 to 66 % of the peak load (5 of the 12 shear cases:
@@ -154,24 +158,26 @@ reaches the analysis, each with one status, measured with r2x's worker where it 
 known. Against it, the scope is **not complete**. What is left (increment S, the owner's
 brief of 2026-11-21):
 
-- **Missing** (r2x solves it, r2c refuses or ignores it): eleven named compression softening
-  models and number 4; a segmental curve for reinforcing steel (read and ignored); draped
-  tendons (ignored); shrinkage and thermal strains of the concrete (ignored).
-- **Compared since 2026-11-21, not yet inside target everywhere** (implemented; the case
-  is new): the rest of the concrete model options
-  (base curves 0 and 3, softening 0, 2, 6, 7, 10, 13 under shear, tension stiffening 1 to 4
-  and 6, the tension stiffening factor); input files in US and kg-cm units; given crack
-  spacings and moment axis; no stirrups with shear; interlocking hoops; prestrains on
-  stirrups and bars; thermal strain of bars; factors in the file; a T-beam with shear; CSA
-  factors and More Detail with shear; More Detail max; five load combinations.
-- 53 cases cover these, in `tests/oracle` since 2026-11-21: 41 that reach a kernel path no
-  earlier case reaches (group A), 12 that combine paths already reached (group B).
-  `tools/scope_cases.py --list` names them.
+- **Built in step 3** (2026-11-21; rules and sources in `docs/kernel.md`): Response's
+  compression softening models, all nineteen numbers; a segmental curve for reinforcing
+  steel; shrinkage and thermal strains of the concrete; the state under the constant loads
+  for sections strained by them.
+- **Missing still: draped tendons.** The drape is read and ignored; its rule was not found
+  in the thesis or in a few steps of the binary. Measured effect in Response: under 0.1 % on
+  the peak of the case that has it. An open question for the owner (log of 2026-11-21-05).
+- **Not built, no case** (found while building): the Hsu softening models combined with
+  Tamai tension stiffening, which Response runs with a steel ratio and a tensile strength of
+  its own; a shrinkage profile of more than three points.
+- **Compared since 2026-11-21, not yet inside target everywhere**: 53 cases in
+  `tests/oracle`, 41 that reach a kernel path no earlier case reaches (group A), 12 that
+  combine paths already reached (group B); `tools/scope_cases.py --list` names them.
+- r2c refuses as out of scope only what is out of scope by design. Inputs Response itself
+  rejects are input errors (curved outline rows, tension stiffening 5, `units="roman"`).
 - **Not solvable with r2x** (measured; nothing to compare with): curved outline rows in an
   input file (Response's reader rejects them; a circle is saved as 13 straight rows, so
   option C4 falls away); a shape without an outline; tension stiffening "None" (Response
   asks a question r2x does not answer) and 5; `units="roman"`; three load combinations on
-  Newbeam. What r2c should do with each is proposed in `docs/scope.md` for the owner.
+  Newbeam. What r2c does with each is in `docs/scope.md`, for the owner to confirm.
 - **Out of scope by design** (owner): hollow sections, long-term effects, strain
   discontinuity, the old text input format.
 - A section with tendons added by hand: dropped from the test set (owner, 2026-11-21).
@@ -181,11 +187,12 @@ brief of 2026-11-21):
   r2x's clipboard helper can fail transiently (once in 25 captures); a rerun of that case
   on its own then matched.
 
-**Where increment S stands** (2026-11-21): step 1, the inventory, and step 2, the 53 cases'
-fixtures and the baseline run on all 85 cases before any kernel change, are done. Next is
-step 3: build what is missing and bring the new cases inside on peak, rising branch and
-shape; then step 4 (how a response ends: A3, G, C2). The baseline is kept outside the
-repository; `docs/verification-results.md` is that run.
+**Where increment S stands** (2026-11-21): steps 1 to 3 are done (the inventory; the 53
+cases and the baseline; what was missing, built). **The scope is not complete yet**, judged
+against `docs/scope.md`: draped tendons are left (the rule is not found), and 32 of the 53
+cases are outside target on the shape of the curve, at the end of the response. Next is
+step 4: Response's own acceptance of a stage, its step control and its end-of-response
+rules (A3, G, C2) in place of r2c's. Reading, for the owner to confirm.
 
 ## 5. Decisions that are the owner's
 
