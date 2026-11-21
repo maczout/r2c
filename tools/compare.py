@@ -12,7 +12,11 @@ What is compared:
 * every control chart: the peak load, the control value there, and how far the reference's
   rising branch lies from the subject's curve (the largest and the mean distance of its points
   from the subject's polyline, with the load scaled by the reference's peak load and the control
-  value by its largest value on that branch, as a percentage);
+  value by its largest value on that branch, as a percentage); and the two-way distance
+  between the whole curves, split at the reference's peak into rising and post-peak (each
+  curve's points against the other's curve, load scaled by the reference's peak, control value
+  by its largest value over the whole curve). One-way misses a subject that runs on past the
+  reference's end; two-way does not;
 * with --views, every detail view at the peak: the subject's stage nearest the reference's peak
   in control value; for each chart the largest distance of the reference's points from the
   subject's curve, as a percentage of the chart's largest value (depth scaled by the section
@@ -68,25 +72,54 @@ def _curve(rec, key):
     return parse_chart(rec.control(key))[3][0]
 
 
-def curve_distance(a, b, xs, ys):
-    """How far each point of curve a lies from curve b (a polyline), with x scaled by xs and y
-    by ys: the largest and the mean distance. Works for curves that double back or jump."""
-    if len(a) == 0 or len(b) == 0:
-        return float("nan"), float("nan")
+def project(a, b, xs, ys):
+    """Each point of curve a against curve b (a polyline), with x scaled by xs and y by ys:
+    its distance from b, and where on b its nearest point lies, as a position along b
+    (segment index plus the fraction along that segment: 0 at b's first point, len(b) - 1
+    at its last). Works for curves that double back or jump."""
     pa = np.column_stack([a[:, 0] / xs, a[:, 1] / ys])
     pb = np.column_stack([b[:, 0] / xs, b[:, 1] / ys])
     if len(pb) == 1:
-        d = np.hypot(*(pa - pb[0]).T)
-        return float(d.max()), float(d.mean())
+        return np.hypot(*(pa - pb[0]).T), np.zeros(len(pa))
     p0, p1 = pb[:-1], pb[1:]
     seg = p1 - p0
     len2 = np.maximum(np.sum(seg * seg, axis=1), 1e-30)
     best = np.full(len(pa), np.inf)
+    pos = np.zeros(len(pa))
     for i in range(len(p0)):
         t = np.clip(((pa - p0[i]) @ seg[i]) / len2[i], 0.0, 1.0)
         d = np.hypot(*(pa - (p0[i] + t[:, None] * seg[i])).T)
-        best = np.minimum(best, d)
-    return float(best.max()), float(best.mean())
+        closer = d < best
+        best = np.where(closer, d, best)
+        pos = np.where(closer, i + t, pos)
+    return best, pos
+
+
+def curve_distance(a, b, xs, ys):
+    """How far each point of curve a lies from curve b (a polyline), with x scaled by xs and y
+    by ys: the largest and the mean distance."""
+    if len(a) == 0 or len(b) == 0:
+        return float("nan"), float("nan")
+    d, _ = project(a, b, xs, ys)
+    return float(d.max()), float(d.mean())
+
+
+def two_way(a, ia, b, xs, ys):
+    """The two-way distance between the reference's curve a (peak at index ia) and the
+    subject's curve b, split at the reference's peak: (rising, post-peak), each the largest
+    distance in either direction, as a fraction, or None for a part with no points.
+
+    Rising: the reference's points up to its peak against b, and the subject's points whose
+    nearest point on a lies before a's peak, against a. Post-peak: the rest of both. A
+    subject's point beyond the reference's end projects onto that end, so a response that runs
+    on past the reference's, or stops short of it, counts as distance after the peak."""
+    da, _ = project(a, b, xs, ys)
+    db, pos = project(b, a, xs, ys)
+    post_b = pos >= ia - 1e-9
+    rise = np.concatenate([da[: ia + 1], db[~post_b]])
+    post = np.concatenate([da[ia + 1:], db[post_b]])
+    return (float(rise.max()) if len(rise) else None,
+            float(post.max()) if len(post) else None)
 
 
 def _rising(c):
@@ -114,6 +147,15 @@ def compare_control(ref, sub, key):
         dmax, dmean = curve_distance(ra, b, xs, pk)
         out["curve_max_diff_pct"] = 100.0 * dmax
         out["curve_mean_diff_pct"] = 100.0 * dmean
+    xw = float(np.max(np.abs(a[:, 0]))) if len(a) else 0.0
+    if len(a) > 1 and len(b) > 0 and pk > 0 and xw > 0:
+        # both curves, both ways; scaled by the reference's peak load and its largest control
+        # value over the whole curve
+        rise, post = two_way(a, ia, b, xw, pk)
+        if rise is not None:
+            out["rising_pct"] = 100.0 * rise
+        if post is not None:
+            out["post_peak_pct"] = 100.0 * post
     return out
 
 
@@ -192,14 +234,17 @@ def render(res) -> str:
         f"subject {s['stage-count']} (peak at {s['peak-stage']})",
         "",
         f"{'control chart':<14}{'ref peak':>11}{'sub peak':>11}{'diff %':>8}"
-        f"{'ref x':>10}{'sub x':>10}{'curve max %':>13}{'mean %':>8}",
+        f"{'ref x':>10}{'sub x':>10}{'curve max %':>13}{'mean %':>8}{'rising %':>10}"
+        f"{'post %':>8}",
     ]
     for c in res["control"]:
         lines.append(
             f"{c['chart']:<14}{c['ref_peak_load']:>11.2f}{c['sub_peak_load']:>11.2f}"
             f"{c['peak_diff_pct']:>8.2f}{c['ref_peak_x']:>10.3f}{c['sub_peak_x']:>10.3f}"
             + (f"{c['curve_max_diff_pct']:>13.2f}{c['curve_mean_diff_pct']:>8.2f}"
-               if "curve_max_diff_pct" in c else ""))
+               if "curve_max_diff_pct" in c else f"{'':>21}")
+            + (f"{c['rising_pct']:>10.2f}" if "rising_pct" in c else f"{'':>10}")
+            + (f"{c['post_peak_pct']:>8.2f}" if "post_peak_pct" in c else ""))
     for k in res["missing_control"]:
         lines.append(f"{k:<14} missing from the subject")
     if "views" in res:

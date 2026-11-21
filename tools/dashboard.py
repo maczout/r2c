@@ -177,7 +177,8 @@ def build(run: dict, results: dict, acc: dict, curves_dir: Path | None, ref_dir:
             "chart": c["chart"] if c else None,
             "peak": [c["ref_peak_load"], c["sub_peak_load"]] if c else None,
             "peak_pct": c["peak_diff_pct"] if c else None,
-            "curve_pct": c.get("curve_max_diff_pct") if c else None,
+            "curve_pct": c.get("rising_pct", c.get("curve_max_diff_pct")) if c else None,
+            "post_pct": c.get("post_peak_pct") if c else None,
             "verdict": report.verdict(checks),
             "limits": {k: v[1] for k, v in checks.items()},
             "views": [],
@@ -214,7 +215,7 @@ def build(run: dict, results: dict, acc: dict, curves_dir: Path | None, ref_dir:
                     o = json.loads(other.read_text()).get(name, {})
                     oc = (o.get("control") or [{}])[-1]
                     same = (abs(oc.get("peak_diff_pct", 1e9) - case["peak_pct"]) < 1e-6
-                            and abs((oc.get("curve_max_diff_pct") or 0)
+                            and abs((oc.get("rising_pct", oc.get("curve_max_diff_pct")) or 0)
                                     - (case["curve_pct"] or 0)) < 1e-6)
                     if o.get("run") and case["run"] and o["run"] != case["run"] and not same:
                         case["curve"]["other_run"] = o["run"]
@@ -335,7 +336,7 @@ H += `</table></div>`;
 if (D.gaps.length) H += `<details open><summary>Not in the test set (from docs/verification.md)</summary><ul class="gaps">${D.gaps.map(g=>`<li>${esc(g)}</li>`).join("")}</ul></details>`;
 
 function tipCase(c) {
- return `${c.name}\ninput ${c.input}\ninitial ${c.initial}; increment ${c.increment}\npeak ${sg(c.peak_pct)} %, curve ${f(c.curve_pct)} %\nstages Response ${c.stages[0]} / r2c ${c.stages[1]}`;
+ return `${c.name}\ninput ${c.input}\ninitial ${c.initial}; increment ${c.increment}\npeak ${sg(c.peak_pct)} %, rising ${f(c.curve_pct)} %, post-peak ${f(c.post_pct)} %\nstages Response ${c.stages[0]} / r2c ${c.stages[1]}`;
 }
 
 // ---------- scorecard
@@ -353,12 +354,13 @@ function peakBar(c) {
  if (lim != null) for (const t of [-lim, lim]) s += `<line x1="${px(t)}" x2="${px(t)}" y1="0" y2="16" stroke="var(--tol)" stroke-width="1.5"/>`;
  return s + `</svg>`;
 }
-function curveBar(c) {
- const x = c.curve_pct; if (x == null) return "";
- let s = `<svg width="${CW}" height="16" role="img" aria-label="curve ${f(x)} %">`;
+function curveBar(c, key = "curve_pct", lk = "curve") {
+ const x = c[key]; if (x == null) return "";
+ const lim = c.limits[lk];
+ let s = `<svg width="${CW}" height="16" role="img" aria-label="${lk} ${f(x)} %">`;
  for (const t of [0.1,1,10]) s += `<line x1="${cl(t)}" x2="${cl(t)}" y1="2" y2="14" stroke="var(--grid)"/>`;
  s += `<rect x="4" y="4" width="${Math.max(2, cl(x)-4)}" height="8" rx="2" fill="var(--s4)"/>`;
- if (c.limits.curve != null) s += `<line x1="${cl(c.limits.curve)}" x2="${cl(c.limits.curve)}" y1="0" y2="16" stroke="var(--tol)" stroke-width="1.5"/>`;
+ if (lim != null) s += `<line x1="${cl(lim)}" x2="${cl(lim)}" y1="0" y2="16" stroke="var(--tol)" stroke-width="1.5"/>`;
  return s + `</svg>`;
 }
 function axisRow() {
@@ -369,17 +371,17 @@ function axisRow() {
  for (const [t,l] of [[0.01,"0.01"],[0.1,"0.1"],[1,"1"],[10,"10"],[100,"100"]]) b += `<text x="${Math.min(CW-12,Math.max(10,cl(t)))}" y="11" text-anchor="middle">${l}</text>`;
  return [a, b + `</svg>`];
 }
-H += `<h2>How close: peak and rising branch</h2>
-<p class="sub">Peak: r2c's largest load on the control chart against Response's (log scale both sides of zero; <span style="color:var(--low)">■</span> r2c lower, <span style="color:var(--high)">■</span> r2c higher). Curve: largest distance of Response's rising-branch points from r2c's curve, as % of Response's peak (log scale).</p>`;
+H += `<h2>How close: peak, rising branch and post-peak</h2>
+<p class="sub">Peak: r2c's largest load on the control chart against Response's (log scale both sides of zero; <span style="color:var(--low)">■</span> r2c lower, <span style="color:var(--high)">■</span> r2c higher). Rising and post-peak: largest distance between the two curves, measured both ways and split at Response's peak, as % of Response's peak (log scale). A response that runs on past Response's end, or stops short of it, shows as post-peak distance.</p>`;
 const [ax1, ax2] = axisRow();
-H += `<div class="scroll"><table><tr><th class="sticky">Case</th><th>Peak diff %</th><th></th><th>Curve %</th><th></th><th>Stages R / r2c</th><th>Verdict</th><th>r2c s</th></tr>
-<tr><td class="sticky"></td><td>${ax1}</td><td></td><td>${ax2}</td><td colspan="4"></td></tr>`;
+H += `<div class="scroll"><table><tr><th class="sticky">Case</th><th>Peak diff %</th><th></th><th>Rising %</th><th></th><th>Post-peak %</th><th></th><th>Stages R / r2c</th><th>Verdict</th><th>r2c s</th></tr>
+<tr><td class="sticky"></td><td>${ax1}</td><td></td><td>${ax2}</td><td></td><td>${ax2}</td><td colspan="4"></td></tr>`;
 for (const g of ["flexure","shear"]) {
  const a = by(g); if (!a.length) continue;
- H += `<tr class="grp"><td class="sticky" colspan="8">${G[g]}</td></tr>`;
- for (const c of a) H += `<tr data-tip="${esc(tipCase(c))}"><td class="sticky">${esc(c.name)}</td><td>${peakBar(c)}</td><td class="num">${sg(c.peak_pct)}</td><td>${curveBar(c)}</td><td class="num">${f(c.curve_pct)}</td><td class="num">${c.stages[0]} / ${c.stages[1]}</td><td>${esc(c.verdict)}</td><td class="num">${c.seconds ?? ""}</td></tr>`;
+ H += `<tr class="grp"><td class="sticky" colspan="10">${G[g]}</td></tr>`;
+ for (const c of a) H += `<tr data-tip="${esc(tipCase(c))}"><td class="sticky">${esc(c.name)}</td><td>${peakBar(c)}</td><td class="num">${sg(c.peak_pct)}</td><td>${curveBar(c)}</td><td class="num">${f(c.curve_pct)}</td><td>${curveBar(c, "post_pct", "post_peak")}</td><td class="num">${f(c.post_pct)}</td><td class="num">${c.stages[0]} / ${c.stages[1]}</td><td>${esc(c.verdict)}</td><td class="num">${c.seconds ?? ""}</td></tr>`;
 }
-H += `</table></div><p class="note">Stage counts after the peak are not compared (see docs/verification.md).</p>`;
+H += `</table></div><p class="note">Stage counts are not compared (see docs/verification.md).</p>`;
 
 // ---------- heatmap
 const views = [...new Set(cases.flatMap(c => c.views.map(v => v.view)))];
@@ -440,7 +442,7 @@ for (const g of ["flexure","shear"]) for (const c of by(g)) {
  const k = c.curve;
  const note = !k.sub ? `<div class="m">No r2c record for this case in the curves folder: Response only.</div>`
   : k.other_run ? `<div class="m">r2c curve from run ${esc(k.other_run)}, metrics from ${esc(c.run)}.</div>` : "";
- H += `<div class="panel"><h3>${esc(c.name)}</h3><div class="m">${esc(c.section)} · ${esc(c.loading)}${c.variants.length?" · "+esc(c.variants.join(", ")):""} · ${esc(k.y)}<br>peak ${sg(c.peak_pct)} % · curve ${f(c.curve_pct)} %</div>${plot(c)}${note}</div>`;
+ H += `<div class="panel"><h3>${esc(c.name)}</h3><div class="m">${esc(c.section)} · ${esc(c.loading)}${c.variants.length?" · "+esc(c.variants.join(", ")):""} · ${esc(k.y)}<br>peak ${sg(c.peak_pct)} % · rising ${f(c.curve_pct)} % · post-peak ${f(c.post_pct)} %</div>${plot(c)}${note}</div>`;
 }
 H += `</div><p class="note">Generated by tools/dashboard.py. Every number comes from the run named at the top; interpretation is in docs/verification.md.</p>`;
 $("#root").innerHTML = H;

@@ -60,10 +60,14 @@ def assess(res: dict, acc: dict) -> dict:
             out["peak"] = (d, lim["peak_pct"], abs(d) <= lim["peak_pct"])
         else:
             out["peak"] = (d, None, None)
-        cv = c.get("curve_max_diff_pct")
+        cv = c.get("rising_pct", c.get("curve_max_diff_pct"))
         if cv is not None:
             cl = lim.get("curve_pct")
             out["curve"] = (cv, cl, None if cl is None else cv <= cl)
+        pv = c.get("post_peak_pct")
+        if pv is not None:
+            pl = lim.get("post_peak_pct")
+            out["post_peak"] = (pv, pl, None if pl is None else pv <= pl)
     vacc = acc.get("views", {})
     exempt = set(vacc.get("views_exempt", []))
     vals = [v["max_diff_pct"] for v in res.get("views", [])
@@ -121,9 +125,9 @@ def render(results: dict, run: dict, acc: dict, acc_path: str) -> str:
             continue
         out += [f"## {title}", "",
                 "| Case | Input | Initial; increment | Stages Resp. / r2c | Chart | "
-                "Peak Resp. | Peak r2c | Peak diff % | Curve % | Views % (worst) | "
-                "Assessment | Time s |",
-                "|---|---|---|---|---|---:|---:|---:|---:|---:|---|---:|"]
+                "Peak Resp. | Peak r2c | Peak diff % | Rising % | Post-peak % | "
+                "Views % (worst) | Assessment | Time s |",
+                "|---|---|---|---|---|---:|---:|---:|---:|---:|---:|---|---:|"]
         for n in names:
             r = ran[n]
             h = r["ref"]
@@ -149,7 +153,8 @@ def render(results: dict, run: dict, acc: dict, acc_path: str) -> str:
                 f"| {n} | {inp} | {h['initial']}; {h['increment']} | "
                 f"{h['stage-count']} / {r['sub']['stage-count']} | {c['chart']} | "
                 f"{c['ref_peak_load']:.1f} | {c['sub_peak_load']:.1f} | "
-                f"{cell(chk.get('peak'))} | {cell(chk.get('curve'), signed=False)} | {worst} | "
+                f"{cell(chk.get('peak'))} | {cell(chk.get('curve'), signed=False)} | "
+                f"{cell(chk.get('post_peak'), signed=False)} | {worst} | "
                 f"{verdict(chk)} | {r.get('seconds', '')} |")
         out.append("")
     if skipped:
@@ -173,12 +178,16 @@ def render(results: dict, run: dict, acc: dict, acc_path: str) -> str:
             out.append(f"| {k} | {rows[k][0]:.1f} | {rows[k][1]} |")
         out.append("")
     out += ["## How the numbers are measured", "",
-            "See `tools/compare.py`. Peak: the largest load on the bottom control chart. Curve: "
-            "the largest distance of Response's rising-branch points from r2c's curve, load "
-            "scaled by Response's peak, control value by its largest value on that branch. "
+            "See `tools/compare.py`. Peak: the largest load on the bottom control chart. "
+            "Rising and post-peak: the largest distance between the two curves, measured both "
+            "ways (Response's points from r2c's curve and r2c's from Response's), split at "
+            "Response's peak; load scaled by Response's peak, control value by its largest value "
+            "over the whole curve. An r2c point counts as post-peak when its nearest point on "
+            "Response's curve is at or after Response's peak, so a response that runs on past "
+            "Response's end, or stops short of it, shows as post-peak distance. "
             "Views: at r2c's stage nearest Response's peak in control value, the largest "
             "distance of Response's points from r2c's curve, relative to the chart's largest "
-            "value. After the peak, stage counts and loads are not compared.", ""]
+            "value. Stage counts are not compared.", ""]
     return "\n".join(out)
 
 
