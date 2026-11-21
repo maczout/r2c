@@ -1,0 +1,103 @@
+#!/usr/bin/env python3
+"""List the checks that changed sides of their target between two verify runs.
+
+Answers: "did this change put any check outside target that was inside, and which did it
+bring inside?" The two folders are tools/verify.py outputs (before, after) on the same
+fixtures. A check is a case's peak, rising branch, post-peak branch or shape, or one detail
+view at one feature stage of Response's curve; inside and outside are decided as
+tools/report.py decides them (docs/acceptance.md, the printed-precision floor included).
+
+    python tools/changes.py VERIFY_BEFORE VERIFY_AFTER [--view principal_tensile_stress]
+
+Prints the checks that went outside, those that came inside, and for each view the number of
+stages outside before and after. With --view, also every stage of that view still outside.
+Exit status 1 if any check went from inside to outside.
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+import sys
+from collections import Counter
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+import report  # noqa: E402
+
+ROOT = Path(__file__).resolve().parents[1]
+
+
+def checks(res: dict, acc: dict) -> dict:
+    """{check name: (ok, text)} for one case of a verify run."""
+    out = {}
+    for k, (v, _lim, ok) in report.assess(res, acc).items():
+        if k == "views" or ok is None:
+            continue
+        out[report.NAMES.get(k, k)] = (ok, f"{v:.2f}" if not isinstance(v, bool) else str(v))
+    lim = acc.get("views", {}).get("views_pct")
+    exempt = set(acc.get("views", {}).get("views_exempt", []))
+    for s in res.get("views_stages", []):
+        for v in s["views"]:
+            if v["view"] in exempt or lim is None:
+                continue
+            name = f"{v['view']} at stage {s['ref_stage']} ({s['feature']})"
+            if v.get("missing"):
+                out[name] = (False, "missing")
+                continue
+            d = 0.0 if v["max_diff"] <= v.get("floor", 0.0) else v["max_diff_pct"]
+            out[name] = (d <= lim, f"{d:.1f}")
+    return out
+
+
+def load(folder: Path) -> dict:
+    return {p.stem: json.loads(p.read_text()) for p in sorted(folder.glob("*.json"))
+            if p.stem not in ("results", "run")}
+
+
+def main(argv=None) -> int:
+    ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
+    ap.add_argument("before")
+    ap.add_argument("after")
+    ap.add_argument("--view", help="list every stage of this view still outside")
+    ap.add_argument("--acceptance", default=str(ROOT / "docs" / "acceptance.md"))
+    a = ap.parse_args(argv)
+    acc = report.read_acceptance(Path(a.acceptance))
+    before, after = load(Path(a.before)), load(Path(a.after))
+    worse, better, still = [], [], []
+    nb, na = Counter(), Counter()
+    for case in sorted(set(before) & set(after)):
+        if "control" not in before[case] or "control" not in after[case]:
+            print(f"{case}: not compared ({list(before[case])[:1]} / {list(after[case])[:1]})")
+            continue
+        cb, ca = checks(before[case], acc), checks(after[case], acc)
+        for k in sorted(set(cb) | set(ca)):
+            ob, tb = cb.get(k, (None, "-"))
+            oa, ta = ca.get(k, (None, "-"))
+            view = k.split(" at stage ")[0]
+            nb[view] += ob is False
+            na[view] += oa is False
+            line = f"  {case}: {k}: {tb} -> {ta}"
+            if ob is not False and oa is False:
+                worse.append(line)
+            elif ob is False and oa is not False:
+                better.append(line)
+            elif oa is False and view == a.view:
+                still.append(line)
+    only = sorted(set(before) ^ set(after))
+    if only:
+        print("in one run only:", ", ".join(only))
+    print(f"went outside target ({len(worse)}):", *worse, sep="\n")
+    print(f"came inside target ({len(better)}):", *better, sep="\n")
+    if a.view:
+        print(f"{a.view} still outside ({len(still)}):", *still, sep="\n")
+    print("checks outside, before -> after:")
+    for k in sorted(nb, key=lambda k: (" at " in k, k)):
+        if nb[k] or na[k]:
+            print(f"  {k}: {nb[k]} -> {na[k]}")
+    return 1 if worse else 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

@@ -5,7 +5,9 @@ CLAUDE.md allows the binary to be read for. Prints Ghidra's C for each address g
 function containing it), and with --calls the routines it calls and those that call it.
 An argument d:ADDRESS prints the double stored at that address instead (a constant the
 decompiler shows as DAT_...); s:HEX lists the functions with an instruction that uses that
-scalar (to find who writes a field at a known offset).
+scalar (to find who writes a field at a known offset); r:ADDRESS lists the functions that
+refer to that address (who uses a constant); v:VALUE lists where a double of that value is
+stored and who refers to each place (to find the routine behind a constant seen in output).
 
 Needs, none of it in the repository:
 * Ghidra (12.x, headless) at $GHIDRA_HOME, with a JDK 21 on the path;
@@ -40,6 +42,15 @@ import java.io.PrintWriter;
 import java.util.TreeSet;
 
 public class R2cDecompile extends GhidraScript {
+    private java.util.TreeMap<String, Integer> users(Address d) {
+        java.util.TreeMap<String, Integer> hits = new java.util.TreeMap<>();
+        for (ghidra.program.model.symbol.Reference r : getReferencesTo(d)) {
+            Function g = getFunctionContaining(r.getFromAddress());
+            hits.merge(g == null ? "? " + r.getFromAddress() : g.getEntryPoint().toString(), 1, Integer::sum);
+        }
+        return hits;
+    }
+
     @Override
     public void run() throws Exception {
         String[] args = getScriptArgs();
@@ -66,6 +77,24 @@ public class R2cDecompile extends GhidraScript {
                                 }
                     }
                     out.println("// scalar 0x" + args[i].substring(2) + " used in: " + hits);
+                    continue;
+                }
+                if (args[i].startsWith("r:")) {
+                    // functions that refer to this address (who uses a constant or a string)
+                    Address d = currentProgram.getAddressFactory().getAddress(args[i].substring(2));
+                    out.println("// " + d + " referred to from: " + users(d));
+                    continue;
+                }
+                if (args[i].startsWith("v:")) {
+                    // where a double of this value is stored, and who refers to each place
+                    byte[] pat = java.nio.ByteBuffer.allocate(8).order(java.nio.ByteOrder.LITTLE_ENDIAN)
+                            .putDouble(Double.parseDouble(args[i].substring(2))).array();
+                    ghidra.program.model.mem.Memory mem = currentProgram.getMemory();
+                    Address at = mem.getMinAddress();
+                    while ((at = mem.findBytes(at, pat, null, true, monitor)) != null) {
+                        out.println("// double " + args[i].substring(2) + " at " + at + ", referred to from: " + users(at));
+                        at = at.add(1);
+                    }
                     continue;
                 }
                 if (args[i].startsWith("d:")) {
