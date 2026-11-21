@@ -13,6 +13,20 @@ person or a coding agent. It is short on purpose: read it whole, then read selec
 "Engineering" in this repository means structural engineering unless it says otherwise. Mark
 anything that needs a structural judgement as such and leave it to the owner.
 
+## Development and meta-development
+
+- **Development changes what r2c does:** the kernel, its interface, and the tests and docs
+  that go with them. It is done in controlled increments, each measured against the targets.
+- **Meta-development changes what "done" means or how it is seen:** the targets
+  (`docs/acceptance.md`), the measures (`tools/compare.py`, `tools/report.py`), the results
+  pages (`tools/dashboard.py`, `tools/site.py`), the fixtures and the test set. It is done
+  with the owner, who decides each choice as it comes up.
+
+In a development session, `docs/acceptance.md` is not changed. Fixing a bug in a measure counts
+as development; any change to the measures, pages or fixtures goes in its own commit with its
+reason, and is listed in the pull request under "Measurement changes" for the owner to review.
+Never change a measure, a target or a fixture to bring a result inside target.
+
 ## Instruction hierarchy
 
 When these pull against each other, the higher one wins.
