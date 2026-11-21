@@ -45,3 +45,12 @@ def test_a_detour_before_the_peak_is_rising():
     sub = [[0, 0], [1, 60], [0.9, 30], [1, 60], [2, 100], [3, 90], [4, 80]]
     rise, post = measure(sub)
     assert rise > 0.05 and post == pytest.approx(0.0)
+
+
+def test_shape():
+    names = [f for f, _ in compare.shape(REF, 100.0, 4.0)]
+    assert names == ["peak", "ends falling"]       # straight to the peak: no stiffness drop
+    cracked = np.array([[0, 0], [0.1, 40], [1, 60], [2, 100], [3, 100]], dtype=float)
+    assert [f for f, _ in compare.shape(cracked, 100.0, 4.0)] == [
+        "cracking", "peak", "ends standing still"]
+    assert [f for f, _ in compare.shape(REF[:3], 100.0, 4.0)] == ["peak", "ends at peak"]

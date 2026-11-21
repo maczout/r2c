@@ -16,7 +16,8 @@ What is compared:
   between the whole curves, split at the reference's peak into rising and post-peak (each
   curve's points against the other's curve, load scaled by the reference's peak, control value
   by its largest value over the whole curve). One-way misses a subject that runs on past the
-  reference's end; two-way does not;
+  reference's end; two-way does not; and the curve's shape: its features in order (cracking,
+  falls of load before the peak, the peak, and how the response ends);
 * with --views, every detail view at the peak: the subject's stage nearest the reference's peak
   in control value; for each chart the largest distance of the reference's points from the
   subject's curve, as a percentage of the chart's largest value (depth scaled by the section
@@ -169,6 +170,11 @@ def compare_control(ref, sub, key):
         out["curve_max_diff_pct"] = 100.0 * dmax
         out["curve_mean_diff_pct"] = 100.0 * dmean
     xw = float(np.max(np.abs(a[:, 0]))) if len(a) else 0.0
+    sa, sb = shape(a, pk, xw), shape(b, pk, xw)
+    if sa:
+        out["shape_ref"] = [f for f, _ in sa]
+        out["shape_sub"] = [f for f, _ in sb]
+        out["shape_same"] = out["shape_ref"] == out["shape_sub"]
     if len(a) > 1 and len(b) > 0 and pk > 0 and xw > 0:
         # both curves, both ways; scaled by the reference's peak load and its largest control
         # value over the whole curve
@@ -180,6 +186,54 @@ def compare_control(ref, sub, key):
         if post is not None:
             out["post_peak_pct"] = 100.0 * post
     return out
+
+
+# Curve shape (owner, 2026-11-21: curves match qualitatively, in the features of their shape).
+# Thresholds are the developer's, fitted on the 25 oracle cases; a second stiffness drop
+# ("yield") was tried and dropped, because it also finds other softening.
+CRACK_STIFFNESS = 0.4   # cracking: the first step whose stiffness is below this × the first's
+FALL = 0.02             # a fall of load: below the largest so far by this × Response's peak
+
+
+def shape(c, pk, xs):
+    """The features of a control curve, in order along it: "cracking", "fall" (of load before
+    the peak), "peak", and how the response ends: "ends falling", "ends standing still" (more
+    stages at the peak load) or "ends at peak". Load is scaled by pk, control value by xs
+    (both the reference's, so both curves are read alike). [(feature, index)]."""
+    if len(c) == 0 or pk <= 0 or xs <= 0:
+        return []
+    ip = int(np.argmax(np.abs(c[:, 1])))
+    sgn = np.sign(c[ip, 0]) or 1.0
+    x = c[:, 0] * sgn / xs
+    y = np.abs(c[:, 1]) / pk
+    ev = []
+    k0 = None
+    for i in range(1, ip + 1):
+        dx, dy = x[i] - x[i - 1], y[i] - y[i - 1]
+        if dx <= 1e-9 or dy <= 0:
+            continue
+        k = dy / dx
+        if k0 is None:
+            k0 = k
+        elif k < CRACK_STIFFNESS * k0:
+            ev.append(("cracking", i))
+            break
+    falling = False
+    for i in range(1, ip):
+        below = y[i] < y[:i].max() - FALL
+        if below and not falling:
+            ev.append(("fall", i))
+        falling = below
+    ev.append(("peak", ip))
+    if ip == len(c) - 1:
+        ev.append(("ends at peak", ip))
+    elif y[-1] < y[ip] - FALL:
+        ev.append(("ends falling", len(c) - 1))
+    else:
+        ev.append(("ends standing still", len(c) - 1))
+    order = ["cracking", "fall", "peak"]
+    ev.sort(key=lambda e: (e[1], order.index(e[0]) if e[0] in order else 3))
+    return ev
 
 
 def _nearest_stage(sub, key, x):
@@ -270,6 +324,10 @@ def render(res) -> str:
                if "curve_max_diff_pct" in c else f"{'':>21}")
             + (f"{c['rising_pct']:>10.2f}" if "rising_pct" in c else f"{'':>10}")
             + (f"{c['post_peak_pct']:>8.2f}" if "post_peak_pct" in c else ""))
+        if "shape_ref" in c:
+            lines.append(f"{'':<14}shape {'same' if c['shape_same'] else 'DIFFERENT'}: "
+                         f"reference {', '.join(c['shape_ref'])}; "
+                         f"subject {', '.join(c['shape_sub'])}")
     for k in res["missing_control"]:
         lines.append(f"{k:<14} missing from the subject")
     if "views" in res:

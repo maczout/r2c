@@ -69,6 +69,8 @@ def assess(res: dict, acc: dict) -> dict:
         if pv is not None:
             pl = lim.get("post_peak_pct")
             out["post_peak"] = (pv, pl, None if pl is None else pv <= max(pl, fl))
+        if "shape_same" in c:
+            out["shape"] = (c["shape_same"], True, c["shape_same"])
     vacc = acc.get("views", {})
     exempt = set(vacc.get("views_exempt", []))
     # a view within the printed-precision floor counts as no difference
@@ -103,6 +105,14 @@ def cell(check, signed=True) -> str:
     return f"{s} {'≤' if ok else '>'} {lim:g}"
 
 
+def shape_cell(c) -> str:
+    if "shape_same" not in c:
+        return ""
+    if c["shape_same"]:
+        return "same"
+    return f"different: Resp. {', '.join(c['shape_ref'])}; r2c {', '.join(c['shape_sub'])}"
+
+
 def render(results: dict, run: dict, acc: dict, acc_path: str) -> str:
     out = [GENERATED, "", "# Verification results", ""]
     commit = run.get("commit", "")[:12] + (" (uncommitted changes)" if run.get("dirty") else "")
@@ -128,9 +138,9 @@ def render(results: dict, run: dict, acc: dict, acc_path: str) -> str:
             continue
         out += [f"## {title}", "",
                 "| Case | Input | Initial; increment | Stages Resp. / r2c | Chart | "
-                "Peak Resp. | Peak r2c | Peak diff % | Rising % | Post-peak % | "
+                "Peak Resp. | Peak r2c | Peak diff % | Rising % | Post-peak % | Shape | "
                 "Views % (worst) | Assessment | Time s |",
-                "|---|---|---|---|---|---:|---:|---:|---:|---:|---:|---|---:|"]
+                "|---|---|---|---|---|---:|---:|---:|---:|---:|---|---:|---|---:|"]
         for n in names:
             r = ran[n]
             h = r["ref"]
@@ -157,7 +167,7 @@ def render(results: dict, run: dict, acc: dict, acc_path: str) -> str:
                 f"{h['stage-count']} / {r['sub']['stage-count']} | {c['chart']} | "
                 f"{c['ref_peak_load']:.1f} | {c['sub_peak_load']:.1f} | "
                 f"{cell(chk.get('peak'))} | {cell(chk.get('curve'), signed=False)} | "
-                f"{cell(chk.get('post_peak'), signed=False)} | {worst} | "
+                f"{cell(chk.get('post_peak'), signed=False)} | {shape_cell(c)} | {worst} | "
                 f"{verdict(chk)} | {r.get('seconds', '')} |")
         out.append("")
     if skipped:
@@ -190,7 +200,9 @@ def render(results: dict, run: dict, acc: dict, acc_path: str) -> str:
             "Response's end, or stops short of it, shows as post-peak distance. "
             "Views: at r2c's stage nearest Response's peak in control value, the largest "
             "distance of Response's points from r2c's curve, relative to the chart's largest "
-            "value. Stage counts are not compared.", ""]
+            "value. Shape: the curve's features in order (cracking, falls of load before the "
+            "peak, the peak, how the response ends), read alike from both curves; it matches "
+            "when they are the same. Stage counts are not compared.", ""]
     return "\n".join(out)
 
 
