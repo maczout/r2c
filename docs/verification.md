@@ -9,8 +9,8 @@ numbers below are those of that run; numbers marked "2026-11-15 run" are from th
 comparison.
 
 The generated results cover all 25 cases, the 7 on Response's sample inputs (Marshall, Cm4,
-Liping LB1, se100, dm-n1n) included (third run of 2026-11-19, after the shear flow stiffness
-was changed to Response's rules). The 15 cases without shear are unchanged from the first
+Liping LB1, se100, dm-n1n) included (run of 2026-11-21; the kernel is that of the third run of
+2026-11-19, after the shear flow stiffness was changed to Response's rules). The 15 cases without shear are unchanged from the first
 run; the detail views of the 7 sample cases were first compared case by case on that day
 (see Detail views).
 Whether a difference is acceptable is decided against `docs/acceptance.md`, not here.
@@ -18,6 +18,43 @@ Whether a difference is acceptable is decided against `docs/acceptance.md`, not 
 Reproduce with `python tools/verify.py tests/oracle --inputs RESPONSE_FOLDER --out OUT`, then
 `python tools/report.py OUT`; compare any two records with
 `python tools/compare.py REF SUBJECT --views`.
+
+## Against the acceptance targets (run of 2026-11-21)
+
+`docs/acceptance.md` holds the owner's development targets since 2026-11-21: ±5 % on every
+metric, the curve's shape the same, a floor at Response's printed precision, and the detail
+views at the features of the curve, not only at the peak. The run of 2026-11-21 (on the
+kernel of 2026-11-19, unchanged) is the first assessed against them. Every case is outside
+on at least one check; the page shows which, one marker per check. Measured, from
+`docs/verification-results.json`:
+
+| Check | Cases outside | What it is, in short |
+|---|---:|---|
+| Peak | 0 of 25 | Largest +3.7 % (Newbeam M/V = 2 m) |
+| Rising | 2 | M/V = 0.5 m (r2c drops back on the way up), US M/V = 1 ft |
+| Post-peak | 6 | Cm4, Newbeam −M, M/V = 1 m and 2 m, M/V = 0.5 m, V alone: how and where the response ends |
+| Shape | 8 | Four shear cases where Response ends with stages standing still at the peak load and r2c stops at it (Marshall, se100, Newbeam N₀ + M/V = 1 m, M/V = 2 m); M/V = 0.5 m and V alone end differently; US M/V = 1 ft has one fall of load fewer in r2c; tension (cracking and a fall of load at one step, read in a different order) |
+| Views | 25 | See below |
+
+**The detail-view misses are not a matter of precision.** Every view comparison above 5 % was
+checked against Response's printed precision (2026-11-21, on the views at the peak): none
+lies within two units of the last printed digit, so the floor in acceptance.md changes none
+of them. Do not look for a precision explanation.
+
+**Principal tensile stress** misses at 58 of the stages compared, in 23 of the 25 cases, by
+about 1.8 MPa: close to the cracking strength. Inferred: one systematic difference, most
+likely the cracking-stress line that Response reduces in the compression zone and r2c does
+not (status, option F). It alone puts most cases outside on views.
+
+**Where the views miss most** (measured, misses above 5 % over comparisons, by the feature of
+Response's curve at which they are compared): at cracking 50 of 462, at a fall of load 33 of
+126, at the peak 82 of 525, at the last stage 85 of 336 where the response ends falling and 29
+of 126 where it ends standing still. The last stages are where the two responses differ most
+(post-peak and shape above), so views there compare unlike states.
+
+Views are matched by load and control value together since 2026-11-21 (owner's choice);
+before, by control value alone. The numbers in the sections below that refer to views at the
+peak are from the earlier matching.
 
 ## Without shear
 

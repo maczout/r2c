@@ -19,35 +19,35 @@ developer's. Items that need a structural judgement are marked **(structural)**.
 - Kernel in Python (numpy only): MCFT node with crack check, dynamic layering, flexure and axial
   driver, shear by the longitudinal stiffness method with Response's own stiffness rules,
   stepping in curvature and then in the shear strain.
-- Tools: `compare.py` (any two records), `verify.py` (r2c on a set of oracle records),
+- Tools: `compare.py` (any two records: peak, rising and post-peak measured both ways,
+  curve shape, detail views at the features of Response's curve), `verify.py` (r2c on a set of oracle records),
   `report.py` (verification results from a verify run), `dashboard.py` (the same results as
   one HTML page of pictures, for the owner's review), `trim.py` (record to fixture),
   `diagnose.py` (r2c at Response's strain states, along its control values, its calculated
   shear stress in Response's states, and its own stages with their profile error),
   `decompile.py` (a routine of r2k.exe from a Ghidra project kept outside the repository),
+  `retrim.py` (re-cut the fixtures from the archive to hold the feature stages),
   `capture.py` (rebuild the oracle archive with r2x), `check.py` (checks before pushing).
-- 25 oracle fixtures in `tests/oracle`; pytest tests (fast set; `-m slow` for five shear cases;
+- 25 oracle fixtures in `tests/oracle`, each with the detail views of the feature stages of
+  Response's curve (cracking, falls of load, peak, last stage); pytest tests (fast set; `-m slow` for five shear cases;
   `R2C_RESPONSE_DIR` for Response's sample inputs).
 - Docs: `kernel.md` (each rule and its source), `verification.md` (what the results mean),
-  `verification-results.md` (generated), `acceptance.md` (the owner's tolerances; template).
+  `verification-results.md` (generated), `acceptance.md` (the owner's development targets).
 
 ## 2. Against Response-2000 1.9.7
 
-The numbers are in `docs/verification-results.md` and what they mean is in
-`docs/verification.md`. In short, for all 25 cases (run of 2026-11-19, third of that day):
+The numbers are in `docs/verification-results.md`, what they mean in `docs/verification.md`
+("Against the acceptance targets"), and the pictures on the results page. Since 2026-11-21
+each case is assessed against the owner's development targets in `docs/acceptance.md`: ±5 %
+on every metric, the curve's shape the same, views at the features of the curve.
 
-| Group | Cases | Result |
-|---|---|---|
-| No shear | 15 | Peak within 0.3 %, curve within 0.5 % (unchanged) |
-| Shear, failure at first stirrup yield | 5 | Peak within 1 % (Liping LB1 −0.4 %, was +1.8 %) |
-| Shear alone (Newbeam, V only) | 1 | Peak 0.5 % low; r2c ends soon after the peak |
-| Shear, section carries more after first stirrup yield | 3 | All reach Response's peak. M/V = 0.5 m: +0.5 % (was −5.2 %). US, M/V = 1 ft: +0.9 %. M/V = 2 m: on Response's curve to its end, then carries on where Response ends, +3.7 % |
-| Shear: dm-n1n | 1 | r2c's peak 3.2 % **above** Response's; not explained |
+Run of 2026-11-21 (kernel of 2026-11-19), cases outside by check: peak 0 of 25, rising 2,
+post-peak 6, shape 8, views 25. Every case is outside on views; in 23 of them principal
+tensile stress alone does it (option F).
 
-No acceptance tolerances are set, so none of this is assessed. The owner's ruling for the
-2026-11-19 step (not a tolerance): the three cases of the fourth row at 7 to 16 % below
-Response's peak were outside acceptance. They are no longer below it; M/V = 2 m is now
-3.7 % above, for a different reason (below).
+Stance (owner, 2026-11-21): r2c clones Response's behaviour; where they differ, Response is
+right, and no structural assessment of results is given. Once a case is inside target,
+closing the gap further is not a goal: build out the scope.
 
 ### What is known about shear
 
@@ -120,22 +120,28 @@ scratch each time; and numpy call overhead on arrays of about 100 nodes.
 
 ## 5. Decisions that are the owner's
 
-1. **Tolerances (structural).** `docs/acceptance.md` holds the stance (owner, 2026-11-17:
-   agreement within tolerance, not mathematical equivalence) and the template; the values are
-   not set. Until they are, nothing is assessed.
-2. **What matters (structural)**: which results, post-peak, which sections and loadings first,
-   errs high vs low. Listed in `docs/acceptance.md`. Where it is silent, the developer decides
-   and records the decision in the session log (owner, 2026-11-17).
+1. **Targets: set** (owner, 2026-11-21) in `docs/acceptance.md`, for development; reviewed
+   when the focus moves from development to testing. All results matter, post-peak and every
+   detail view included; ±5 % on every metric with a floor at Response's printed precision;
+   the curve's shape the same; shear cases may be accepted with minor deviations depending
+   on progress, recorded as known deviations here.
+2. **Test set** (owner, 2026-11-21): the present 25 cases are right for proof of concept and
+   for building the clone; range and completeness are reviewed when the scope of
+   development is complete.
 3. **Reverse engineering.** The original brief allowed it "to answer questions but not as the
-   primary development approach". The 2026-11-15 build used many rules read from the binary
-   (each marked in `docs/kernel.md`). CLAUDE.md now ranks it below acceptance and the thesis,
-   as the means of finding out why r2c misses acceptance (the developer's wording, 2026-11-17,
-   for the owner to confirm).
+   primary development approach". CLAUDE.md ranks it below acceptance and the thesis, as the
+   means of finding out why r2c misses acceptance (the developer's wording, 2026-11-17, for
+   the owner to confirm).
 4. **Dependencies.** numpy only. Compiling the node routine (option D4) would add one.
 
 ## 6. Options for next steps
 
-Grouped, not ranked. Sizes are rough.
+Grouped, not ranked. Sizes are rough. Since 2026-11-21 the targets decide what is work: a
+check outside target is work, a gap inside target is not. Options that waited on the owner's
+word because they reach past Response's peak (A3, G) or into the detail views (F, H, I) no
+longer do: post-peak and every view are in the targets, and where r2c and Response differ,
+Response is right (owner, 2026-11-21). Reading, for the owner to confirm: that this puts A3
+and G in scope for development sessions.
 
 **A. Shear: where the response ends, and how a stage is accepted.** The stiffness is done
 (section 2). What is left decides M/V = 2 m (+3.7 %) and bears on dm-n1n (B).
