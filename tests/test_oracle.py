@@ -37,6 +37,21 @@ SAMPLES = {
     "marshall-nonly": (0.05, 0.1),
     "cm4-asis": (0.2, 0.5),
 }
+# Quick Define sections (T-beam, circular column, I-girder with strands): their inputs are
+# r2x's, found by SHA-256 under R2C_DEFINE_DIR
+DEFINE = {
+    "tbeam-m": (0.1, 0.1),
+    "tbeam-negm": (0.05, 1.2),
+    "column-nonly": (0.05, 0.1),
+    "column-n4000-m": (0.05, 0.4),
+    "igirder-m": (0.1, 0.4),
+}
+DEFINE_SLOW = {
+    "column-mv": (0.8, 3.0),
+    # 4.3 % on the moment-curvature chart: Response's load falls and recovers at a curvature
+    # of 0.4 rad/km, r2c's rises through it
+    "igirder-m2v": (0.9, 5.0),
+}
 SLOW = {
     "newbeam-mv": (0.6, 1.5),
     "newbeam-nmv": (0.6, 2.0),
@@ -81,6 +96,25 @@ def test_response_samples(case, oracle_dir, response_dir):
 def test_shear(case, oracle_dir):
     ref = record.read(oracle_dir / f"{case}.r2x.txt")
     _check(ref, _solve(ref), *SLOW[case])
+
+
+def _define(case, oracle_dir, define_dirs, limits):
+    ref = record.read(oracle_dir / f"{case}.r2x.txt")
+    path = verify.find_input(ref.header["input-name"], ref.header["input-sha256"], define_dirs)
+    if path is None:
+        pytest.skip(f"{ref.header['input-name']} is not under R2C_DEFINE_DIR")
+    _check(ref, _solve(ref, path), *limits)
+
+
+@pytest.mark.parametrize("case", sorted(DEFINE))
+def test_quick_define_sections(case, oracle_dir, define_dirs):
+    _define(case, oracle_dir, define_dirs, DEFINE[case])
+
+
+@pytest.mark.slow
+@pytest.mark.parametrize("case", sorted(DEFINE_SLOW))
+def test_quick_define_shear(case, oracle_dir, define_dirs):
+    _define(case, oracle_dir, define_dirs, DEFINE_SLOW[case])
 
 
 def test_same_charts_as_the_oracle(oracle_dir):
