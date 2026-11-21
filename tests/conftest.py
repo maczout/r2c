@@ -33,3 +33,14 @@ def define_dirs() -> list[Path]:
     if not d or not Path(d).is_dir():
         pytest.skip("R2C_DEFINE_DIR is not set: the Quick Define inputs are not available")
     return [Path(d)]
+
+
+@pytest.fixture(scope="session")
+def scope_dirs() -> list[Path]:
+    """Where the inputs of the scope cases of increment S are, from R2C_SCOPE_DIR: the folder
+    `python tools/variants.py R2C_SCOPE_DIR --inputs R2X/tests/reference` writes. They are
+    derived from r2x's inputs and are not in this repository."""
+    d = os.environ.get("R2C_SCOPE_DIR")
+    if not d or not Path(d).is_dir():
+        pytest.skip("R2C_SCOPE_DIR is not set: the inputs of the scope cases are not available")
+    return [Path(d)]
