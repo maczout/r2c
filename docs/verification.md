@@ -8,7 +8,8 @@ run of `tools/verify.py` and headed by the commit, machine and date of that run.
 numbers below are those of that run; numbers marked "2026-11-15 run" are from the earlier
 comparison.
 
-The generated results cover all 32 cases: the 25 of the first test set, the 7 on Response's
+The generated results cover all 85 cases since the run of 2026-11-21 on the scope cases:
+the 32 below and the 53 of increment S (see "The scope cases" below). The 32 are the 25 of the first test set, the 7 on Response's
 sample inputs (Marshall, Cm4, Liping LB1, se100, dm-n1n) included, and since the third run
 of 2026-11-21 the 7 on Quick Define sections (T-beam, circular column, I-girder with
 strands; see "Quick Define sections" below). For the first 25 the kernel is that of the
@@ -60,6 +61,43 @@ of 126 where it ends standing still. The last stages are where the two responses
 Views are matched by load and control value together since 2026-11-21 (owner's choice);
 before, by control value alone. The numbers in the sections below that refer to views at the
 peak are from the earlier matching.
+
+## The scope cases: the baseline (fourth run of 2026-11-21)
+
+53 cases were added on 2026-11-21 for increment S, one for each item of `docs/scope.md`
+that no case had: 41 that reach a kernel path no earlier case reaches (group A) and 12 that
+combine paths already reached (group B). The fourth run of 2026-11-21 is the baseline: all
+85 cases on the kernel of the third run, before any change for the increment. Measured, from
+that run with `tools/targets.py` (the checks and limits are the report's own):
+
+- **The 32 earlier cases are unchanged**: no check changed sides against the third run
+  (`tools/changes.py`); peak 0 outside, rising 2, shape 10, as before.
+- **Of the 53 new cases, 17 are inside on peak, rising branch and shape** before anything
+  is built: the two base curves (linear, elasto-plastic), the moment axis, the prestrain on
+  bars, factors in the file with and without `--factors none`, the kg-cm file with shear,
+  More Detail max and More Detail with shear, the negative elevations, constant tension
+  with moment, a US file solved in SI, constant shear with moment, tension stiffening 2
+  and 3, and the two shrinkage cases (r2c ignores the shrinkage; the peak hardly moves, the
+  views are outside).
+- **14 fail**: twelve softening models r2c refuses; the bar's thermal strain and the
+  constant negative moment with shear both stop with "no equilibrium under the initial
+  loads".
+- **22 are outside on one of the three.** By what the difference looks like:
+  - *r2c carries on past Response's failure* (a fall of load in r2c, then a higher peak, 12
+    to 22 % above Response's, where Response's response ends falling): given crack
+    spacings, the prestrain on stirrups, tension stiffening 1 and 6, softening 0 on the
+    I-girder; the T-beam at M/V = 2 m (+8 %, Response's stages stand still). This is how a
+    response ends (step 4 of the increment), unless a rule of the feature is behind it.
+  - *The last stage only* (shape: Response ends falling or standing still, r2c ends at its
+    peak or standing still; peak and rising branch inside): interlocking hoops, softening
+    2, 10 and 13, the drape, the I-girder at M/V = 1 m, CSA factors with shear, no stirrups,
+    the tension stiffening factor, tension stiffening 4. The known deviation of the shear
+    cases (`docs/status.md`).
+  - *The feature itself*: the segmental steel curve (−5.7 %; r2c ignores the curve);
+    softening 6 and 7 (+5.6 % and +4.9 %, rising 5.3 %).
+  - *The rising branch*: constant compression with shear alone (58 %), axial load with
+    moment and shear together (8.7 %), the US file with shear (12.3 %, as the US case of the
+    first set).
 
 ## Quick Define sections (third run of 2026-11-21)
 
@@ -313,19 +351,19 @@ stress and 9.8 otherwise in kg-cm units).
 
 ## Not compared
 
-* A section with tendons added to it by hand (dropped from the test set by the owner,
-  2026-11-21: the I-girder covers strands, Cm4 covers prestress). A T-beam with shear.
-  Curved outline segments (a width of UP or DOWN): not implemented, and no input has one.
-* `--more-detail` with shear, CSA factors with shear, US or kg-cm input files (as opposed to
-  results in those units), stirrup patterns other than those compared (single leg, open,
-  closed, hoop: T-headed bars and interlocking hoops are not), segmental steel curves, concrete models other than the defaults and
-  those in the samples.
-* Anything out of scope: hollow sections, long-term effects, strain discontinuity.
+`docs/scope.md` is the inventory of what an r2x solve can take and whether a case has it.
+Not compared after 2026-11-21: what r2x itself cannot solve (tension stiffening "None",
+a shape without an outline, three load combinations on Newbeam) and what is out of scope
+by design (hollow sections, long-term effects, strain discontinuity, the old text format).
+A section with tendons added by hand was dropped from the test set by the owner
+(2026-11-21: the I-girder covers strands, Cm4 covers prestress).
 
 ## Oracle captures
 
-32 captures (25 of 2026-11-15 to 19, 7 of 2026-11-21 on the Quick Define sections), each of every stage, made with `r2x` (worker, `--stage all`) from Response-2000
+85 captures (25 of 2026-11-15 to 19, 7 of 2026-11-21 on the Quick Define sections, 53 of
+2026-11-21 for increment S, whose inputs `tools/variants.py` derives from inputs already in
+the set), each of every stage, made with `r2x` (worker, `--stage all`) from Response-2000
 1.9.7 (r2k.exe SHA-256 bbf4bc59…4e74) under Wine 9.0. The fixtures in tests/oracle are those
-records cut down to the control charts and the peak stage with tools/trim.py; nothing in them
-is edited. Response's sample inputs are not in this repository. The archive of full captures
+records cut down to the control charts and the feature stages with tools/trim.py; nothing in
+them is edited. Response's sample inputs are not in this repository. The archive of full captures
 was rebuilt with `tools/capture.py` on 2026-11-19 and every capture matched its fixture.

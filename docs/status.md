@@ -33,10 +33,13 @@ developer's. Items that need a structural judgement are marked **(structural)**.
   its fixture), `curves.py` (the control curves of two records point by point), `ends.py`
   (how each shear response ends in r2c and in Response), `scope.py` (which fixture has which
   input feature), `variants.py` (inputs derived from present ones by stated text edits),
-  `probe.py` (what Response does with an input, through r2x), `check.py` (checks before
-  pushing).
-- 32 oracle fixtures in `tests/oracle`, each with the detail views of the feature stages of
-  Response's curve (cracking, falls of load, peak, last stage); pytest tests (fast set;
+  `probe.py` (what Response does with an input, through r2x), `scope_cases.py` (the 53
+  scope cases and their first capture), `targets.py` (which cases are inside on peak,
+  rising branch and shape), `check.py` (checks before pushing).
+- 85 oracle fixtures in `tests/oracle` (32, and the 53 scope cases of increment S since
+  2026-11-21), each with the detail views of the feature stages of
+  Response's curve (cracking, falls of load, peak, last stage); pytest tests on the first
+  32 (fast set;
   `-m slow` for seven shear cases; `R2C_RESPONSE_DIR` for Response's sample inputs,
   `R2C_DEFINE_DIR` for the Quick Define inputs, which are r2x's:
   `tests/reference/define`).
@@ -52,12 +55,20 @@ The numbers are in `docs/verification-results.md`, what they mean in `docs/verif
 each case is assessed against the owner's development targets in `docs/acceptance.md`: ±5 %
 on every metric, the curve's shape the same, views at the features of the curve.
 
-Third run of 2026-11-21, 32 cases (the 25, and 7 on Quick Define sections: T-beam, circular
+Third run of 2026-11-21, the first 32 cases (the 25, and 7 on Quick Define sections: T-beam, circular
 column with hoops, I-girder with strands), cases outside by check: peak 0 of 32, rising 2,
 post-peak 10, shape 10, views 30. On the 25, no check changed sides against the second run
 (peak 0 of 25, rising 2, post-peak 6, shape 8, views 23). The seven new cases are all inside
 on peak and rising branch; the five without shear are inside on shape too
 (`docs/verification.md`, "Quick Define sections").
+
+**The 53 scope cases, baseline** (fourth run of 2026-11-21, all 85 cases, the kernel
+unchanged): the 32 are as above, no check changed sides. Of the 53, 17 are inside on peak,
+rising branch and shape, 14 fail (twelve softening models refused; two stop with "no
+equilibrium under the initial loads") and 22 are outside on one of the three, most of them
+at the end of the response (`docs/verification.md`, "The scope cases: the baseline";
+`python tools/targets.py VERIFY_OUT --new`). They are what steps 3 and 4 of increment S
+work on; none is a known deviation yet.
 
 **Known deviation, shear cases (the last stage).** Response's response to moment and shear
 often ends on a collapsed stage, at 4 to 66 % of the peak load (5 of the 12 shear cases:
@@ -146,14 +157,16 @@ brief of 2026-11-21):
 - **Missing** (r2x solves it, r2c refuses or ignores it): eleven named compression softening
   models and number 4; a segmental curve for reinforcing steel (read and ignored); draped
   tendons (ignored); shrinkage and thermal strains of the concrete (ignored).
-- **Not compared** (implemented, no oracle case): the rest of the concrete model options
+- **Compared since 2026-11-21, not yet inside target everywhere** (implemented; the case
+  is new): the rest of the concrete model options
   (base curves 0 and 3, softening 0, 2, 6, 7, 10, 13 under shear, tension stiffening 1 to 4
   and 6, the tension stiffening factor); input files in US and kg-cm units; given crack
   spacings and moment axis; no stirrups with shear; interlocking hoops; prestrains on
   stirrups and bars; thermal strain of bars; factors in the file; a T-beam with shear; CSA
   factors and More Detail with shear; More Detail max; five load combinations.
-- 53 new cases cover these: 41 that reach a kernel path no present case reaches (group A),
-  12 that combine paths already reached (group B). `tools/scope_cases.py --list` names them.
+- 53 cases cover these, in `tests/oracle` since 2026-11-21: 41 that reach a kernel path no
+  earlier case reaches (group A), 12 that combine paths already reached (group B).
+  `tools/scope_cases.py --list` names them.
 - **Not solvable with r2x** (measured; nothing to compare with): curved outline rows in an
   input file (Response's reader rejects them; a circle is saved as 13 straight rows, so
   option C4 falls away); a shape without an outline; tension stiffening "None" (Response
@@ -163,13 +176,16 @@ brief of 2026-11-21):
   discontinuity, the old text input format.
 - A section with tendons added by hand: dropped from the test set (owner, 2026-11-21).
 - `tools/capture.py` has rebuilt the oracle archive against Response (2026-11-19): all 25
-  captures match their fixtures. The seven of 2026-11-21 were captured once, with `--add`.
+  captures match their fixtures. The seven of 2026-11-21 and the 53 scope cases were
+  captured once, with `--add`.
   r2x's clipboard helper can fail transiently (once in 25 captures); a rerun of that case
   on its own then matched.
 
-**Where increment S stands** (2026-11-21): step 1, the inventory, is done. Next is step 2:
-the 53 cases' fixtures and the baseline run on all cases before any kernel change; then
-step 3 (build what is missing), step 4 (how a response ends: A3, G, C2).
+**Where increment S stands** (2026-11-21): step 1, the inventory, and step 2, the 53 cases'
+fixtures and the baseline run on all 85 cases before any kernel change, are done. Next is
+step 3: build what is missing and bring the new cases inside on peak, rising branch and
+shape; then step 4 (how a response ends: A3, G, C2). The baseline is kept outside the
+repository; `docs/verification-results.md` is that run.
 
 ## 5. Decisions that are the owner's
 
@@ -286,8 +302,12 @@ Negative option values need the `=` form (`--initial=-2000,0,0`). An all-stage c
 this for every fixture. The Newbeam input (`input.r2t`) is in r2x's
 `tests/reference/newbeam`; the Quick Define inputs are r2x's
 `tests/reference/define/quick-{tbeam,column,ibeam-strands}/hand.r2t`, captured under the
-names tbeam.r2t, column.r2t and igirder.r2t (r2x records the input's name). Verify with both
-folders: `--inputs RESPONSE_FOLDER R2X/tests/reference`.
+names tbeam.r2t, column.r2t and igirder.r2t (r2x records the input's name). The inputs of
+the 53 scope cases are derived from those: `python tools/variants.py SCOPE_INPUTS --inputs
+R2X/tests/reference` writes them (`tools/scope_cases.py` does the same into the archive's
+`scope-inputs`). Verify with all three folders: `--inputs RESPONSE_FOLDER
+R2X/tests/reference SCOPE_INPUTS`. Several captures can run at once, each in a Wine prefix
+of its own (`tools/scope_cases.py --jobs N`).
 
 **The thesis** is at `~/references/bentz-thesis/` on the owner's machine (thesis.pdf and
 appen_a, b, c.pdf from hadrianworks.com's "About the programs" page, each with a
