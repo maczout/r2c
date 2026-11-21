@@ -1,9 +1,9 @@
 {
  "run": {
   "r2c_version": "0.1.0",
-  "commit": "c2740ddce794587c493e1f4a3d42ca0db9d5ced4",
+  "commit": "9008410e3a204b3ba8b88c53310f0fc1093c5f63",
   "dirty": false,
-  "started": "2026-11-21T08:26:36-07:00",
+  "started": "2026-11-21T08:55:56-07:00",
   "host": "Makertyre",
   "machine": "Linux x86_64, 32 cores",
   "python": "3.12.3",
@@ -185,9 +185,9 @@
       {
        "view": "principal_tensile_stress",
        "ref_max": 3.191,
-       "max_diff": 0.4319000000000001,
+       "max_diff": 0.09082091694256367,
        "floor": 0.0002,
-       "max_diff_pct": 13.534942024443753,
+       "max_diff_pct": 2.8461584751665203,
        "lines": [
         3,
         3
@@ -427,9 +427,9 @@
       {
        "view": "principal_tensile_stress",
        "ref_max": 2.2,
-       "max_diff": 0.474539239153461,
+       "max_diff": 0.02049999999999998,
        "floor": 0.0002,
-       "max_diff_pct": 21.56996541606641,
+       "max_diff_pct": 0.9318181818181809,
        "lines": [
         3,
         3
@@ -1095,7 +1095,7 @@
     }
    ],
    "seconds": 8.7,
-   "run": "c2740ddce794",
+   "run": "9008410e3a20",
    "sub_curve": [
     [
      0.239,
@@ -1604,9 +1604,9 @@
       {
        "view": "principal_tensile_stress",
        "ref_max": 2.7307,
-       "max_diff": 0.06547143544652809,
+       "max_diff": 0.007724704962424718,
        "floor": 0.0002,
-       "max_diff_pct": 2.3976063077792538,
+       "max_diff_pct": 0.28288369144998415,
        "lines": [
         3,
         3
@@ -1846,9 +1846,9 @@
       {
        "view": "principal_tensile_stress",
        "ref_max": 2.7307,
-       "max_diff": 0.5497087463450959,
+       "max_diff": 0.06136681135549674,
        "floor": 0.0002,
-       "max_diff_pct": 20.130689799139265,
+       "max_diff_pct": 2.2472923190206444,
        "lines": [
         3,
         3
@@ -2513,8 +2513,8 @@
      "ref_stage": 29
     }
    ],
-   "seconds": 52.6,
-   "run": "c2740ddce794",
+   "seconds": 50.3,
+   "run": "9008410e3a20",
    "sub_curve": [
     [
      -0.0,
@@ -2823,9 +2823,9 @@
       {
        "view": "principal_tensile_stress",
        "ref_max": 4.2139,
-       "max_diff": 0.48919999999999997,
+       "max_diff": 0.4105,
        "floor": 0.0002,
-       "max_diff_pct": 11.609198129998338,
+       "max_diff_pct": 9.741569567384133,
        "lines": [
         3,
         3
@@ -3065,9 +3065,9 @@
       {
        "view": "principal_tensile_stress",
        "ref_max": 2.968,
-       "max_diff": 0.6261203241687728,
+       "max_diff": 0.3688000622245973,
        "floor": 0.0002,
-       "max_diff_pct": 21.095698253664853,
+       "max_diff_pct": 12.425878107297754,
        "lines": [
         3,
         3
@@ -3307,9 +3307,9 @@
       {
        "view": "principal_tensile_stress",
        "ref_max": 3.2266,
-       "max_diff": 0.630608254741056,
+       "max_diff": 0.3963286109578976,
        "floor": 0.0002,
-       "max_diff_pct": 19.54404806114969,
+       "max_diff_pct": 12.283165281035693,
        "lines": [
         3,
         3
@@ -3554,9 +3554,9 @@
     {
      "view": "principal_tensile_stress",
      "ref_max": 2.968,
-     "max_diff": 0.6261203241687728,
+     "max_diff": 0.3688000622245973,
      "floor": 0.0002,
-     "max_diff_pct": 21.095698253664853,
+     "max_diff_pct": 12.425878107297754,
      "lines": [
       3,
       3
@@ -3732,8 +3732,8 @@
      "ref_stage": 17
     }
    ],
-   "seconds": 42.2,
-   "run": "c2740ddce794",
+   "seconds": 41.7,
+   "run": "9008410e3a20",
    "sub_curve": [
     [
      0.0,
@@ -4026,9 +4026,9 @@
       {
        "view": "principal_tensile_stress",
        "ref_max": 2.813,
-       "max_diff": 0.019050985730571235,
+       "max_diff": 0.010497639709993872,
        "floor": 0.0002,
-       "max_diff_pct": 0.6772479818901967,
+       "max_diff_pct": 0.37318306825431463,
        "lines": [
         3,
         3
@@ -4268,9 +4268,9 @@
       {
        "view": "principal_tensile_stress",
        "ref_max": 1.873,
-       "max_diff": 0.3782402988775456,
+       "max_diff": 0.02830835176571915,
        "floor": 0.0002,
-       "max_diff_pct": 20.194356587162073,
+       "max_diff_pct": 1.5113909111435744,
        "lines": [
         3,
         3
@@ -4510,9 +4510,9 @@
       {
        "view": "principal_tensile_stress",
        "ref_max": 1.8734,
-       "max_diff": 0.3783160599593679,
+       "max_diff": 0.026906567190752635,
        "floor": 0.0002,
-       "max_diff_pct": 20.19408882029294,
+       "max_diff_pct": 1.436242510449057,
        "lines": [
         3,
         3
@@ -4757,9 +4757,9 @@
     {
      "view": "principal_tensile_stress",
      "ref_max": 1.873,
-     "max_diff": 0.3782402988775456,
+     "max_diff": 0.02830835176571915,
      "floor": 0.0002,
-     "max_diff_pct": 20.194356587162073,
+     "max_diff_pct": 1.5113909111435744,
      "lines": [
       3,
       3
@@ -4935,8 +4935,8 @@
      "ref_stage": 39
     }
    ],
-   "seconds": 55.7,
-   "run": "c2740ddce794",
+   "seconds": 57.1,
+   "run": "9008410e3a20",
    "sub_curve": [
     [
      -0.0,
@@ -5212,9 +5212,9 @@
       {
        "view": "principal_tensile_stress",
        "ref_max": 2.813,
-       "max_diff": 0.01770936701715072,
+       "max_diff": 0.008660578163207653,
        "floor": 0.0002,
-       "max_diff_pct": 0.6295544620387742,
+       "max_diff_pct": 0.30787693434794355,
        "lines": [
         3,
         3
@@ -5880,7 +5880,7 @@
     }
    ],
    "seconds": 1.4,
-   "run": "c2740ddce794",
+   "run": "9008410e3a20",
    "sub_curve": [
     [
      -0.0,
@@ -6241,9 +6241,9 @@
       {
        "view": "principal_tensile_stress",
        "ref_max": 0.1257,
-       "max_diff": 1.8902999999999999,
+       "max_diff": 0.0,
        "floor": 0.0002,
-       "max_diff_pct": 1503.8186157517896,
+       "max_diff_pct": 0.0,
        "lines": [
         3,
         3
@@ -6483,9 +6483,9 @@
       {
        "view": "principal_tensile_stress",
        "ref_max": 0.1008,
-       "max_diff": 1.9152,
+       "max_diff": 0.0,
        "floor": 0.0002,
-       "max_diff_pct": 1900.0,
+       "max_diff_pct": 0.0,
        "lines": [
         3,
         3
@@ -6725,9 +6725,9 @@
       {
        "view": "principal_tensile_stress",
        "ref_max": 0.1008,
-       "max_diff": 1.9152,
+       "max_diff": 0.0,
        "floor": 0.0002,
-       "max_diff_pct": 1900.0,
+       "max_diff_pct": 0.0,
        "lines": [
         3,
         3
@@ -6971,15 +6971,15 @@
     },
     {
      "view": "principal_tensile_stress",
-     "ref_max": 0.1008,
-     "max_diff": 1.9152,
+     "ref_max": 0.1257,
+     "max_diff": 0.0,
      "floor": 0.0002,
-     "max_diff_pct": 1900.0,
+     "max_diff_pct": 0.0,
      "lines": [
       3,
       3
      ],
-     "ref_stage": 21
+     "ref_stage": 17
     },
     {
      "view": "principal_tensile_strain",
@@ -7151,7 +7151,7 @@
     }
    ],
    "seconds": 0.1,
-   "run": "c2740ddce794",
+   "run": "9008410e3a20",
    "sub_curve": [
     [
      0.0,
@@ -7452,9 +7452,9 @@
       {
        "view": "principal_tensile_stress",
        "ref_max": 1.2285,
-       "max_diff": 0.43021435072131925,
+       "max_diff": 0.03550662580361081,
        "floor": 0.0002,
-       "max_diff_pct": 35.019483168198555,
+       "max_diff_pct": 2.890242230656151,
        "lines": [
         3,
         3
@@ -7694,9 +7694,9 @@
       {
        "view": "principal_tensile_stress",
        "ref_max": 1.2285,
-       "max_diff": 0.2529008183712386,
+       "max_diff": 0.036500000000000234,
        "floor": 0.0002,
-       "max_diff_pct": 20.586147201566025,
+       "max_diff_pct": 2.97110297110299,
        "lines": [
         3,
         3
@@ -7936,9 +7936,9 @@
       {
        "view": "principal_tensile_stress",
        "ref_max": 1.2285,
-       "max_diff": 1.018453581531437,
+       "max_diff": 0.1391864962642019,
        "floor": 0.0002,
-       "max_diff_pct": 82.90220443886342,
+       "max_diff_pct": 11.329792125698162,
        "lines": [
         3,
         3
@@ -8183,9 +8183,9 @@
     {
      "view": "principal_tensile_stress",
      "ref_max": 1.2285,
-     "max_diff": 1.018453581531437,
+     "max_diff": 0.1391864962642019,
      "floor": 0.0002,
-     "max_diff_pct": 82.90220443886342,
+     "max_diff_pct": 11.329792125698162,
      "lines": [
       3,
       3
@@ -8362,7 +8362,7 @@
     }
    ],
    "seconds": 1.2,
-   "run": "c2740ddce794",
+   "run": "9008410e3a20",
    "sub_curve": [
     [
      -0.0,
@@ -8739,9 +8739,9 @@
       {
        "view": "principal_tensile_stress",
        "ref_max": 28.1627,
-       "max_diff": 1.818268920466591,
+       "max_diff": 0.25532011066368104,
        "floor": 0.0002,
-       "max_diff_pct": 6.4563018477155625,
+       "max_diff_pct": 0.9065896049160096,
        "lines": [
         3,
         3
@@ -8981,9 +8981,9 @@
       {
        "view": "principal_tensile_stress",
        "ref_max": 19.2659,
-       "max_diff": 5.483131086015994,
+       "max_diff": 3.4988170327105528,
        "floor": 0.0002,
-       "max_diff_pct": 28.460290388800907,
+       "max_diff_pct": 18.160672653291844,
        "lines": [
         3,
         3
@@ -9223,9 +9223,9 @@
       {
        "view": "principal_tensile_stress",
        "ref_max": 19.2659,
-       "max_diff": 9.163702058568294,
+       "max_diff": 0.8113999999999955,
        "floor": 0.0002,
-       "max_diff_pct": 47.56436013146697,
+       "max_diff_pct": 4.2115862741942784,
        "lines": [
         3,
         3
@@ -9470,14 +9470,14 @@
     {
      "view": "principal_tensile_stress",
      "ref_max": 19.2659,
-     "max_diff": 9.163702058568294,
+     "max_diff": 3.4988170327105528,
      "floor": 0.0002,
-     "max_diff_pct": 47.56436013146697,
+     "max_diff_pct": 18.160672653291844,
      "lines": [
       3,
       3
      ],
-     "ref_stage": 59
+     "ref_stage": 56
     },
     {
      "view": "principal_tensile_strain",
@@ -9648,8 +9648,8 @@
      "ref_stage": 56
     }
    ],
-   "seconds": 1.3,
-   "run": "c2740ddce794",
+   "seconds": 1.2,
+   "run": "9008410e3a20",
    "sub_curve": [
     [
      -0.0,
@@ -10046,9 +10046,9 @@
       {
        "view": "principal_tensile_stress",
        "ref_max": 2.7628,
-       "max_diff": 0.04571508472933465,
+       "max_diff": 0.006973902221903609,
        "floor": 0.0002,
-       "max_diff_pct": 1.6546650039573858,
+       "max_diff_pct": 0.2524215369155787,
        "lines": [
         3,
         3
@@ -10288,9 +10288,9 @@
       {
        "view": "principal_tensile_stress",
        "ref_max": 1.89,
-       "max_diff": 0.537897229846764,
+       "max_diff": 0.3432016223046773,
        "floor": 0.0002,
-       "max_diff_pct": 28.460170891363177,
+       "max_diff_pct": 18.158815994956473,
        "lines": [
         3,
         3
@@ -10530,9 +10530,9 @@
       {
        "view": "principal_tensile_stress",
        "ref_max": 1.89,
-       "max_diff": 0.8989101107552758,
+       "max_diff": 0.07959999999999998,
        "floor": 0.0002,
-       "max_diff_pct": 47.56138152144317,
+       "max_diff_pct": 4.21164021164021,
        "lines": [
         3,
         3
@@ -10777,14 +10777,14 @@
     {
      "view": "principal_tensile_stress",
      "ref_max": 1.89,
-     "max_diff": 0.8989101107552758,
+     "max_diff": 0.3432016223046773,
      "floor": 0.0002,
-     "max_diff_pct": 47.56138152144317,
+     "max_diff_pct": 18.158815994956473,
      "lines": [
       3,
       3
      ],
-     "ref_stage": 227
+     "ref_stage": 224
     },
     {
      "view": "principal_tensile_strain",
@@ -10955,8 +10955,8 @@
      "ref_stage": 224
     }
    ],
-   "seconds": 4.3,
-   "run": "c2740ddce794",
+   "seconds": 4.4,
+   "run": "9008410e3a20",
    "sub_curve": [
     [
      -0.0,
@@ -12049,9 +12049,9 @@
       {
        "view": "principal_tensile_stress",
        "ref_max": 2.7628,
-       "max_diff": 0.17836756969875134,
+       "max_diff": 0.025009205322438253,
        "floor": 0.0002,
-       "max_diff_pct": 6.456043495683775,
+       "max_diff_pct": 0.9052122963094779,
        "lines": [
         3,
         3
@@ -12291,9 +12291,9 @@
       {
        "view": "principal_tensile_stress",
        "ref_max": 1.89,
-       "max_diff": 0.537897229846764,
+       "max_diff": 0.3432016223046773,
        "floor": 0.0002,
-       "max_diff_pct": 28.460170891363177,
+       "max_diff_pct": 18.158815994956473,
        "lines": [
         3,
         3
@@ -12533,9 +12533,9 @@
       {
        "view": "principal_tensile_stress",
        "ref_max": 1.89,
-       "max_diff": 0.8989101107552758,
+       "max_diff": 0.07959999999999998,
        "floor": 0.0002,
-       "max_diff_pct": 47.56138152144317,
+       "max_diff_pct": 4.21164021164021,
        "lines": [
         3,
         3
@@ -12780,14 +12780,14 @@
     {
      "view": "principal_tensile_stress",
      "ref_max": 1.89,
-     "max_diff": 0.8989101107552758,
+     "max_diff": 0.3432016223046773,
      "floor": 0.0002,
-     "max_diff_pct": 47.56138152144317,
+     "max_diff_pct": 18.158815994956473,
      "lines": [
       3,
       3
      ],
-     "ref_stage": 59
+     "ref_stage": 56
     },
     {
      "view": "principal_tensile_strain",
@@ -12958,8 +12958,8 @@
      "ref_stage": 56
     }
    ],
-   "seconds": 1.3,
-   "run": "c2740ddce794",
+   "seconds": 1.2,
+   "run": "9008410e3a20",
    "sub_curve": [
     [
      -0.0,
@@ -13360,9 +13360,9 @@
       {
        "view": "principal_tensile_stress",
        "ref_max": 2.7628,
-       "max_diff": 0.05136578415889767,
+       "max_diff": 0.04315900156871302,
        "floor": 0.0002,
-       "max_diff_pct": 1.859192998367514,
+       "max_diff_pct": 1.5621471539276466,
        "lines": [
         3,
         3
@@ -14511,8 +14511,8 @@
      "ref_stage": 55
     }
    ],
-   "seconds": 84.2,
-   "run": "c2740ddce794",
+   "seconds": 84.6,
+   "run": "9008410e3a20",
    "sub_curve": [
     [
      -0.0,
@@ -14829,9 +14829,9 @@
       {
        "view": "principal_tensile_stress",
        "ref_max": 2.7628,
-       "max_diff": 0.054793257583386684,
+       "max_diff": 0.025009205322438253,
        "floor": 0.0002,
-       "max_diff_pct": 1.9832509621900494,
+       "max_diff_pct": 0.9052122963094779,
        "lines": [
         3,
         3
@@ -15071,9 +15071,9 @@
       {
        "view": "principal_tensile_stress",
        "ref_max": 2.0772,
-       "max_diff": 0.31936225868076296,
+       "max_diff": 0.1177986614243548,
        "floor": 0.0002,
-       "max_diff_pct": 15.374651390369872,
+       "max_diff_pct": 5.671031264411458,
        "lines": [
         3,
         3
@@ -15313,9 +15313,9 @@
       {
        "view": "principal_tensile_stress",
        "ref_max": 2.0774,
-       "max_diff": 0.31939155939803965,
+       "max_diff": 0.1179980622307223,
        "floor": 0.0002,
-       "max_diff_pct": 15.374581659672652,
+       "max_diff_pct": 5.680083865924825,
        "lines": [
         3,
         3
@@ -15559,15 +15559,15 @@
     },
     {
      "view": "principal_tensile_stress",
-     "ref_max": 2.0772,
-     "max_diff": 0.31936225868076296,
+     "ref_max": 2.0774,
+     "max_diff": 0.1179980622307223,
      "floor": 0.0002,
-     "max_diff_pct": 15.374651390369872,
+     "max_diff_pct": 5.680083865924825,
      "lines": [
       3,
       3
      ],
-     "ref_stage": 86
+     "ref_stage": 87
     },
     {
      "view": "principal_tensile_strain",
@@ -15738,8 +15738,8 @@
      "ref_stage": 87
     }
    ],
-   "seconds": 114.6,
-   "run": "c2740ddce794",
+   "seconds": 113.4,
+   "run": "9008410e3a20",
    "sub_curve": [
     [
      -0.0,
@@ -16140,9 +16140,9 @@
       {
        "view": "principal_tensile_stress",
        "ref_max": 2.7628,
-       "max_diff": 0.05460798874963056,
+       "max_diff": 0.025009205322438253,
        "floor": 0.0002,
-       "max_diff_pct": 1.9765451263077518,
+       "max_diff_pct": 0.9052122963094779,
        "lines": [
         3,
         3
@@ -16382,9 +16382,9 @@
       {
        "view": "principal_tensile_stress",
        "ref_max": 1.89,
-       "max_diff": 0.4700325229458302,
+       "max_diff": 0.14426722996613764,
        "floor": 0.0002,
-       "max_diff_pct": 24.869445658509537,
+       "max_diff_pct": 7.633186770695113,
        "lines": [
         3,
         3
@@ -17049,8 +17049,8 @@
      "ref_stage": 42
     }
    ],
-   "seconds": 46.3,
-   "run": "c2740ddce794",
+   "seconds": 45.6,
+   "run": "9008410e3a20",
    "sub_curve": [
     [
      -0.0,
@@ -17335,9 +17335,9 @@
       {
        "view": "principal_tensile_stress",
        "ref_max": 2.4995,
-       "max_diff": 1.2984,
+       "max_diff": 0.024556601287184912,
        "floor": 0.0002,
-       "max_diff_pct": 51.94638927785557,
+       "max_diff_pct": 0.9824605435961158,
        "lines": [
         3,
         3
@@ -17577,9 +17577,9 @@
       {
        "view": "principal_tensile_stress",
        "ref_max": 3.6589,
-       "max_diff": 1.7955,
+       "max_diff": 0.0034999999999997117,
        "floor": 0.0002,
-       "max_diff_pct": 49.072125502200116,
+       "max_diff_pct": 0.09565716472162977,
        "lines": [
         3,
         3
@@ -17819,9 +17819,9 @@
       {
        "view": "principal_tensile_stress",
        "ref_max": 3.6589,
-       "max_diff": 1.7955,
+       "max_diff": 0.002773843161669442,
        "floor": 0.0002,
-       "max_diff_pct": 49.072125502200116,
+       "max_diff_pct": 0.07581084920794343,
        "lines": [
         3,
         3
@@ -18066,9 +18066,9 @@
     {
      "view": "principal_tensile_stress",
      "ref_max": 2.4995,
-     "max_diff": 1.2984,
+     "max_diff": 0.024556601287184912,
      "floor": 0.0002,
-     "max_diff_pct": 51.94638927785557,
+     "max_diff_pct": 0.9824605435961158,
      "lines": [
       3,
       3
@@ -18244,8 +18244,8 @@
      "ref_stage": 16
     }
    ],
-   "seconds": 0.8,
-   "run": "c2740ddce794",
+   "seconds": 0.7,
+   "run": "9008410e3a20",
    "sub_curve": [
     [
      0.174,
@@ -18824,9 +18824,9 @@
       {
        "view": "principal_tensile_stress",
        "ref_max": 2.6917,
-       "max_diff": 0.030165464890224942,
+       "max_diff": 0.023180390034411517,
        "floor": 0.0002,
-       "max_diff_pct": 1.1206845075686347,
+       "max_diff_pct": 0.8611802962592977,
        "lines": [
         3,
         3
@@ -19308,9 +19308,9 @@
       {
        "view": "principal_tensile_stress",
        "ref_max": 2.3177,
-       "max_diff": 0.21025690786214762,
+       "max_diff": 0.016505525523255505,
        "floor": 0.0002,
-       "max_diff_pct": 9.07179133891995,
+       "max_diff_pct": 0.7121510775016398,
        "lines": [
         3,
         3
@@ -19734,7 +19734,7 @@
     }
    ],
    "seconds": 1.3,
-   "run": "c2740ddce794",
+   "run": "9008410e3a20",
    "sub_curve": [
     [
      -0.0,
@@ -20127,9 +20127,9 @@
       {
        "view": "principal_tensile_stress",
        "ref_max": 2.7628,
-       "max_diff": 0.17836756969875134,
+       "max_diff": 0.025009205322438253,
        "floor": 0.0002,
-       "max_diff_pct": 6.456043495683775,
+       "max_diff_pct": 0.9052122963094779,
        "lines": [
         3,
         3
@@ -20369,9 +20369,9 @@
       {
        "view": "principal_tensile_stress",
        "ref_max": 1.89,
-       "max_diff": 0.537897229846764,
+       "max_diff": 0.3432016223046773,
        "floor": 0.0002,
-       "max_diff_pct": 28.460170891363177,
+       "max_diff_pct": 18.158815994956473,
        "lines": [
         3,
         3
@@ -20611,9 +20611,9 @@
       {
        "view": "principal_tensile_stress",
        "ref_max": 1.89,
-       "max_diff": 0.8989101107552758,
+       "max_diff": 0.07959999999999998,
        "floor": 0.0002,
-       "max_diff_pct": 47.56138152144317,
+       "max_diff_pct": 4.21164021164021,
        "lines": [
         3,
         3
@@ -20858,14 +20858,14 @@
     {
      "view": "principal_tensile_stress",
      "ref_max": 1.89,
-     "max_diff": 0.8989101107552758,
+     "max_diff": 0.3432016223046773,
      "floor": 0.0002,
-     "max_diff_pct": 47.56138152144317,
+     "max_diff_pct": 18.158815994956473,
      "lines": [
       3,
       3
      ],
-     "ref_stage": 59
+     "ref_stage": 56
     },
     {
      "view": "principal_tensile_strain",
@@ -21037,7 +21037,7 @@
     }
    ],
    "seconds": 1.1,
-   "run": "c2740ddce794",
+   "run": "9008410e3a20",
    "sub_curve": [
     [
      -0.0,
@@ -21412,9 +21412,9 @@
       {
        "view": "principal_tensile_stress",
        "ref_max": 1.89,
-       "max_diff": 1.795,
+       "max_diff": 0.9724485084665361,
        "floor": 0.0002,
-       "max_diff_pct": 94.97354497354497,
+       "max_diff_pct": 51.45230203526646,
        "lines": [
         3,
         3
@@ -21654,9 +21654,9 @@
       {
        "view": "principal_tensile_stress",
        "ref_max": 1.89,
-       "max_diff": 1.7954999999999999,
+       "max_diff": 0.029399999999999978,
        "floor": 0.0002,
-       "max_diff_pct": 95.0,
+       "max_diff_pct": 1.5555555555555545,
        "lines": [
         3,
         3
@@ -21896,9 +21896,9 @@
       {
        "view": "principal_tensile_stress",
        "ref_max": 1.89,
-       "max_diff": 1.7954999999999999,
+       "max_diff": 0.12640440479889356,
        "floor": 0.0002,
-       "max_diff_pct": 95.0,
+       "max_diff_pct": 6.688063745973205,
        "lines": [
         3,
         3
@@ -22143,14 +22143,14 @@
     {
      "view": "principal_tensile_stress",
      "ref_max": 1.89,
-     "max_diff": 1.7954999999999999,
+     "max_diff": 0.9724485084665361,
      "floor": 0.0002,
-     "max_diff_pct": 95.0,
+     "max_diff_pct": 51.45230203526646,
      "lines": [
       3,
       3
      ],
-     "ref_stage": 22
+     "ref_stage": 14
     },
     {
      "view": "principal_tensile_strain",
@@ -22321,8 +22321,8 @@
      "ref_stage": 14
     }
    ],
-   "seconds": 0.5,
-   "run": "c2740ddce794",
+   "seconds": 0.4,
+   "run": "9008410e3a20",
    "sub_curve": [
     [
      -0.0,
@@ -22591,9 +22591,9 @@
       {
        "view": "principal_tensile_stress",
        "ref_max": 3.0327,
-       "max_diff": 0.5408999999999998,
+       "max_diff": 0.009836153405749512,
        "floor": 0.0002,
-       "max_diff_pct": 17.835592046691062,
+       "max_diff_pct": 0.3243365122085769,
        "lines": [
         3,
         3
@@ -22833,9 +22833,9 @@
       {
        "view": "principal_tensile_stress",
        "ref_max": 1.8429,
-       "max_diff": 0.5254818787950309,
+       "max_diff": 0.0347,
        "floor": 0.0002,
-       "max_diff_pct": 28.51385744180536,
+       "max_diff_pct": 1.8829019480167128,
        "lines": [
         3,
         3
@@ -23075,9 +23075,9 @@
       {
        "view": "principal_tensile_stress",
        "ref_max": 1.843,
-       "max_diff": 0.525508388041653,
+       "max_diff": 0.034699999999999995,
        "floor": 0.0002,
-       "max_diff_pct": 28.513748672905752,
+       "max_diff_pct": 1.8827997829625607,
        "lines": [
         3,
         3
@@ -23322,9 +23322,9 @@
     {
      "view": "principal_tensile_stress",
      "ref_max": 1.8429,
-     "max_diff": 0.5254818787950309,
+     "max_diff": 0.0347,
      "floor": 0.0002,
-     "max_diff_pct": 28.51385744180536,
+     "max_diff_pct": 1.8829019480167128,
      "lines": [
       3,
       3
@@ -23500,8 +23500,8 @@
      "ref_stage": 44
     }
    ],
-   "seconds": 35.0,
-   "run": "c2740ddce794",
+   "seconds": 34.1,
+   "run": "9008410e3a20",
    "sub_curve": [
     [
      0.042,
@@ -23770,9 +23770,9 @@
       {
        "view": "principal_tensile_stress",
        "ref_max": 0.4781,
-       "max_diff": 1.7894999999999999,
+       "max_diff": 0.004705319177305039,
        "floor": 0.0002,
-       "max_diff_pct": 374.2940807362476,
+       "max_diff_pct": 0.9841705035149632,
        "lines": [
         3,
         3
@@ -24012,9 +24012,9 @@
       {
        "view": "principal_tensile_stress",
        "ref_max": 0.4836,
-       "max_diff": 1.7954999999999999,
+       "max_diff": 0.007412764698889248,
        "floor": 0.0002,
-       "max_diff_pct": 371.27791563275434,
+       "max_diff_pct": 1.5328297557670076,
        "lines": [
         3,
         3
@@ -24254,9 +24254,9 @@
       {
        "view": "principal_tensile_stress",
        "ref_max": 1.89,
-       "max_diff": 1.7954999999999999,
+       "max_diff": 0.1891206406381984,
        "floor": 0.0002,
-       "max_diff_pct": 95.0,
+       "max_diff_pct": 10.00638310255018,
        "lines": [
         3,
         3
@@ -24500,15 +24500,15 @@
     },
     {
      "view": "principal_tensile_stress",
-     "ref_max": 0.4781,
-     "max_diff": 1.7894999999999999,
+     "ref_max": 1.89,
+     "max_diff": 0.1891206406381984,
      "floor": 0.0002,
-     "max_diff_pct": 374.2940807362476,
+     "max_diff_pct": 10.00638310255018,
      "lines": [
       3,
       3
      ],
-     "ref_stage": 16
+     "ref_stage": 34
     },
     {
      "view": "principal_tensile_strain",
@@ -24680,7 +24680,7 @@
     }
    ],
    "seconds": 0.3,
-   "run": "c2740ddce794",
+   "run": "9008410e3a20",
    "sub_curve": [
     [
      0.0,
@@ -26103,7 +26103,7 @@
     }
    ],
    "seconds": 0.8,
-   "run": "c2740ddce794",
+   "run": "9008410e3a20",
    "sub_curve": [
     [
      0.0,
@@ -27281,8 +27281,8 @@
      "ref_stage": 30
     }
    ],
-   "seconds": 54.9,
-   "run": "c2740ddce794",
+   "seconds": 54.8,
+   "run": "9008410e3a20",
    "sub_curve": [
     [
      -0.0,
@@ -27833,9 +27833,9 @@
       {
        "view": "principal_tensile_stress",
        "ref_max": 274.1213,
-       "max_diff": 78.01795215732622,
+       "max_diff": 49.785128565305335,
        "floor": 0.0002,
-       "max_diff_pct": 28.46110541476573,
+       "max_diff_pct": 18.161714746466373,
        "lines": [
         3,
         3
@@ -28075,9 +28075,9 @@
       {
        "view": "principal_tensile_stress",
        "ref_max": 274.1213,
-       "max_diff": 130.38288060146192,
+       "max_diff": 11.546400000000009,
        "floor": 0.0002,
-       "max_diff_pct": 47.56393633090968,
+       "max_diff_pct": 4.2121498767151655,
        "lines": [
         3,
         3
@@ -28322,14 +28322,14 @@
     {
      "view": "principal_tensile_stress",
      "ref_max": 274.1213,
-     "max_diff": 130.38288060146192,
+     "max_diff": 49.785128565305335,
      "floor": 0.0002,
-     "max_diff_pct": 47.56393633090968,
+     "max_diff_pct": 18.161714746466373,
      "lines": [
       3,
       3
      ],
-     "ref_stage": 59
+     "ref_stage": 56
     },
     {
      "view": "principal_tensile_strain",
@@ -28500,8 +28500,8 @@
      "ref_stage": 56
     }
    ],
-   "seconds": 1.2,
-   "run": "c2740ddce794",
+   "seconds": 1.1,
+   "run": "9008410e3a20",
    "sub_curve": [
     [
      -0.0,
@@ -29383,9 +29383,9 @@
       {
        "view": "principal_tensile_stress",
        "ref_max": 2.7628,
-       "max_diff": 1.7228,
+       "max_diff": 1.6966013044979011,
        "floor": 0.0002,
-       "max_diff_pct": 62.35702910091212,
+       "max_diff_pct": 61.40876301208561,
        "lines": [
         3,
         3
@@ -29630,9 +29630,9 @@
     {
      "view": "principal_tensile_stress",
      "ref_max": 2.7628,
-     "max_diff": 1.7228,
+     "max_diff": 1.6966013044979011,
      "floor": 0.0002,
-     "max_diff_pct": 62.35702910091212,
+     "max_diff_pct": 61.40876301208561,
      "lines": [
       3,
       3
@@ -29808,8 +29808,8 @@
      "ref_stage": 51
     }
    ],
-   "seconds": 25.6,
-   "run": "c2740ddce794",
+   "seconds": 25.0,
+   "run": "9008410e3a20",
    "sub_curve": [
     [
      0.0,
@@ -30424,7 +30424,7 @@
     }
    ],
    "seconds": 0.0,
-   "run": "c2740ddce794",
+   "run": "9008410e3a20",
    "sub_curve": [
     [
      -0.0,
@@ -30822,9 +30822,9 @@
       {
        "view": "principal_tensile_stress",
        "ref_max": 2.4751,
-       "max_diff": 0.1510055782501493,
+       "max_diff": 0.03677419662897188,
        "floor": 0.0002,
-       "max_diff_pct": 6.100988980249254,
+       "max_diff_pct": 1.485766095469754,
        "lines": [
         3,
         3
@@ -31064,9 +31064,9 @@
       {
        "view": "principal_tensile_stress",
        "ref_max": 2.4763,
-       "max_diff": 0.15094675826942497,
+       "max_diff": 0.05644145742461678,
        "floor": 0.0002,
-       "max_diff_pct": 6.095657160660056,
+       "max_diff_pct": 2.279265736163501,
        "lines": [
         3,
         3
@@ -31310,15 +31310,15 @@
     },
     {
      "view": "principal_tensile_stress",
-     "ref_max": 2.4751,
-     "max_diff": 0.1510055782501493,
+     "ref_max": 2.4763,
+     "max_diff": 0.05644145742461678,
      "floor": 0.0002,
-     "max_diff_pct": 6.100988980249254,
+     "max_diff_pct": 2.279265736163501,
      "lines": [
       3,
       3
      ],
-     "ref_stage": 33
+     "ref_stage": 35
     },
     {
      "view": "principal_tensile_strain",
@@ -31489,8 +31489,8 @@
      "ref_stage": 35
     }
    ],
-   "seconds": 77.0,
-   "run": "c2740ddce794",
+   "seconds": 76.2,
+   "run": "9008410e3a20",
    "sub_curve": [
     [
      -0.0,

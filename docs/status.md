@@ -25,7 +25,9 @@ developer's. Items that need a structural judgement are marked **(structural)**.
   one HTML page of pictures, for the owner's review), `trim.py` (record to fixture),
   `diagnose.py` (r2c at Response's strain states, along its control values, its calculated
   shear stress in Response's states, and its own stages with their profile error),
-  `decompile.py` (a routine of r2k.exe from a Ghidra project kept outside the repository),
+  `decompile.py` (a routine of r2k.exe from a Ghidra project kept outside the repository;
+  who uses a constant), `viewlines.py` (one view's lines from two records, side by side),
+  `changes.py` (the checks that changed sides of their target between two verify runs),
   `retrim.py` (re-cut the fixtures from the archive to hold the feature stages),
   `capture.py` (rebuild the oracle archive with r2x), `check.py` (checks before pushing).
 - 25 oracle fixtures in `tests/oracle`, each with the detail views of the feature stages of
@@ -41,9 +43,17 @@ The numbers are in `docs/verification-results.md`, what they mean in `docs/verif
 each case is assessed against the owner's development targets in `docs/acceptance.md`: ±5 %
 on every metric, the curve's shape the same, views at the features of the curve.
 
-Run of 2026-11-21 (kernel of 2026-11-19), cases outside by check: peak 0 of 25, rising 2,
-post-peak 6, shape 8, views 25. Every case is outside on views; in 23 of them principal
-tensile stress alone does it (option F).
+Second run of 2026-11-21 (kernel of 2026-11-19; the Principal Tensile Stress line drawn as
+Response draws it), cases outside by check: peak 0 of 25, rising 2, post-peak 6, shape 8,
+views 23. Marshall and the Newbeam with N₀ = −2000 kN, both without shear, are inside on
+every check. Principal tensile stress is outside at 28 stages in 18 cases (58 in 23
+before); in seven cases without shear it is the only view outside, by one point at the
+crack front (option F2).
+
+**Known deviation, shear cases (cracking under compression).** Response lowers the cracking
+strain and the principal tension of a node by the compression across it; r2c draws the
+lowered line and does not apply it in its node (`docs/kernel.md`, "Cracking under
+compression"; option F1).
 
 Stance (owner, 2026-11-21): r2c clones Response's behaviour; where they differ, Response is
 right, and no structural assessment of results is given. Once a case is inside target,
@@ -172,19 +182,32 @@ sections and added tendons; implement curved outline segments (needed for circle
 - E5. `tools/capture.py` could retry a case once when r2x fails, since the one failure seen was
   transient. Not done: one failure is not yet a pattern.
 
-**F. Detail views.** Reduced cracking-stress line in the compression zone; crack spacing on
-multi-layer sections; signed shear on crack; transverse bond. Display-level, except that the
-first may hint at a reduced cracking strength under biaxial compression that r2c does not
-apply. No effect seen in the cases compared.
+**F. Detail views.** The cracking-stress line on the Principal Tensile Stress chart is drawn
+as Response draws it since 2026-11-21. Left: crack spacing on multi-layer sections; signed
+shear on crack; transverse bond; and
+- F1. **Cracking under compression in the node** (kernel). Response's rule
+  (`docs/kernel.md`) also lowers the cracking strain and caps f1; r2c does not apply that.
+  Tried 2026-11-21 (three lines in `node.evaluate`): against the present state 18 more
+  checks come inside (17 views, among them tensile stress on Liping LB1 at cracking and
+  M/V = 1 m at the peak; and the shape of Marshall with shear) and 15 go outside, 11 of them
+  because one stage of the shear-alone case is matched to a different r2c stage, 4 by a
+  point or two (`docs/verification.md`, "Principal tensile stress"). Peaks stay inside
+  target. **Needs the owner's word**: it is Response's behaviour, and it puts checks outside
+  that are inside (see the open question in the log of 2026-11-21-02).
+- F2. **Node spacing at the crack front** (kernel, layering). Response has nodes every
+  0.34 mm at the crack front, r2c every 0.67 to 1.1 mm; one point of Response's f1 there
+  lies off r2c's line (10 stages; the only view outside in seven cases). Layers down to
+  h/1024 were tried: six stages come inside, one goes outside, Marshall stays at 8 %.
+  Response's own layering rule has not been read; that is the next step.
 
 **H. Steel stress at a crack, found 2026-11-17.** At the Newbeam's peak with CSA factors
 Response shows the bottom bar at 340 MPa at a crack and r2c shows 0; the Newbeam with N and M
 differs the same way. Not investigated (see `docs/verification.md`, Detail views). Display or
 kernel: unknown. The peak loads in these cases agree.
 
-**I. Detail views of the sample-input cases, found 2026-11-19.** Not investigated. Marshall
-under axial compression alone: Principal Tensile Stress 1900 % (Response's largest value
-0.10 MPa), like the Newbeam's 371 %. With shear: se100 Longitudinal Concrete Stress 15 % and
+**I. Detail views of the sample-input cases, found 2026-11-19.** Not investigated, except
+Principal Tensile Stress under axial compression alone (Marshall 1900 %, Newbeam 371 %):
+that was the cracking-stress line, gone since 2026-11-21. With shear: se100 Longitudinal Concrete Stress 15 % and
 Average Angle 14 %, Liping LB1 Long. Reinf Stress at Crack 18 %, Marshall Shear Stress 8 %,
 strains 5 to 8 %. Part may come from comparing at slightly different states (peaks differ by
 0.1 to 4.5 %). Details in `docs/verification.md`. Whether they matter depends on what
@@ -214,7 +237,9 @@ repository).
 |---|---|
 | `004ad9c0`, `004ac960` | concrete stress, tangent |
 | `004ac190`, `004af050`, `004aefa0` | concrete set-up, ε0, ft |
-| `0046aaa0`, `0046a960` | MCFT node; crack strain |
+| `0046aaa0`, `0046a960` | MCFT node; crack strain, with its lowering by compression |
+| `004a7b60` | a second node routine that calls the crack strain; not read |
+| `00569f58` | flag for the lowering by compression; set in `004992b0`, `004b2580` |
 | `004aea40`, `004ae630` | steel stress, tangent |
 | `004ab4e0` | derived steel properties (rupture strain, tendon yield) |
 | `004ae520`, `004ac830` | steel capacity at a crack, concentrated strain |
