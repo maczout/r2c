@@ -364,6 +364,95 @@ Response's stepping is not described in the thesis and was deduced from its outp
   of the peak is left after a shear failure or less than a fifth after a rupture.
 * More Detail adds a stage between every two up to the peak, to at most 327 stages.
 
+## Response's own load stage control [B], read 2026-11-21
+
+Read from the binary for step 4 of increment S (the routines: stage control `00418af0` and
+its wrapper `00418860`; a new stage `00415e30`; the next target `0041a870`; the control
+variable `00422de0` and its base step `00419250`; the change of control variable `004162d0`;
+the end of the response `00419990`; the profile error `00420f20` and the stage's state code
+`004204b0`; the single-state solve `00424c60`). This section says what Response does. What
+of it r2c has taken over is said under "Load stages" above; until that says otherwise, r2c's
+stepping is its own.
+
+**Control variable.** With a = |ΔN|, b = 3·|ΔM|/h and c = |ΔV| (the load increments; h the
+section's depth): the curvature if a ≤ b and c ≤ b (the moment dominates, or there is no
+increment); else the strain at the moment axis. So shear alone is stepped in the axial
+strain, not in the shear strain. The other variable, used after a change (below): where the
+moment dominates, the shear strain if there is shear, else the axial strain; where it does
+not, the curvature or the shear strain, whichever of b and c is larger, or the axial strain
+if shear is the largest and b < a.
+
+**Base step Δ0** of a control variable, fixed when it is chosen:
+
+* curvature: 0.004/h/50 (h in metres, per metre); 0.004/h/20 without shear; halved if
+  |ΔV|/2 < |ΔN| with shear, halved again under a large constant axial load, and again if
+  M/V < h;
+* axial strain: ε0 of the concrete over 20;
+* shear strain: 0.02 mm/m where a stirrup spans more than half the depth and the transverse
+  steel is above a minimum (0.08·√fc′ MPa of a strength measure), else 0.05 mm/m.
+
+**Stepping.** The first stage after the initial one is at Δ0/6. Each next target is the
+previous *target* plus Δ0 times a multiplier, which starts at 1. From the fifth stage, while
+the multiplier is not above 1, Δ0 is raised to a tenth of the target's value when it is less
+(the 10 % growth seen on the control charts).
+
+**Events.** After a stage is accepted it is compared with the one before: newly cracked
+(principal tensile strain above the cracking strain at any node), newly crushing (principal
+compressive strain beyond ε0 at any node), a node state of yield or slip at a crack (only
+where there are no stirrups), a change in the number of ruptured layers. If there is one,
+and the last step is more than 2 % of the travel of the control variable from the start
+(0.5 % for crushing, 1 % for rupture), the last stage is set aside and a stage is put at a
+fifth of the way to it (four fifths, for a stage that has un-cracked); this repeats on the
+shrinking interval, and then the stage set aside is taken up again.
+
+**Accepting a stage.** A stage is worked on in passes: solve the global strains for the
+loads at the control value with the shear strain profile as it is; update the profile from
+the calculated shear stress; measure the profile error. The error is the standard deviation,
+over 50 points of the depth, of the difference between the calculated shear stress and the
+shear stress of the state, over the mean calculated shear stress (taken as 0.9 % where the
+shear is negligible). After each pass:
+
+* converged below 1 %: the stage is accepted;
+* else another pass, up to 16; with the error above 10 after four passes the profile is
+  reset and the updates are damped by half;
+* after 16 passes the stage is accepted as it is, **unless** its error is above 3 % **and**
+  its load is above the largest load of the stages so far: then it is refused. So a stage
+  that does not converge is kept when the load has fallen, which is the collapsed last
+  stage of many of Response's shear responses;
+* a stage whose state code is not zero (below) is refused while the multiplier is 0.5 or
+  more, and one with code 3 is refused while its load is above the largest so far.
+
+**A stage refused, or not solved.** The stage is reset to the one before and tried again
+closer: the first time at half a base step back with the multiplier marked; after that the
+multiplier is halved each time (and doubled again after a stage accepted at the first try
+while it is under 0.25). When the multiplier is under 0.2 (0.05 if the control is the axial
+strain) and the other control variable is not the present one, the control variable is
+changed instead: the multiplier goes back to 1, the base step is that of the new variable,
+in the direction the new variable has been moving over the last two thirds of the stages.
+The response ends when the multiplier falls under 0.005 (without shear: after eight tries).
+
+**The state code** of a stage: 1, a node whose shear on the crack is at its limit with no
+reserve; 4, a stirrup strained beyond rupture; 3 or 2, the principal compression at its
+strength over a zone reaching an extreme fibre, or the extreme fibre's compressive strain
+beyond 5·ε0; else 0. [Read in outline only; the conditions for 2 and 3 are not all worked
+out.]
+
+**The end of the response.** After each accepted stage, in this order:
+
+1. the state code is not zero and the load is under 0.8 of the largest so far: the end;
+2. a new event against the stage before (as above): not the end;
+3. the load is under 0.2 of the largest so far, from the eleventh stage on: the end;
+4. with constant loads, a load that is being increased has fallen under 1 % of its largest
+   value: the end;
+5. at any node the principal compressive strain is beyond 4 times the largest ε0 of the
+   concretes, or the transverse strain is above 50 mm/m: the end;
+6. the strain at the top or bottom fibre is above 5 times the largest rupture strain of the
+   steels: the end.
+
+Besides: a stage with less than 1 % of the load of the one before is dropped; of three
+stages in a row with no load, one is dropped; the response ends after 327 solves. The stage
+Response shows when the solve ends is the one with the largest load.
+
 ## Inferred or fitted values, in one place
 
 | What | Value | Basis |
