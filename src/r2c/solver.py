@@ -60,6 +60,7 @@ class Stage:
     detail: Detail
     control: float = 0.0
     event: bool = False
+    cmode: str | None = None      # the control variable the stage was found in
 
 
 class Analysis:
@@ -709,9 +710,6 @@ def _root(f, x0, dx, tol, maxit=80):
 class Flexure:
     """Full response without shear: axial load and moment."""
 
-    # when no state is found at a target or short of it, Response ends the response
-    search_beyond = False
-
     def __init__(self, an: Analysis, on_stage=None):
         self.an = an
         self.sec = an.sec
@@ -932,19 +930,13 @@ class Flexure:
                             break
                         except SolveError:
                             continue
-                    if not done and self.search_beyond and (
-                            peak <= 0 or self.stages[-1].lam > 0.95 * peak):
-                        # no state short of the target either: while the load is still at
-                        # its highest, look for one beyond it
-                        t = target
-                        for _ in range(6):
-                            t = t + sgn * max(d0, 0.1 * abs(t))
-                            try:
-                                cur = self.advance(cur, t, 2)
-                                done = True
-                                break
-                            except SolveError:
-                                continue
+                    if not done and self.switch_control(self.stages[-1]):
+                        # no state at a larger value of the control variable: carry on
+                        # with another one
+                        cur = self.stages[-1]
+                        sgn, d0 = self.sign, self.step0
+                        target = cur.control + sgn * max(d0, 0.1 * abs(cur.control))
+                        continue
                     if not done:
                         break
                     target = cur.control
@@ -971,6 +963,11 @@ class Flexure:
     def collapsed(self, st: Stage, peak: float) -> bool:
         return False
 
+    def switch_control(self, st: Stage) -> bool:
+        """Change the control variable at the last stage found, if there is another to step
+        in. True if it was changed."""
+        return False
+
     def spent(self, st: Stage, peak: float) -> bool:
         """Steel has ruptured and less than a fifth of the peak load is left."""
         return bool(self.an.dead.any()) and peak > 0 and st.lam < 0.2 * peak
@@ -995,8 +992,10 @@ class Flexure:
         self.an.epy[:] = 0.0
         try:
             for i in range(1, len(stages)):
-                if i <= peak and added < room:
-                    a, b = stages[i - 1], stages[i]
+                a, b = stages[i - 1], stages[i]
+                # not between stages found in another control variable
+                same = (a.cmode or self.mode) == (b.cmode or self.mode) == self.mode
+                if i <= peak and added < room and same:
                     try:
                         mid = self.solve(0.5 * (a.control + b.control), a)
                         out.append(mid)

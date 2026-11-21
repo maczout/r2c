@@ -7,7 +7,8 @@ What r2c computes, and where each rule comes from. Three sources, marked in the 
   of the kernel is the thesis': MCFT at a node, the crack check, dynamic layering, the
   longitudinal stiffness method, the nested solution loops.
 * **[B]** The Response-2000 1.9.7 program itself, read with a decompiler to answer a specific
-  question the thesis leaves open (a constant, a default, the exact form of a rule).
+  question the thesis leaves open (a constant, a default, the exact form of a rule). Where a
+  routine's address is given, `tools/decompile.py` shows it.
 * **[O]** Inferred from Response's output (the oracle, through r2x): fitted or deduced, not
   read anywhere. These are the weakest and are listed again at the end.
 
@@ -112,10 +113,67 @@ differ by less than 1 % of the shear force. The reported shear strain is the ave
 by the shear stress [O]. Bond charts are the change of bar (or stirrup) force along the member
 over the bar surface; r2c's transverse bond is a numerical derivative and is approximate.
 
-Known weakness: this iteration is r2c's own, with fixed damping, and it does not always
-converge where Response's does, mainly after stirrups have yielded and unloaded. Then r2c
-takes the closest iterate if it is within 5 %, looks for a state further along, and otherwise
-ends the response (docs/verification.md).
+### The stiffness in the shear flow calculation [B]
+
+Read from the binary on 2026-11-19 (routines `0041e840`, `0041fe20`, `00427cd0`, `0046b940`,
+`004201e0`, `004a8710`, `004ae630`, `00440ea0`; how it was read is in session log
+2026-11-19-04). Until then r2c differentiated its whole node routine numerically, crack check
+included, which is not what Response does and was the cause of responses ending short.
+
+* **The node** [`0046b940`]. Analytic, in the principal directions. Along the principal
+  compression: the slope of the compression curve, with the softening by the principal
+  tension counted for the changes of longitudinal and transverse strain but not for the
+  change of shear strain. Between the two: the secant shear stiffness
+  (f1 − f2)/(2(ε1 − ε2)). Along the principal tension it depends on what set the tension f1
+  in the node routine (`0046aaa0` records it):
+  * the average relation (uncracked, tension stiffening, or Bentz's lower bound): the slope
+    of the tension stiffening curve, Ec·φ up to the cracking strain;
+  * the reserve of the steel at a crack (x and y together, or one of them with the shear on
+    the crack below its limit), or the floor after cracking: nothing;
+  * one steel's reserve with the shear on the crack at its limit (f1 = cx + vci,max/tan θ or
+    cy + vci,max·tan θ): the derivative of that expression with the reserve held constant;
+    the limit's own slope against the crack width is taken with 0.3 where the limit has 0.31.
+  The matrix this gives is not symmetric; r2c forms it term by term as Response does.
+* **Stirrups** [`004a8710`, `004ae630`]: the slope of the steel's loading curve at the total
+  strain. Nothing on the yield plateau; no elastic stiffness for a stirrup that is unloading
+  from a plastic strain (reading: the routine's test for unloading compares two stresses
+  that are equal when the steel unloads; variants with elastic unloading fit Response's
+  states worse, measured, session log).
+* **Condensation** [`00427cd0`]: for no change of transverse stress, as before (thesis 6-4).
+* **Longitudinal bars** [`004201e0`]: the larger of the slope of the loading curve at the
+  average strain and at the concentrated strain at a crack (k·ε + prestrain + εsh − fy/E,
+  the strain of the capacity at a crack), less the concrete displaced. On the hardening
+  branch the slope's magnitude is used, past the strain at peak stress too. Nothing for a
+  bar that has ruptured. This replaces the rule inferred from output on 2026-11-19 (the
+  slope at the start of strain hardening for a bar on its plateau), which was this rule's
+  value at one strain.
+* **The depth that counts** [`00440ea0`, `00427cd0`]: concrete and bars outside a range
+  (zlo, zhi) have no stiffness. At a face cracked in flexure the range ends at the outer
+  edge of the outermost bar in the cracked zone that still has stiffness, or at the crack
+  front if there is none; at a face compressed past the strain at peak stress, where that
+  strain is reached. A node whose principal compressive strain is past the strain at peak
+  stress has none either.
+* **Not taken over**: a "long. nonlinear distribution" of strain added to the plane-section
+  change (a table that nothing in the cases compared fills; it belongs to features out of
+  scope), and Response's handling of a state with no stiffness at all (r2c reports no state).
+
+The iteration, its damping and what happens when it does not converge are still r2c's own:
+fixed damping, at most 30 passes; the closest iterate is accepted if it is within 3 %
+[r2c's own; 5 % until 2026-11-19]; otherwise the response ends. Response's own profile
+update was read in passing [`0041e840`: each point's shear strain is scaled by the mean of 1
+and the ratio of calculated to state stress, within bounds] and is close to r2c's; its
+acceptance and step control (`00418af0`, `00424c60`) were not taken over. The driver's
+search beyond a state it could not find (r2c's own, from the first build) was removed on
+2026-11-19: with the stiffness right it carried the Newbeam at M/V = 1 m 22 % past
+Response's failure.
+
+Measured with `tools/diagnose.py flow` (2026-11-19, r2c in Response's own states): r2c's
+calculated shear stress is as close to the state's as Response's own two lines are (within 1
+point of Response's figure) at every stage of Marshall, se100 and the Newbeam at M/V = 1 m
+with and without axial load, and at all but one stage of shear alone; at M/V = 2 m to stage 78 of 87 (2 % at the end, was 13
+to 35 % from stage 57); at M/V = 0.5 m to stage 39 (was 7 to 27 % from 37). What is left: 3
+to 7 % after the load has fallen and is recovering (M/V = 0.5 m from stage 41; US case from
+31), and 2 to 5 % on Liping LB1 from stage 13. Not explained.
 
 ## Load stages [O, all of it]
 
@@ -123,6 +181,12 @@ Response's stepping is not described in the thesis and was deduced from its outp
 
 * Control variable: the strain at the centroid if the axial load is being increased; else
   the curvature if the moment is; else the shear strain.
+* With moment and shear, once shear governs Response's stages step in the shear strain (about
+  10 % a stage on its Shear - γxy chart) while the curvature stalls or turns back, through
+  zero in one case (Newbeam M/V = 0.5 m from stage 36; US units, M/V = 1 ft, from stage 27).
+  What makes Response change over is not known. r2c's own rule: when no state is found at a
+  larger curvature, nor part of the way, and the stirrups are past half of yield or have
+  yielded before, it carries on in the reported shear strain with the same step rule.
 * First step Δ0: 0.2 mm/m ÷ h in curvature (0.08 with shear; halved with a constant axial
   load); ε0/20 in axial strain; 0.024 mm/m in shear strain. Stages at Δ0/6 and 7Δ0/6, then
   each step is the larger of Δ0 and 10 % of the control value.
@@ -144,6 +208,8 @@ Response's stepping is not described in the thesis and was deduced from its outp
 | Start of unloading tracking | stage 1 | one prestressed case (Cm4) |
 | Stirrup plastic strain kept by depth | yes | one case (Newbeam, M/V = 2 m) |
 | Shear profile tolerance | 1 % of V | Response's accepted stages measure 0 to 1 % |
+| Closest iterate accepted | within 3 % of V | r2c's own, chosen 2026-11-19 from two cases before the stiffness rules were read; not revisited since |
+| Change to shear strain control | no state at a larger curvature; stirrups past 0.5 fy | r2c's own trigger; that Response steps in the shear strain is from two cases |
 | Shear-only control on the weighted strain | 0.024 mm/m | one case |
 | Factored steel capped at fy | yes | one case (CSA factors) |
 

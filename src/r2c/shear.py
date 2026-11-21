@@ -21,9 +21,6 @@ from r2c.solver import Analysis, Flexure, SolveError, Stage, _root
 
 
 class Shear(Flexure):
-    # with shear, r2c's profile iteration fails at some states where Response's does not:
-    # look beyond such a state before ending the response (docs/verification.md)
-    search_beyond = True
 
     def __init__(self, an: Analysis, on_stage=None):
         super().__init__(an, on_stage)
@@ -44,15 +41,93 @@ class Shear(Flexure):
             self.mode = "gam"
             self.step0 = 0.024e-3
             self.sign = 1.0
+        self.mode0 = self.mode
+        # diagnostics only (tools/diagnose.py flow --fit-layer): a layer's tangent stiffness
+        # in the shear flow, in place of its own
+        self.bar_stiffness: dict[int, float] = {}
         self.profile_tol = 0.01
+        # an iteration that does not converge is accepted at its closest iterate within this
+        self.profile_accept = 0.03
         self.evals = 0
         self.budget = 600
         self.ratio = 1.2        # reported (force-weighted) shear strain over the plain mean
 
     # -- tangent stiffness and the shear flow ---------------------------------------------------
+    def bar_tangent(self, i, es):
+        """Stiffness of longitudinal layer i in the shear flow calculation [B 004201e0]: the
+        larger of the slope of its curve at the average strain and at the concentrated strain
+        at a crack; nothing once it has ruptured."""
+        l = self.sec.layers[i]
+        if self.an.dead[i]:
+            return 0.0
+        st = l.steel
+        ec = st.crack_strain(es - l.prestrain, l.prestrain, l.rho, l.strand)
+        return float(max(st.tangent(es), st.tangent(ec))) * st.phi
+
+    def zone(self, e0, phi, es, e2, zf, idx):
+        """The depth range (zlo, zhi) outside which Response gives concrete and bars no
+        stiffness in the shear flow calculation [B 00440ea0]. At a face cracked in flexure it
+        ends at the outer edge of the outermost bar in the cracked zone that still has
+        stiffness (the crack front if there is none); at a face compressed past the strain at
+        peak stress, where that strain is reached."""
+        an, sec = self.an, self.sec
+        ztop, zbot = sec.ztop, sec.zbot
+        kap = -phi                                  # strain = a + kap * z
+        etop = float(an.strain(e0, phi, ztop))
+        ebot = float(an.strain(e0, phi, zbot))
+        live = [(l, self.bar_tangent(i, es[i])) for i, l in enumerate(sec.layers)]
+
+        def front(target):
+            # depth at which the longitudinal strain is `target`
+            if abs(kap) * sec.h <= 1e-11:
+                return None
+            return sec.zc + (target - e0) / kap
+
+        def law_at(z):
+            for z1, z2, _b1, _b2, law in sec.segs:
+                if z2 - 1e-9 <= z <= z1 + 1e-9:
+                    return law
+            return sec.conc0
+
+        ltop, lbot = law_at(ztop), law_at(zbot)
+        ecr_t = float(ltop.crack_strain(np.interp(ztop, sec.tz, an.t_ft)))
+        ecr_b = float(lbot.crack_strain(np.interp(zbot, sec.tz, an.t_ft)))
+        zhi = ztop
+        if etop > ecr_t:
+            zf_ = front(ecr_t)
+            inz = [l.z + 0.5 * l.db for l, t in live
+                   if t > 0 and (zf_ is None or (l.z > zf_ if kap > 0 else l.z < zf_))]
+            zhi = max(inz) if inz else (zf_ if zf_ is not None else ztop)
+        zlo = zbot
+        if ebot > ecr_b:
+            zf_ = front(ecr_b)
+            inz = [l.z - 0.5 * l.db for l, t in live
+                   if t > 0 and (zf_ is None or (l.z < zf_ if kap < 0 else l.z > zf_))]
+            zlo = min(inz) if inz else (zf_ if zf_ is not None else zbot)
+        if kap > 1e-8 / 1e3:
+            zc_ = front(-lbot.e0)
+            if zc_ is not None and zlo < zc_:
+                zlo = zc_
+        elif kap < -1e-8 / 1e3:
+            zc_ = front(-ltop.e0)
+            if zc_ is not None and zc_ < zhi:
+                zhi = zc_
+        if zhi - zlo == 0.0:
+            zhi, zlo = zbot + 0.7 * sec.h, zbot + 0.3 * sec.h
+        zhi = min(max(zhi, zbot), ztop)
+        zlo = min(max(zlo, zbot), ztop)
+        # concrete crushed inside the depth with both faces sound: nothing is left
+        e0s = np.array([law.e0 for law in sec.laws])[idx]
+        crushed = e2 < -e0s
+        if not crushed[0] and not crushed[-1] and crushed.any():
+            zlo, zhi = ztop, zbot
+        return zlo, zhi
+
     def tangent(self, e0, phi, gam):
         """Per node: the condensed tangent stiffness (j, k, m, n) of thesis eq. 6-4, with the
-        state it was taken at."""
+        state it was taken at. The node's stiffness is Response's own [B 0046b940, 00427cd0]:
+        analytic, in the principal directions, with the tension's stiffness set by what
+        governs the tension at the node (docs/kernel.md)."""
         an, sec = self.an, self.sec
         z, b = an.layer_nodes()
         zf = z.ravel()
@@ -61,42 +136,116 @@ class Shear(Flexure):
         out, ex, g, smx, smt, ey = an.eval_nodes(e0, phi, gam, z, f1cx)
         m = sec.tab(sec.t_m, zf)
         ft = np.interp(zf, sec.tz, an.t_ft)
-        cx = f1cx(zf)
         idx = an.law_index(zf, z)
-        sts = an.stirrups_at(zf)
-        rcrit = sec.tab(sec.t_rhocrit, zf)
-        epy = np.interp(zf, sec.tz, an.epy)
+        n_ = len(zf)
 
-        def fixed(exv, eyv, gv):
-            fx = np.empty(len(zf))
-            fy = np.empty(len(zf))
-            vv = np.empty(len(zf))
-            tot, res, _ = an.stirrup_stress(sts, eyv, rcrit, epy)
-            for j, law in enumerate(sec.laws):
-                k = idx == j
-                if not k.any():
-                    continue
-                o = nodelib.evaluate(law, exv[k], eyv[k], gv[k], m[k], ft[k], smx[k], smt[k],
-                                     cx[k], res[k])
-                fx[k], fy[k], vv[k] = o.fcx, o.fcy + tot[k], o.v
-            return fx, fy, vv
+        th = out.theta
+        co, si = np.cos(th), np.sin(th)
+        s2, c2, sc = si * si, co * co, si * co
+        cs = c2 - s2
+        with np.errstate(divide="ignore", invalid="ignore"):
+            t = si / co
+        t = np.where(np.abs(t) > 1e6, np.sign(t) * 1e6, t)
+        t = np.where(t == 0.0, 1e-6, t)
+        t = np.where(np.abs(t) < 1e-6, np.sign(t) * 1e-6, t)
+        t2 = t * t
+        e1, e2 = out.e1, out.e2
+        rad = np.maximum(np.sqrt(g * g + (ex - ey) ** 2), 1e-6)
 
-        d = 2e-7
-        f0 = fixed(ex, ey, g)
-        fa = fixed(ex + d, ey, g)
-        fb = fixed(ex, ey + d, g)
-        fc = fixed(ex, ey, g + d)
-        a_, d_, g_ = ((fa[i] - f0[i]) / d for i in range(3))
-        b_, e_, h_ = ((fb[i] - f0[i]) / d for i in range(3))
-        c_, f_, i_ = ((fc[i] - f0[i]) / d for i in range(3))
-        e_safe = np.where(np.abs(e_) > 1e-6, e_, np.inf)
-        jj = a_ - b_ * d_ / e_safe
-        kk = c_ - b_ * f_ / e_safe
-        mm = g_ - h_ * d_ / e_safe
-        nn = i_ - h_ * f_ / e_safe
+        # the principal stresses' own slopes: tension along 1; compression along 2 and its
+        # softening by the strain along 1
+        d = 1e-8
+        et1 = np.empty(n_)
+        a2 = np.empty(n_)
+        b2 = np.empty(n_)
+        phic = np.empty(n_)
+        dvci = np.zeros(n_)
+        for j, law in enumerate(sec.laws):
+            k = idx == j
+            if not k.any():
+                continue
+            f = lambda p, q: law.stress(p, q, ft[k], m[k])[0]
+            # (up to the cracking strain the slope is the concrete's stiffness: no difference
+            # taken across the cracking strain)
+            et1[k] = np.where(e1[k] <= law.crack_strain(ft[k]), law.Ec * law.phi,
+                              (f(e1[k] + d, e2[k]) - f(e1[k], e2[k])) / d)
+            a2[k] = (f(e2[k] + d, e1[k]) - f(e2[k] - d, e1[k])) / (2 * d)
+            b2[k] = (f(e2[k], e1[k] + d) - f(e2[k], e1[k])) / d
+            phic[k] = law.phi
+            # slope of the limit of the shear on the crack against the principal strain
+            aa = 24.0 * out.w[k] / (law.agg + 16.0)
+            dvci[k] = -0.18 * math.sqrt(law.fcp) * (24.0 * out.sdiag[k] / (law.agg + 16.0)) \
+                / (aa + 0.3) ** 2 * law.phi
+        vci = out.vcimax
+        gov = np.where(out.cracked, out.gov, nodelib.GOV_AVG)
+        ok_s, ok_c, ok_t = s2 > 1e-6, c2 > 1e-6, np.abs(t) > 1e-6
+        ok_sc = np.abs(sc) > 1e-6
+        BIGE = 1.0      # 1e6 Pa
+        with np.errstate(divide="ignore", invalid="ignore"):
+            # limit 3: f1 = cx + vci,max / tan
+            x3 = np.where(ok_s & ok_t, dvci / t - vci / s2 * sc / rad / s2, BIGE)
+            y3 = np.where(ok_s & ok_c, vci / s2 * sc / rad / c2 + dvci / t, 0.0)
+            g3 = np.where(ok_t & ok_sc, dvci / t - vci / s2 / sc * cs / (2 * rad), 0.0)
+            # limit 4: f1 = cy + vci,max * tan
+            y4 = np.where(ok_c, dvci * t - vci / c2 * sc / rad / c2, BIGE)
+            x4 = np.where(ok_s, vci * t / s2 / rad + dvci * t, BIGE)
+            g4 = np.where(ok_sc, vci / c2 / sc * cs / (2 * rad) + dvci * t, BIGE)
+        is0, is3, is4 = gov == nodelib.GOV_AVG, gov == nodelib.GOV_VCI_X, gov == nodelib.GOV_VCI_Y
+        e1x = np.where(is0, et1, np.where(is3, x3, np.where(is4, x4, 0.0)))
+        e1y = np.where(is0, et1, np.where(is3, y3, np.where(is4, y4, 0.0)))
+        e1g = np.where(is0, et1, np.where(is3, g3, np.where(is4, g4, 0.0)))
+        # compression: softening counts with the strain along 1 the column brings; not for
+        # the shear strain's column
+        e2x = a2 + t2 * b2
+        e2y = a2 + b2 / t2
+        e2g = a2
+        de = e1 - e2
+        with np.errstate(divide="ignore", invalid="ignore"):
+            gs = np.where(np.abs(de) > 1e-15, 0.5 * (out.f1 - out.f2) / de,
+                          e2x * e1x / (e2x + e1x + 1e-6))
+        p_, q_ = e1x * s2, e2x * c2
+        hh = 4.0 * gs * c2 * s2
+        u = 2.0 * gs * sc * cs
+        A = p_ * s2 + q_ * c2 + hh
+        B = e2y * c2 * s2 + e1y * s2 * c2 - hh
+        C = -(e2g * c2 * sc - e1g * s2 * sc - u)
+        D = p_ * c2 + q_ * s2 - hh
+        E = e1y * c2 * c2 + e2y * s2 * s2 + hh
+        F = -(e2g * s2 * sc - e1g * c2 * sc + u)
+        G = -(q_ * sc - p_ * sc - u)
+        H = -(e2y * s2 * sc - e1y * c2 * sc + u)
+        I = e1g * c2 * s2 + e2g * c2 * s2 + gs * cs * cs
+        tiny = 1e-12    # 1e-6 Pa
+        A = np.where(np.abs(A) < tiny, 1e-6, A)
+        E = np.where(np.abs(E) < tiny, 1e-6, E)
+        I = np.where(np.abs(I) < tiny, 1e-6, I)
+
+        # the stirrups' part of the transverse stiffness: the slope of their curve
+        ks = np.zeros(n_)
+        a_n = np.zeros(n_)
+        a_s = np.zeros(n_)
+        for st, rho, fac in an.stirrups_at(zf):
+            if not rho.any():
+                continue
+            ks += rho * fac * st.steel.tangent(ey * fac + st.prestrain) * st.steel.phi
+            a_n += np.where(rho > 0, st.area / len(sec.stirrups), 0.0)
+            a_s += np.where(rho > 0, st.area / (st.space + 1e-4), 0.0)
+        eff = np.clip(0.5 * (3.0 - a_n / (a_s + 1e-9) / sec.h), 0.0, 1.0)
+        Et = E + eff * ks
+        with np.errstate(divide="ignore", invalid="ignore"):
+            inv = np.where(Et != 0.0, 1.0 / Et, 0.0)
+        jj = A - D * B * inv
+        kk = C - F * B * inv
+        mm = G - H * D * inv
+        nn = I - H * F * inv
+
+        zlo, zhi = self.zone(e0, phi, es, e2, zf, idx)
+        e0s = np.array([law.e0 for law in sec.laws])[idx]
+        off = (zf > zhi + 1e-9) | (zf < zlo - 1e-9) | (e2 < -e0s)
+        jj, kk, mm, nn = (np.where(off, 0.0, q) for q in (jj, kk, mm, nn))
         shp = z.shape
         return dict(z=z, b=b, out=out, ex=ex, g=g, ey=ey, es=es, fs=fs, j=jj.reshape(shp),
-                    k=kk.reshape(shp), m=mm.reshape(shp), n=nn.reshape(shp))
+                    k=kk.reshape(shp), m=mm.reshape(shp), n=nn.reshape(shp), zone=(zlo, zhi))
 
     def shear_flow(self, e0, phi, gam, v_total):
         """The shear stress profile longitudinal equilibrium requires: (z nodes from the top
@@ -121,11 +270,9 @@ class Shear(Flexure):
         for i, l in enumerate(sec.layers):
             if math.isnan(t["fs"][i]):
                 continue
-            de = 1e-7
-            f1 = an.steel(e0 + de, phi)[1][i]
-            et = (f1 - t["fs"][i]) / de
-            if math.isnan(et):
-                continue
+            zlo, zhi = t["zone"]
+            et = 0.0 if (l.z < zlo or l.z > zhi) else self.bar_tangent(i, t["es"][i])
+            et = self.bar_stiffness.get(i, et)
             jz = float(np.interp(l.z, z.ravel()[::-1], t["j"].ravel()[::-1]))
             ea = (et - jz) * l.area
             yb = l.z - sec.zaxial
@@ -374,7 +521,7 @@ class Shear(Flexure):
             x, info, ok = self._newton(c, best[4])
             if not ok:
                 x, info, ok = self._nested(c, best[4])
-        if not ok or info is None or err > 0.05:
+        if not ok or info is None or err > self.profile_accept:
             an.shape = saved_shape
             self.ratio = saved_ratio
             raise SolveError(f"no equilibrium at control value {c:g}")
@@ -407,13 +554,42 @@ class Shear(Flexure):
             fg = np.interp(grid, zu, fu)
             dg = np.abs(np.gradient(fg, grid))
             det.tbond = np.interp(zs, grid, dg) * self.sec.stirrups[0].db / 4.0
-        st = Stage(e0, phi, gam, lam, n, m, v, det, control=c)
+        st = Stage(e0, phi, gam, lam, n, m, v, det, control=c, cmode=self.mode)
         # the shear strain Response reports: weighted by the shear force over the depth
         num = np.trapezoid(det.out.v * det.gxy * det.b, det.z)
         den = np.trapezoid(det.out.v * det.b, det.z)
         st.gam_avg = float(num / den) if abs(den) > 1e-9 else 0.0
         st.perr = err
         return st
+
+    def switch_control(self, st: Stage) -> bool:
+        """From curvature to the shear strain. Where shear governs, the curvature stops
+        growing, or turns back, while the shear strain and the load still rise: Response's
+        stages there step in the shear strain (inferred from its control charts)."""
+        rep = getattr(st, "gam_avg", 0.0)
+        if self.mode != "phi" or self.an.dv == 0.0 or st.gam == 0.0 or rep == 0.0:
+            return False
+        sts = self.sec.stirrups
+        if sts and not float(np.max(self.an.epy)) > 0.0:
+            # only once the stirrups are working hard (past half of yield, or yielded
+            # before): a state missed earlier, at first cracking say, is not shear taking over
+            fy = sts[0].steel.fy * sts[0].steel.phi
+            if float(np.max(np.abs(st.detail.fsy))) < 0.5 * fy:
+                return False
+        self.mode = "gam"
+        self.ratio = rep / st.gam
+        self.sign = 1.0 if rep > 0 else -1.0
+        self.step0 = 0.024e-3
+        st.control = rep
+        st.cmode = "gam"
+        return True
+
+    def more_detail(self, stages, peak, limit):
+        mode, self.mode = self.mode, self.mode0
+        try:
+            return super().more_detail(stages, peak, limit)
+        finally:
+            self.mode = mode
 
     def relax(self, outer: int) -> float:
         return 1.0 if outer == 0 else 0.5

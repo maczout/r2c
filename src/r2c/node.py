@@ -38,6 +38,16 @@ class NodeOut:
     f1crack: np.ndarray      # f1 + vci / tan(theta): the demand on the x steel at a crack
     tan: np.ndarray
     floor: np.ndarray
+    gov: np.ndarray          # what governs f1 (GOV_*): the shear flow's stiffness depends on it
+
+
+# what sets the principal tension at a node (Response's own codes, docs/kernel.md)
+GOV_AVG = 0        # the average relation (tension stiffening, or uncracked)
+GOV_BOTH = 1       # the reserve of the x and y steel together
+GOV_STEEL = 2      # the reserve of one steel, the shear on the crack below its limit
+GOV_VCI_X = 3      # the x steel's reserve with the shear on the crack at its limit
+GOV_VCI_Y = 4      # the y steel's reserve with the shear on the crack at its limit
+GOV_FLOOR = 5      # the floor after cracking
 
 
 def evaluate(law: ConcreteLaw, ex, ey, gxy, m, ft_eff, smx, smy, f1cx, f1cy) -> NodeOut:
@@ -72,6 +82,7 @@ def evaluate(law: ConcreteLaw, ex, ey, gxy, m, ft_eff, smx, smy, f1cx, f1cy) -> 
     vcimax = np.zeros_like(ex)
     vci = np.zeros_like(ex)
     floor = np.zeros_like(ex)
+    gov = np.zeros(ex.shape, dtype=np.int8)
     if cracked.any():
         k = cracked
         tk, sk, ck, s2k, c2k = t[k], s[k], c[k], s2[k], c2[k]
@@ -97,9 +108,18 @@ def evaluate(law: ConcreteLaw, ex, ey, gxy, m, ft_eff, smx, smy, f1cx, f1cy) -> 
         vv = np.minimum(np.abs(d), vmax)
         f1c = sg * vv / tk + cx
         f1d = np.where(np.abs(tk) >= TMAX, 2.0 * fk, vv * sg * tk + cy)
+        favg = fk
         fk = np.minimum(np.minimum(fk, f1b), np.minimum(f1c, f1d))
+        capped = vmax <= np.abs(d)
+        tol = 1e-6          # 1 Pa
+        gk = np.where(np.abs(fk - favg) < tol, GOV_AVG,
+                      np.where(np.abs(fk - f1c) < tol, np.where(capped, GOV_VCI_X, GOV_STEEL),
+                               np.where(np.abs(fk - f1d) < tol,
+                                        np.where(capped, GOV_VCI_Y, GOV_STEEL), GOV_BOTH)))
         lim = np.minimum(lim, f1b)
         low = fk < fl
+        gk = np.where(low, GOV_FLOOR, gk)
+        gov[k] = gk
         fk = np.where(low, fl, fk)
         lim = np.where(low, np.maximum(lim, fl), lim)
         # shear on the crack, from equilibrium at the crack
@@ -130,4 +150,4 @@ def evaluate(law: ConcreteLaw, ex, ey, gxy, m, ft_eff, smx, smy, f1cx, f1cy) -> 
     fcy = f1 - v * t
     f1crack = np.abs(vci) / t + f1
     return NodeOut(fcx, fcy, v, f1, f2, f2max, e1, e2, theta, w, sdiag, vci, vcimax, f1lim,
-                   cracked, f1crack, t, floor)
+                   cracked, f1crack, t, floor, gov)

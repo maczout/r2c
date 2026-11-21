@@ -213,6 +213,32 @@ class SteelLaw:
     def stress(self, e):
         return self.raw(e) * self.phi
 
+    def tangent(self, e):
+        """Slope of the loading curve at strain e, as Response's shear flow calculation takes
+        it [B 004ae630]: no account of unloading; nothing on the yield plateau; on the
+        hardening branch the slope's magnitude, also past the strain at peak stress; nothing
+        once ruptured. Without the material factor."""
+        e = np.asarray(e, dtype=float)
+        a = np.abs(e)
+        if self.prestress:
+            d = 1e-7
+            with np.errstate(invalid="ignore"):
+                t = (np.abs(self.raw(a + d)) - np.abs(self.raw(a))) / d
+            return np.where(np.isnan(t), 0.0, t)
+        hard = 0.0 if self.factored else 1.0
+        t = np.where(a < self.fy / self.E, self.E,
+                     np.where(a < self.esh, 0.0,
+                              np.where(a < self.rupture,
+                                       hard * 2.0 * abs(self.curv) * np.abs(a - self.eu), 0.0)))
+        return t
+
+    def crack_strain(self, e, prestrain, rho, strand: bool):
+        """The concentrated strain at a crack for an average strain e (see crack_capacity)."""
+        base = 0.625 if strand else 1.0
+        rho = np.asarray(rho, dtype=float)
+        k = np.where(rho > 0, np.maximum(1.0, base * 0.014 / np.maximum(rho, 1e-12)), 2.0)
+        return k * np.asarray(e, dtype=float) + prestrain + (self.esh - self.fy / self.E)
+
     def crack_capacity(self, e, prestrain, rho, strand: bool):
         """Largest stress the steel can reach at a crack, for an average strain e (thesis 4-5):
         the bare-bar stress at a concentrated strain, never less than yield. nan: the bar

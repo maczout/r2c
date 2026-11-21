@@ -40,6 +40,13 @@ SAMPLES = {
 SLOW = {
     "newbeam-mv": (0.6, 1.5),
     "newbeam-nmv": (0.6, 2.0),
+    # r2c follows Response's curve to its end (0.2 %) and carries on where Response ends:
+    # its largest load is 3.7 % above Response's
+    "newbeam-m2v": (4.0, 1.0),
+    # through Response's load drop and recovery, stepping in the shear strain. r2c steps
+    # over the lowest point of the drop, which is the 13 % on the moment-curvature chart
+    "newbeam-us-mv": (1.3, 14.0),
+    "newbeam-m05v": (0.8, 4.0),
 }
 
 

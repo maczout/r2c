@@ -79,6 +79,7 @@ straight. Negative shear is refused, as in Response.
     tools/report.py        write docs/verification-results.md from a verify run
     tools/dashboard.py     the results as one HTML page (published by CI with GitHub Pages)
     tools/diagnose.py      r2c at Response's strain states, and along its control values
+    tools/decompile.py     a routine of Response's binary, from a Ghidra project kept elsewhere
     tools/capture.py       rebuild the archive of full oracle captures with r2x
     tools/check.py         checks before pushing: results current, docs as generated
     tests/oracle/          records captured from Response-2000 with r2x (control charts, peak)
