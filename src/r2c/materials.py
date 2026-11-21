@@ -14,7 +14,7 @@ from dataclasses import dataclass
 
 import numpy as np
 
-from r2c.inputs import Concrete, OutOfScope, Rebar
+from r2c.inputs import Concrete, InputError, Rebar
 
 # Tension stiffening models (t_stiff)
 TS_NONE, TS_VC82, TS_CM87, TS_IZUMO, TS_TAMAI, TS_HALF, TS_PLASTIC, TS_BENTZ = range(8)
@@ -134,7 +134,7 @@ class ConcreteLaw:
             return 0.9 / np.sqrt(1.0 + 600.0 * e1)
         if m == 18:                     # Collins-Bentz 2011 (Response's default)
             return np.minimum(1.0 / (0.8 + max(170.0, 3.0 * f) * e1), 1.0)
-        raise OutOfScope(f"compression softening model {m} is not one of Response's")
+        raise InputError(f"compression softening model {m} is not one of Response-2000's")
 
     def _base(self, x: np.ndarray, fmax: np.ndarray, n=None) -> np.ndarray:
         """The base curve: stress (positive) at x = strain / strain at peak, for a peak
