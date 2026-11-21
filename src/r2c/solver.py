@@ -872,7 +872,9 @@ class Flexure:
             e0, phi = float(x[0]), float(x[1])
         n, m, v = an.forces(e0, phi)
         det = an.detail(e0, phi, 0.0)
-        c = phi if self.mode == "phi" else e0
+        # the control variable's value at the start: curvature, the strain at the centroid,
+        # or, stepping in the shear strain, none yet
+        c = {"phi": phi, "gam": 0.0}.get(self.mode, e0)
         return Stage(e0, phi, 0.0, 0.0, n, m, v, det, control=c)
 
     def _initial_guesses(self):
