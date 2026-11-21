@@ -26,7 +26,15 @@ on top.
 Depth z is measured up from the bottom; charts use y = z − zc, zc the centroid of the gross
 concrete. Plane sections: εx(y) = εx0 − φ·y. The shear strain is γ(y) = γ0·s(y), s a profile of
 mean one over the width-weighted depth [T 7-3]. Concrete is taken net of the bars (a bar's
-force is As·(fs − fc)) [O]. Curved outline segments are read as straight (not implemented).
+force is As·(fs − fc)) [O].
+
+The outline is the list of (height, width) rows of the input, straight between rows; two rows
+at one height make a step in width (a flange). Quick Define writes a circle as 13 such rows,
+points of the circle every 15°, and Response analyses those rows as they are, straight between
+them [O: the column's peak under axial load alone agrees within 0.01 % with the polygon's
+area; the circle has 1.1 % more]. The curved segments of the thesis (a row whose width is UP
+or DOWN, an elliptical transition between its neighbours [T, Appendix A 2-4 and 5-9]) are not
+implemented: no input compared so far has one.
 
 ## Concrete
 
@@ -117,6 +125,31 @@ k·ε + prestrain + (εsh − fy/E), k = max(1, 0.014/ρ) (0.625 of that for str
 than yield; ρ is all the steel on the layer's side of the centroid over 0.8·Ag [B]. Steel
 that has yielded on average and whose concentrated strain passes the end of its curve
 ruptures at the crack and is removed.
+
+### At a step in width [O]
+
+Where the width steps (web to flange) the shear stress and the shear strain jump with it, and
+the node above and the node below the step are different nodes at one height. Response's own
+charts show the same: three points 0.05 mm apart at each step, the shear strain a quarter
+across a step to four times the width (measured, I-girder, M/V = 2 m). In r2c:
+
+* the shear strain profile has a point on each side of every step, and a layer's node on a
+  step reads the profile on the layer's own side;
+* a node's stirrup ratio ρv = Av/(b·s) is taken with the width of the node's own layer.
+
+Both are r2c's own way of keeping the two sides apart, not rules read from Response. The
+tables over the depth (crack spacing, bond, steel ratio at a crack) are still interpolated
+across a step from their 100 stations.
+
+### Hoops [T 7-6]
+
+A hoop's strain is the transverse strain times sin²α and only the transverse component of
+its force counts (times sin α), α the angle between the hoop and the direction of no strain
+[T 7-6, eq. 7-7]. Response's Stirrup Stress chart follows this: 86.2 MPa at a transverse
+strain of 0.660 mm/m where sin²α = 0.652, and 110.1 MPa at 0.569 mm/m where it is 0.967
+(measured, column with M/V = 1 m, stage 30; the hoop's radius is half the depth between
+`disttop` and `distbot`). The plastic strain a stirrup unloads from (Reinforcement, above)
+is kept in the hoop's own strain.
 
 ## Layers [T 7-3]
 
@@ -231,6 +264,8 @@ Response's stepping is not described in the thesis and was deduced from its outp
 | Layering thresholds | above | chosen; results insensitive at the tolerances reported |
 | Start of unloading tracking | stage 1 | one prestressed case (Cm4) |
 | Stirrup plastic strain kept by depth | yes | one case (Newbeam, M/V = 2 m) |
+| The two sides of a step in width kept apart | profile and stirrup ratio | r2c's own; Response's charts show both sides (I-girder) |
+| A circle from Quick Define is its 13 rows, straight between | yes | one case (column, N alone) |
 | Shear profile tolerance | 1 % of V | Response's accepted stages measure 0 to 1 % |
 | Closest iterate accepted | within 3 % of V | r2c's own, chosen 2026-11-19 from two cases before the stiffness rules were read; not revisited since |
 | Change to shear strain control | no state at a larger curvature; stirrups past 0.5 fy | r2c's own trigger; that Response steps in the shear strain is from two cases |
@@ -240,6 +275,6 @@ Response's stepping is not described in the thesis and was deduced from its outp
 ## Not implemented
 
 Hollow sections, long-term effects, strain discontinuity, the old text input format, curved
-outline segments, and the lowering of the cracking strain and of f1 by compression in the
+outline segments (rows with a width of UP or DOWN), and the lowering of the cracking strain and of f1 by compression in the
 node (above, "Cracking under compression": the chart's line is lowered, the node's cracking
 is not).

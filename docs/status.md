@@ -29,10 +29,14 @@ developer's. Items that need a structural judgement are marked **(structural)**.
   who uses a constant), `viewlines.py` (one view's lines from two records, side by side),
   `changes.py` (the checks that changed sides of their target between two verify runs),
   `retrim.py` (re-cut the fixtures from the archive to hold the feature stages),
-  `capture.py` (rebuild the oracle archive with r2x), `check.py` (checks before pushing).
-- 25 oracle fixtures in `tests/oracle`, each with the detail views of the feature stages of
-  Response's curve (cracking, falls of load, peak, last stage); pytest tests (fast set; `-m slow` for five shear cases;
-  `R2C_RESPONSE_DIR` for Response's sample inputs).
+  `capture.py` (rebuild the oracle archive with r2x; `--add` captures a new case and cuts
+  its fixture), `curves.py` (the control curves of two records point by point), `ends.py`
+  (how each shear response ends in r2c and in Response), `check.py` (checks before pushing).
+- 32 oracle fixtures in `tests/oracle`, each with the detail views of the feature stages of
+  Response's curve (cracking, falls of load, peak, last stage); pytest tests (fast set;
+  `-m slow` for seven shear cases; `R2C_RESPONSE_DIR` for Response's sample inputs,
+  `R2C_DEFINE_DIR` for the Quick Define inputs, which are r2x's:
+  `tests/reference/define`).
 - Docs: `kernel.md` (each rule and its source), `verification.md` (what the results mean),
   `verification-results.md` (generated), `acceptance.md` (the owner's development targets).
 
@@ -43,9 +47,22 @@ The numbers are in `docs/verification-results.md`, what they mean in `docs/verif
 each case is assessed against the owner's development targets in `docs/acceptance.md`: ±5 %
 on every metric, the curve's shape the same, views at the features of the curve.
 
-Second run of 2026-11-21 (kernel of 2026-11-19; the Principal Tensile Stress line drawn as
-Response draws it), cases outside by check: peak 0 of 25, rising 2, post-peak 6, shape 8,
-views 23. Marshall and the Newbeam with N₀ = −2000 kN, both without shear, are inside on
+Third run of 2026-11-21, 32 cases (the 25, and 7 on Quick Define sections: T-beam, circular
+column with hoops, I-girder with strands), cases outside by check: peak 0 of 32, rising 2,
+post-peak 10, shape 10, views 30. On the 25, no check changed sides against the second run
+(peak 0 of 25, rising 2, post-peak 6, shape 8, views 23). The seven new cases are all inside
+on peak and rising branch; the five without shear are inside on shape too
+(`docs/verification.md`, "Quick Define sections").
+
+**Known deviation, shear cases (the last stage).** Response's response to moment and shear
+often ends on a collapsed stage, at 4 to 66 % of the peak load (5 of the 12 shear cases:
+both new ones, the column at M/V = 1 m and the I-girder at M/V = 2 m, and dm-n1n and the
+Newbeam at M/V = 0.5 m and 1 m). r2c never finds such a state (`tools/ends.py`) and ends at
+its last stage near the peak, so the shape check reads "ends falling" against "ends
+standing still" on the two new cases; the rest of their shape is the same. This is
+Response's acceptance of a stage (option A3).
+
+Marshall and the Newbeam with N₀ = −2000 kN, both without shear, are inside on
 every check. Principal tensile stress is outside at 28 stages in 18 cases (58 in 23
 before); in seven cases without shear it is the only view outside, by one point at the
 crack front (option F2).
@@ -116,16 +133,18 @@ scratch each time; and numpy call overhead on arrays of about 100 nodes.
 
 ## 4. Not done
 
-- Quick Define variants (T, I, circular sections, added tendons): in the agreed test set, not
-  captured or compared. Cm4 is the only prestressed and only non-rectangular section tested.
-  Circular sections are untested, and curved outline segments are read as straight.
-- Not compared: More Detail with shear, CSA factors with shear, US or kg-cm input files,
-  stirrup patterns other than those in the samples, segmental steel curves, concrete models
+- Curved outline segments (a row with a width of UP or DOWN, thesis Appendix A): not
+  implemented. Not needed so far: Quick Define writes a circle as 13 straight rows and
+  Response analyses those (`docs/kernel.md`, Geometry). A lone UP or DOWN line in an outline
+  is read and ignored; a width of UP or DOWN is refused as out of scope.
+- A section with tendons added by hand: dropped from the test set (owner, 2026-11-21).
+- Not compared: a T-beam with shear, More Detail with shear, CSA factors with shear, US or
+  kg-cm input files, T-headed stirrups and interlocking hoops, segmental steel curves, concrete models
   other than the defaults and those in the samples.
 - Out of scope by design: hollow sections, long-term effects, strain discontinuity, the old text
   input format.
 - `tools/capture.py` has rebuilt the oracle archive against Response (2026-11-19): all 25
-  captures match their fixtures. r2x's clipboard helper can fail transiently (once in 25
+  captures match their fixtures. The seven of 2026-11-21 were captured once, with `--add`. r2x's clipboard helper can fail transiently (once in 25
   captures); a rerun of that case on its own then matched.
 
 ## 5. Decisions that are the owner's
@@ -135,9 +154,10 @@ scratch each time; and numpy call overhead on arrays of about 100 nodes.
    detail view included; ±5 % on every metric with a floor at Response's printed precision;
    the curve's shape the same; shear cases may be accepted with minor deviations depending
    on progress, recorded as known deviations here.
-2. **Test set** (owner, 2026-11-21): the present 25 cases are right for proof of concept and
-   for building the clone; range and completeness are reviewed when the scope of
-   development is complete.
+2. **Test set** (owner, 2026-11-21): the 25 cases are right for proof of concept and
+   for building the clone; seven on Quick Define sections were added the same day (T-beam
+   M and −M; column N, N₀ + M, M + V; I-girder M, M + V) and "Newbeam with tendons added"
+   dropped. Range and completeness are reviewed when the scope of development is complete.
 3. **Reverse engineering.** The original brief allowed it "to answer questions but not as the
    primary development approach". CLAUDE.md ranks it below acceptance and the thesis, as the
    means of finding out why r2c misses acceptance (the developer's wording, 2026-11-17, for
@@ -167,8 +187,21 @@ and G in scope for development sessions.
 **B. dm-n1n** (errs high, +3.2 %). Not the stiffness (section 2). Next: Response's stage
 acceptance (A3), then a structural read of what governs that section's failure.
 
-**C. Finish the agreed test set.** Capture and compare the Quick Define T, I and circular
-sections and added tendons; implement curved outline segments (needed for circles).
+**C. The Quick Define sections: done for peak, rising branch and shape** (2026-11-21), but
+for the last stage of the two shear cases (A3). Left on these sections, all in the views or
+after the peak (`docs/verification.md`, "Quick Define sections"):
+- C1. Crack spacing tables on the circular column: longitudinal 21 % and transverse 11 % or
+  more off at every stage; crack widths and diagonal spacing follow. The rules for bars
+  around a circle and for hoops are in the binary's tables (`004fec60`, `004ff1a0`,
+  `004bc470` and what calls them) and have not been read.
+- C2. The column under axial load alone after its peak: Response leaves the uniform state
+  (a curved state with no moment, the load falling by a quarter in one step); r2c stays on
+  it.
+- C3. The I-girder with shear: a fall of load at V = 26 kN and another at a curvature of
+  0.39 rad/km in Response, neither in r2c (1.7 % and 4.3 % of the peak; inside target).
+- C4. Curved outline segments, if an input ever has one (thesis Appendix A; no oracle case).
+- C5. Views at a step in width: Response's charts have a point on each side of the step;
+  r2c's have the upper layer's only.
 
 **D. Performance** (software).
 - D1. The failing tail: shorter since 2026-11-19 (section 3), not measured in detail.
@@ -226,7 +259,14 @@ SHA-256 `bbf4bc59…4e74`). One capture:
 Negative option values need the `=` form (`--initial=-2000,0,0`). An all-stage capture takes
 25 to 75 s; captures run one at a time in the default Wine prefix. `tools/capture.py` does
 this for every fixture. The Newbeam input (`input.r2t`) is in r2x's
-`tests/reference/newbeam`.
+`tests/reference/newbeam`; the Quick Define inputs are r2x's
+`tests/reference/define/quick-{tbeam,column,ibeam-strands}/hand.r2t`, captured under the
+names tbeam.r2t, column.r2t and igirder.r2t (r2x records the input's name). Verify with both
+folders: `--inputs RESPONSE_FOLDER R2X/tests/reference`.
+
+**The thesis** is at `~/references/bentz-thesis/` on the owner's machine (thesis.pdf and
+appen_a, b, c.pdf from hadrianworks.com's "About the programs" page, each with a
+`pdftotext -layout` copy), outside every repository (owner, 2026-11-21).
 
 **Routines in r2k.exe 1.9.7 already located** (addresses as the decompiler shows them).
 Internal units in the binary: Pa and m; fc′ stored negative. `tools/decompile.py` shows any

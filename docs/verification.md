@@ -8,9 +8,12 @@ run of `tools/verify.py` and headed by the commit, machine and date of that run.
 numbers below are those of that run; numbers marked "2026-11-15 run" are from the earlier
 comparison.
 
-The generated results cover all 25 cases, the 7 on Response's sample inputs (Marshall, Cm4,
-Liping LB1, se100, dm-n1n) included (run of 2026-11-21; the kernel is that of the third run of
-2026-11-19, after the shear flow stiffness was changed to Response's rules). The 15 cases without shear are unchanged from the first
+The generated results cover all 32 cases: the 25 of the first test set, the 7 on Response's
+sample inputs (Marshall, Cm4, Liping LB1, se100, dm-n1n) included, and since the third run
+of 2026-11-21 the 7 on Quick Define sections (T-beam, circular column, I-girder with
+strands; see "Quick Define sections" below). For the first 25 the kernel is that of the
+third run of 2026-11-19, after the shear flow stiffness was changed to Response's rules: no
+check of theirs changed sides in the third run of 2026-11-21 (`tools/changes.py`). The 15 cases without shear are unchanged from the first
 run; the detail views of the 7 sample cases were first compared case by case on that day
 (see Detail views).
 Whether a difference is acceptable is decided against `docs/acceptance.md`, not here.
@@ -57,6 +60,61 @@ of 126 where it ends standing still. The last stages are where the two responses
 Views are matched by load and control value together since 2026-11-21 (owner's choice);
 before, by control value alone. The numbers in the sections below that refer to views at the
 peak are from the earlier matching.
+
+## Quick Define sections (third run of 2026-11-21)
+
+Seven cases on three sections made with Response's Quick Define (the owner's test-set
+decision, 2026-11-21): a T-beam, a circular column with hoops, an I-girder with 12 strands.
+The target for this increment (the owner's brief): inside on peak, rising branch and shape;
+views reported, not chased. Numbers are those of `docs/verification-results.md`.
+
+| Case | Peak % | Rising % | Shape | Also outside |
+|---|---:|---:|---|---|
+| T-beam, M | −0.03 | 0.03 | same | views (7 %: crack spacing, tensile stress) |
+| T-beam, −M | 0.00 | 0.92 | same | post-peak 20 %; views 8 % |
+| Column, N | 0.00 | 0.00 | same | post-peak 161 %; views |
+| Column, N₀ = −4000 kN, M | −0.02 | 0.02 | same | views (21 %: crack spacing) |
+| Column, M/V = 1 m | −0.52 | 1.79 | different at the end | post-peak, views |
+| I-girder, M | −0.03 | 0.18 | same | views (48 % at the last stage: steel stress at a crack) |
+| I-girder, M/V = 2 m | −0.44 | 4.33 | different at the end | post-peak, views |
+
+* **The five cases without shear were inside on peak, rising branch and shape before any
+  kernel change** (the baseline run, kept outside the repository). The kernel changes of
+  this increment do not touch them.
+* **The two shear cases** were outside in the baseline: the I-girder found no stage after
+  the first, the column's peak was 3.8 % low and its rising branch 5.1 % off. Three faults
+  of r2c's own, none a missing rule of Response's (`docs/kernel.md`, "At a step in width"
+  and "Hoops"): the shear strain profile could not jump at a flange; a web node on a flange
+  junction took its stirrup ratio from the flange's width; a hoop's plastic strain was not
+  kept in the hoop's own strain. Both are now inside on peak and rising branch.
+* **Shape, both shear cases: Response's last stage is a collapsed one** (33 % of the peak
+  on the column, 12 % on the I-girder) and r2c ends at its last stage near the peak. The
+  rest of the shape is the same. Response ends this way in five of the twelve shear cases;
+  r2c never finds such a state (`tools/ends.py`): its responses end where its iteration
+  finds no state. This is Response's acceptance of a stage (option A3), out of scope for
+  this increment; recorded as a known deviation in `docs/status.md`.
+* **I-girder, M/V = 2 m, rising 4.3 %:** at a curvature of 0.39 to 0.47 rad/km Response's
+  load falls from 1100 to 1083 kN·m and recovers; r2c's rises through. Before that, at
+  V = 26 kN, Response has a fall of load (to 16 kN) that r2c does not: 1.7 % of the peak.
+  Not investigated: inside target.
+* **Column under axial load alone, after the peak:** Response's load falls from 16 191 to
+  11 914 kN in one step and its concrete stress is no longer uniform over the depth (48 MPa
+  near mid-depth, 7 MPa at both faces: a curved state with no moment). r2c stays on the
+  uniform state and its load falls smoothly. Reported, not chased (post-peak).
+* **T-beam under negative moment, after the peak:** as the Newbeam's (r2c takes one more
+  stage before the bars rupture).
+* **Views.** On the column the crack spacings differ at every stage: longitudinal 21 %
+  (Response's is larger near the top and bottom faces, 490 against 387 mm), transverse 11 %
+  and more away from mid-depth (1811 against 1139 mm at y = 215 mm; the same at mid-depth).
+  The tables' rules for bars placed around a circle and for hoops have not been read from
+  the binary. Crack widths and the diagonal spacing follow. On the T-beam and I-girder the
+  crack spacing is 5 to 8 % off in places. With shear, views at the peak are 5 to 14 % off
+  on the column and 5 to 12 % on the I-girder (transverse bond 97 %, r2c's numerical
+  derivative), and the last stage is compared with whatever r2c stage is nearest to
+  Response's collapsed one.
+* **A circle is its polygon.** Quick Define writes the column's outline as 13 rows; r2c
+  reads them straight and the peak under axial load agrees within 0.01 %. Curved outline
+  segments were not needed and are not implemented.
 
 ## Principal tensile stress (2026-11-21)
 
@@ -255,19 +313,18 @@ stress and 9.8 otherwise in kg-cm units).
 
 ## Not compared
 
-* Sections from Quick Define other than the Newbeam's rectangle: T, I and circular sections,
-  and added tendons. These were in the plan and were not run. The only non-rectangular and the
-  only prestressed section compared is Cm4. Circular sections in particular are untested, and
-  curved outline segments are read as straight.
+* A section with tendons added to it by hand (dropped from the test set by the owner,
+  2026-11-21: the I-girder covers strands, Cm4 covers prestress). A T-beam with shear.
+  Curved outline segments (a width of UP or DOWN): not implemented, and no input has one.
 * `--more-detail` with shear, CSA factors with shear, US or kg-cm input files (as opposed to
-  results in those units), stirrup patterns other than those in the samples (hoops, T-headed
-  bars, interlocking), segmental steel curves, concrete models other than the defaults and
+  results in those units), stirrup patterns other than those compared (single leg, open,
+  closed, hoop: T-headed bars and interlocking hoops are not), segmental steel curves, concrete models other than the defaults and
   those in the samples.
 * Anything out of scope: hollow sections, long-term effects, strain discontinuity.
 
 ## Oracle captures
 
-25 captures, each of every stage, made with `r2x` (worker, `--stage all`) from Response-2000
+32 captures (25 of 2026-11-15 to 19, 7 of 2026-11-21 on the Quick Define sections), each of every stage, made with `r2x` (worker, `--stage all`) from Response-2000
 1.9.7 (r2k.exe SHA-256 bbf4bc59…4e74) under Wine 9.0. The fixtures in tests/oracle are those
 records cut down to the control charts and the peak stage with tools/trim.py; nothing in them
 is edited. Response's sample inputs are not in this repository. The archive of full captures
