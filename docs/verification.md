@@ -138,6 +138,68 @@ One view check went outside against the baseline, on a new case: Long. Average B
 last stage of newbeam-ncomp-v (4.5 to 6.8 %). Its stages are different ones since the first
 step was put right; the case came inside on the rising branch by the same change.
 
+## How a response ends: Response's own stage control (sixth run of 2026-11-21)
+
+Step 4 of increment S put Response's own load stage control in place of r2c's for every
+case with shear (`docs/kernel.md`, "Load stages" and "Response's own load stage control"):
+its control variable and steps, its closing in on an event, its passes on a stage and its
+rule for keeping a stage that has not converged, what it does when a stage is refused, its
+change of control variable and its end tests. Measured, sixth run of 2026-11-21, all 85
+cases, against the fifth run (`tools/targets.py`, `tools/changes.py`, `tools/ends.py`):
+
+| | Fifth run | Sixth run |
+|---|---:|---:|
+| Cases inside on peak, rising branch and shape | 43 of 85 | 51 of 85 |
+| … of the 53 scope cases | 21 | 27 |
+| Peak outside | 11 | 5 |
+| Rising branch outside | 7 | 6 |
+| Shape outside | 42 | 33 |
+| Post-peak outside | 44 | 42 |
+| Shear responses that end as Response's does (of 50) | 14 | 23 |
+
+- **The 32 earlier cases: peak and rising branch as before** (none went outside). Two
+  shape checks came inside (Marshall with shear; Newbeam with N₀ and M/V = 1 m: both now
+  end standing still, as Response's). No post-peak or shape check went outside. View
+  checks: 25 went outside and 55 came inside, on seven and eleven of the cases: the stages
+  compared are other states now (r2c's stages sit at Response's control values, and the
+  shear cases' last stages are different ones). Eleven of the 25 are at one stage of the
+  shear-alone case, just past first cracking, where r2c's stage is on the other side of it.
+- **dm-n1n** (option B, reported as the brief asks, not chased): the peak is +0.10 % (it
+  was +3.2 %), the rising branch 0.08 %, the shape the same, post-peak 3.8 %: inside on all
+  four. r2c no longer carries on past Response's peak there.
+- **Peaks that came inside**: given crack spacings (+21.6 % to +0.04 %), the prestrain on
+  stirrups (+21.8 % to +0.07 %), tension stiffening 1 and 6 (+18.2 % and +12.6 % to under
+  3 %), softening 3 and 4 (+7 % and +6 % to about +1 %). In each r2c used to carry on past
+  Response's failure; it now ends where Response does.
+- **What Response's rules reproduce, stage for stage**: Newbeam at M/V = 1 m (the same
+  curvatures to the peak, the change to shear strain control at the same stage, the plateau
+  at 193 kN after it); shear alone, falling branch included (r2c's stages at shear strains
+  of 4.34 and 4.44 mm/m carry 192.6 and 193.1 kN, Response's at 4.34 and 4.43 mm/m carry
+  192.5 and 193.0); no stirrups (the stages to the peak: 120.4, 123.7, 125.2 kN against
+  120.4, 123.6, 125.2; r2c then ends standing still at 126.8 kN where Response has a last
+  stage at 74 % of its peak of 125.8).
+
+**Still outside, and why** (known deviations, `docs/status.md`):
+
+- *Five peaks*: softening 0 and 8 (+19.0 %), 5 (+10.1 %), 6 (+5.5 %) on the I-girder, and
+  the T-beam at M/V = 2 m (+7.4 %). Response's response ends there while its load is still
+  rising: just after the web cracks on the I-girder (its next stages do not converge, are
+  kept because their load is under the peak, and the third has collapsed), with stages
+  standing still on the T-beam. r2c's profile iteration converges at those states, and with
+  Response's own rules a converged stage is accepted, so r2c goes on. In Response's own
+  peak states r2c's forces agree (step 3).
+- *Six rising branches*: softening 7, 9 and 11 on the I-girder (5 to 14 %), Newbeam at M/V =
+  0.5 m (6.1 %, from 18.2 %), and the two US cases (13.1 % and 7.3 %: one fall of load
+  fewer than Response's on the way up).
+- *The shape alone, 22 shear cases*: the last stage. Response's ends falling in most of them (a
+  collapsed last stage, kept because it had not converged and its load was under the peak);
+  r2c's ends standing still, its step having died at the same plateau, or the other way
+  round (Newbeam at M/V = 2 m). Which of the two happens turns on whether one stage's
+  sixteen passes converge, in Response and in r2c alike; the rule is the same, the stage is
+  not always.
+
+Times: the 50 shear cases take a median of 66 s each (78 s in the fifth run), 126 s at most.
+
 ## Quick Define sections (third run of 2026-11-21)
 
 Seven cases on three sections made with Response's Quick Define (the owner's test-set

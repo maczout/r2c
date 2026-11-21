@@ -310,15 +310,12 @@ included, which is not what Response does and was the cause of responses ending 
   change (a table that nothing in the cases compared fills; it belongs to features out of
   scope), and Response's handling of a state with no stiffness at all (r2c reports no state).
 
-The iteration, its damping and what happens when it does not converge are still r2c's own:
-fixed damping, at most 30 passes; the closest iterate is accepted if it is within 3 %
-[r2c's own; 5 % until 2026-11-19]; otherwise the response ends. Response's own profile
-update was read in passing [`0041e840`: each point's shear strain is scaled by the mean of 1
-and the ratio of calculated to state stress, within bounds] and is close to r2c's; its
-acceptance and step control (`00418af0`, `00424c60`) were not taken over. The driver's
-search beyond a state it could not find (r2c's own, from the first build) was removed on
-2026-11-19: with the stiffness right it carried the Newbeam at M/V = 1 m 22 % past
-Response's failure.
+The iteration, the profile update and what happens when a stage does not converge are
+Response's since 2026-11-21 (Load stages, below). Until then they were r2c's own: fixed
+damping, up to 30 passes, the closest iterate accepted within 3 %, the response ended
+otherwise. The driver's search beyond a state it could not find (r2c's own, from the first
+build) was removed on 2026-11-19: with the stiffness right it carried the Newbeam at M/V =
+1 m 22 % past Response's failure.
 
 Measured with `tools/diagnose.py flow` (2026-11-19, r2c in Response's own states): r2c's
 calculated shear stress is as close to the state's as Response's own two lines are (within 1
@@ -338,31 +335,66 @@ that fits the section's own strains: the shrinkage profile, then the strains at 
 prestrained bars carry nothing [T 7-3: with shrinkage the first estimate is "a linear fit to
 those profiles"; the second plane and the cut-back are r2c's own].
 
-## Load stages [O, all of it]
+## Load stages
 
-Response's stepping is not described in the thesis and was deduced from its output:
+**With shear: Response's own load stage control [B]**, taken over 2026-11-21 in place of
+r2c's (step 4 of increment S). The rules are in the next section, each as read from the
+binary: the control variable and its base step, the stepping and its growth, the closing in
+on an event, the passes on a stage and when a stage that has not converged is kept, what
+happens when a stage is refused, the change of control variable, the end tests. What r2c
+does of its own inside that frame, or reads into it:
 
-* Control variable: the strain at the centroid if the axial load is being increased; else
-  the curvature if the moment is; else the shear strain.
-* With moment and shear, once shear governs Response's stages step in the shear strain (about
-  10 % a stage on its Shear - γxy chart) while the curvature stalls or turns back, through
-  zero in one case (Newbeam M/V = 0.5 m from stage 36; US units, M/V = 1 ft, from stage 27).
-  What makes Response change over is not known. r2c's own rule: when no state is found at a
-  larger curvature, nor part of the way, and the stirrups are past half of yield or have
-  yielded before, it carries on in the reported shear strain with the same step rule.
-* The control variable's value at the initial stage is the curvature or the centroid's
-  strain there; stepping in the shear strain starts from zero.
-* First step Δ0: 0.2 mm/m ÷ h in curvature (0.08 with shear; halved with a constant axial
-  load); ε0/20 in axial strain; 0.024 mm/m in shear strain. Stages at Δ0/6 and 7Δ0/6, then
-  each step is the larger of Δ0 and 10 % of the control value.
-* When a step contains first cracking or the extreme fibre reaching ε0, the event is
-  approached in steps of a fifth of what remains, on two levels. Bar rupture: a fifth of the
-  step, or a twenty-fifth, if that stops short of the rupture.
-* The response ends when the extreme compressive strain passes 4·ε0, when no state can be
-  found at a target nor at a half, quarter and eighth of the step, when the load has run out,
-  after 101 stages, and (r2c's own rules, where Response's are not known) when less than half
-  of the peak is left after a shear failure or less than a fifth after a rupture.
-* More Detail adds a stage between every two up to the peak, to at most 327 stages.
+* The global strains of a pass are solved by r2c's Newton iteration with its bracketing
+  fallback. Response's solve can come back "not closed" and the stage is carried on from;
+  r2c's reading of that: the nearest state found, if it is out of balance by less than 2 %
+  of the section's scale [O, r2c's own threshold].
+* **The shear strain profile is kept at the nodes' own heights** (and on its base grid of
+  the tables' heights). On the fixed grid alone it could not follow the closely spaced
+  nodes at a crack front, and the profile iteration was left with an error it could not
+  remove: 1.6 to 3.8 % in Response's measure, where it now goes under 0.1 % [measured,
+  Newbeam at M/V = 1 m, 40 passes on five stages]. That is what lets Response's measure and
+  its 1 % and 3 % be used as they are.
+* The profile update is Response's [B `0041e840`]: where a node carries shear, its shear
+  strain times the mean of one and (calculated stress over the state's stress), that factor
+  within ten either way; the profile is then brought back to a mean of one. Where a node
+  carries no shear yet, r2c's own: the calculated stress over the node's tangent stiffness.
+* Under shear alone, half of the update is taken in the second half of the sixteen passes
+  [O, r2c's own, from that one loading: without it the stage past the peak does not settle
+  where Response's does; with it under every loading r2c settles where Response's stages
+  stand still].
+* Shear alone is stepped in the shear strain, 0.02 mm/m a stage, half that under a constant
+  compression [O: Response's stages under shear alone are evenly spaced in the shear strain
+  while the axial strain stays at nothing; the binary's choice read for the beam gives the
+  axial strain there, so shear alone is taken to run in another of its analysis classes,
+  whose base steps are those]. No change of control variable under shear alone.
+* State code 1's "no reserve" is read as "no stirrup crosses the node"; the shear on the
+  crack "at its limit" is what governs the node's tension (The node, above).
+* The load compared with "the largest so far" is the load factor. A stage found with the
+  loads reversed is not a stage.
+* "A large constant axial load" (the base step in curvature is halved) is taken as more
+  than 0.1 MPa on the gross area [O: Newbeam under −2000 kN steps at half the base step].
+
+How far this goes [measured, sixth run of 2026-11-21]: on Newbeam at M/V = 1 m r2c's stages
+are Response's stage for stage up to the peak (the same curvatures), the control changes to
+the shear strain at the same place and the plateau after the peak is Response's (193 kN at
+4.5 to 4.8 mm/m). Under shear alone the whole response is Response's, the falling branch
+included. Where r2c's profile iteration settles and Response's does not, r2c still goes on
+past Response's end, and the last stage often differs (`docs/status.md`, known deviations).
+
+**Without shear [O]**: r2c's own stepping, deduced from Response's control charts before
+the binary was read, and now seen to be Response's rule (the next section): the strain at
+the centroid if the axial load is being increased, else the curvature; a first step of Δ0/6
+(Δ0 = 0.2 mm/m ÷ h in curvature, ε0/20 in axial strain), then Δ0, growing to a tenth of the
+control value; an event (first cracking, the extreme fibre reaching ε0) approached in fifths
+of what remains; bar rupture approached at a fifth and a twenty-fifth of the step. The
+response ends when the extreme compressive strain passes 4·ε0, when no state is found at a
+target nor at a half, quarter and eighth of the step, when the load has run out, and (r2c's
+own) when less than a fifth of the peak is left after a rupture. Response's end tests for
+these cases (the next section, 3 to 6) come to the same on the cases compared.
+
+The control variable's value at the initial stage is the curvature or the centroid's strain
+there. More Detail adds a stage between every two up to the peak, among the stages found in
+the first control variable, to at most 327 stages. A response has at most 101 stages [O].
 
 ## Response's own load stage control [B], read 2026-11-21
 
@@ -431,11 +463,19 @@ changed instead: the multiplier goes back to 1, the base step is that of the new
 in the direction the new variable has been moving over the last two thirds of the stages.
 The response ends when the multiplier falls under 0.005 (without shear: after eight tries).
 
-**The state code** of a stage: 1, a node whose shear on the crack is at its limit with no
-reserve; 4, a stirrup strained beyond rupture; 3 or 2, the principal compression at its
-strength over a zone reaching an extreme fibre, or the extreme fibre's compressive strain
-beyond 5·ε0; else 0. [Read in outline only; the conditions for 2 and 3 are not all worked
-out.]
+**The state code** of a stage [`004204b0`]. A node is *crushing* when its principal
+compression is within 1.5 % of its (softened) strength or its principal compressive strain
+is beyond ε0.
+
+* 1: a node whose shear on the crack is at its limit with a zero in a field taken to mean
+  no transverse steel there;
+* 4: a transverse strain beyond the largest rupture strain of the transverse steels (10 mm/m
+  at least);
+* 3: the web crushing: a crushing node that carries shear and does not belong to the
+  crushing zone that starts at an extreme fibre (top first, else bottom); or the whole
+  depth crushing with shear; or every node beyond ε0;
+* 2: an extreme fibre's principal compressive strain beyond 5·ε0 (10 mm/m at least);
+* else 0.
 
 **The end of the response.** After each accepted stage, in this order:
 
@@ -457,16 +497,17 @@ Response shows when the solve ends is the one with the largest load.
 
 | What | Value | Basis |
 |---|---|---|
-| Stepping rules and end rules | above | Response's control charts |
+| Stepping and end rules without shear | above | Response's control charts; they agree with the binary's rules as read |
 | Layering thresholds | above | chosen; results insensitive at the tolerances reported |
 | Start of unloading tracking | stage 1 | one prestressed case (Cm4) |
 | Stirrup plastic strain kept by depth | yes | one case (Newbeam, M/V = 2 m) |
 | The two sides of a step in width kept apart | profile and stirrup ratio | r2c's own; Response's charts show both sides (I-girder) |
 | A circle from Quick Define is its 13 rows, straight between | yes | one case (column, N alone) |
-| Shear profile tolerance | 1 % of V | Response's accepted stages measure 0 to 1 % |
-| Closest iterate accepted | within 3 % of V | r2c's own, chosen 2026-11-19 from two cases before the stiffness rules were read; not revisited since |
-| Change to shear strain control | no state at a larger curvature; stirrups past 0.5 fy | r2c's own trigger; that Response steps in the shear strain is from two cases |
-| Shear-only control on the weighted strain | 0.024 mm/m | one case |
+| "Not closed" global solution carried on from | out of balance under 2 % of the section's scale | r2c's own reading of Response's solve status |
+| Damping under shear alone | half the update in the second half of the passes | one loading (shear alone) |
+| Shear alone stepped in the shear strain | 0.02 mm/m; half under constant compression | two cases |
+| "Large" constant axial load for the base step | above 0.1 MPa on the gross area | one case |
+| State code 1 needs no stirrup at the node | yes | one case (no stirrups) |
 | Factored steel capped at fy | yes | one case (CSA factors) |
 | Shrinkage profile through more than three points | parabola through the nearest three | r2c's own reading of the manual; three points compared |
 | Interlocking hoops are stirrups | yes | one case (column, M/V = 1 m) |
