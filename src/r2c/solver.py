@@ -23,6 +23,9 @@ BIG = 1e9
 FAR = 1e6            # stands for a neutral axis outside the section (whole section in tension)
 
 
+STEP = 1e-6          # mm: how far from a step in width the shear strain profile is read
+
+
 class SolveError(RuntimeError):
     """No equilibrium state was found for a load stage."""
 
@@ -71,7 +74,13 @@ class Analysis:
         self.shear = (self.dv != 0.0) or (self.v0 != 0.0)
         self.t_ft = sec.cracking_table(self.n0, self.m0, self.dn, self.dm)
         self.bounds = self._initial_bounds()
-        self.shape_z = sec.tz.copy()
+        # the shear strain profile's grid: the tables' heights, and a point just above and
+        # just below every step in width, where the shear strain jumps
+        self.steps = np.array([z for z in sec.breaks()[1:-1]
+                               if abs(sec.width_side(z, True) - sec.width_side(z, False))
+                               > 1e-6])
+        self.shape_z = np.array(sorted(set(sec.tz.tolist())
+                                       | {z + d for z in self.steps for d in (-STEP, STEP)}))
         self.shape = self._elastic_shape()
         self.max_layers = 220
         # plastic strain of each layer, from which it unloads elastically
@@ -120,6 +129,17 @@ class Analysis:
         mean = np.trapezoid(tau * b, z) / np.trapezoid(b, z)
         return tau / mean if mean > 0 else np.ones_like(z)
 
+    def profile_z(self, z):
+        """Heights at which the shear strain profile is read for nodes z of shape (L, 3): a
+        layer's top or bottom node on a step in width is read on the layer's own side."""
+        if not len(self.steps) or z.ndim != 2 or z.shape[1] != 3:
+            return z
+        zp = z.copy()
+        for zs in self.steps:
+            zp[np.abs(z[:, 0] - zs) < 1e-9, 0] = zs - STEP
+            zp[np.abs(z[:, 2] - zs) < 1e-9, 2] = zs + STEP
+        return zp
+
     def layer_nodes(self, bounds=None):
         """(z, b) arrays of shape (L, 3): top, middle and bottom of every layer."""
         sec = self.sec
@@ -163,7 +183,10 @@ class Analysis:
             return
         st = sec.stirrups[0].steel
         z = np.asarray(det.z, dtype=float)
-        ep = np.asarray(det.ey, dtype=float) - np.asarray(det.fsy, dtype=float) / (st.E * st.phi)
+        # in the stirrup's own strain: a hoop is strained by less than the concrete (7-6)
+        fac = self.stirrups_at(z)[0][2]
+        ep = np.asarray(det.ey, dtype=float) * fac \
+            - np.asarray(det.fsy, dtype=float) / (st.E * st.phi)
         ep = np.where((np.asarray(det.rhov) > 0) & (ep > 1e-9), ep, 0.0)
         order = np.argsort(z)
         self.epy = np.maximum(self.epy, np.interp(sec.tz, z[order], ep[order]))
@@ -285,7 +308,8 @@ class Analysis:
         smx = sec.tab(sec.t_smx, zf)
         smt = sec.tab(sec.t_smt, zf)
         cx = f1cx(zf)
-        g = gam * np.interp(zf, self.shape_z, self.shape) if gam != 0.0 else np.zeros_like(zf)
+        g = gam * np.interp(self.profile_z(z).ravel(), self.shape_z, self.shape) \
+            if gam != 0.0 else np.zeros_like(zf)
         if self.shear and ey is None:
             out, eyv = self.transverse(zf, z, ex, g, m, ft, smx, smt, cx)
             return out, ex, g, smx, smt, eyv
