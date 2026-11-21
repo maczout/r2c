@@ -237,6 +237,8 @@ def table(results: dict) -> str:
            "chart at the peak counts as different.",
            "- **r2c**: whether r2c reads the input and sets up its analysis (nothing is "
            "solved here).",
+           "- A probe whose input is used as it is (a file in other units, Newbeam under "
+           "other loads) has no base to compare with: those two columns are empty.",
            "",
            "| Probe | Base | What | Loads (initial + increment) | Save As | r2x solve | "
            "Peak / base | Charts | r2c |",
@@ -262,7 +264,12 @@ def table(results: dict) -> str:
             solved = f"{s['stages']} stages, peak {s['peak-stage']}"
             if s.get("units") not in (None, "si") or s.get("factors") != "1.00,1.00,1.00":
                 solved += f" ({s['units']}; factors {s['factors']})"
-            if b.get("peaks") and s.get("units") == b.get("units"):
+            v = variants.VARIANTS.get(name)
+            unedited = v is not None and not v.edits      # the base is the input itself
+            if unedited:
+                s = dict(s)
+                s.pop("charts", None)
+            elif b.get("peaks") and s.get("units") == b.get("units"):
                 key = list(s["peaks"])[-1]
                 by = b["peaks"].get(key, [0, 0])[1]
                 if by:

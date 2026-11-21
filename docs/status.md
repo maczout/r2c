@@ -31,14 +31,19 @@ developer's. Items that need a structural judgement are marked **(structural)**.
   `retrim.py` (re-cut the fixtures from the archive to hold the feature stages),
   `capture.py` (rebuild the oracle archive with r2x; `--add` captures a new case and cuts
   its fixture), `curves.py` (the control curves of two records point by point), `ends.py`
-  (how each shear response ends in r2c and in Response), `check.py` (checks before pushing).
+  (how each shear response ends in r2c and in Response), `scope.py` (which fixture has which
+  input feature), `variants.py` (inputs derived from present ones by stated text edits),
+  `probe.py` (what Response does with an input, through r2x), `check.py` (checks before
+  pushing).
 - 32 oracle fixtures in `tests/oracle`, each with the detail views of the feature stages of
   Response's curve (cracking, falls of load, peak, last stage); pytest tests (fast set;
   `-m slow` for seven shear cases; `R2C_RESPONSE_DIR` for Response's sample inputs,
   `R2C_DEFINE_DIR` for the Quick Define inputs, which are r2x's:
   `tests/reference/define`).
 - Docs: `kernel.md` (each rule and its source), `verification.md` (what the results mean),
-  `verification-results.md` (generated), `acceptance.md` (the owner's development targets).
+  `verification-results.md` (generated), `acceptance.md` (the owner's development targets),
+  `scope.md` (every input an r2x solve can take, and r2c's status on each; the checklist for
+  "scope complete"), `scope-probes.md` (generated: what Response does with each).
 
 ## 2. Against Response-2000 1.9.7
 
@@ -131,21 +136,40 @@ limit (the same failure as stopping short); on the stages found, about 50 force 
 per stage at about 7 ms each, 80 % of it the transverse equilibrium solve, which starts from
 scratch each time; and numpy call overhead on arrays of about 100 nodes.
 
-## 4. Not done
+## 4. Scope: what is not done
 
-- Curved outline segments (a row with a width of UP or DOWN, thesis Appendix A): not
-  implemented. Not needed so far: Quick Define writes a circle as 13 straight rows and
-  Response analyses those (`docs/kernel.md`, Geometry). A lone UP or DOWN line in an outline
-  is read and ignored; a width of UP or DOWN is refused as out of scope.
+`docs/scope.md` is the inventory (2026-11-21): every input an r2x solve can take that
+reaches the analysis, each with one status, measured with r2x's worker where it was not
+known. Against it, the scope is **not complete**. What is left (increment S, the owner's
+brief of 2026-11-21):
+
+- **Missing** (r2x solves it, r2c refuses or ignores it): eleven named compression softening
+  models and number 4; a segmental curve for reinforcing steel (read and ignored); draped
+  tendons (ignored); shrinkage and thermal strains of the concrete (ignored).
+- **Not compared** (implemented, no oracle case): the rest of the concrete model options
+  (base curves 0 and 3, softening 0, 2, 6, 7, 10, 13 under shear, tension stiffening 1 to 4
+  and 6, the tension stiffening factor); input files in US and kg-cm units; given crack
+  spacings and moment axis; no stirrups with shear; interlocking hoops; prestrains on
+  stirrups and bars; thermal strain of bars; factors in the file; a T-beam with shear; CSA
+  factors and More Detail with shear; More Detail max; five load combinations.
+- 53 new cases cover these: 41 that reach a kernel path no present case reaches (group A),
+  12 that combine paths already reached (group B). `tools/scope_cases.py --list` names them.
+- **Not solvable with r2x** (measured; nothing to compare with): curved outline rows in an
+  input file (Response's reader rejects them; a circle is saved as 13 straight rows, so
+  option C4 falls away); a shape without an outline; tension stiffening "None" (Response
+  asks a question r2x does not answer) and 5; `units="roman"`; three load combinations on
+  Newbeam. What r2c should do with each is proposed in `docs/scope.md` for the owner.
+- **Out of scope by design** (owner): hollow sections, long-term effects, strain
+  discontinuity, the old text input format.
 - A section with tendons added by hand: dropped from the test set (owner, 2026-11-21).
-- Not compared: a T-beam with shear, More Detail with shear, CSA factors with shear, US or
-  kg-cm input files, T-headed stirrups and interlocking hoops, segmental steel curves, concrete models
-  other than the defaults and those in the samples.
-- Out of scope by design: hollow sections, long-term effects, strain discontinuity, the old text
-  input format.
 - `tools/capture.py` has rebuilt the oracle archive against Response (2026-11-19): all 25
-  captures match their fixtures. The seven of 2026-11-21 were captured once, with `--add`. r2x's clipboard helper can fail transiently (once in 25
-  captures); a rerun of that case on its own then matched.
+  captures match their fixtures. The seven of 2026-11-21 were captured once, with `--add`.
+  r2x's clipboard helper can fail transiently (once in 25 captures); a rerun of that case
+  on its own then matched.
+
+**Where increment S stands** (2026-11-21): step 1, the inventory, is done. Next is step 2:
+the 53 cases' fixtures and the baseline run on all cases before any kernel change; then
+step 3 (build what is missing), step 4 (how a response ends: A3, G, C2).
 
 ## 5. Decisions that are the owner's
 
@@ -199,7 +223,8 @@ after the peak (`docs/verification.md`, "Quick Define sections"):
   it.
 - C3. The I-girder with shear: a fall of load at V = 26 kN and another at a curvature of
   0.39 rad/km in Response, neither in r2c (1.7 % and 4.3 % of the peak; inside target).
-- C4. Curved outline segments, if an input ever has one (thesis Appendix A; no oracle case).
+- C4. Curved outline segments: fall away. An input file cannot carry one (measured
+  2026-11-21, `docs/scope.md` section 1.4).
 - C5. Views at a step in width: Response's charts have a point on each side of the step;
   r2c's have the upper layer's only.
 
@@ -211,7 +236,7 @@ after the peak (`docs/verification.md`, "Quick Define sections"):
 - D5. Measure Response's solve time properly: peak-only r2x captures of the shear cases.
 
 **E. Housekeeping.**
-- E3. Compare the untested combinations in section 4.
+- E3. Compare the untested combinations: now increment S, by `docs/scope.md`.
 - E5. `tools/capture.py` could retry a case once when r2x fails, since the one failure seen was
   transient. Not done: one failure is not yet a pattern.
 
