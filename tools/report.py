@@ -60,17 +60,20 @@ def assess(res: dict, acc: dict) -> dict:
             out["peak"] = (d, lim["peak_pct"], abs(d) <= lim["peak_pct"])
         else:
             out["peak"] = (d, None, None)
+        fl = c.get("floor_pct", 0.0)
         cv = c.get("rising_pct", c.get("curve_max_diff_pct"))
         if cv is not None:
             cl = lim.get("curve_pct")
-            out["curve"] = (cv, cl, None if cl is None else cv <= cl)
+            out["curve"] = (cv, cl, None if cl is None else cv <= max(cl, fl))
         pv = c.get("post_peak_pct")
         if pv is not None:
             pl = lim.get("post_peak_pct")
-            out["post_peak"] = (pv, pl, None if pl is None else pv <= pl)
+            out["post_peak"] = (pv, pl, None if pl is None else pv <= max(pl, fl))
     vacc = acc.get("views", {})
     exempt = set(vacc.get("views_exempt", []))
-    vals = [v["max_diff_pct"] for v in res.get("views", [])
+    # a view within the printed-precision floor counts as no difference
+    vals = [0.0 if v["max_diff"] <= v.get("floor", 0.0) else v["max_diff_pct"]
+            for v in res.get("views", [])
             if not v.get("missing") and v["view"] not in exempt]
     if vals:
         vw = max(vals)

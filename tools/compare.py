@@ -64,6 +64,27 @@ def parse_chart(body: bytes):
     return title, xt, yt, [np.array(c, dtype=float).reshape(-1, 2) for c in lines]
 
 
+def resolution(body: bytes) -> tuple[float, float]:
+    """The printed resolution of a chart's x and y values: one unit in the last decimal
+    place shown (Response prints a fixed number of decimals per chart)."""
+    dx = dy = 0
+    for ln in body.decode("latin1").splitlines():
+        p = ln.split()
+        if len(p) >= 2:
+            try:
+                float(p[0]), float(p[1])
+            except ValueError:
+                continue
+            dx = max(dx, len(p[0].partition(".")[2]))
+            dy = max(dy, len(p[1].partition(".")[2]))
+    return 10.0 ** -dx, 10.0 ** -dy
+
+
+# A difference within this many units of the last printed digit is never a miss (owner,
+# 2026-11-21: absolute limits for small values close to the numerical precision).
+FLOOR_DIGITS = 2
+
+
 def control_keys(rec) -> list[str]:
     return [k.split("/", 1)[1] for k in rec.sections if k.startswith("control/")]
 
@@ -152,6 +173,8 @@ def compare_control(ref, sub, key):
         # both curves, both ways; scaled by the reference's peak load and its largest control
         # value over the whole curve
         rise, post = two_way(a, ia, b, xw, pk)
+        rx, ry = resolution(ref.control(key))
+        out["floor_pct"] = 100.0 * FLOOR_DIGITS * float(np.hypot(rx / xw, ry / pk))
         if rise is not None:
             out["rising_pct"] = 100.0 * rise
         if post is not None:
@@ -197,7 +220,9 @@ def compare_views(ref, sub, ref_stage, sub_stage):
                 continue
             dmax, _ = curve_distance(a, lb[i], scale, max(span, 1e-9))
             worst = max(worst, dmax * scale)
+        rx, ry = resolution(ref.stage(ref_stage, key))
         rows.append({"view": key, "ref_max": scale, "max_diff": worst,
+                     "floor": FLOOR_DIGITS * rx,
                      "max_diff_pct": float(100.0 * worst / scale) if scale > 1e-9 else 0.0,
                      "lines": [len(la), len(lb)]})
     return rows
