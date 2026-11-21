@@ -3,49 +3,67 @@
 **This file is the owner's.** It sits at the top of the instruction hierarchy in CLAUDE.md:
 where it speaks, it governs. The developer may propose changes; only the owner makes them.
 
-Status: **template, 2026-11-17.** The stance below is the owner's own words, 2026-11-17. The
-tolerances are not set yet. Until they are, `tools/report.py` reports every difference and
-assesses none.
+Status: **development targets, set by the owner 2026-11-21.** These hold while the scope of
+the clone is being built. They will be reviewed when the focus moves from development to
+testing.
 
 ## Stance
 
 > "I have a structural engineer's definition of agreement which includes a tolerance. It
 > [is] not mathematical equivalence." (owner, 2026-11-17)
 
-> "I don't mind the system making those decisions so long as the documentation is clear. I
-> will specify what is important to me." (owner, 2026-11-17, on deciding what is done)
+> "The priority is cloning Response's behaviour in a naive way (software). I won't provide
+> separate engineering assessment of results in this project." (owner, 2026-11-21)
 
-Reading, for the owner to confirm: r2c aims to agree with Response-2000 within the
-tolerances below, not to reproduce it. Matching Response more closely than the tolerance is
-not a goal in itself. Where r2c is inside tolerance by a route other than Response's, that is
-acceptable, provided `docs/kernel.md` records the route.
+> "My read of past runs is [the developer] is trying hard to get an unreasonably tight numeric
+> match and it is distracting attention from building out the scope." (owner, 2026-11-21)
 
-## What matters (the owner to complete)
+What this means for the work:
 
-These are the structural judgements that order the work. The developer decides anything not
-covered here and records the decision in the session log.
+- r2c reproduces Response-2000's behaviour, including where and how a response ends. Where
+  r2c and Response differ, Response is right; whether r2c's result is better for the section
+  is not a question this project asks.
+- Agreement within the targets below is enough. Once a case is inside them, closing the gap
+  further is not a goal: build out the scope instead.
+- No structural assessment of results will be given. Questions of the form "is this state
+  real for the section?" are answered by "follow Response".
 
-1. **Which results matter.** For example: the peak load; the rising branch of the control
-   curve; the state at service load; detail views at the peak; the post-peak response.
-   *Not yet set.*
-2. **Post-peak.** Whether the response after the peak needs to agree at all, and if so up
-   to where. Response's own last stages are often unconverged. *Not yet set.*
-3. **Which sections and loadings matter most**, to order the remaining test set (Quick
-   Define T, I, circular, added tendons; shear variants). *Not yet set.*
-4. **Errs high vs errs low.** Whether a difference on the unconservative side (r2c's peak
-   above Response's) gets a tighter limit than one on the conservative side. *Not yet set.*
+## What matters (owner, 2026-11-21)
 
-## Tolerances (machine-read)
+1. **Which results.** All of them: every branch of the control curves, including after the
+   peak, and all detail views.
+2. **Axial and moment cases** (no shear) match Response qualitatively, in the features of the
+   curve's shape, and numerically within the targets below.
+3. **Cases with shear** aim for the same. Matching them is accepted to be harder; minor
+   deviations may be accepted, depending on how the project is progressing. A shear case
+   outside target is recorded as a known deviation in `docs/status.md`, not left silent.
+4. **Errs high vs low.** Treated the same. (Follows from the stance: no engineering
+   assessment.)
+5. **The test set.** The present 25 cases are right for proof of concept and for building the
+   clone. Range and completeness are reviewed when the scope of development is complete.
 
-`tools/report.py` reads the block below. A value left out means "not assessed". All values
-are percentages, measured as `tools/compare.py` measures them:
+## Targets (machine-read)
+
+**±5 % on all metrics**, for current development. Where a value is small, close to the
+numerical precision of the output, an absolute limit applies in place of the percentage.
+
+`tools/report.py` reads the block below. A value left out means "not assessed". Percentages
+are measured as `tools/compare.py` measures them:
 
 - `peak_pct`: the difference of the largest load on the bottom control chart, relative to
-  Response's. If `peak_pct_high` is given, it applies when r2c's peak is above Response's
-  (unconservative) and `peak_pct` when it is below.
-- `curve_pct`: the largest distance of Response's rising-branch points from r2c's curve,
-  with load scaled by Response's peak and the control value by its largest value on that
-  branch.
+  Response's.
+- `curve_pct`: the rising branch. The largest distance between the two curves up to
+  Response's peak, measured both ways (Response's points from r2c's curve and r2c's from
+  Response's), load scaled by Response's peak, control value by its largest value over the
+  whole curve.
+- `post_peak_pct`: the same, after Response's peak. An r2c point counts as post-peak when its
+  nearest point on Response's curve is at or after Response's peak, so a response that runs on
+  past Response's end, or stops short of it, counts here.
+- **Shape** (not a number): the curve's features in order (cracking, falls of load before
+  the peak, the peak, and how the response ends: falling, standing still, or at the peak)
+  must be the same. Always assessed.
+- **Small values:** a difference within two units of the last digit Response prints is never
+  a miss, for the curves and the views alike. The resolution is read from the data.
 - `views_pct`: the largest difference in any detail view at the peak, relative to that
   chart's largest value. Views listed in `views_exempt` are reported but not assessed.
 
@@ -53,23 +71,27 @@ Cases without a shear increment are `flexure`; cases with one are `shear`.
 
 ```toml
 [flexure]
-# peak_pct = 
-# peak_pct_high = 
-# curve_pct = 
+peak_pct = 5.0
+curve_pct = 5.0
+post_peak_pct = 5.0
 
 [shear]
-# peak_pct = 
-# peak_pct_high = 
-# curve_pct = 
+peak_pct = 5.0
+curve_pct = 5.0
+post_peak_pct = 5.0
 
 [views]
-# views_pct = 
-# views_exempt = []
+views_pct = 5.0
+views_exempt = []
 ```
+
+### Not yet measured
+
+- **Detail views away from the peak.** Today views are compared at the peak only.
 
 ## How this relates to the tests
 
 The limits in `tests/test_oracle.py` are regression limits: "no worse than it was when last
 compared", set just above the differences found. They protect against breaking what works.
-The tolerances here say what is good enough. A case can pass its regression test and fail
-acceptance, and the other way round.
+The targets here say what is good enough for now. A case can pass its regression test and
+miss its target, and the other way round.

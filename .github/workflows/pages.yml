@@ -1,12 +1,21 @@
-# Publishes tools/dashboard.py's page of the committed verification results with GitHub Pages,
-# on every push to main. The page is built from docs/verification-results.json and the oracle
-# fixtures alone; nothing is run against Response here. Pages must be set to deploy from
-# GitHub Actions (repository Settings > Pages > Source).
+# Publishes the results site with GitHub Pages: main's page at the root and a preview page for
+# every branch under branches/ (tools/site.py). Each page is built from that branch's
+# committed results (docs/verification-results.json) and the oracle fixtures alone; nothing is
+# run against Response here. Pages must be set to deploy from GitHub Actions (repository
+# Settings > Pages > Source).
+#
+# Runs on pushes to main and after every run of the tests workflow, which runs on every push
+# to any branch. A workflow_run runs in main's context, so it may deploy to the github-pages
+# environment (which by default only main may); it builds every branch, so the site is whole
+# whichever push started it. workflow_run takes effect once this file is on main.
 name: pages
 
 on:
   push:
     branches: [main]
+  workflow_run:
+    workflows: [tests]
+    types: [completed]
   workflow_dispatch:
 
 permissions:
@@ -24,12 +33,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0        # the page says whether the results are stale against HEAD
+          fetch-depth: 0        # every branch, and each page says whether its results are stale
       - uses: actions/setup-python@v5
         with:
           python-version: "3.13"
       - run: pip install -e .
-      - run: mkdir -p _site && python tools/dashboard.py --out _site/index.html
+      - run: git fetch --no-tags origin '+refs/heads/*:refs/remotes/origin/*'
+      - run: python tools/site.py _site
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site

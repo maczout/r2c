@@ -60,13 +60,22 @@ def assess(res: dict, acc: dict) -> dict:
             out["peak"] = (d, lim["peak_pct"], abs(d) <= lim["peak_pct"])
         else:
             out["peak"] = (d, None, None)
-        cv = c.get("curve_max_diff_pct")
+        fl = c.get("floor_pct", 0.0)
+        cv = c.get("rising_pct", c.get("curve_max_diff_pct"))
         if cv is not None:
             cl = lim.get("curve_pct")
-            out["curve"] = (cv, cl, None if cl is None else cv <= cl)
+            out["curve"] = (cv, cl, None if cl is None else cv <= max(cl, fl))
+        pv = c.get("post_peak_pct")
+        if pv is not None:
+            pl = lim.get("post_peak_pct")
+            out["post_peak"] = (pv, pl, None if pl is None else pv <= max(pl, fl))
+        if "shape_same" in c:
+            out["shape"] = (c["shape_same"], True, c["shape_same"])
     vacc = acc.get("views", {})
     exempt = set(vacc.get("views_exempt", []))
-    vals = [v["max_diff_pct"] for v in res.get("views", [])
+    # a view within the printed-precision floor counts as no difference
+    vals = [0.0 if v["max_diff"] <= v.get("floor", 0.0) else v["max_diff_pct"]
+            for v in res.get("views", [])
             if not v.get("missing") and v["view"] not in exempt]
     if vals:
         vw = max(vals)
@@ -78,12 +87,22 @@ def assess(res: dict, acc: dict) -> dict:
 def verdict(checks: dict) -> str:
     oks = [ok for _v, _l, ok in checks.values()]
     if any(ok is False for ok in oks):
-        return "outside"
+        return "outside: " + ", ".join(NAMES.get(k, k) for k, (_v, _l, ok) in checks.items()
+                                       if ok is False)
     if oks and all(ok is True for ok in oks):
         return "within"
     if any(ok is True for ok in oks):
         return "within, partly assessed"
     return "not assessed"
+
+
+NAMES = {"curve": "rising", "post_peak": "post-peak"}
+
+
+def label(ref: dict) -> str:
+    """The case in engineering terms (tools/dashboard.py, label)."""
+    import dashboard
+    return dashboard.label(ref)
 
 
 def cell(check, signed=True) -> str:
@@ -94,6 +113,14 @@ def cell(check, signed=True) -> str:
     if ok is None:
         return s
     return f"{s} {'≤' if ok else '>'} {lim:g}"
+
+
+def shape_cell(c) -> str:
+    if "shape_same" not in c:
+        return ""
+    if c["shape_same"]:
+        return "same"
+    return f"different: Resp. {', '.join(c['shape_ref'])}; r2c {', '.join(c['shape_sub'])}"
 
 
 def render(results: dict, run: dict, acc: dict, acc_path: str) -> str:
@@ -121,9 +148,9 @@ def render(results: dict, run: dict, acc: dict, acc_path: str) -> str:
             continue
         out += [f"## {title}", "",
                 "| Case | Input | Initial; increment | Stages Resp. / r2c | Chart | "
-                "Peak Resp. | Peak r2c | Peak diff % | Curve % | Views % (worst) | "
-                "Assessment | Time s |",
-                "|---|---|---|---|---|---:|---:|---:|---:|---:|---|---:|"]
+                "Peak Resp. | Peak r2c | Peak diff % | Rising % | Post-peak % | Shape | "
+                "Views % (worst) | Assessment | Time s |",
+                "|---|---|---|---|---|---:|---:|---:|---:|---:|---|---:|---|---:|"]
         for n in names:
             r = ran[n]
             h = r["ref"]
@@ -146,10 +173,11 @@ def render(results: dict, run: dict, acc: dict, acc_path: str) -> str:
             if extra:
                 inp += " " + " ".join(extra)
             out.append(
-                f"| {n} | {inp} | {h['initial']}; {h['increment']} | "
+                f"| {n}: {label(h)} | {inp} | {h['initial']}; {h['increment']} | "
                 f"{h['stage-count']} / {r['sub']['stage-count']} | {c['chart']} | "
                 f"{c['ref_peak_load']:.1f} | {c['sub_peak_load']:.1f} | "
-                f"{cell(chk.get('peak'))} | {cell(chk.get('curve'), signed=False)} | {worst} | "
+                f"{cell(chk.get('peak'))} | {cell(chk.get('curve'), signed=False)} | "
+                f"{cell(chk.get('post_peak'), signed=False)} | {shape_cell(c)} | {worst} | "
                 f"{verdict(chk)} | {r.get('seconds', '')} |")
         out.append("")
     if skipped:
@@ -167,18 +195,25 @@ def render(results: dict, run: dict, acc: dict, acc_path: str) -> str:
             if k not in rows or v["max_diff_pct"] > rows[k][0]:
                 rows[k] = (v["max_diff_pct"], n)
     if rows:
-        out += ["## Detail views at the peak, worst case per view", "",
+        out += ["## Detail views at the features of the curve, worst case per view", "",
                 "| View | Worst % | Case |", "|---|---:|---|"]
         for k in sorted(rows, key=lambda k: -rows[k][0]):
             out.append(f"| {k} | {rows[k][0]:.1f} | {rows[k][1]} |")
         out.append("")
     out += ["## How the numbers are measured", "",
-            "See `tools/compare.py`. Peak: the largest load on the bottom control chart. Curve: "
-            "the largest distance of Response's rising-branch points from r2c's curve, load "
-            "scaled by Response's peak, control value by its largest value on that branch. "
-            "Views: at r2c's stage nearest Response's peak in control value, the largest "
+            "See `tools/compare.py`. Peak: the largest load on the bottom control chart. "
+            "Rising and post-peak: the largest distance between the two curves, measured both "
+            "ways (Response's points from r2c's curve and r2c's from Response's), split at "
+            "Response's peak; load scaled by Response's peak, control value by its largest value "
+            "over the whole curve. An r2c point counts as post-peak when its nearest point on "
+            "Response's curve is at or after Response's peak, so a response that runs on past "
+            "Response's end, or stops short of it, shows as post-peak distance. "
+            "Views: at each feature stage of Response's curve (cracking, falls of load, peak, "
+            "last stage) and r2c's stage nearest it in load and control value, the largest "
             "distance of Response's points from r2c's curve, relative to the chart's largest "
-            "value. After the peak, stage counts and loads are not compared.", ""]
+            "value. Shape: the curve's features in order (cracking, falls of load before the "
+            "peak, the peak, how the response ends), read alike from both curves; it matches "
+            "when they are the same. Stage counts are not compared.", ""]
     return "\n".join(out)
 
 

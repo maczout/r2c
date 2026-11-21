@@ -6,7 +6,7 @@
 
 Answers, at a glance, for the owner's review: which sections and loadings the test set covers
 (and what it leaves out), how far r2c's peak and rising branch are from Response's in every
-case, how the detail views at the peak compare, and what the control curves look like
+case, how the detail views at the features of the curve compare, and what the control curves look like
 overlaid.
 
 RESULTS is a folder written by tools/verify.py (results.json and run.json) or the combined
@@ -124,15 +124,26 @@ def variants(ref: dict) -> list[str]:
     md = int(ref.get("more-detail") or 0)
     if md:
         out.append(f"More Detail ×{md}")
+    force, length = UNITS.get(ref["units"], ("", ""))
     n0 = nums(ref["initial"])[0]
     if n0:
-        out.append(f"N₀ = {n0:g}")
+        out.append(f"N₀ = {n0:g} {force}".rstrip())
     n, m, v = nums(ref["increment"])
     if v and m:
-        out.append(f"M/V = {abs(m / v):g}")
+        out.append(f"M/V = {abs(m / v):g} {length}".rstrip())
     if n and m:
-        out.append(f"N/M = {n / m:g}")
+        out.append(f"N/M = {n / m:g}" + (f" /{length}" if length else ""))
     return out
+
+
+# force and length of each unit system, for labels (Response's SI: kN and kN·m; US: kip and
+# kip·ft). kg-cm is left without units: not checked.
+UNITS = {"si": ("kN", "m"), "us": ("kip", "ft")}
+
+
+def label(ref: dict) -> str:
+    """A case in engineering terms, with units: section, loading path, what sets it apart."""
+    return ", ".join([section_name(ref), loading(ref)] + variants(ref))
 
 
 # ---------------------------------------------------------------- assembling
@@ -170,6 +181,8 @@ def build(run: dict, results: dict, acc: dict, curves_dir: Path | None, ref_dir:
             "section": section_name(ref),
             "loading": loading(ref),
             "variants": variants(ref),
+            "label": label(ref),
+            "checks": {k: v[2] for k, v in checks.items()},
             "input": ref["input-name"],
             "initial": ref["initial"], "increment": ref["increment"],
             "stages": [int(ref["stage-count"]), int(r["sub"]["stage-count"])],
@@ -177,7 +190,9 @@ def build(run: dict, results: dict, acc: dict, curves_dir: Path | None, ref_dir:
             "chart": c["chart"] if c else None,
             "peak": [c["ref_peak_load"], c["sub_peak_load"]] if c else None,
             "peak_pct": c["peak_diff_pct"] if c else None,
-            "curve_pct": c.get("curve_max_diff_pct") if c else None,
+            "curve_pct": c.get("rising_pct", c.get("curve_max_diff_pct")) if c else None,
+            "post_pct": c.get("post_peak_pct") if c else None,
+            "shape": ([c["shape_ref"], c["shape_sub"]] if c and "shape_ref" in c else None),
             "verdict": report.verdict(checks),
             "limits": {k: v[1] for k, v in checks.items()},
             "views": [],
@@ -193,7 +208,10 @@ def build(run: dict, results: dict, acc: dict, curves_dir: Path | None, ref_dir:
             if v.get("missing"):
                 case["views"].append({"view": v["view"], "missing": True})
             else:
+                feat = {s["ref_stage"]: s["feature"] for s in r.get("views_stages", [])}
                 case["views"].append({"view": v["view"], "pct": round(v["max_diff_pct"], 3),
+                                      "stage": v.get("ref_stage"),
+                                      "feature": feat.get(v.get("ref_stage"), ""),
                                       "ref_max": v["ref_max"], "diff": v["max_diff"]})
         # curves
         refp = ref_dir / f"{name}.r2x.txt"
@@ -214,7 +232,7 @@ def build(run: dict, results: dict, acc: dict, curves_dir: Path | None, ref_dir:
                     o = json.loads(other.read_text()).get(name, {})
                     oc = (o.get("control") or [{}])[-1]
                     same = (abs(oc.get("peak_diff_pct", 1e9) - case["peak_pct"]) < 1e-6
-                            and abs((oc.get("curve_max_diff_pct") or 0)
+                            and abs((oc.get("rising_pct", oc.get("curve_max_diff_pct")) or 0)
                                     - (case["curve_pct"] or 0)) < 1e-6)
                     if o.get("run") and case["run"] and o["run"] != case["run"] and not same:
                         case["curve"]["other_run"] = o["run"]
@@ -335,7 +353,7 @@ H += `</table></div>`;
 if (D.gaps.length) H += `<details open><summary>Not in the test set (from docs/verification.md)</summary><ul class="gaps">${D.gaps.map(g=>`<li>${esc(g)}</li>`).join("")}</ul></details>`;
 
 function tipCase(c) {
- return `${c.name}\ninput ${c.input}\ninitial ${c.initial}; increment ${c.increment}\npeak ${sg(c.peak_pct)} %, curve ${f(c.curve_pct)} %\nstages Response ${c.stages[0]} / r2c ${c.stages[1]}`;
+ return `${c.label}\n${c.name}\ninput ${c.input}\ninitial ${c.initial}; increment ${c.increment}\npeak ${sg(c.peak_pct)} %, rising ${f(c.curve_pct)} %, post-peak ${f(c.post_pct)} %${c.shape ? "\nshape Response: " + c.shape[0].join(", ") + "\nshape r2c: " + c.shape[1].join(", ") : ""}\nstages Response ${c.stages[0]} / r2c ${c.stages[1]}`;
 }
 
 // ---------- scorecard
@@ -353,12 +371,28 @@ function peakBar(c) {
  if (lim != null) for (const t of [-lim, lim]) s += `<line x1="${px(t)}" x2="${px(t)}" y1="0" y2="16" stroke="var(--tol)" stroke-width="1.5"/>`;
  return s + `</svg>`;
 }
-function curveBar(c) {
- const x = c.curve_pct; if (x == null) return "";
- let s = `<svg width="${CW}" height="16" role="img" aria-label="curve ${f(x)} %">`;
+const CHECKS = [["peak","peak"],["curve","rising"],["post_peak","post"],["shape","shape"],["views","views"]];
+function checkChips(c) {
+ return CHECKS.map(([k, l]) => {
+  const ok = c.checks ? c.checks[k] : undefined;
+  if (ok === undefined) return "";
+  const col = ok === true ? "var(--ok, #2a7)" : ok === false ? "var(--high)" : "var(--ink-3)";
+  const mark = ok === true ? "✓" : ok === false ? "✗" : "–";
+  return `<span style="color:${col};margin-right:6px;white-space:nowrap">${mark} ${l}</span>`;
+ }).join("");
+}
+function sameShape(c) { return c.shape && c.shape[0].join() === c.shape[1].join(); }
+function shapeCell(c) {
+ if (!c.shape) return "";
+ return sameShape(c) ? "same" : `<span style="color:var(--high)">different</span>`;
+}
+function curveBar(c, key = "curve_pct", lk = "curve") {
+ const x = c[key]; if (x == null) return "";
+ const lim = c.limits[lk];
+ let s = `<svg width="${CW}" height="16" role="img" aria-label="${lk} ${f(x)} %">`;
  for (const t of [0.1,1,10]) s += `<line x1="${cl(t)}" x2="${cl(t)}" y1="2" y2="14" stroke="var(--grid)"/>`;
  s += `<rect x="4" y="4" width="${Math.max(2, cl(x)-4)}" height="8" rx="2" fill="var(--s4)"/>`;
- if (c.limits.curve != null) s += `<line x1="${cl(c.limits.curve)}" x2="${cl(c.limits.curve)}" y1="0" y2="16" stroke="var(--tol)" stroke-width="1.5"/>`;
+ if (lim != null) s += `<line x1="${cl(lim)}" x2="${cl(lim)}" y1="0" y2="16" stroke="var(--tol)" stroke-width="1.5"/>`;
  return s + `</svg>`;
 }
 function axisRow() {
@@ -369,25 +403,25 @@ function axisRow() {
  for (const [t,l] of [[0.01,"0.01"],[0.1,"0.1"],[1,"1"],[10,"10"],[100,"100"]]) b += `<text x="${Math.min(CW-12,Math.max(10,cl(t)))}" y="11" text-anchor="middle">${l}</text>`;
  return [a, b + `</svg>`];
 }
-H += `<h2>How close: peak and rising branch</h2>
-<p class="sub">Peak: r2c's largest load on the control chart against Response's (log scale both sides of zero; <span style="color:var(--low)">■</span> r2c lower, <span style="color:var(--high)">■</span> r2c higher). Curve: largest distance of Response's rising-branch points from r2c's curve, as % of Response's peak (log scale).</p>`;
+H += `<h2>How close: peak, rising branch and post-peak</h2>
+<p class="sub">Peak: r2c's largest load on the control chart against Response's (log scale both sides of zero; <span style="color:var(--low)">■</span> r2c lower, <span style="color:var(--high)">■</span> r2c higher). Rising and post-peak: largest distance between the two curves, measured both ways and split at Response's peak, as % of Response's peak (log scale). A response that runs on past Response's end, or stops short of it, shows as post-peak distance.</p>`;
 const [ax1, ax2] = axisRow();
-H += `<div class="scroll"><table><tr><th class="sticky">Case</th><th>Peak diff %</th><th></th><th>Curve %</th><th></th><th>Stages R / r2c</th><th>Verdict</th><th>r2c s</th></tr>
-<tr><td class="sticky"></td><td>${ax1}</td><td></td><td>${ax2}</td><td colspan="4"></td></tr>`;
+H += `<div class="scroll"><table><tr><th class="sticky">Case</th><th>Peak diff %</th><th></th><th>Rising %</th><th></th><th>Post-peak %</th><th></th><th>Shape</th><th>Stages R / r2c</th><th>Verdict</th><th>r2c s</th></tr>
+<tr><td class="sticky"></td><td>${ax1}</td><td></td><td>${ax2}</td><td></td><td>${ax2}</td><td colspan="5"></td></tr>`;
 for (const g of ["flexure","shear"]) {
  const a = by(g); if (!a.length) continue;
- H += `<tr class="grp"><td class="sticky" colspan="8">${G[g]}</td></tr>`;
- for (const c of a) H += `<tr data-tip="${esc(tipCase(c))}"><td class="sticky">${esc(c.name)}</td><td>${peakBar(c)}</td><td class="num">${sg(c.peak_pct)}</td><td>${curveBar(c)}</td><td class="num">${f(c.curve_pct)}</td><td class="num">${c.stages[0]} / ${c.stages[1]}</td><td>${esc(c.verdict)}</td><td class="num">${c.seconds ?? ""}</td></tr>`;
+ H += `<tr class="grp"><td class="sticky" colspan="11">${G[g]}</td></tr>`;
+ for (const c of a) H += `<tr data-tip="${esc(tipCase(c))}"><td class="sticky">${esc(c.label)}<div class="m">${esc(c.name)}</div></td><td>${peakBar(c)}</td><td class="num">${sg(c.peak_pct)}</td><td>${curveBar(c)}</td><td class="num">${f(c.curve_pct)}</td><td>${curveBar(c, "post_pct", "post_peak")}</td><td class="num">${f(c.post_pct)}</td><td>${shapeCell(c)}</td><td class="num">${c.stages[0]} / ${c.stages[1]}</td><td>${checkChips(c)}</td><td class="num">${c.seconds ?? ""}</td></tr>`;
 }
-H += `</table></div><p class="note">Stage counts after the peak are not compared (see docs/verification.md).</p>`;
+H += `</table></div><p class="note">Stage counts are not compared (see docs/verification.md).</p>`;
 
 // ---------- heatmap
 const views = [...new Set(cases.flatMap(c => c.views.map(v => v.view)))];
 const bins = [[1,"<1"],[2,"1–2"],[5,"2–5"],[10,"5–10"],[25,"10–25"],[100,"25–100"],[Infinity,"≥100"]];
 const binOf = p => bins.findIndex(b => p < b[0]);
 const cs = 18, lw = 112, th = 150;
-H += `<h2>Detail views at the peak</h2>
-<p class="sub">Largest difference in each chart, as % of that chart's largest value, at r2c's stage nearest Response's peak. Hatched rows: that stage is more than 5 % away from Response's peak in control value, so the two are different states.</p>
+H += `<h2>Detail views at the features of the curve</h2>
+<p class="sub">Largest difference in each chart, as % of that chart's largest value, over the stages compared: cracking, falls of load, the peak and the last stage of Response's curve, each against r2c's stage nearest it in load and control value (the tooltip names the stage). Hatched rows: at the peak, r2c's nearest stage is more than 5 % away in control value, so the two are different states.</p>
 <div class="legend">${bins.map((b,i)=>`<span><span class="sw" style="background:var(--s${i+1})"></span>${b[1]} %</span>`).join("")}
 <span><span class="sw" style="background:var(--surface);border:1px solid var(--border)"></span>chart all zero</span></div>`;
 let hm = `<svg width="${lw + views.length*cs + 4}" height="${th + cases.length*cs + 4}" role="img" aria-label="heatmap of detail-view differences">
@@ -403,7 +437,7 @@ cases.forEach((c, i) => {
   let fill, tip;
   if (r.missing) { fill = "var(--surface)"; tip = `${c.name} · ${v}\nmissing in r2c`; }
   else if (r.ref_max === 0) { fill = "var(--surface)"; tip = `${c.name} · ${v}\nchart all zero in Response`; }
-  else { fill = `var(--s${binOf(r.pct)+1})`; tip = `${c.name} · ${v}\n${f(r.pct,1)} % (${f(r.diff,3)} of ${f(r.ref_max,3)})${far?`\nstages differ by ${f(c.views_gap_pct,0)} % in control value`:""}`; }
+  else { fill = `var(--s${binOf(r.pct)+1})`; tip = `${c.name} · ${v}\n${f(r.pct,1)} % (${f(r.diff,3)} of ${f(r.ref_max,3)})${r.stage!=null?`\nworst at Response's stage ${r.stage}${r.feature?" ("+r.feature+")":""}`:""}${far?`\nstages differ by ${f(c.views_gap_pct,0)} % in control value`:""}`; }
   hm += `<rect x="${x+1}" y="${y+1}" width="${cs-2}" height="${cs-2}" rx="2" fill="${fill}" stroke="${fill==="var(--surface)"?"var(--border)":"none"}" data-tip="${esc(tip)}"/>`;
   if (r.missing) hm += `<text x="${x+cs/2}" y="${y+11}" text-anchor="middle">×</text>`;
   if (far && !r.missing) hm += `<rect x="${x+1}" y="${y+1}" width="${cs-2}" height="${cs-2}" fill="url(#hatch)" opacity="0.6" pointer-events="none"/>`;
@@ -440,7 +474,7 @@ for (const g of ["flexure","shear"]) for (const c of by(g)) {
  const k = c.curve;
  const note = !k.sub ? `<div class="m">No r2c record for this case in the curves folder: Response only.</div>`
   : k.other_run ? `<div class="m">r2c curve from run ${esc(k.other_run)}, metrics from ${esc(c.run)}.</div>` : "";
- H += `<div class="panel"><h3>${esc(c.name)}</h3><div class="m">${esc(c.section)} · ${esc(c.loading)}${c.variants.length?" · "+esc(c.variants.join(", ")):""} · ${esc(k.y)}<br>peak ${sg(c.peak_pct)} % · curve ${f(c.curve_pct)} %</div>${plot(c)}${note}</div>`;
+ H += `<div class="panel"><h3>${esc(c.label)}</h3><div class="m">${esc(c.name)} · ${esc(k.y)}<br>peak ${sg(c.peak_pct)} % · rising ${f(c.curve_pct)} % · post-peak ${f(c.post_pct)} %${c.shape && !sameShape(c) ? `<br>shape differs: Response ${esc(c.shape[0].join(", "))}; r2c ${esc(c.shape[1].join(", "))}` : ""}</div>${plot(c)}${note}</div>`;
 }
 H += `</div><p class="note">Generated by tools/dashboard.py. Every number comes from the run named at the top; interpretation is in docs/verification.md.</p>`;
 $("#root").innerHTML = H;
