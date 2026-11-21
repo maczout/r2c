@@ -224,7 +224,7 @@ class Shear(Flexure):
         ks = np.zeros(n_)
         a_n = np.zeros(n_)
         a_s = np.zeros(n_)
-        for st, rho, fac in an.stirrups_at(zf):
+        for st, rho, fac in an.stirrups_at(zf, an.node_width(z)):
             if not rho.any():
                 continue
             ks += rho * fac * st.steel.tangent(ey * fac + st.prestrain) * st.steel.phi
@@ -254,7 +254,7 @@ class Shear(Flexure):
         t = self.tangent(e0, phi, gam)
         z, b = t["z"], t["b"]
         y = z - sec.zaxial
-        s = np.interp(z, an.shape_z, an.shape)
+        s = np.interp(an.profile_z(z), an.shape_z, an.shape)
         dz = (z[:, 0] - z[:, 2])[:, None]
         w = np.array([1.0, 4.0, 1.0]) / 6.0
 
@@ -343,7 +343,7 @@ class Shear(Flexure):
         dif = float(np.sum((np.abs(tau - vstate) * bb) @ wts * dzl))
         err = dif / tot if tot > 1e-9 else 0.0
         # onto the profile's own grid, bottom up
-        zf = z.ravel()[::-1]
+        zf = an.profile_z(z).ravel()[::-1]
         gf = gnew.ravel()[::-1]
         zz, ii = np.unique(zf, return_index=True)
         prof = np.interp(an.shape_z, zz, gf[ii])

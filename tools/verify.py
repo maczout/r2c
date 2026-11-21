@@ -1,14 +1,18 @@
 #!/usr/bin/env python3
 """Run r2c on every case of a set of reference records and compare.
 
-    python tools/verify.py REFERENCE_DIR --inputs DIR [--out DIR] [--only NAME ...] [--jobs N]
+    python tools/verify.py REFERENCE_DIR --inputs DIR [DIR ...] [--out DIR] [--only NAME ...]
+                           [--jobs N]
 
 REFERENCE_DIR holds r2x-raw records (NAME.r2x.txt), normally captured from Response-2000 with
 r2x. Each record's header says how it was made (input, units, factors, loads, More Detail);
 r2c is run the same way and the two records are compared with tools/compare.py.
 
---inputs is where the input files named in the headers are found (for example Response's own
-folder, for its sample files). "File > New" and Newbeam's input.r2t need no file: r2c has that
+--inputs is where the input files named in the headers are found: Response's own folder for
+its sample files, and r2x's tests/reference for the Quick Define sections. A file is taken by
+its name if it is directly in one of the folders, and otherwise by the SHA-256 the header
+records, anywhere under them (the Quick Define inputs are all called hand.r2t in r2x and were
+captured under other names). "File > New" and Newbeam's input.r2t need no file: r2c has that
 section built in.
 
 Results: OUT/NAME.r2x.txt (r2c's record), OUT/NAME.json (the comparison), OUT/summary.md,
@@ -23,6 +27,7 @@ from __future__ import annotations
 
 import argparse
 import datetime as dt
+import hashlib
 import json
 import os
 import platform
@@ -56,6 +61,21 @@ def options(header: dict) -> dict:
     )
 
 
+def find_input(name: str, digest: str | None, folders) -> Path | None:
+    """The input a record names: by name directly in a folder, else by SHA-256 under one."""
+    for d in folders or []:
+        p = Path(d) / name
+        if p.is_file():
+            return p
+    if digest:
+        for d in folders or []:
+            for p in sorted(Path(d).rglob("*")):
+                if p.is_file() and p.suffix.lower() in (".rsp", ".r2t") and \
+                        hashlib.sha256(p.read_bytes()).hexdigest() == digest:
+                    return p
+    return None
+
+
 def one(args):
     ref_path, inputs, out = args
     name = Path(ref_path).name[: -len(".r2x.txt")]
@@ -64,8 +84,8 @@ def one(args):
     src = ref.header["input-name"]
     path = None
     if src.lower() not in BUILT_IN:
-        path = Path(inputs) / src if inputs else None
-        if path is None or not path.exists():
+        path = find_input(src, ref.header.get("input-sha256"), inputs)
+        if path is None:
             return name, {"skipped": f"input {src} not found"}
     t = time.time()
     try:
@@ -138,7 +158,8 @@ def run_info(a, names) -> dict:
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     ap.add_argument("reference_dir")
-    ap.add_argument("--inputs", help="folder with the input files named in the records")
+    ap.add_argument("--inputs", nargs="+",
+                    help="folders with the input files named in the records")
     ap.add_argument("--out", default="verify-out")
     ap.add_argument("--only", nargs="*", help="case names to run (default: all)")
     ap.add_argument("--jobs", type=int, default=1)
