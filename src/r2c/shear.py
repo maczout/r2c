@@ -605,8 +605,12 @@ class Shear(Flexure):
             self.mode = mode
 
     def relax(self, passes: int) -> float:
-        """The share of the updated profile taken: all of it, the update being Response's,
-        which is damped in itself."""
+        """The share of the updated profile taken: all of it (the update is Response's, which
+        is damped in itself). Under shear alone, half of it in the second half of the passes
+        [O, r2c's own: without it the stage past the peak does not settle, where Response's
+        does; with it everywhere, r2c settles where Response's stages stand still]."""
+        if self.mode0 == "gam" and passes >= self.passes // 2:
+            return 0.5
         return 1.0
 
     # -- Response's load stage control [B; docs/kernel.md "Response's own load stage control"] ---
