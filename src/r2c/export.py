@@ -59,8 +59,10 @@ def _nz(x: float) -> float:
     return -0.0 if x == 0.0 else x
 
 
-def control(key: str, stages: list[Stage], u: Units, gam_avg=None) -> bytes:
-    ex = [s.e0 * 1e3 for s in stages]
+def control(key: str, stages: list[Stage], u: Units, gam_avg=None, axis: float = 0.0) -> bytes:
+    """A control chart. axis: the height of the moment axis above the centroid; Response's
+    axial strain is the strain there (measured: newbeam-axialloc-nm)."""
+    ex = [(s.e0 - s.phi * axis) * 1e3 for s in stages]
     if key == "moment_ex":
         return chart("Control : Moment - |e_x", f"Axial Strain ({u.l_strain})", f"Moment ({u.l_moment})",
                      [(0, [(x, _nz(s.m / u.moment)) for x, s in zip(ex, stages)])], 3)
@@ -120,8 +122,8 @@ class Views:
         sec, u = self.sec, self.u
         d = st.detail
         o = d.out
-        y = (d.z - sec.zc) / u.length
-        ytop, ybot = (sec.ztop - sec.zc) / u.length, (sec.zbot - sec.zc) / u.length
+        y = (d.z - sec.zaxial) / u.length
+        ytop, ybot = (sec.ztop - sec.zaxial) / u.length, (sec.zbot - sec.zaxial) / u.length
         depth = f"Beam Depth ({u.l_len})"
         cs, ss, ln = u.conc_stress, u.steel_stress, u.length
 
@@ -133,8 +135,8 @@ class Views:
             order = sorted(range(len(sec.layers)), key=lambda i: sec.layers[i].z)
             for i in order:
                 l = sec.layers[i]
-                lo = (l.z - l.db / 2 - sec.zc) / u.length
-                hi = (l.z + l.db / 2 - sec.zc) / u.length
+                lo = (l.z - l.db / 2 - sec.zaxial) / u.length
+                hi = (l.z + l.db / 2 - sec.zaxial) / u.length
                 v = vals[i]
                 v = 0.0 if (isinstance(v, float) and math.isnan(v)) else v
                 out += [(0.0, lo), (v, lo), (v, hi), (0.0, hi)]
@@ -218,9 +220,10 @@ class Views:
                                   [(0, list(zip(vals, yy)))], 4)
             elif key == "shrinkage_thermal_strain":
                 yy = np.linspace(ybot, ytop, 101)
-                r = [(0.0, ybot)] + [(0.0, v) for v in yy] + [(0.0, ytop)]
+                sh = sec.shrinkage(yy * u.length + sec.zaxial) * 1e3
+                r = [(0.0, ybot)] + list(zip(sh, yy)) + [(0.0, ytop)]
                 made[key] = chart("Shrinkage & Thermal Strain", f"strain ({u.l_strain})", depth,
-                                  [(0, r), (4, steps(np.zeros(len(sec.layers))))], 3)
+                                  [(0, r), (4, steps([l.thermal * 1e3 for l in sec.layers]))], 3)
             elif key == "longitudinal_concrete_stress":
                 made[key] = chart("Longitudinal Concrete Stress", f"Stress ({u.l_conc})", depth,
                                   [(0, rows(o.fcx / cs))], 3)

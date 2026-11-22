@@ -52,6 +52,27 @@ DEFINE_SLOW = {
     # of 0.4 rad/km, r2c's rises through it
     "igirder-m2v": (0.9, 5.0),
 }
+# The scope cases of increment S without shear (docs/scope.md). Their inputs are variants of
+# r2x's (tools/variants.py), found by name or SHA-256 under R2C_SCOPE_DIR; the two on Newbeam
+# itself need none.
+SCOPE = {
+    "newbeam-segsteel-m": (0.05, 0.1),
+    "newbeam-cmod0-m": (0.05, 0.1),
+    "newbeam-cmod3-m": (0.05, 0.1),
+    "newbeam-axialloc-nm": (0.05, 0.1),
+    "newbeam-shrink-m": (0.1, 0.8),
+    "newbeam-thermgrad-m": (0.05, 0.3),
+    "newbeam-bartherm-m": (0.05, 0.1),
+    "newbeam-usfile-si-m": (0.05, 0.1),
+    "newbeam-negelev-m": (0.05, 0.1),
+    "newbeam-bardep-m": (0.05, 0.1),
+    "newbeam-csafile-m": (0.05, 0.1),
+    "newbeam-csafile-none-m": (0.05, 0.1),
+}
+SCOPE_BUILT_IN = {
+    "newbeam-ntension-m": (0.05, 0.1),
+    "newbeam-m-mdmax": (0.05, 0.1),
+}
 SLOW = {
     "newbeam-mv": (0.6, 1.5),
     "newbeam-nmv": (0.6, 2.0),
@@ -115,6 +136,21 @@ def test_quick_define_sections(case, oracle_dir, define_dirs):
 @pytest.mark.parametrize("case", sorted(DEFINE_SLOW))
 def test_quick_define_shear(case, oracle_dir, define_dirs):
     _define(case, oracle_dir, define_dirs, DEFINE_SLOW[case])
+
+
+@pytest.mark.parametrize("case", sorted(SCOPE))
+def test_scope_cases(case, oracle_dir, scope_dirs):
+    ref = record.read(oracle_dir / f"{case}.r2x.txt")
+    path = verify.find_input(ref.header["input-name"], ref.header["input-sha256"], scope_dirs)
+    if path is None:
+        pytest.skip(f"{ref.header['input-name']} is not under R2C_SCOPE_DIR")
+    _check(ref, _solve(ref, path), *SCOPE[case])
+
+
+@pytest.mark.parametrize("case", sorted(SCOPE_BUILT_IN))
+def test_scope_cases_on_newbeam(case, oracle_dir):
+    ref = record.read(oracle_dir / f"{case}.r2x.txt")
+    _check(ref, _solve(ref), *SCOPE_BUILT_IN[case])
 
 
 def test_same_charts_as_the_oracle(oracle_dir):

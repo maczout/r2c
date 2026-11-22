@@ -35,6 +35,7 @@ class Layer:
     prestrain: float        # dep less thermal strain
     strand: bool
     rho: float = 0.0        # ratio used for the strain concentration at a crack
+    thermal: float = 0.0    # the layer's thermal strain (already taken off the prestrain)
 
 
 @dataclass
@@ -87,7 +88,8 @@ class Section:
         for l in inp.longs:
             st = steels[l.type.lower()]
             self.layers.append(Layer(l.name, l.z, l.area, max(l.num, 1.0), l.db, st,
-                                     l.dep - l.thermal, _is_strand(l.bartitle)))
+                                     l.dep - l.thermal, _is_strand(l.bartitle),
+                                     thermal=l.thermal))
         # steel ratio for the strain concentration at a crack: all the steel on the layer's
         # side of the centroid over 0.8 of the gross area
         above = sum(o.area for o in self.layers if o.z > self.zc) + \
@@ -112,7 +114,36 @@ class Section:
                                          _is_strand(t.bartitle), t.pattern, legs))
         self.smx_user = inp.smx
         self.smt_user = inp.smt
+        # shrinkage and thermal strain of the concrete: (elevation, strain) from the bottom up
+        self.shrink = sorted({(float(z), float(e)) for z, e in inp.shrink})
+        if not any(e for _, e in self.shrink):
+            self.shrink = []
         self._tables()
+
+    def shrinkage(self, z):
+        """The shrinkage or thermal strain of the concrete at heights z: the strain the
+        concrete would take up unrestrained, which carries no stress. A parabola through
+        the points given (the manual, 3-5: "Response-2000 parabolically interpolates between
+        these points"; Response's own Shrinkage & Thermal Strain chart shows it for three
+        points, measured); constant beyond the end points; straight between two points."""
+        z = np.asarray(z, dtype=float)
+        pts = self.shrink
+        if not pts:
+            return np.zeros_like(z)
+        zs = np.array([p[0] for p in pts])
+        es = np.array([p[1] for p in pts])
+        if len(pts) < 3:
+            return np.interp(z, zs, es)
+        zc = np.clip(z, zs[0], zs[-1])
+        # the three points nearest each height (all three when there are only three)
+        i = np.clip(np.searchsorted(zs, zc) - 1, 0, len(zs) - 3)
+        i = np.where((i + 3 <= len(zs) - 1) & (zc - zs[i + 1] > zs[np.minimum(i + 2, len(zs) - 1)] - zc),
+                     i + 1, i)
+        z0, z1, z2 = zs[i], zs[i + 1], zs[i + 2]
+        e0, e1, e2 = es[i], es[i + 1], es[i + 2]
+        return (e0 * (zc - z1) * (zc - z2) / ((z0 - z1) * (z0 - z2))
+                + e1 * (zc - z0) * (zc - z2) / ((z1 - z0) * (z1 - z2))
+                + e2 * (zc - z0) * (zc - z1) / ((z2 - z0) * (z2 - z1)))
 
     # -- geometry -------------------------------------------------------------------------------
     @staticmethod

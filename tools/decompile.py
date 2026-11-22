@@ -7,7 +7,9 @@ An argument d:ADDRESS prints the double stored at that address instead (a consta
 decompiler shows as DAT_...); s:HEX lists the functions with an instruction that uses that
 scalar (to find who writes a field at a known offset); r:ADDRESS lists the functions that
 refer to that address (who uses a constant); v:VALUE lists where a double of that value is
-stored and who refers to each place (to find the routine behind a constant seen in output).
+stored and who refers to each place (to find the routine behind a constant seen in output);
+a:ADDRESS lists the instructions of the function at that address (for what the decompiler
+hides, such as the arguments of an inlined pow).
 
 Needs, none of it in the repository:
 * Ghidra (12.x, headless) at $GHIDRA_HOME, with a JDK 21 on the path;
@@ -94,6 +96,21 @@ public class R2cDecompile extends GhidraScript {
                     while ((at = mem.findBytes(at, pat, null, true, monitor)) != null) {
                         out.println("// double " + args[i].substring(2) + " at " + at + ", referred to from: " + users(at));
                         at = at.add(1);
+                    }
+                    continue;
+                }
+                if (args[i].startsWith("a:")) {
+                    // the instructions of the function at this address (for what the decompiler
+                    // hides: the arguments of an inlined pow, say)
+                    Address d = currentProgram.getAddressFactory().getAddress(args[i].substring(2));
+                    Function g = getFunctionContaining(d);
+                    if (g == null) { out.println("// " + args[i] + ": no function here"); continue; }
+                    out.println("// ==== instructions of " + g.getEntryPoint());
+                    ghidra.program.model.listing.InstructionIterator it =
+                        currentProgram.getListing().getInstructions(g.getBody(), true);
+                    while (it.hasNext()) {
+                        ghidra.program.model.listing.Instruction ins = it.next();
+                        out.println(ins.getAddress() + "  " + ins);
                     }
                     continue;
                 }

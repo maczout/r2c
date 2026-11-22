@@ -68,7 +68,8 @@ class Result:
         detail = stage_spec.resolve(len(self.stages), self.peak)
         keys = export.control_keys(self.increment)
         sections = [(record.control_section(k),
-                     export.control(k, self.stages, self.units, self.gam_avg)) for k in keys]
+                     export.control(k, self.stages, self.units, self.gam_avg,
+                                    self.section.zaxial - self.section.zc)) for k in keys]
         charts = viewlib.record_order(views)
         builder = export.Views(self.section, self.units)
         wanted = set(detail)

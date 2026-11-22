@@ -99,6 +99,45 @@ that run with `tools/targets.py` (the checks and limits are the report's own):
     moment and shear together (8.7 %), the US file with shear (12.3 %, as the US case of the
     first set).
 
+## The scope cases after step 3 (fifth run of 2026-11-21)
+
+Step 3 of increment S built what the inventory listed as missing (`docs/kernel.md`:
+"Compression softening", the segmental steel curve, shrinkage and thermal strain, the state
+under the constant loads) and fixed two faults of r2c's own that the new cases showed (the
+first step in shear strain under a constant axial load; strains and depths about a given
+moment axis). Measured, fifth run of 2026-11-21, all 85 cases, with `tools/targets.py` and
+`tools/changes.py` against the baseline:
+
+- **No case fails or is refused.** The 14 that did in the baseline all run.
+- **The 32 earlier cases: no check changed sides**, views included.
+- **Of the 53 scope cases, 21 are inside on peak, rising branch and shape** (17 in the
+  baseline): the segmental steel curve (−5.73 % to −0.00 %), the bar's thermal strain,
+  compression with shear alone (rising 58 % to 4.7 %) and softening 1 came inside; the two
+  shrinkage cases were inside on the three before and now have the feature in (thermal
+  gradient: rising 1.30 % to 0.14 %).
+- **32 are outside, every one of them on the shape, at the end of the response**; none is
+  outside for its feature's rule. With the shape:
+  - 11 also on the peak (+5 to +22 %): softening 0, 3, 4, 5, 6 and 8, given crack spacings,
+    the prestrain on stirrups, tension stiffening 1 and 6, the T-beam. In each, r2c's curve
+    lies on Response's up to where Response's response ends, and r2c carries on to a higher
+    load; on the I-girder that is just after the web cracks.
+  - 5 on the rising branch (5 to 16 %): softening 7, 9 and 12, the US file with shear, and
+    axial load with moment and shear together (r2c stops short there: it steps in the axial
+    strain, which turns back).
+  - 16 on the shape alone: the last stage.
+
+**The features' rules, apart from how the response ends.** r2c was put in Response's own
+peak state of each feature case, with its history (`tools/diagnose.py states` on the
+captures of every stage). Measured: moment within 0.4 % in every case; shear within 1 % for
+softening 2, 6, 7, 9 to 15, tension stiffening 1, 2, 3, 4 and 6, the tension stiffening
+factor, given crack spacings, the prestrain on stirrups, no stirrups, interlocking hoops,
+the drape and the T-beam; within 3 % for softening 0, 1, 3, 5, whose peak in Response comes
+at the web's cracking. So the 32 are a matter of where and how the response ends: step 4.
+
+One view check went outside against the baseline, on a new case: Long. Average Bond at the
+last stage of newbeam-ncomp-v (4.5 to 6.8 %). Its stages are different ones since the first
+step was put right; the case came inside on the rising branch by the same change.
+
 ## Quick Define sections (third run of 2026-11-21)
 
 Seven cases on three sections made with Response's Quick Define (the owner's test-set

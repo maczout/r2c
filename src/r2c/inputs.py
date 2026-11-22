@@ -102,10 +102,8 @@ class SectionInput:
     axialloc: float = -1.0       # mm above the bottom where N acts; -1 = centroid
     concretes: list[Concrete] = field(default_factory=list)
     rebars: list[Rebar] = field(default_factory=list)
-    # outline: (elevation mm, width mm, concrete name, code) from the top down; code is '' or
-    # 'UP'/'DOWN' for an elliptical transition between its neighbours
+    # outline: (elevation mm, width mm, concrete name) from the top down, straight between rows
     outline: list[tuple[float, float, str]] = field(default_factory=list)
-    curves: list[tuple[int, str]] = field(default_factory=list)   # (index in outline after which, 'UP'|'DOWN')
     hollow: list[tuple[float, float, str]] = field(default_factory=list)
     longs: list[LongLayer] = field(default_factory=list)
     trans: list[TransLayer] = field(default_factory=list)
@@ -146,8 +144,14 @@ def _f(el, key, default):
 
 
 def _units_of(text: str | None) -> str:
-    return {"metric": "si", "us": "us", "oldmetric": "kgcm", None: "si"}.get(
-        text.lower() if text else None, "si")
+    known = {"metric": "si", "us": "us", "oldmetric": "kgcm"}
+    if not text:
+        return "si"
+    if text.lower() not in known:
+        # the schema also lists "roman"; Response reads such a file in a unit system its own
+        # Preferences do not offer (docs/scope.md 1.1)
+        raise InputError(f"units={text!r}: the units of an input are metric, US or oldmetric")
+    return known[text.lower()]
 
 
 def default_section() -> SectionInput:
@@ -230,6 +234,12 @@ def parse(data: bytes) -> SectionInput:
         c.c_mod = int(_f(el, "c_mod", 2))
         c.c_soft = int(_f(el, "c_soft", 18))
         c.t_stiff = int(_f(el, "t_stiff", 7))
+        if c.t_stiff == 5:
+            raise InputError("tension stiffening model 5 (Stuart Oliver) is not supported: "
+                             "Response-2000 refuses the file too")
+        if not 0 <= c.t_stiff <= 7 or not 0 <= c.c_soft <= 18 or not 0 <= c.c_mod <= 4:
+            raise InputError(f"concrete {c.name!r}: c_mod={c.c_mod}, c_soft={c.c_soft}, "
+                             f"t_stiff={c.t_stiff} are not all models of Response-2000")
         nums = [float(x) for x in _NUM.findall(el.text or "")]
         c.segments = [(nums[i] * 1e-3, nums[i + 1] * u.conc_stress)
                       for i in range(0, len(nums) - 1, 2)]
@@ -261,12 +271,12 @@ def parse(data: bytes) -> SectionInput:
 
     solid = beam.find("sectionSOLID")
     if solid is not None and (solid.text or "").strip():
-        s.outline, s.curves = _outline(solid.text, u, s.concretes[0].name)
+        s.outline = _outline(solid.text, u, s.concretes[0].name)
     else:
         shape = beam.find("shapesection")
         if shape is None:
             raise InputError("the section has no concrete outline (<sectionSOLID>)")
-        s.outline, s.curves = _shape(shape, u, s.concretes[0].name)
+        s.outline = _shape(shape, u, s.concretes[0].name)
     hollow = beam.find("sectionHOLLOW")
     if hollow is not None and (hollow.text or "").strip():
         raise OutOfScope("hollow sections (<sectionHOLLOW>) are not implemented")
@@ -345,49 +355,58 @@ def parse(data: bytes) -> SectionInput:
     return s
 
 
+CURVED = ("curved outline rows (UP, DOWN) cannot be in an input file: Response-2000's reader "
+          "rejects them. Give the curve as straight rows, as Response saves a circle")
+
+
 def _outline(text: str, u: Units, first: str):
     rows: list[tuple[float, float, str]] = []
-    curves: list[tuple[int, str]] = []
     for line in text.splitlines():
         toks = [t for t in _TOKEN.findall(line)]
         if not toks:
             continue
-        if toks[0].upper() in ("UP", "DOWN") and len(toks) == 1:
-            curves.append((len(rows) - 1, toks[0].upper()))
-            continue
+        # UP and DOWN mark a curved segment in shape.dat and in Response's outline dialog,
+        # which turn it into straight rows; a file has the rows (docs/scope.md 1.4)
+        if any(t.upper() in ("UP", "DOWN") for t in toks[:2]):
+            raise InputError(CURVED)
         try:
-            elev, width = float(toks[0]), toks[1]
+            elev, width = float(toks[0]), float(toks[1])
         except (ValueError, IndexError):
             raise InputError(f"section outline line {line.strip()!r}") from None
         name = toks[2].strip('"') if len(toks) > 2 else ""
-        if width.upper() in ("UP", "DOWN"):
-            raise OutOfScope("elliptical outline rows given as a width are not read")
-        rows.append((elev * u.length, float(width) * u.length, name))
+        rows.append((elev * u.length, width * u.length, name))
     if len(rows) < 2:
         raise InputError("the section outline needs at least two rows")
     # Response lists rows from the top down; a row's concrete type applies upwards from it.
     rows.sort(key=lambda r: -r[0])
-    out = []
-    for elev, width, name in rows:
-        out.append((elev, width, name or first))
-    return out, curves
+    return [(elev, width, name or first) for elev, width, name in rows]
 
 
 def _shape(el, u: Units, first: str):
+    """The outline of a shape given without one. Response-2000 itself opens such a file
+    with no concrete and cannot solve it (docs/scope.md 1.4), so this is not compared; the
+    rows are those Response writes when the shape is defined in it."""
     name = (el.get("name") or "").upper()
     p = [_f(el, f"par{i}", 0.0) * u.length for i in range(1, 7)]
     if name == "RECT":
         b, h = p[0], p[1]
-        return [(h, b, first), (0.0, b, first)], []
+        return [(h, b, first), (0.0, b, first)]
     if name == "TBEAM":
         btop, h, bweb, ttop = p[:4]
         return [(h, btop, first), (h - ttop, btop, first), (h - ttop, bweb, first),
-                (0.0, bweb, first)], []
+                (0.0, bweb, first)]
     if name == "IBEAM":
         btop, h, bweb, ttop, tbot, bbot = p
         return [(h, btop, first), (h - ttop, btop, first), (h - ttop, bweb, first),
-                (tbot, bweb, first), (tbot, bbot, first), (0.0, bbot, first)], []
+                (tbot, bweb, first), (tbot, bbot, first), (0.0, bbot, first)]
     if name == "CIRCLE":
+        # as Response writes a circle: 13 rows, every 15 degrees, 0.1 mm wide at the poles
         d = p[0]
-        return [(d, 0.0, first), (d * 0.5, d, first), (0.0, 0.0, first)], [(0, "UP"), (1, "DOWN")]
-    raise OutOfScope(f"shape {name!r} without an explicit outline is not read")
+        rows = []
+        for i in range(13):
+            a = math.radians(15.0 * i)
+            w = d * math.sin(a)
+            rows.append((0.5 * d * (1.0 + math.cos(a)), w if 0 < i < 12 else 0.1, first))
+        return rows
+    raise InputError(f"shape {name!r} has no outline in the file, and is not one of RECT, "
+                     "TBEAM, IBEAM, CIRCLE")
