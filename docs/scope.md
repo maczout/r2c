@@ -26,8 +26,8 @@ exercise which feature is from `tools/scope.py` (it reads the fixtures' inputs).
 | Status | Meaning |
 |---|---|
 | **compared** | r2c implements it and an oracle case has it (the fixture is named) |
-| **not compared** | r2c implements it; no oracle case has it yet (the new case is named) |
-| **missing** | r2x solves it; r2c refuses it, or reads it and ignores it (the new case is named) |
+| **not compared** | r2c implements it; no oracle case has it |
+| **missing** | r2x solves it; r2c refuses it, or reads it and ignores it (its oracle case is named) |
 | **by design** | out of scope by the owner's decision: hollow sections, long-term effects, strain discontinuity, the old text format |
 
 and two that the measurements made necessary (the developer's addition; reading, for the
@@ -38,10 +38,11 @@ owner to confirm):
 | **no effect** | Response accepts it and no chart changes: it does not reach the analysis |
 | **not solvable** | r2x cannot solve it: Response rejects the input or fails on it, or r2x's own checks stop the solve. There is nothing to compare with |
 
-"New case" names are the fixtures step 2 of the increment adds. The cases come in two
-groups: **A**, those that exercise a kernel path no present case reaches, and **B**,
-combinations of paths that are each reached already. The brief asks for A first when there
-are more than 15.
+Case names in bold are the 53 fixtures step 2 of increment S added (2026-11-21; listed by
+`tools/scope_cases.py --list`). They come in two groups: **A**, those that exercise a kernel
+path no earlier case reaches, and **B**, combinations of paths that are each reached already.
+"Compared" says that an oracle case has the item and r2c is run against it; whether r2c is
+inside target on the case is in `docs/verification-results.md`, not here.
 
 ---
 
@@ -54,12 +55,12 @@ are more than 15.
 | Several sections in one file (the catalogue) | opens on the first | reads the first | compared | cm4-asis, liping-asis, marshall-*, se100-asis |
 | Title, analysis by, date (`name`, `doneby`, `date`) | text only | title read | no effect | |
 | Units of the file: SI (`units="metric"`) | | reads | compared | every fixture |
-| Units of the file: US (`units="US"`) | reads; solves (probe newbeam-usfile) | reads | not compared | **newbeam-usfile-mv** (A, the brief's), **newbeam-usfile-si-m** (B: `--units si` over a US file) |
-| Units of the file: kg-cm (`units="oldmetric"`) | reads; solves (probe newbeam-kgcmfile) | reads | not compared | **newbeam-kgcmfile-mv** (A, the brief's) |
+| Units of the file: US (`units="US"`) | reads; solves (probe newbeam-usfile) | reads | compared since 2026-11-21 | **newbeam-usfile-mv** (A, the brief's), **newbeam-usfile-si-m** (B: `--units si` over a US file) |
+| Units of the file: kg-cm (`units="oldmetric"`) | reads; solves (probe newbeam-kgcmfile) | reads | compared since 2026-11-21 | **newbeam-kgcmfile-mv** (A, the brief's) |
 | Units of the file: `roman` (in the schema only) | reads it in a fourth unit system that its Preferences do not offer; r2x records the solve as kg-cm (probe newbeam-roman) | reads it as SI | not solvable (r2x cannot name the units; see open questions) | |
-| Crack spacing given (`smx`, `smt`) | solves; peak +3 % on Newbeam, M + V (probe newbeam-smx) | uses them | not compared | **newbeam-smx-mv** (A) |
+| Crack spacing given (`smx`, `smt`) | solves; peak +3 % on Newbeam, M + V (probe newbeam-smx) | uses them | compared since 2026-11-21 | **newbeam-smx-mv** (A) |
 | Crack spacing automatic | | implemented | compared | every fixture |
-| Moment axis given (`axialloc`) | solves; peak +21 % under N = −1000 kN (probe newbeam-axialloc) | uses it | not compared | **newbeam-axialloc-nm** (A) |
+| Moment axis given (`axialloc`) | solves; peak +21 % under N = −1000 kN (probe newbeam-axialloc) | uses it | compared since 2026-11-21 | **newbeam-axialloc-nm** (A) |
 | Moment axis at the centroid | | implemented | compared | every fixture with axial load |
 | The old text format (Ver_0.8) | | refuses | by design | |
 
@@ -70,20 +71,20 @@ are more than 15.
 | Strength `fcp`; aggregate size `maxagg`; its reduction above 60 MPa | | implemented | compared | all; 10 mm in cm4-asis; 60 MPa igirder-*, 66 MPa cm4-asis |
 | Tensile strength automatic / given (`ft`) | | implemented | compared | all / cm4-asis |
 | Strain at peak stress automatic / given (`e0`) | | implemented | compared | all / liping-asis |
-| Tension stiffening factor (`tsfactor`) | solves; peak −4 % (probe newbeam-tsfactor) | implemented | not compared | **newbeam-tsfactor-mv** (A) |
+| Tension stiffening factor (`tsfactor`) | solves; peak −4 % (probe newbeam-tsfactor) | implemented | compared since 2026-11-21 | **newbeam-tsfactor-mv** (A) |
 | Several concrete types, by region of the outline | | implemented | compared | cm4-asis (two types) |
 | Base curve 2, Popovics/Thorenfeldt/Collins (default) | | implemented | compared | all but two |
-| Base curve 0, linear | solves (probe newbeam-cmod0) | implemented | not compared | **newbeam-cmod0-m** (A) |
+| Base curve 0, linear | solves (probe newbeam-cmod0) | implemented | compared since 2026-11-21 | **newbeam-cmod0-m** (A) |
 | Base curve 1, parabolic | solves | implemented | compared | se100-asis |
-| Base curve 3, elasto-plastic | solves (probe newbeam-cmod3) | implemented | not compared | **newbeam-cmod3-m** (A) |
+| Base curve 3, elasto-plastic | solves (probe newbeam-cmod3) | implemented | compared since 2026-11-21 | **newbeam-cmod3-m** (A) |
 | Base curve 4, segmental, with its curve | solves | implemented | compared | cm4-asis |
 | Compression softening 18, Collins-Bentz 2011 (default) | | implemented | compared | every shear case |
-| Compression softening 0, none | solves | implemented | not compared (cm4-asis has it, but without shear nothing softens) | **igirder-csoft0-m2v** (A) |
-| Compression softening 2 (Vecchio-Collins 1986), 6 (Mehlhorn et al), 7 (Maekawa et al), 10 (CAN CSA A23.3 M84), 13 (Porasz-Collins 1988) | solves each (probes igirder-csoft2, 6, 7, 10, 13) | has a formula under each number; none has a source in `docs/kernel.md` | not compared | **igirder-csoft2-m2v, -csoft6-, -csoft7-, -csoft10-, -csoft13-** (A) |
+| Compression softening 0, none | solves | implemented | compared since 2026-11-21 (cm4-asis has it too, but without shear nothing softens) | **igirder-csoft0-m2v** (A) |
+| Compression softening 2 (Vecchio-Collins 1986), 6 (Mehlhorn et al), 7 (Maekawa et al), 10 (CAN CSA A23.3 M84), 13 (Porasz-Collins 1988) | solves each (probes igirder-csoft2, 6, 7, 10, 13) | has a formula under each number; none has a source in `docs/kernel.md` | compared since 2026-11-21 | **igirder-csoft2-m2v, -csoft6-, -csoft7-, -csoft10-, -csoft13-** (A) |
 | Compression softening 1 (Vecchio-Collins 1982), 3 (Vecchio-Collins 1992-A), 5 (1992-B), 8 (Noguchi et al), 9 (Belarbi-Hsu proportional), 11 (Collins 1978), 12 (Kaufmann-Marti 1998), 14 (Zhang-Hsu 1998 with eta), 15 (Hsu 1993), 16 (Zhu-Hsu-Lee 2001), 17 (Zhang-Hsu 1998, no eta) | solves each on the I-girder (probes igirder-csoft1 … 17; 9 and 11 at M/V = 1 m, since r2x's own check stops them at 2 m). On Newbeam, 1 ends in Response's "No closure on shear distribution" | refuses each | missing | **igirder-csoft1-m2v, -csoft3-, -csoft5-, -csoft8-, -csoft12-, -csoft14-, -csoft15-, -csoft16-, -csoft17-m2v; igirder-csoft9-mv, -csoft11-mv** (A) |
 | Compression softening 4 (no name in the dialogs; printed as "Unsupported Method") | solves, with a result of its own (probe igirder-csoft4) | refuses | missing | **igirder-csoft4-m2v** (A) |
 | Tension stiffening 7, Bentz 1999 (default) | | implemented | compared | all |
-| Tension stiffening 1 (Vecchio-Collins 1982), 2 (Collins-Mitchell 1987), 3 (Izumo et al), 4 (Tamai et al), 6 (elasto-plastic) | solves each; peaks −4 to +9 % (probes newbeam-tstiff1 … 6) | implemented | not compared | **newbeam-tstiff1-mv, -tstiff2-, -tstiff3-, -tstiff4-, -tstiff6-mv** (A) |
+| Tension stiffening 1 (Vecchio-Collins 1982), 2 (Collins-Mitchell 1987), 3 (Izumo et al), 4 (Tamai et al), 6 (elasto-plastic) | solves each; peaks −4 to +9 % (probes newbeam-tstiff1 … 6) | implemented | compared since 2026-11-21 | **newbeam-tstiff1-mv, -tstiff2-, -tstiff3-, -tstiff4-, -tstiff6-mv** (A) |
 | Tension stiffening 0, none | Response asks "Do you wish to leave tension off?" before solving; r2x stops at the question (probe newbeam-tstiff0) | implemented | not solvable | |
 | Tension stiffening 5 (Stuart Oliver) | Response refuses the file: "Stuart Oliver Model Unsupported" (probe newbeam-tstiff5) | reads it as the default | not solvable | |
 
@@ -107,7 +108,7 @@ peak by less than 0.3 % (probes newbeam-csoft0 … 17), on the I-girder by −9 
 |---|---|---|---|---|
 | Rows of elevation and width; a step in width; a tapering width; a concrete type per region | | implemented | compared | rectangle: Newbeam and others; step: tbeam-*, igirder-*, cm4-asis; taper: column-*, liping-asis, cm4-asis |
 | A circle, as Response writes one: 13 straight rows | analyses the polygon | implemented | compared | column-* |
-| Elevations below zero | shifts the section to start at zero; same charts but one rounding (probe newbeam-negelev) | implemented | not compared | **newbeam-negelev-m** (B) |
+| Elevations below zero | shifts the section to start at zero; same charts but one rounding (probe newbeam-negelev) | implemented | compared since 2026-11-21 | **newbeam-negelev-m** (B) |
 | Curved rows: a lone `UP` or `DOWN` line, or a width of `UP` or `DOWN` | rejects the file: "Error in Quotes!" (probes column-curved, column-curvedwidth). Curves exist in shape.dat and in the outline dialog only; Response turns them into straight rows there, and writes the rows | reads a lone line and ignores it; refuses a width | not solvable (see below) | |
 | A shape without an outline (`<shapesection>` alone: RECT, CIRCLE, TBEAM, IBEAM) | opens the file with an empty outline; the solve fails: "bad request" (probes newbeam-, tbeam-, column-nooutline) | builds the outline from the shape's dimensions | not solvable (see below) | |
 | A shape beside an outline | the outline is the section; the shape is a label | reads the outline | compared | all |
@@ -119,7 +120,7 @@ peak by less than 0.3 % (probes newbeam-csoft0 … 17), on the I-girder by −9 
 |---|---|---|---|---|
 | Layers of bars by title or by area; number, area, elevation | | implemented | compared | all; by area: cm4-asis, liping-asis |
 | Tendons with a prestrain (`dep`) | | implemented | compared | igirder-*, cm4-asis |
-| A prestrain on bars that are not prestressing steel | solves; peak +0.6 % (probe newbeam-bardep) | implemented (the tendons' path) | not compared | **newbeam-bardep-m** (B) |
+| A prestrain on bars that are not prestressing steel | solves; peak +0.6 % (probe newbeam-bardep) | implemented (the tendons' path) | compared since 2026-11-21 | **newbeam-bardep-m** (B) |
 | Draped tendons (`drape`) | solves; every chart changes, the peak by less than 0.1 % (probe igirder-drape) | reads it and ignores it | missing | **igirder-drape-m2v** (A) |
 | Circular pattern (`pattern="1"`, `nround`, `aligned`, `index`) | the layers are in the file one by one | reads the layers | compared | column-* |
 | Distributed pattern (`pattern="2"`, `index`) | no chart changes (probe newbeam-longpattern2) | reads the layers | no effect | |
@@ -130,12 +131,12 @@ peak by less than 0.3 % (probes newbeam-csoft0 … 17), on the I-girder by −9 
 | Item | What Response does (measured) | r2c | Status | Case |
 |---|---|---|---|---|
 | Area, spacing, top and bottom, by title or by area; several sets | | implemented | compared | all shear cases; cm4-asis, liping-asis |
-| None, with shear | solves; peak −38 % (probe newbeam-nostirrups) | implemented | not compared | **newbeam-nostirrups-mv** (A) |
+| None, with shear | solves; peak −38 % (probe newbeam-nostirrups) | implemented | compared since 2026-11-21 | **newbeam-nostirrups-mv** (A) |
 | Pattern 1 single leg, 2 open, 3 closed, 5 T-headed single leg | on Newbeam every chart is the same byte for byte whichever of these (and 6) the stirrup is given as (probes newbeam-pattern1, 2, 3, 6) | the area is the file's | compared | 1: liping-asis; 2: dmn1n-asis, igirder-*; 3: marshall-*, se100-asis, tbeam-*, cm4-asis; 5: every Newbeam case |
 | Pattern 4, hoop | | implemented | compared | column-* |
-| Pattern 6, interlocking hoops | on the circular column not what a hoop gives: peak +1.4 % (probe column-interlock) | treats it as stirrups with two legs | not compared | **column-interlock-mv** (A, the brief's) |
+| Pattern 6, interlocking hoops | on the circular column not what a hoop gives: peak +1.4 % (probe column-interlock) | treats it as stirrups with two legs | compared since 2026-11-21 | **column-interlock-mv** (A, the brief's) |
 | Pattern 7, horizontal tie | as a stirrup, but with no transverse bond (one chart differs, probe newbeam-pattern7) | treats it as a stirrup | compared | liping-asis (the ties there have no depth) |
-| Prestrain on stirrups (`dep`) | solves; peak +0.9 % (probe newbeam-stirrupdep) | implemented | not compared | **newbeam-stirrupdep-mv** (A) |
+| Prestrain on stirrups (`dep`) | solves; peak +0.9 % (probe newbeam-stirrupdep) | implemented | compared since 2026-11-21 | **newbeam-stirrupdep-mv** (A) |
 
 T-headed stirrups, in the brief's list of new cases, are compared already: Newbeam's own
 stirrup is the T-headed single leg (pattern 5; Response's Quick Define default), in all 18
@@ -147,8 +148,8 @@ Newbeam fixtures (reading, for the owner to confirm).
 |---|---|---|---|---|
 | Loads (`<sectloading>`) | used when no option overrides them (probe newbeam-loads) | implemented | compared | the as-is cases take their loads from the files (cm4-, dmn1n-, liping-, marshall-, se100-asis); verify passes them as options, as r2x records them |
 | Shrinkage and thermal strain of the concrete over the depth (`<shrinktherm>`) | solves; every chart changes (probes newbeam-shrink, newbeam-thermgrad) | reads it and ignores it | missing | **newbeam-shrink-m, newbeam-thermgrad-m** (A) |
-| Thermal strain of a bar layer (`<rebarthermx>`) | solves; peak −0.3 % (probe newbeam-bartherm) | implemented (taken off the prestrain) | not compared | **newbeam-bartherm-m** (A) |
-| Material factors in the file (`<analysisoptions phic, phis, phip>`) | used (probe newbeam-csafile) | implemented | not compared | **newbeam-csafile-m**, **newbeam-csafile-none-m** (`--factors none` over them) (B) |
+| Thermal strain of a bar layer (`<rebarthermx>`) | solves; peak −0.3 % (probe newbeam-bartherm) | implemented (taken off the prestrain) | compared since 2026-11-21 | **newbeam-bartherm-m** (A) |
+| Material factors in the file (`<analysisoptions phic, phis, phip>`) | used (probe newbeam-csafile) | implemented | compared since 2026-11-21 | **newbeam-csafile-m**, **newbeam-csafile-none-m** (`--factors none` over them) (B) |
 | Strain discontinuity (`<straindiscont>`) | | refuses | by design | |
 | Long-term effects (`<analysisoptions longterm, sustainM, sustainN, age>`) | | refuses | by design | |
 | `<analysisoptions clamp>` | dropped on saving; no chart changes (probe newbeam-clamp) | does not read it | no effect | |
@@ -172,10 +173,10 @@ Newbeam fixtures (reading, for the owner to confirm).
 | `--units si` | implemented | compared | most fixtures |
 | `--units us` over an SI file | implemented | compared | newbeam-us, newbeam-us-mv |
 | `--units kgcm` over an SI file | implemented | compared without shear (newbeam-kgcm); with shear through the kg-cm file | **newbeam-kgcmfile-mv** (A) |
-| `--units si` over a file in other units | implemented | not compared | **newbeam-usfile-si-m** (B) |
+| `--units si` over a file in other units | implemented | compared since 2026-11-21 | **newbeam-usfile-si-m** (B) |
 | `--factors none` | implemented | compared | most fixtures |
 | `--factors csa`, without shear | implemented | compared | newbeam-csa |
-| `--factors csa`, with shear | implemented | not compared | **newbeam-csa-mv** (A, the brief's) |
+| `--factors csa`, with shear | implemented | compared since 2026-11-21 | **newbeam-csa-mv** (A, the brief's) |
 | `--initial`, `--increment`: moment alone, either sign | implemented | compared | newbeam-m, newbeam-negm, tbeam-*, cm4-asis and others |
 | … axial load alone, either sign | implemented | compared | newbeam-nonly, column-nonly, marshall-nonly; newbeam-tension |
 | … constant compression, moment increasing | implemented | compared | newbeam-n2000-m, column-n4000-m |
@@ -184,16 +185,16 @@ Newbeam fixtures (reading, for the owner to confirm).
 | … shear alone | implemented | compared | newbeam-vonly |
 | … constant compression, moment and shear increasing | implemented | compared | newbeam-nmv, liping-asis |
 | … `0,0,0`: the initial load alone | implemented | compared | newbeam-zero |
-| … constant tension, moment increasing | implemented | not compared | **newbeam-ntension-m** (B) |
-| … constant compression, shear increasing alone | implemented | not compared | **newbeam-ncomp-v** (B) |
-| … constant shear, moment increasing | implemented | not compared | **newbeam-v0-m** (B) |
-| … a constant moment, moment and shear increasing | implemented | not compared | **newbeam-m0neg-mv** (B) |
-| … axial load, moment and shear increasing together | implemented | not compared | **newbeam-nmv-incr** (B) |
+| … constant tension, moment increasing | implemented | compared since 2026-11-21 | **newbeam-ntension-m** (B) |
+| … constant compression, shear increasing alone | implemented | compared since 2026-11-21 | **newbeam-ncomp-v** (B) |
+| … constant shear, moment increasing | implemented | compared since 2026-11-21 | **newbeam-v0-m** (B) |
+| … a constant moment, moment and shear increasing | implemented | compared since 2026-11-21 | **newbeam-m0neg-mv** (B) |
+| … axial load, moment and shear increasing together | implemented | compared since 2026-11-21 | **newbeam-nmv-incr** (B) |
 | … constant tension with moment and shear; a constant moment with shear alone; axial load and shear together | implemented | not solvable on Newbeam: r2x's own check stops the first two ("Response has more than the N stages on its control curves"), Response fails on the third ("No closure on shear distribution") (probes newbeam-loads-ntension-mv, -m0-v, -nv) | |
 | … a negative shear | refuses, as Response's dialog does | (Response's own rule: the manual, 3-5) | |
 | `--more-detail N`, without shear | implemented | compared | newbeam-m-md2 |
-| `--more-detail N`, with shear | implemented | not compared | **newbeam-mv-md2** (A, the brief's) |
-| `--more-detail max` | implemented | not compared | **newbeam-m-mdmax** (B) |
+| `--more-detail N`, with shear | implemented | compared since 2026-11-21 | **newbeam-mv-md2** (A, the brief's) |
+| `--more-detail max` | implemented | compared since 2026-11-21 | **newbeam-m-mdmax** (B) |
 | `--stage`, `--views` | implemented | compared: they choose what is written, not what is solved; every fixture is cut from a capture of every stage and all four views | all |
 | No input (File > New) | implemented | compared | newbeam-new |
 
@@ -201,8 +202,8 @@ Other sections under shear, from the brief's list:
 
 | Item | Status | Case |
 |---|---|---|
-| T-beam with moment and shear | not compared | **tbeam-m2v** (A, the brief's) |
-| I-girder at M/V = 1 m (the base of igirder-csoft9-mv and -csoft11-mv) | not compared | **igirder-mv** (B) |
+| T-beam with moment and shear | compared since 2026-11-21 | **tbeam-m2v** (A, the brief's) |
+| I-girder at M/V = 1 m (the base of igirder-csoft9-mv and -csoft11-mv) | compared since 2026-11-21 | **igirder-mv** (B) |
 
 ---
 
@@ -214,7 +215,7 @@ Judged against this inventory, the scope is complete when
    named compression softening models and number 4, the segmental steel curve, draped
    tendons, shrinkage and thermal strains of the concrete;
 2. every **missing** and **not compared** item has its case in `tests/oracle` and is
-   reported in `docs/verification-results.md`;
+   reported in `docs/verification-results.md` (done 2026-11-21: 53 cases);
 3. r2c refuses only what is **by design**, and treats as input errors the files Response
    itself rejects (see below).
 

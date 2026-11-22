@@ -30,14 +30,17 @@ there; inputs are found by SHA-256 and run under the fixture's input name, so po
 
 --add makes a new case, which has no fixture yet: INPUT is copied into the archive under its
 own name (give the file the name the case should record, e.g. a copy of hand.r2t called
-tbeam.r2t), every stage is captured with the settings the other fixtures use (SI, no factors,
-all views, More Detail 0) and the given loads (kN and kN.m; the = form, since a value may
-start with a minus sign), and the capture is cut
+tbeam.r2t), every stage and all views are captured with the given loads (in the units in
+effect; the = form, since a value may start with a minus sign) and, unless --units,
+--factors or --more-detail say otherwise, SI, no factors and More Detail 0, and the capture is cut
 to tests/oracle/NAME.r2x.txt: the control charts and the detail views of the feature stages of
 the curve (tools/compare.py, feature_stages), as tools/retrim.py cuts the others.
 
-Captures must run one at a time in the default Wine prefix, which this tool does. Each takes
-25 to 75 s, nearly all of it r2x reading the charts of every stage.
+Captures must run one at a time in one Wine prefix, which this tool does. Each takes 25 to
+75 s, nearly all of it r2x reading the charts of every stage. Several can run at once in
+prefixes of their own: give each run its own with --worker "python -m r2x.worker --prefix
+DIR" (tools/scope_cases.py does). The inputs of the cases added in increment S are derived
+by tools/variants.py; point --inputs at the folder it writes as well.
 
 Not run in the session that wrote it (no Response there): check with --dry-run first.
 """
@@ -115,18 +118,17 @@ def check(capture: Path, fixture: Path) -> dict:
             "header_differs": diff_header, "sections_differ": diff_sections}
 
 
-ADD_DEFAULTS = {"views": "general,cracking,reinforcement,no-shear", "units": "si",
-                "factors": "1.00,1.00,1.00", "more-detail": "0"}
+ADD_VIEWS = "general,cracking,reinforcement,no-shear"
+FACTORS = {"none": "1.00,1.00,1.00", "csa": "0.65,0.85,0.90"}
 
 
-def add(a, archive: Path, worker: list[str]) -> int:
+def add_case(archive: Path, worker: list[str], response_dir: str, fixtures: Path, name: str,
+             src: Path, initial: str, increment: str, units: str = "si",
+             factors: str = "none", more_detail: str = "0") -> int:
     """Capture a new case and cut its fixture."""
     import compare
 
-    name, src = a.add
-    initial, increment = a.initial, a.increment
-    src = Path(src)
-    fixture = Path(a.fixtures) / f"{name}.r2x.txt"
+    fixture = fixtures / f"{name}.r2x.txt"
     if fixture.exists():
         print(f"{name}: there is a fixture already; rebuild it without --add")
         return 1
@@ -135,16 +137,15 @@ def add(a, archive: Path, worker: list[str]) -> int:
     named.parent.mkdir(parents=True, exist_ok=True)
     shutil.copyfile(src, named)
     out = archive / f"{name}.r2x.txt"
-    h = dict(ADD_DEFAULTS, initial=initial, increment=increment)
-    cmd = command(h, named, out, worker, a.response_dir)
+    h = {"views": ADD_VIEWS, "units": units, "factors": FACTORS[factors],
+         "more-detail": more_detail, "initial": initial, "increment": increment}
+    cmd = command(h, named, out, worker, response_dir)
     print(f"{name}: capturing", flush=True)
     t = time.monotonic()
     proc = subprocess.run(cmd, capture_output=True, text=True)
     took = round(time.monotonic() - t, 1)
     entry = {"command": shlex.join(cmd), "made": dt.datetime.now().isoformat(timespec="seconds"),
              "seconds": took, "exit": proc.returncode}
-    mpath = archive / "manifest.json"
-    manifest = json.loads(mpath.read_text()) if mpath.exists() else {}
     ok = proc.returncode == 0 and out.exists()
     if not ok:
         entry["stderr"] = proc.stderr[-2000:]
@@ -159,9 +160,28 @@ def add(a, archive: Path, worker: list[str]) -> int:
         entry["check"] = check(out, fixture)
         print(f"{name}: {took} s, {rec.header.get('stage-count')} stages; fixture keeps "
               + ", ".join(f"{n} ({feats.get(n, 'peak')})" for n in keep))
-    manifest[name] = entry
-    mpath.write_text(json.dumps(manifest, indent=1))
+    # several captures may run at once, each in its own Wine prefix: one manifest entry a file
+    (archive / "manifest").mkdir(exist_ok=True)
+    (archive / "manifest" / f"{name}.json").write_text(json.dumps({name: entry}, indent=1))
     return 0 if ok else 1
+
+
+def add(a, archive: Path, worker: list[str]) -> int:
+    name, src = a.add
+    rc = add_case(archive, worker, a.response_dir, Path(a.fixtures), name, Path(src),
+                  a.initial, a.increment, a.units, a.factors, a.more_detail)
+    merge_manifest(archive)
+    return rc
+
+
+def merge_manifest(archive: Path):
+    """Fold the entries of ARCHIVE/manifest/ into ARCHIVE/manifest.json."""
+    mpath = archive / "manifest.json"
+    manifest = json.loads(mpath.read_text()) if mpath.exists() else {}
+    for p in sorted((archive / "manifest").glob("*.json")):
+        manifest.update(json.loads(p.read_text()))
+        p.unlink()
+    mpath.write_text(json.dumps(manifest, indent=1))
 
 
 def main(argv=None) -> int:
@@ -175,13 +195,19 @@ def main(argv=None) -> int:
     ap.add_argument("--from", dest="fixtures", default=str(ROOT / "tests" / "oracle"),
                     help="folder of fixtures to use as the recipe")
     ap.add_argument("--only", nargs="*", help="case names (default: every fixture)")
-    ap.add_argument("--worker", default="python -m r2x.worker",
+    ap.add_argument("--worker", default=f"{sys.executable} -m r2x.worker",
                     help="how to run r2x's worker (default: %(default)s)")
     ap.add_argument("--dry-run", action="store_true", help="print the commands only")
     ap.add_argument("--add", nargs=2, metavar=("NAME", "INPUT"),
                     help="capture a new case and cut its fixture")
     ap.add_argument("--initial", default="0,0,0", help="with --add: N,M,V at the start")
     ap.add_argument("--increment", default="0,1,0", help="with --add: the N,M,V increment")
+    ap.add_argument("--units", default="si", choices=("si", "us", "kgcm"),
+                    help="with --add: the units in effect (default: si)")
+    ap.add_argument("--factors", default="none", choices=("none", "csa"),
+                    help="with --add: the material factors (default: none)")
+    ap.add_argument("--more-detail", default="0",
+                    help="with --add: More Detail presses, or max (default: 0)")
     a = ap.parse_args(argv)
     if not a.response_dir and not a.dry_run:
         ap.error("--response-dir or $R2X_RESPONSE_DIR is required")
