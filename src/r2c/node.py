@@ -40,6 +40,7 @@ class NodeOut:
     floor: np.ndarray
     gov: np.ndarray          # what governs f1 (GOV_*): the shear flow's stiffness depends on it
     f1draw: np.ndarray = None    # the cracking stress as Response draws it: lowered by compression
+    ecr: np.ndarray = None       # the cracking strain before it is lowered by compression
 
 
 # what sets the principal tension at a node (Response's own codes, docs/kernel.md)
@@ -77,12 +78,17 @@ def evaluate(law: ConcreteLaw, ex, ey, gxy, m, ft_eff, smx, smy, f1cx, f1cy) -> 
 
     ecr = law.crack_strain(ft_eff)
     f1lim = np.maximum(law.ft, ft_eff) * phi
-    # Response lowers the cracking stress with the compression across it (docs/kernel.md,
-    # "Cracking under compression"). Here only the line drawn on the Principal Tensile Stress
-    # chart is lowered: the cracking strain and f1 are not.
+    # Response lowers the cracking strain and the cracking stress with the compression across
+    # the node (docs/kernel.md, "Cracking under compression"): the node cracks at the lowered
+    # strain, its crack width and floor are measured from it, and f1 is held under the
+    # lowered stress.
     red = np.clip(1.05 - f2 / (f2max - 1e-6), 0.05, 1.0)
     red = np.where(np.abs(e2) > abs(law.e0), 0.05, red)
-    f1draw = f1lim * red
+    ecr0 = ecr
+    ecr = ecr * red
+    f1lim = f1lim * red
+    f1 = np.minimum(f1, f1lim)
+    f1draw = f1lim.copy()
     cracked = e1 > ecr
     w = np.zeros_like(ex)
     sdiag = np.zeros_like(ex)
@@ -158,4 +164,4 @@ def evaluate(law: ConcreteLaw, ex, ey, gxy, m, ft_eff, smx, smy, f1cx, f1cy) -> 
     fcy = f1 - v * t
     f1crack = np.abs(vci) / t + f1
     return NodeOut(fcx, fcy, v, f1, f2, f2max, e1, e2, theta, w, sdiag, vci, vcimax, f1lim,
-                   cracked, f1crack, t, floor, gov, f1draw)
+                   cracked, f1crack, t, floor, gov, f1draw, ecr0)

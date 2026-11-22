@@ -93,26 +93,42 @@ class Analysis:
 
     # -- layers ---------------------------------------------------------------------------------
     def _initial_bounds(self) -> np.ndarray:
+        """The layers every stage starts from, as Response-2000 builds them (docs/kernel.md,
+        "Layers"): each stretch of the outline in equal layers, about seven to the depth of
+        the section, then a boundary at the upper and at the lower edge of every bar."""
         sec = self.sec
-        grid = [sec.zbot + sec.h * i / 14.0 for i in range(15)]
-        fixed = set(sec.breaks())
+        h = sec.h
+        bd: list[float] = []
+        for z1, z2, *_ in sec.segs:
+            n = int((z1 - z2) * 8.0 / (h + 0.1) + 0.99)
+            nl = max(n - 1, 1)
+            bd.extend(z1 - (z1 - z2) * i / nl for i in range(nl))
+        bd.append(sec.zbot)
+        bd = sorted(set(round(z, 9) for z in bd) | set(sec.breaks()), reverse=True)
+        sliver = h / 2048.0
+        near = 0.2          # mm
         for l in sec.layers:
-            for z in (l.z - l.db / 2.0, l.z + l.db / 2.0):
-                if sec.zbot + 1e-6 < z < sec.ztop - 1e-6:
-                    fixed.add(round(z, 9))
-        tol = sec.h / 56.0
-        pts = sorted(fixed)
-        # zone edges closer together than a sliver are merged
-        merged = []
-        for z in pts:
-            if merged and z - merged[-1] < sec.h / 400.0 and z not in sec.breaks():
-                continue
-            merged.append(z)
-        pts = merged
-        for g in grid:
-            if all(abs(g - z) > tol for z in pts):
-                pts.append(g)
-        return np.array(sorted(pts, reverse=True))
+            for second in (False, True):
+                for i in range(len(bd) - 1):
+                    lt, lb = bd[i], bd[i + 1]
+                    if not (abs(lt - l.z) < 1.0 or l.z <= lt):
+                        continue
+                    if second:
+                        if not lb < l.z:
+                            continue
+                    elif not (l.z < lt and (lb < l.z or abs(lb - l.z) < 0.1)):
+                        continue
+                    top = min(l.z + l.db / 2.0, lt)
+                    bot = max(l.z - l.db / 2.0, lb)
+                    if abs(top - lt) >= near:
+                        if top < lt and bot != lb and abs(lb - top) > sliver \
+                                and abs(lt - top) > sliver:
+                            bd.insert(i + 1, top)
+                    elif abs(bot - lb) >= near and bot > lb and abs(lb - bot) > sliver \
+                            and abs(lt - bot) > sliver:
+                        bd.insert(i + 1, bot)
+                    break
+        return np.array(bd)
 
     def _elastic_shape(self) -> np.ndarray:
         """Shear strain profile of the uncracked section (VQ/Ib), scaled to a mean of one."""
@@ -517,24 +533,30 @@ class Analysis:
         return n, m, v, (z, b, out, ex, g, smx, smt, es, fs, f1cx, eyn)
 
     def refine(self, e0, phi, gam):
-        """Dynamic layering: split every layer whose stresses are not interpolated well by a
-        parabola through its three nodes, or that the crack front passes through. Returns True
-        if any layer was split."""
+        """Dynamic layering, as Response-2000 does it (docs/kernel.md, "Layers"): each half of
+        a layer is checked at its middle against the parabola through the layer's three nodes,
+        and a layer with a half that fails is split in two; a half that passed is not looked
+        at again. The layers are built from the base layers each time, for this strain state
+        alone. Returns True if they are not the layers there were."""
         sec = self.sec
-        changed = False
+        before = self.bounds
+        self.bounds = self._initial_bounds()
         es, fs = self.steel(e0, phi)
         f1cx = self.crack_check(e0, phi, es, fs)
-        hmin = sec.h / 512.0
-        for _ in range(12):
+        hmin = sec.h / 1024.0
+        z, _b = self.layer_nodes()
+        out, *_ = self.eval_nodes(e0, phi, gam, z, f1cx)
+        tol1 = 0.002 * max(float(np.max(np.abs(out.f1))), 1e-6)
+        tol2 = 0.002 * max(float(np.max(np.abs(out.f2))), 1e-6)
+        done = np.zeros(len(z), dtype=bool)
+        for _ in range(16):
             z, _b = self.layer_nodes()
-            if len(z) >= self.max_layers:
+            if len(z) >= self.max_layers - 2 or done.all():
                 break
             out, *_ = self.eval_nodes(e0, phi, gam, z, f1cx)
             f1 = out.f1.reshape(z.shape)
             f2 = out.f2.reshape(z.shape)
-            cr = out.cracked.reshape(z.shape)
-            tol1 = 0.002 * max(float(np.max(np.abs(f1))), 1e-6)
-            tol2 = 0.002 * max(float(np.max(np.abs(f2))), 1e-6)
+            over = (out.e1 - out.ecr).reshape(z.shape)
             zq = np.stack([0.75 * z[:, 0] + 0.25 * z[:, 2], 0.25 * z[:, 0] + 0.75 * z[:, 2]],
                           axis=1)
             oq, *_ = self.eval_nodes(e0, phi, gam, zq, f1cx)
@@ -546,19 +568,35 @@ class Analysis:
                 a = 0.375 * f[:, 0] + 0.75 * f[:, 1] - 0.125 * f[:, 2]
                 c = -0.125 * f[:, 0] + 0.75 * f[:, 1] + 0.375 * f[:, 2]
                 return np.stack([a, c], axis=1)
-            bad = (np.abs(interp(f1) - q1) > tol1).any(axis=1)
-            bad |= (np.abs(interp(f2) - q2) > tol2).any(axis=1)
-            bad |= ~(cr.all(axis=1) | (~cr).all(axis=1))
-            thick = (z[:, 0] - z[:, 2]) > 2.0 * hmin
-            split = bad & thick
+            bad = np.abs(interp(f1) - q1) > tol1
+            bad |= np.abs(interp(f2) - q2) > tol2
+            # the crack front passes through the half
+            a, m, c = over[:, 0], over[:, 1], over[:, 2]
+            bad[:, 0] |= ((a < 0) & (m > 0)) | ((a > 0) & (m < 0))
+            bad[:, 1] |= ((m < 0) & (c > 0)) | ((m > 0) & (c < 0))
+            thick = 0.5 * (z[:, 0] - z[:, 2]) > hmin
+            bad &= (thick & ~done)[:, None]
+            split = bad.any(axis=1)
+            done |= ~split
             if not split.any():
                 break
-            room = self.max_layers - len(z)
+            room = self.max_layers - 2 - len(z)
             idx = np.nonzero(split)[0][:room]
-            self.bounds = np.array(sorted(set(self.bounds.tolist()) | set(z[idx, 1].tolist()),
-                                          reverse=True))
-            changed = True
-        return changed
+            keep = np.zeros(len(z), dtype=bool)
+            keep[idx] = True
+            bounds, flags = [], []
+            for i in range(len(z)):
+                bounds.append(z[i, 0])
+                if keep[i]:
+                    flags.append(not bad[i, 0])
+                    bounds.append(z[i, 1])
+                    flags.append(not bad[i, 1])
+                else:
+                    flags.append(bool(done[i]))
+            bounds.append(z[-1, 2])
+            self.bounds = np.array(bounds)
+            done = np.array(flags)
+        return len(before) != len(self.bounds) or not np.array_equal(before, self.bounds)
 
     def coarsen(self):
         """Start a stage from the base layers again (the crack front has moved on)."""
