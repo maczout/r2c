@@ -44,6 +44,18 @@ until phase B (validate and refine). Phase A is done when, on that set:
 - **Won't:** the endings of shear responses. They are recorded as known deviations in
   `docs/status.md`. For a shear case, "shape" leaves out how the response ends.
 
+**Bounds** (owner, 2026-11-22: "in case I am wrong and we are spinning tires"). The Musts
+may prove harder than they look. Each part of an increment aimed at a Must gets:
+
+- **Two approaches, at most.** Each is grounded in the thesis or the manual, or in a rule
+  read from the binary within the documented scope. If neither brings the check inside
+  target, stop that part. Don't try a third approach, and don't tune constants to fit.
+- **No regression.** Peak, rising branch and shape must not go outside on any phase A case,
+  and no Must view that is inside may go outside.
+- **On stopping,** record what was tried and what it moved in the log. Add a decision to
+  `docs/summary.md` with the options: accept the miss as a known deviation, move the view
+  down a tier, or a named third approach with its grounds. Carry on with the next part.
+
 The decisions behind these are D1 to D3 in `docs/summary.md`.
 
 ## What matters (owner, 2026-11-21)
@@ -101,7 +113,22 @@ post_peak_pct = 5.0
 [views]
 views_pct = 5.0
 views_exempt = []
+# owner, 2026-11-22 (D2): the tiers of the phase A exit criteria
+must = ["longitudinal_strain", "longitudinal_concrete_stress", "principal_compressive_stress",
+        "principal_tensile_stress", "principal_tensile_strain", "long_reinforcement_stress",
+        "long_reinf_stress_at_crack", "shrinkage_thermal_strain"]
+should = ["transverse_strain", "shear_strain", "shear_stress", "shear_on_crack",
+          "average_angle", "stirrup_stress", "stirrup_stress_at_crack",
+          "transverse_average_bond"]
+could = ["crack_widths", "long_crack_spacing", "transverse_crack_spacing",
+         "diagonal_spacing", "long_average_bond"]
 ```
+
+**View tiers** (owner, 2026-11-22). *Must:* the views of the stress state (`must` above), on
+cases without shear. *Should:* the views related to shear (`should`), and the stress-state
+views on shear cases. *Could:* the views related to cracking (`could`), on every case. Each
+tier is assessed against `views_pct` and counted separately. The longitudinal steel stress at
+a crack and the principal tensile strain and stress are in the Must by the owner's choice.
 
 ### Not yet measured
 
