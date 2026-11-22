@@ -1069,9 +1069,10 @@ class Flexure:
                 return x, True
 
     # which of Response's own solves are in use (docs/kernel.md, "The stage solve without
-    # shear"): under a stepped axial strain, and under a stepped curvature
+    # shear"): under a stepped axial strain (off: owner, D36), and under a stepped
+    # curvature (on: owner, D35)
     own_axial = False
-    own_curvature = False
+    own_curvature = True
 
     def response_solve(self) -> bool:
         return self.own_axial if self.mode == "e0" else self.own_curvature

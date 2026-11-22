@@ -490,10 +490,13 @@ the first control variable, to at most 327 stages. A response has at most 101 st
 
 How Response-2000 finds the state of a stage when there is no shear. Read for increment A3
 (`00425f10`, `0041e1e0`, `00425af0`, `004276a0`, `00416730`, `00433c50`, `00418af0`,
-`004a9030`). **Written in r2c and not in use**: each of the two solves brings the check it
-was read for inside target and moves another Must view outside, so r2c's own solve (the
-balanced state, to a root of the unbalanced force) is still the default
-(`docs/summary.md`, D35 and D36; `Flexure.own_curvature`, `Flexure.own_axial`).
+`004a9030`). **The secant, under a stepped curvature, is in use since increment A4**
+(owner, 2026-11-22, D35; `Flexure.own_curvature`): it brings M's last stage inside and
+leaves one point outside at the last stage of "constant N +200 kN, then M", a known
+deviation (`docs/status.md`). **The general solve, under a stepped axial strain, is written
+and not in use** (owner, 2026-11-22, D36: tension's shape is a known deviation for phase A;
+`Flexure.own_axial`); there r2c's own solve (the balanced state, to a root of the unbalanced
+force) is still what runs.
 
 *Which solve.* Under a stepped curvature, the secant below. Under a stepped axial strain
 Response sets its relaxation flag, and with that flag the stage goes to the general solve it
