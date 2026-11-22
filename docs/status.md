@@ -36,20 +36,26 @@ developer's. Items that need a structural judgement are marked **(structural)**.
   input feature), `variants.py` (inputs derived from present ones by stated text edits),
   `probe.py` (what Response does with an input, through r2x), `scope_cases.py` (the 53
   scope cases and their first capture), `targets.py` (which cases are inside on peak,
-  rising branch and shape), `check.py` (checks before pushing). `decompile.py` also lists
+  rising branch and shape; `--counts`: cases inside, check by check, which is the progress
+  table of the summary), `check.py` (checks before pushing). `decompile.py` also lists
   a routine's instructions (`a:ADDRESS`).
-- 85 oracle fixtures in `tests/oracle` (32, and the 53 scope cases of increment S since
-  2026-11-21), each with the detail views of the feature stages of
-  Response's curve (cracking, falls of load, peak, last stage); pytest tests on the first
-  32 and on the fourteen scope cases without shear (`R2C_SCOPE_DIR` for their inputs), and
-  on the reader and the material rules of increment S (fast set;
-  `-m slow` for seven shear cases; `R2C_RESPONSE_DIR` for Response's sample inputs,
-  `R2C_DEFINE_DIR` for the Quick Define inputs, which are r2x's:
-  `tests/reference/define`).
+- 85 oracle fixtures, each with the detail views of the feature stages of Response's curve
+  (cracking, falls of load, peak, last stage). **The phase A set, 17 of them, is in
+  `tests/oracle`**: Newbeam with only its loads varied (listed in `docs/summary.md`). **The
+  other 68 are parked in `tests/oracle/parked`** until phase B (owner, 2026-11-22: D16,
+  D19): kept, and not run by default. The folder is the set: verify, capture, retrim and
+  scope read one folder and not the folders under it, so `tests/oracle` gives phase A and
+  `tests/oracle/parked` the parked set, on request.
+- pytest: by default the reader and material rules, and the eight phase A cases without
+  shear; `-m "slow and not parked"` the nine with shear; `-m parked` the parked cases
+  (`R2C_RESPONSE_DIR` for Response's sample inputs, `R2C_DEFINE_DIR` for the Quick Define
+  inputs, which are r2x's `tests/reference/define`, `R2C_SCOPE_DIR` for the inputs of the
+  scope cases). Five parked fixtures need a removed feature and have no test.
 - Docs: `kernel.md` (each rule and its source), `verification.md` (what the results mean),
   `verification-results.md` (generated), `acceptance.md` (the owner's development targets),
-  `scope.md` (every input an r2x solve can take, and r2c's status on each; the checklist for
-  "scope complete"), `scope-probes.md` (generated: what Response does with each).
+  `scope.md` (every input an r2x solve can take, whether the manual documents it, and
+  r2c's status on each; the checklist for "scope complete"), `scope-probes.md` (generated:
+  what Response does with each).
 
 ## 2. Against Response-2000 1.9.7
 
@@ -58,12 +64,25 @@ The numbers are in `docs/verification-results.md`, what they mean in `docs/verif
 each case is assessed against the owner's development targets in `docs/acceptance.md`: ±5 %
 on every metric, the curve's shape the same, views at the features of the curve.
 
-Third run of 2026-11-21, the first 32 cases (the 25, and 7 on Quick Define sections: T-beam, circular
-column with hoops, I-girder with strands), cases outside by check: peak 0 of 32, rising 2,
-post-peak 10, shape 10, views 30. On the 25, no check changed sides against the second run
-(peak 0 of 25, rising 2, post-peak 6, shape 8, views 23). The seven new cases are all inside
-on peak and rising branch; the five without shear are inside on shape too
-(`docs/verification.md`, "Quick Define sections").
+**The phase A baseline** (run of 2026-11-22, the 17 cases, after the parking and the
+removals; measured, `python tools/targets.py VERIFY_OUT --counts`). Cases inside target:
+peak 17 of 17, rising branch 16, shape 13, post-peak 10, views 1. r2c's 17 records are byte
+for byte those of a run made before the removals on the same machine, so nothing moved.
+What is outside, and the views of the cases without shear, are in `docs/verification.md`,
+"Phase A baseline". The generated results now hold these 17 cases only.
+
+Outside on a Must (D1, D2), on the phase A set:
+
+- Rising branch: M/V = 0.5 m (6.1 %; known deviation 2 below).
+- Shape: V alone (Response has a fall of load before the peak, r2c none) and tension
+  (cracking and a fall of load at one step, read in a different order). M/V = 0.5 m and
+  2 m are outside only by how the response ends, which is a Won't; the measure still
+  counts it (D25).
+- Views of the stress state under moment and axial load: 7 of the 8 cases without shear
+  are outside; principal tensile stress in five, steel stress at a crack in two.
+
+**What follows describes all 85 cases as they stood in the sixth run of 2026-11-21**, the
+last that ran the parked cases. Peak and rising branch of the 17 have not moved since.
 
 **All 85 cases, after increment S** (sixth run of 2026-11-21: the 32, and the 53 scope
 cases; Response's own stage control in place of r2c's for the cases with shear). No case
@@ -73,7 +92,9 @@ rising 6, shape 33, post-peak 42. On the 32 earlier cases peak and rising branch
 before; two shape checks came inside (`docs/verification.md`, "How a response ends").
 
 **Known deviations, shear cases** (owner's brief of 2026-11-21: a shear case outside target
-is recorded here). All of them are about where and how a response ends; in Response's own
+is recorded here; how a shear response ends is a Won't of phase A, owner 2026-11-22, D1).
+On the phase A set these are: M/V = 2 m in item 1, M/V = 0.5 m in item 2, and in item 3
+M/V = 0.5 m and 2 m. All of them are about where and how a response ends; in Response's own
 peak states r2c's forces agree within 1 to 3 % on every one.
 
 1. *r2c goes on past Response's end; the peak is outside* (5 cases): softening 0 and 8
@@ -94,8 +115,9 @@ peak states r2c's forces agree within 1 to 3 % on every one.
    fails to converge is not always the same. 23 of the 50 shear responses now end as
    Response's does (14 before; `python tools/ends.py VERIFY_OUT`).
 
-**Known deviation, the column under axial load alone after its peak (C2).** Response
-leaves the uniform state (a curved state with no moment, the load falling by a quarter in
+**Known deviation, the column under axial load alone after its peak (C2). Not cloned**
+(owner, 2026-11-22, D12: it looks wrong in Response; r2c's uniform post-peak stands). A
+parked case. Response leaves the uniform state (a curved state with no moment, the load falling by a quarter in
 one step); r2c stays on it. Not resolved in step 4: on the two rectangular sections under
 axial load alone Response keeps the uniform state to the end, as r2c does, and its control
 variable does not change; what makes the circular column different was not found.
@@ -110,8 +132,9 @@ strain and the principal tension of a node by the compression across it; r2c dra
 lowered line and does not apply it in its node (`docs/kernel.md`, "Cracking under
 compression"; option F1).
 
-Stance (owner, 2026-11-21): r2c clones Response's behaviour; where they differ, Response is
-right, and no structural assessment of results is given. Once a case is inside target,
+Stance (owner, 2026-11-21 and 2026-11-22): r2c reproduces Response's behaviour as
+documented; where they differ, documented Response is right, undocumented behaviour of the
+binary is not cloned, and no structural assessment of results is given. Once a case is inside target,
 closing the gap further is not a goal: build out the scope.
 
 ### What is known about shear
@@ -177,62 +200,41 @@ limit (the same failure as stopping short); on the stages found, about 50 force 
 per stage at about 7 ms each, 80 % of it the transverse equilibrium solve, which starts from
 scratch each time; and numpy call overhead on arrays of about 100 nodes.
 
-## 4. Scope: what is not done
+## 4. Scope
 
-`docs/scope.md` is the inventory (2026-11-21): every input an r2x solve can take that
-reaches the analysis, each with one status, measured with r2x's worker where it was not
-known. Against it, the scope is **not complete**. What is left (increment S, the owner's
-brief of 2026-11-21):
+`docs/scope.md` is the inventory: every input an r2x solve can take that reaches the
+analysis, each marked as documented or not with the manual's page (2026-11-22), and with
+one status. Completion is judged against Response as documented (owner, 2026-11-22).
 
-- **Built in step 3** (2026-11-21; rules and sources in `docs/kernel.md`): Response's
-  compression softening models, all nineteen numbers; a segmental curve for reinforcing
-  steel; shrinkage and thermal strains of the concrete; the state under the constant loads
-  for sections strained by them.
-- **Missing still: draped tendons.** The drape is read and ignored; its rule was not found
-  in the thesis or in a few steps of the binary. Measured effect in Response: under 0.1 % on
-  the peak of the case that has it. An open question for the owner (log of 2026-11-21-05).
-- **Not built, no case** (found while building): the Hsu softening models combined with
-  Tamai tension stiffening, which Response runs with a steel ratio and a tensile strength of
-  its own; a shrinkage profile of more than three points.
-- **Compared since 2026-11-21, not yet inside target everywhere**: 53 cases in
-  `tests/oracle`, 41 that reach a kernel path no earlier case reaches (group A), 12 that
-  combine paths already reached (group B); `tools/scope_cases.py --list` names them.
-- r2c refuses as out of scope only what is out of scope by design. Inputs Response itself
-  rejects are input errors (curved outline rows, tension stiffening 5, `units="roman"`).
-- **Not solvable with r2x** (measured; nothing to compare with): curved outline rows in an
-  input file (Response's reader rejects them; a circle is saved as 13 straight rows, so
-  option C4 falls away); a shape without an outline; tension stiffening "None" (Response
-  asks a question r2x does not answer) and 5; `units="roman"`; three load combinations on
-  Newbeam. What r2c does with each is in `docs/scope.md`, for the owner to confirm.
-- **Out of scope by design** (owner): hollow sections, long-term effects, strain
-  discontinuity, the old text input format.
-- A section with tendons added by hand: dropped from the test set (owner, 2026-11-21).
+- **Nothing documented is missing**, apart from what is out of scope by the owner's
+  decision: hollow sections, long-term effects, strain discontinuity, the old text format,
+  draped tendons (D4), the Hsu softening models with Tamai tension stiffening (D5).
+- **Removed on 2026-11-22 as beyond the documented scope** (D10, D18) and refused since:
+  compression softening 4, 16 and 17; a segmental curve for reinforcing steel. A drape other
+  than zero and a Hsu model with Tamai tension stiffening are refused too, where they were
+  read and ignored. A shape with no outline is an input error (D6).
+- **Kept, waiting for the owner**: the softening models the manual names without a rule in
+  the documents (D21); the default softening of Response 1.9.7, later than the manual (D22);
+  several sections in one file and the horizontal tie, read as the nearest documented thing
+  (D23).
+- r2c refuses as out of scope what is out by design or removed. Inputs Response itself
+  rejects are input errors (curved outline rows, tension stiffening 5, `units="roman"`, a
+  shape with no outline).
+- **Not solvable with r2x** (measured; nothing to compare with): tension stiffening "None"
+  (Response asks a question r2x does not answer); three load combinations on Newbeam.
+- No case: a shrinkage profile of more than three points.
+- Response's program folder is not read (D9): the shipped bar list is built in.
 - `tools/capture.py` has rebuilt the oracle archive against Response (2026-11-19): all 25
   captures match their fixtures. The seven of 2026-11-21 and the 53 scope cases were
-  captured once, with `--add`.
-  r2x's clipboard helper can fail transiently (once in 25 captures); a rerun of that case
-  on its own then matched.
+  captured once, with `--add`. r2x's clipboard helper can fail transiently (once in 25
+  captures); a rerun of that case on its own then matched.
 
-**Where increment S stands** (2026-11-21): all four steps are done as far as they could be
-taken. **The scope is not complete, judged against `docs/scope.md`** (reading, for the
-owner to confirm). What is left, and why:
-
-1. **Draped tendons** are read and ignored: the rule was not found in the thesis or in a
-   few steps of the binary (open question for the owner; effect in Response under 0.1 % on
-   the peak of the case that has it).
-2. **26 of the 53 scope cases are outside target on a chased check** (peak, rising branch
-   or shape), all of them at the end of the response or on the way a shear response
-   steps; with eight of the 32 earlier cases they are the known deviations of section 2. Response's own rules are in; what is left is that r2c's profile iteration
-   converges at some states where Response's does not, and the other way round.
-3. **Not built, no case**: the Hsu softening models combined with Tamai tension stiffening;
-   a shrinkage profile of more than three points.
-4. **Not resolved**: the column under axial load alone after its peak (C2).
-
-Where a next session picks up: (a) the owner's answers to the open questions in the logs of
-2026-11-21-04 to -07; (b) if the endings are to be chased further, the next thing to read
-is Response's global solve (`004276a0`) and how its relaxation factor (the driver's field at
-0x14) enters, since r2c's own solve and damping are what still differ from Response's; (c)
-otherwise the move to verification: the owner's review of the test set and the targets.
+**Where a next session picks up**: the owner's answers to D21 to D26 in `docs/summary.md`.
+D26 proposes the first increment on the exit criteria (A2): the measures first, with the
+owner (stage matching, D13; shape without the ending of shear responses, D25; the views
+sorted into the tiers of D2), then the views without shear (options F1, F2 and H below),
+then the two shape misses and the rising branch at M/V = 0.5 m. Nothing was started on the
+exit criteria in the session of the reset.
 
 ## 5. Decisions that are the owner's
 
@@ -253,7 +255,9 @@ otherwise the move to verification: the owner's review of the test set and the t
 
 ## 6. Options for next steps
 
-Grouped, not ranked. Sizes are rough. Since 2026-11-21 the targets decide what is work: a
+Grouped, not ranked; the ranking for the next increment is D26 in `docs/summary.md`. Options
+C and the softening and section-specific items concern parked cases and wait for phase B.
+Sizes are rough. Since 2026-11-21 the targets decide what is work: a
 check outside target is work, a gap inside target is not. Options that waited on the owner's
 word because they reach past Response's peak (A3, G) or into the detail views (F, H, I) no
 longer do: post-peak and every view are in the targets, and where r2c and Response differ,
@@ -303,15 +307,15 @@ after the peak (`docs/verification.md`, "Quick Define sections"):
 **F. Detail views.** The cracking-stress line on the Principal Tensile Stress chart is drawn
 as Response draws it since 2026-11-21. Left: crack spacing on multi-layer sections; signed
 shear on crack; transverse bond; and
-- F1. **Cracking under compression in the node** (kernel). Response's rule
+- F1. **Cracking under compression in the node** (kernel; the owner's word is given, D14:
+  yes, after the stage matching is fixed, D13). Response's rule
   (`docs/kernel.md`) also lowers the cracking strain and caps f1; r2c does not apply that.
   Tried 2026-11-21 (three lines in `node.evaluate`): against the present state 18 more
   checks come inside (17 views, among them tensile stress on Liping LB1 at cracking and
   M/V = 1 m at the peak; and the shape of Marshall with shear) and 15 go outside, 11 of them
   because one stage of the shear-alone case is matched to a different r2c stage, 4 by a
   point or two (`docs/verification.md`, "Principal tensile stress"). Peaks stay inside
-  target. **Needs the owner's word**: it is Response's behaviour, and it puts checks outside
-  that are inside (see the open question in the log of 2026-11-21-02).
+  target.
 - F2. **Node spacing at the crack front** (kernel, layering). Response has nodes every
   0.34 mm at the crack front, r2c every 0.67 to 1.1 mm; one point of Response's f1 there
   lies off r2c's line (10 stages; the only view outside in seven cases). Layers down to

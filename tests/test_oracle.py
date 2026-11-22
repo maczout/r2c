@@ -87,6 +87,13 @@ SLOW = {
     # its largest load is 3.7 % above Response's
     "newbeam-m2v": (4.0, 1.0),
     "newbeam-m05v": (0.8, 4.0),
+    # the other phase A cases with shear, at the baseline of 2026-11-22
+    "newbeam-vonly": (0.2, 1.0),
+    "newbeam-ncomp-v": (1.0, 3.2),
+    # the largest load is 2.6 % above Response's
+    "newbeam-nmv-incr": (3.0, 2.2),
+    "newbeam-m0neg-mv": (0.1, 1.9),
+    "newbeam-v0-m": (0.05, 0.1),
 }
 PARKED_SLOW = {
     # through Response's load drop and recovery, stepping in the shear strain. r2c steps
