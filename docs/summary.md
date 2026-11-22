@@ -5,9 +5,10 @@
 current at the end of every session (CLAUDE.md, "Ending a session"). Everything else in
 `docs/` is the developer's working record and backs this page; it does not replace it.
 
-Last updated: 2026-11-22, by the developer, at the end of the session that reset the working
-set (log 2026-11-22-02). **Four new decisions wait for the owner: D21 to D23 and D26.** D24
-and D25 are the developer's readings, to confirm.
+Last updated: 2026-11-22, by the owner and the developer: D21 to D26 answered after the
+session that reset the working set (log 2026-11-22-02). **No decision waits for the owner.**
+Next: the measures with the owner (A2, part 1), then a development session on A2's other
+parts.
 
 ## Aim
 
@@ -83,7 +84,7 @@ Each item of the scope inventory is now marked as documented or not, with the ma
 softening models combined with Tamai tension stiffening (D5); compression softening 4 (D10),
 16 and 17 (later than the manual); a segmental stress-strain curve for reinforcing steel. A
 shape with no outline is an input error (D6). Response's program folder was never read, and
-is not (D9). Three things were unclear and are kept until the owner decides: D21 to D23.
+is not (D9). Three things were unclear and were put to the owner: the eleven softening models the manual names are kept (D21); 1.9.7's defaults are followed (D22); several sections in one file and the horizontal tie are to be refused (D23, in A2).
 
 ## Decisions
 
@@ -119,11 +120,10 @@ owner) · *open* (no suggestion yet).
 | D12 | Circular column under axial load alone after its peak (C2) | decided, owner 2026-11-22 | Looks wrong in Response: not cloned; r2c's uniform post-peak stands. Pure N stays in Phase A on Newbeam. |
 | D17 | Which document defines a complete feature | decided, owner 2026-11-22 (suggestion approved) | The manual (thesis Appendix A) for which features exist; the thesis for how they calculate |
 | D18 | Features built beyond the documented set (less common softening models, segmental steel, …) | decided, owner 2026-11-22 | Remove the code |
-
-| D21 | Compression softening models that the manual names but that neither the manual nor the thesis gives a rule for (eleven of them: Vecchio-Collins 1982, 1992-A and 1992-B, Mehlhorn, Maekawa, Noguchi, Belarbi-Hsu, Collins 1978, Kaufmann-Marti, Hsu-Zhang 1998, Hsu 1993). Their rules in r2c were read from the binary. D18 names "less common softening models" for removal; the manual lists them, so they were kept | suggested | Remove them. Keep the four the documents give a rule for or recommend (none, Vecchio-Collins 1986, the CSA rule, Porasz-Collins) and the default (D22). Cost: eleven parked I-girder cases would then be refused. This also disposes of D5 |
-| D22 | The default compression softening of Response 1.9.7 (Collins-Bentz 2011) is later than the manual and the thesis, so by D17 it is not documented. Every case uses it. For Newbeam's concrete it is the thesis' own equation; they differ above 57 MPa. The automatic tensile strength is another default where the program differs from the thesis | suggested | Keep. Where a default of Response 1.9.7 differs from the 2000 documents, r2c follows the program, because the oracle runs with its defaults |
-| D23 | Two things an input file can carry that the manual does not have, and that r2c reads as the nearest documented thing with no code of their own: several sections in one file (the first is read), and the horizontal tie (read as a stirrup). Both occur only in Response's sample inputs, which are parked | suggested | Leave as they are until phase B, and decide then with the sample inputs in front of us |
-| D24 | Reading of "out of scope" and "remove" (D4, D5, D10, D18): r2c refuses such an input and says why, where before it read a drape and ignored it, or ran a Hsu model with Tamai tension stiffening as two independent models | suggested (reading, for the owner to confirm) | Yes: refuse, do not ignore silently |
+| D21 | Compression softening models that the manual names but that neither the manual nor the thesis gives a rule for (eleven of them: Vecchio-Collins 1982, 1992-A and 1992-B, Mehlhorn, Maekawa, Noguchi, Belarbi-Hsu, Collins 1978, Kaufmann-Marti, Hsu-Zhang 1998, Hsu 1993). Their rules in r2c were read from the binary. D18 names "less common softening models" for removal; the manual lists them, so they were kept | decided, owner 2026-11-22 | **Keep them.** Being named in the manual counts as documented; their rules from the binary stay. (The developer had suggested removing them.) |
+| D22 | The default compression softening of Response 1.9.7 (Collins-Bentz 2011) is later than the manual and the thesis, so by D17 it is not documented. Every case uses it. For Newbeam's concrete it is the thesis' own equation; they differ above 57 MPa. The automatic tensile strength is another default where the program differs from the thesis | decided, owner 2026-11-22 (suggestion approved) | Keep. Where a default of Response 1.9.7 differs from the 2000 documents, r2c follows the program, because the oracle runs with its defaults |
+| D23 | Two things an input file can carry that the manual does not have, and that r2c reads as the nearest documented thing with no code of their own: several sections in one file (the first is read), and the horizontal tie (read as a stirrup). Both occur only in Response's sample inputs, which are parked | decided, owner 2026-11-22 | **Refuse them now**, with a reason, as for the other removals (D24). (The developer had suggested leaving them until phase B.) |
+| D24 | Reading of "out of scope" and "remove" (D4, D5, D10, D18): r2c refuses such an input and says why, where before it read a drape and ignored it, or ran a Hsu model with Tamai tension stiffening as two independent models | decided, owner 2026-11-22 (reading confirmed) | Yes: refuse, do not ignore silently |
 
 ### Measurement and test set (meta-development)
 
@@ -134,14 +134,13 @@ owner) · *open* (no suggestion yet).
 | D15 | The generated results JSON is committed on every run (~80,000 lines) | decided, owner 2026-11-22 (suggestion approved) | Build it in CI instead of storing it |
 | D16 | The test set has grown to 85 cases | decided, owner 2026-11-22 | Develop on Newbeam; the rest is parked until Phase B |
 | D19 | Parked fixtures: delete, or keep and not run by default? | decided, owner 2026-11-22 (suggestion approved) | Keep them, not run by default |
-
-| D25 | The shape check still counts how a shear response ends, against D1a. Two cases (M/V = 0.5 m and 2 m) are outside on shape for that reason alone | suggested (reading, for the owner to confirm) | Change the measure so that shape leaves out the ending for shear cases, in the same piece of work as D13, with the owner |
+| D25 | The shape check still counts how a shear response ends, against D1a. Two cases (M/V = 0.5 m and 2 m) are outside on shape for that reason alone | decided, owner 2026-11-22 (reading confirmed) | Change the measure so that shape leaves out the ending for shear cases, in the same piece of work as D13, with the owner |
 
 ### The next increment
 
 | # | Question | Status | Answer |
 |---|---|---|---|
-| D26 | What the first increment on the exit criteria should be | suggested | **Increment A2: the Musts without shear, with the measures put right first.** Its parts are ranked below |
+| D26 | What the first increment on the exit criteria should be | decided, owner 2026-11-22 (suggestion approved, as ranked) | **Increment A2: the Musts without shear, with the measures put right first.** Its parts are ranked below |
 
 The parts of A2, ranked by how much of a Must each closes (the Musts: peak, rising branch,
 shape, and the views of the stress state under moment and axial load). Peak is met.
@@ -161,6 +160,8 @@ shape, and the views of the stress state under moment and axial load). Peak is m
 5. **V alone: the fall of load before the peak. M/V = 0.5 m: the recovery after a fall of
    load.** *Shape: one case. Rising branch: one case, its only miss.* Both are shear cases
    and the cause of neither is known, so this is the least certain part and comes last.
+
+Also in A2, before part 2: refuse several sections in one file and the horizontal tie (D23), as for the other removals.
 
 Not in A2: the ending of −M (a Should), the views related to shear (Should) and to cracking
 (Could), speed.
