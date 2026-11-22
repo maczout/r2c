@@ -16,6 +16,12 @@ def oracle_dir() -> Path:
 
 
 @pytest.fixture(scope="session")
+def parked_dir() -> Path:
+    """The fixtures parked until phase B (docs/summary.md, D16 and D19)."""
+    return ORACLE / "parked"
+
+
+@pytest.fixture(scope="session")
 def response_dir() -> Path:
     """Response-2000's folder (for its sample inputs), from R2C_RESPONSE_DIR. They are not in
     this repository: they are part of Response."""

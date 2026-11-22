@@ -58,7 +58,8 @@ def main(argv=None) -> int:
         if "control" not in r or float(r["ref"]["increment"].split(",")[2]) == 0.0:
             continue
         c = r["control"][-1]
-        ref = record.read(Path(a.fixtures) / f"{name}.r2x.txt")
+        fx = Path(a.fixtures) / f"{name}.r2x.txt"
+        ref = record.read(fx if fx.exists() else fx.parent / "parked" / fx.name)
         sub = record.read(out / f"{name}.r2x.txt")
         e_ref, e_sub = c["shape_ref"][-1], c["shape_sub"][-1]
         total += 1

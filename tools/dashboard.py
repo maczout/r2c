@@ -214,7 +214,10 @@ def build(run: dict, results: dict, acc: dict, curves_dir: Path | None, ref_dir:
                                       "feature": feat.get(v.get("ref_stage"), ""),
                                       "ref_max": v["ref_max"], "diff": v["max_diff"]})
         # curves
+        # a parked case's fixture is under the folder (tests/oracle/parked)
         refp = ref_dir / f"{name}.r2x.txt"
+        if not refp.exists():
+            refp = ref_dir / "parked" / refp.name
         if c and refp.exists():
             xt, yt, rc = curve(record.read(refp), c["chart"])
             case["curve"] = {"x": xt, "y": yt, "ref": rc,

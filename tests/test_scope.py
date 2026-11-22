@@ -10,8 +10,8 @@ import numpy as np
 import pytest
 
 from r2c import inputs, run
-from r2c.inputs import Concrete, InputError, OutOfScope, Rebar
-from r2c.materials import ConcreteLaw, SteelLaw
+from r2c.inputs import Concrete, InputError, OutOfScope
+from r2c.materials import ConcreteLaw
 
 BEAM = """<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
 <document><r3g_beam {beam}>
@@ -63,6 +63,40 @@ def test_a_model_number_response_does_not_have_is_rejected():
         inputs.parse(beam(concrete='c_soft="19"'))
 
 
+def test_a_shape_without_an_outline_is_rejected():
+    # Response-2000 opens such a file with no concrete and cannot solve it (D6)
+    for shape in ("RECT", "CIRCLE"):
+        with pytest.raises(InputError, match="no concrete outline"):
+            inputs.parse(beam(outline="", shape=shape))
+
+
+# -- beyond the documented scope: refused (docs/scope.md; docs/summary.md D4, D5, D10, D18) ------
+@pytest.mark.parametrize("model", [4, 16, 17])
+def test_softening_models_that_are_not_in_the_manual_are_refused(model):
+    with pytest.raises(OutOfScope, match="softening"):
+        inputs.parse(beam(concrete=f'c_soft="{model}"'))
+
+
+@pytest.mark.parametrize("model", [9, 14, 15])
+def test_hsu_softening_with_tamai_tension_stiffening_is_refused(model):
+    with pytest.raises(OutOfScope, match="Tamai"):
+        inputs.parse(beam(concrete=f'c_soft="{model}" t_stiff="4"'))
+    inputs.parse(beam(concrete=f'c_soft="{model}"'))
+    inputs.parse(beam(concrete='c_soft="2" t_stiff="4"'))
+
+
+def test_a_segmental_curve_for_reinforcing_steel_is_refused():
+    with pytest.raises(OutOfScope, match="segmental"):
+        inputs.parse(beam(steel="\n0.0 0.0\n2.0 400.0\n100.0 600.0\n"))
+
+
+def test_draped_tendons_are_refused():
+    layer = '<longreinfx z="100.0" type="Low Relax" A="99.0" dep="6.5" {} name="strand"/>'
+    with pytest.raises(OutOfScope, match="draped"):
+        inputs.parse(beam(extra=layer.format('drape="0.05"')))
+    inputs.parse(beam(extra=layer.format('drape="0.0"')))
+
+
 def test_out_of_scope_by_design_is_still_refused():
     with pytest.raises(OutOfScope):
         inputs.parse(beam(outline=RECT + '<sectionHOLLOW>\n400 100\n200 100\n</sectionHOLLOW>'))
@@ -73,15 +107,6 @@ def test_out_of_scope_by_design_is_still_refused():
 
 
 # -- what a file carries is taken from it --------------------------------------------------------
-def test_a_circle_without_an_outline_is_the_polygon_response_writes():
-    s = inputs.parse(beam(outline="", shape="CIRCLE", par1="600.0"))
-    assert len(s.outline) == 13
-    # r2x's quick-column: 589.8 155.3; 450.0 519.6; 300.0 600.0; the poles 0.1 wide
-    by_elev = {round(z, 1): round(w, 1) for z, w, _ in s.outline}
-    assert by_elev[589.8] == 155.3 and by_elev[450.0] == 519.6 and by_elev[300.0] == 600.0
-    assert by_elev[600.0] == 0.1 and by_elev[0.0] == 0.1
-
-
 def test_factors_and_units_come_from_the_file_when_no_option_is_given(tmp_path):
     p = tmp_path / "f.r2t"
     p.write_bytes(beam(extra='<analysisoptions phic="0.65" phis="0.85" phip="0.90"/>'))
@@ -117,21 +142,6 @@ def test_shrinkage_is_a_parabola_through_three_points():
     assert sec.shrinkage(np.array([0.0, 300.0, 600.0])) * 1e3 == pytest.approx([0, 0, 0.3])
 
 
-# -- reinforcing steel with a segmental curve ----------------------------------------------------
-def test_segmental_steel_properties_are_derived_from_the_curve():
-    r = Rebar(segments=[(0.0, 0.0), (2e-3, 400.0), (10e-3, 450.0), (30e-3, 540.0),
-                        (80e-3, 600.0), (100e-3, 600.0)])
-    st = SteelLaw(r)
-    assert st.E == pytest.approx(200000.0)
-    # Response's own Save As of this curve writes fy 412.9 and esh 4.1
-    assert st.fy == pytest.approx(412.9, abs=0.05)
-    assert st.esh * 1e3 == pytest.approx(4.1, abs=0.05)
-    assert (st.fu, st.eu, st.rupture) == (600.0, 0.08, 0.1)
-    assert st.raw(np.array([0.003]))[0] == pytest.approx(406.25)
-    assert st.raw(np.array([-0.003]))[0] == pytest.approx(-406.25)
-    assert math.isnan(st.raw(np.array([0.11]))[0])
-
-
 # -- compression softening: beta at a transverse strain of 2 mm/m, 60 MPa, e0 2.4 mm/m ------------
 E1, E2, FC, E0 = 2e-3, -1.5e-3, 60.0, 2.4e-3
 KF = 0.1825 * math.sqrt(FC)
@@ -140,7 +150,6 @@ BETA = {
     1: 1 / (0.85 + 0.27 * E1 / 1.5e-3),
     2: 1 / (0.8 + 0.34 * E1 / E0),
     3: 1 / (1 + KF * 0.35 * (E1 / 1.5e-3 - 0.28) ** 0.8),
-    4: 1 / (1 + KF * 0.23 * E1 / 1.5e-3),
     5: 1 / (1 + 0.27 * (E1 / E0 - 0.37)),
     6: 1 / (0.8 + 0.34 * E1 / E0),
     7: 1.15 - 125 * E1,
@@ -152,8 +161,6 @@ BETA = {
     13: 1 / ((0.9 + 0.0045 * FC) * (0.8 + 0.34 * E1 / E0)),
     14: (5.8 / math.sqrt(FC)) / math.sqrt(1 + 400 * E1),
     15: 0.9 / math.sqrt(1 + 600 * E1),
-    16: (5.8 / math.sqrt(FC)) / math.sqrt(1 + 400 * E1),
-    17: (5.8 / math.sqrt(FC)) / math.sqrt(1 + 400 * E1),
     18: 1 / (0.8 + 180 * E1),
 }
 

@@ -39,9 +39,8 @@ area; the circle has 1.1 % more]. The curved segments of the manual (a row whose
 or DOWN [T, Appendix A 2-4 and 5-9]) cannot be in an input file: Response's XML reader
 rejects them, and r2c does as an input error [O: measured with r2x, `docs/scope.md` 1.4;
 B: the two words are used by the reader of shape.dat `004f96e0` and the outline dialog's
-width field `00448d90` only]. A shape given without an outline (which Response opens with no
-concrete and cannot solve) is given the rows Response writes when the shape is defined in
-it; for a circle, the 13 rows [O; not compared].
+width field `00448d90` only]. A shape given without an outline, which Response opens with no
+concrete and cannot solve, is an input error too [O; owner, 2026-11-22, D6].
 
 Shrinkage and thermal strain of the concrete, εsh(z), is the strain the concrete would take
 up unrestrained: a node's concrete strain is εx(z) − εsh(z), and the bars' is not changed.
@@ -80,7 +79,13 @@ is taken off its prestrain [T, manual 3-5: "can be used the same way as prestrai
 negative); ε2 is the compressive strain itself, ε0 the strain at peak stress, fc′ in MPa,
 strains as plain numbers, magnitudes throughout. The numbers are the file's `c_soft`, the
 names those of Response's dialog [T, manual Table 2-1 for the names; the rules, constants
-and exponents are the binary's].
+and exponents are the binary's]. r2c has the models the manual names, and the default. The
+thesis itself gives two rules, both in ε1 alone: 1/(0.8 + 170·ε1) for normal strength
+concrete, which is number 10 and, up to 56.7 MPa, the default 18; and that times
+1/(0.9 + 0.0045·fc′) for high strength concrete [T 5-1, p. 58 to 59]. Not in the manual and
+refused as out of scope: 4 (no name in the dialogs), 16 (Zhu-Hsu-Lee 2001) and 17 (Zhang-Hsu
+1998, no eta) [owner, 2026-11-22, D10 and D18]. Whether the named models without a rule in
+the documents stay, and the default, are D21 and D22 in `docs/summary.md`.
 
 | No. | Model | β (never above 1 unless said) | Strain at peak stress |
 |---:|---|---|---|
@@ -88,7 +93,6 @@ and exponents are the binary's].
 | 1 | Vecchio-Collins 1982 | 1/(0.85 + 0.27·ε1/ε2) | β·ε0 |
 | 2 | Vecchio-Collins 1986 | 1/(0.8 + 0.34·ε1/ε0) | ε0 |
 | 3 | Vecchio-Collins 1992-A | 1/(1 + Kf·Kc), Kc = 0.35·(ε1/ε2 − 0.28)^0.8, zero below 0.28 | see below |
-| 4 | no name in the dialogs | 1/(1 + Kf·0.23·ε1/ε2) | see below |
 | 5 | Vecchio-Collins 1992-B | 1/(1 + 0.27·(ε1/ε0 − 0.37)) (Kf is 1 for this model) | ε0 |
 | 6 | Mehlhorn et al | 1/(0.8 + 0.34·ε1/ε0), not below 0.8 | ε0 |
 | 7 | Maekawa et al | 1.15 − 125·ε1, between 0.65 and 1 | ε0 |
@@ -98,7 +102,7 @@ and exponents are the binary's].
 | 11 | Collins 1978 | 3.6/(1 + 2·(ε1 + ε2)/ε0) | β·ε0 |
 | 12 | Kaufmann-Marti 1998 | fc′^0.6667/(0.4 + 30·ε1)/fc′ | ε0 |
 | 13 | Porasz-Collins 1988 | 1/((0.9 + 0.0045·fc′)·(0.8 + 0.34·ε1/ε0)) | ε0 |
-| 14, 16, 17 | Zhang-Hsu 1998, Zhu-Hsu-Lee 2001 | min(0.9, 5.8/√fc′)/√(1 + 400·ε1/η), η = 1 (below) | β·ε0 |
+| 14 | Hsu-Zhang 1998 | min(0.9, 5.8/√fc′)/√(1 + 400·ε1) | β·ε0 |
 | 15 | Hsu 1993 | 0.9/√(1 + 600·ε1) | β·ε0 |
 | 18 | Collins-Bentz 2011 (default) | 1/(0.8 + max(170, 3·fc′)·ε1) | ε0 |
 
@@ -106,17 +110,17 @@ Kf = max(1, 0.1825·√fc′). The peak stress is β·fc′ and the base curve i
 ε2 over the strain at peak stress, with these particulars:
 
 * Popovics: n = max(1.1, 0.8 + f/17) and, past the peak strain, k = max(1, 0.67 + f/62), f
-  the lowered peak stress; for models 3 and 4, n is that of the unlowered strength.
-* Models 3 and 4: up to β·ε0 the curve with peak β·fc′ at β·ε0; from there to ε0 a plateau
+  the lowered peak stress; for model 3, n is that of the unlowered strength.
+* Model 3: up to β·ε0 the curve with peak β·fc′ at β·ε0; from there to ε0 a plateau
   at β·fc′; past ε0 the unlowered curve times β.
-* Parabola with models 1, 9, 14 to 17: past the lowered peak strain εp the stress is
-  β·fc′·(1 − ((ε2 − εp)/(2·ε0 − εp))²), running out at 2·ε0 (4·ε0 for model 16).
+* Parabola with models 1, 9, 11, 14 and 15: past the lowered peak strain εp the stress is
+  β·fc′·(1 − ((ε2 − εp)/(2·ε0 − εp))²), running out at 2·ε0.
 * Segmental: the curve's stress times β.
 
-η of the Hsu models is the ratio of the steel's strengths in the two directions; Response
-sets it, and the Houston models' own tensile strength 0.31·√fc′, only when one of 9, 14 to
-17 is combined with Tamai tension stiffening (its "RA-STM mode") [B `004fbf70`, `004aefa0`];
-otherwise η = 1. That combination is not built in r2c and not compared (`docs/scope.md`).
+The Hsu models (9, 14, 15) combined with Tamai tension stiffening are Response's "RA-STM
+mode" [T, manual Table 2-1], which runs them with a steel ratio and a tensile strength of
+its own. That combination is out of scope and refused [owner, 2026-11-22, D5]; with any
+other tension stiffening the models are as in the table.
 Response's messages that some models are "only defined for the parabolic base curve" are
 not raised when a file is opened and solved, and the concrete's set-up does not change the
 base curve [B `004ac190`; O: no message in the probes].
@@ -124,7 +128,7 @@ base curve [B `004ac190`; O: no message in the probes].
 How well r2c follows these [measured 2026-11-21 with `tools/diagnose.py states` on the
 captures of every stage, r2c put in Response's own peak state with its history]: moment
 within 0.4 %, shear within 1 % for the models whose peak comes after softening has set in (2,
-6, 7, 9 to 15); for 0, 1, 3, 4, 5 and 8 Response's response ends soon after the web cracks,
+6, 7, 9 to 15); for 0, 1, 3, 5 and 8 Response's response ends soon after the web cracks,
 before softening acts, and its peak state agrees within 3 % in shear. The numbers of 2, 6, 7,
 10 and 13 were in r2c before with formulas that had no source; 2, 6, 7, 10 and 13 turned out
 as the binary has them.
@@ -136,26 +140,18 @@ as the binary has them.
   in effect the stress is capped at fy [O].
 * Tendons: Ramberg-Osgood [T]. Response derives the rest: the strength is capped at the
   curve's value at the rupture strain, and "yield" is 0.9 of the strength [B].
-* Bars with a segmental curve (points of strain and stress in the `<rebar>` element): the
-  stress is read off the curve, straight between points, the same in compression; past the
-  last point the bar has ruptured. Response derives the properties the rest of the analysis
-  uses [B `004ab4e0`, `004aea40`]: the stiffness from the stress at 0.5 mm/m; the strength
-  and its strain from the highest point; yield where the curve meets the line of that
-  stiffness offset by 2 mm/m (the strength, if it never does); in place of the strain at
-  strain hardening, the strain at which the curve passes 1.001 times yield; rupture at the
-  last point that carries more than 1 % of yield. For the curve of newbeam-segsteel-m
-  Response's own Save As writes fy 412.9 MPa and εsh 4.1 mm/m, and r2c derives the same
-  [O]. A segmental curve given for prestressing steel is dropped by Response on reading and
-  changes nothing [O: probe igirder-segstrand].
+* A segmental curve for reinforcing steel (points of strain and stress in the `<rebar>`
+  element) is not in the manual, whose curve is the one above [T, manual A-17], and is
+  refused as out of scope [owner, 2026-11-22, D18]. One given for prestressing steel is
+  dropped by Response on reading and changes nothing [O: probe igirder-segstrand]; r2c does
+  not read it.
 * Interlocking hoops (stirrup pattern 6) are analysed as stirrups, not by the hoop rule
   below [O: on the circular column Response's result with pattern 6 is not its result with
   a hoop; r2c as stirrups is within 0.8 % in shear in Response's peak state]. Patterns 1, 2,
   3 and 5 give the same charts byte for byte in Response on a rectangular section; a
   horizontal tie (7) differs in the Transverse Average Bond chart only [O: the probes].
-* Draped tendons: the drape is read and **not used**. Its rule was not found (the thesis
-  shows results, 10-10, and no rule; the layer's drape field could not be followed into the
-  analysis in a few steps of the binary). Measured: a drape of 0.05 on eight of twelve
-  strands changes Response's peak by under 0.1 %.
+* Draped tendons are out of scope [owner, 2026-11-22, D4]: a layer with a drape other than
+  zero is refused.
 * Unloading is elastic from a plastic strain kept per layer; it is tracked from the first load
   stage after the initial one [O]. Stirrups keep a plastic strain by depth [O].
 
@@ -511,17 +507,17 @@ Response shows when the solve ends is the one with the largest load.
 | Factored steel capped at fy | yes | one case (CSA factors) |
 | Shrinkage profile through more than three points | parabola through the nearest three | r2c's own reading of the manual; three points compared |
 | Interlocking hoops are stirrups | yes | one case (column, M/V = 1 m) |
-| A shape without an outline | the rows Response writes for it | not compared: Response cannot solve such a file |
 | Second starting plane and step cut-back for the initial state | above | r2c's own; three cases |
 
 ## Not implemented
 
 Out of scope by the owner's decision: hollow sections, long-term effects, strain
-discontinuity, the old text input format. r2c refuses these and nothing else as out of
-scope; what Response itself rejects is an input error (`docs/scope.md`, section 3).
+discontinuity, the old text input format; and since 2026-11-22 draped tendons (D4) and the
+Hsu softening models with Tamai tension stiffening (D5). Beyond the documented scope and
+taken out on 2026-11-22 (D10, D18): compression softening 4, 16 and 17, and a segmental
+curve for reinforcing steel. r2c refuses these as out of scope; what Response itself rejects
+is an input error (`docs/scope.md`, section 3). Response's program folder is not read (D9).
 
-Read and not used: a tendon's drape (Reinforcement, above). Not built: the Hsu softening
-models with Tamai tension stiffening (η and the tensile strength of "RA-STM mode"; Compression
-softening, above). Not applied in the node: the lowering of the cracking strain and of f1 by
+Not applied in the node: the lowering of the cracking strain and of f1 by
 compression (above, "Cracking under compression": the chart's line is lowered, the node's
 cracking is not).

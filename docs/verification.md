@@ -8,7 +8,16 @@ run of `tools/verify.py` and headed by the commit, machine and date of that run.
 numbers below are those of that run; numbers marked "2026-11-15 run" are from the earlier
 comparison.
 
-The generated results cover all 85 cases since the run of 2026-11-21 on the scope cases:
+**Since 2026-11-22 the generated results cover the phase A set alone**: the 17 cases on
+Newbeam that vary only the load (`tests/oracle`; "Phase A baseline" below). The other 68
+cases are parked until phase B (`tests/oracle/parked`; `docs/summary.md`, D16 and D19) and
+are not run by default. The sections after the baseline describe them as they stood in the
+runs of 2026-11-21; those numbers are no longer in the generated file (they are in its
+history in git, and come back with
+`python tools/verify.py tests/oracle/parked --inputs …`). Five parked cases need a feature
+that was removed on 2026-11-22 and r2c now refuses them (`docs/scope.md`, section 3).
+
+Until then the generated results covered all 85 cases, since the run of 2026-11-21 on the scope cases:
 the 32 below and the 53 of increment S (see "The scope cases" below). The 32 are the 25 of the first test set, the 7 on Response's
 sample inputs (Marshall, Cm4, Liping LB1, se100, dm-n1n) included, and since the third run
 of 2026-11-21 the 7 on Quick Define sections (T-beam, circular column, I-girder with
@@ -19,9 +28,51 @@ run; the detail views of the 7 sample cases were first compared case by case on 
 (see Detail views).
 Whether a difference is acceptable is decided against `docs/acceptance.md`, not here.
 
-Reproduce with `python tools/verify.py tests/oracle --inputs RESPONSE_FOLDER --out OUT`, then
+Reproduce with `python tools/verify.py tests/oracle --out OUT` (the phase A set needs no
+input folder; the parked set needs `--inputs RESPONSE_FOLDER R2X/tests/reference SCOPE_INPUTS`), then
 `python tools/report.py OUT`; compare any two records with
 `python tools/compare.py REF SUBJECT --views`.
+
+## Phase A baseline (run of 2026-11-22)
+
+The 17 phase A cases, run after the parking of the other cases and the removal of what is
+beyond the documented scope. **Nothing moved**: r2c's 17 records are byte for byte those of
+a run made on the same machine before the removals (measured: `cmp` of the records of the
+two runs; `python tools/changes.py` on the two reports no check that changed sides). So the
+numbers are those of the sixth run of 2026-11-21 for these cases.
+
+Cases inside target, check by check (measured: `python tools/targets.py VERIFY_OUT
+--counts`; the limits are `docs/acceptance.md`'s):
+
+| Check | Inside, of 17 | Outside |
+|---|---:|---|
+| Peak | 17 | none; largest +3.3 % (M/V = 2 m) and +2.6 % (N + M + V increasing) |
+| Rising branch | 16 | M/V = 0.5 m (6.1 %) |
+| Shape | 13 | M/V = 0.5 m and 2 m (how the response ends, and nothing else); V alone (Response has a fall of load before the peak, r2c none); tension (cracking and a fall of load at one step, read in the other order) |
+| Post-peak | 10 | without shear: −M (20 %); with shear: constant V then M (5.9 %), M/V = 0.5, 1 and 2 m, V alone, constant N then V |
+| Views | 1 | all but the Newbeam with N₀ = −2000 kN |
+
+The shape check still counts how a shear response ends. Under the owner's reading D1a it
+should not, and then M/V = 0.5 m and 2 m are inside on shape (their features up to the peak
+are the same) and V alone and tension stay outside. The measure has not been changed: that
+is a change to a measure, for the owner (`docs/summary.md`, D25).
+
+**The views of the eight cases without shear** (the stress state under moment and axial
+load, a Must of phase A). Outside, by view and the feature stage at which it is compared
+(measured, from the run's results):
+
+- Principal tensile stress in five cases (10 to 51 %): M and −M at the peak, constant
+  tension then M and N alone at the last stage, N + M at cracking. One point at the crack
+  front in most ("Principal tensile stress" below).
+- Steel stress at a crack in two (N + M at the peak, 100 %; tension at the fall of load,
+  78 %): finding H of `docs/status.md`, not investigated.
+- At the last stage of −M: longitudinal strain, principal tensile strain and crack widths,
+  5 to 6 %, where the post-peak branch is 20 % off.
+- Diagonal crack spacing at cracking under tension (100 %), and longitudinal average bond
+  under no load (100 %): one chart each, not investigated.
+
+With shear, every view is outside in three to eight of the nine cases; most of it follows
+from comparing unlike stages (D13).
 
 ## Against the acceptance targets (run of 2026-11-21)
 
