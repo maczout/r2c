@@ -37,7 +37,9 @@ developer's. Items that need a structural judgement are marked **(structural)**.
   `probe.py` (what Response does with an input, through r2x), `scope_cases.py` (the 53
   scope cases and their first capture), `targets.py` (which cases are inside on peak,
   rising branch and shape; `--counts`: cases inside, check by check, which is the progress
-  table of the summary), `check.py` (checks before pushing). `decompile.py` also lists
+  table of the summary), `nodes.py` (the node depths of two records at a stage: are r2c's
+  nodes where Response's are), `branch.py` (where the states before a fall of load end, for
+  a case without shear), `check.py` (checks before pushing). `decompile.py` also lists
   a routine's instructions (`a:ADDRESS`).
 - 85 oracle fixtures, each with the detail views of the feature stages of Response's curve
   (cracking, falls of load, peak, last stage). **The phase A set, 17 of them, is in
@@ -50,7 +52,10 @@ developer's. Items that need a structural judgement are marked **(structural)**.
   shear; `-m "slow and not parked"` the nine with shear; `-m parked` the parked cases
   (`R2C_RESPONSE_DIR` for Response's sample inputs, `R2C_DEFINE_DIR` for the Quick Define
   inputs, which are r2x's `tests/reference/define`, `R2C_SCOPE_DIR` for the inputs of the
-  scope cases). Five parked fixtures need a removed feature and have no test.
+  scope cases). Eleven parked fixtures need something removed: five have no test, and the
+  six on Response's sample inputs that hold several sections have a test that they are
+  refused (D23). One parked test fails since A2: `newbeam-cmod0-m`, peak 0.09 % against a
+  regression limit of 0.05 % (measured 2026-11-22; left alone, parked cases are not in A2).
 - Docs: `kernel.md` (each rule and its source), `verification.md` (what the results mean),
   `verification-results.md` (generated), `acceptance.md` (the owner's development targets),
   `scope.md` (every input an r2x solve can take, whether the manual documents it, and
@@ -64,25 +69,34 @@ The numbers are in `docs/verification-results.md`, what they mean in `docs/verif
 each case is assessed against the owner's development targets in `docs/acceptance.md`: ±5 %
 on every metric, the curve's shape the same, views at the features of the curve.
 
-**The phase A baseline** (run of 2026-11-22, the 17 cases, after the parking and the
-removals; measured, `python tools/targets.py VERIFY_OUT --counts`). Cases inside target:
-peak 17 of 17, rising branch 16, shape 13, post-peak 10, views 1. r2c's 17 records are byte
-for byte those of a run made before the removals on the same machine, so nothing moved.
-What is outside, and the views of the cases without shear, are in `docs/verification.md`,
-"Phase A baseline". The generated results now hold these 17 cases only.
+**Phase A after increment A2** (run of 2026-11-22, the 17 cases; measured,
+`python tools/targets.py VERIFY_OUT --counts`). Cases inside target: peak 17 of 17, rising
+branch 17, shape 15, post-peak 11, views of the stress state without shear (Must) 5 of 8,
+views Should 8 of 17, views Could 7 of 17. What changed in the kernel, and what each change
+moved, is in `docs/verification.md`, "A2, parts 2 to 5"; the rules are in `docs/kernel.md`
+("Cracking under compression", "Layers", "Steel stress at a crack").
 
-Outside on a Must (D1, D2), on the phase A set:
+Outside on a Must (D1, D2), on the phase A set, each with its decision in
+`docs/summary.md`:
 
-- Rising branch: M/V = 0.5 m (6.1 %; known deviation 2 below).
-- Shape: V alone (Response has a fall of load before the peak, r2c none) and tension
-  (cracking and a fall of load at one step, read in a different order). A shear case's
-  ending is no longer counted (D25).
-- Views of the stress state without shear (the tiers of D27): 6 of the 8 cases are
-  outside; principal tensile stress in five, steel stress at a crack in two, −M's strains by
-  a point.
+- Shape: tension (one rising point fewer before the fall at cracking; r2c's states before
+  the fall end at 275.6 kN, Response's last is 276.2; D31) and V alone (r2c's fall of load
+  before the peak is 1.9 % of the peak, the measure counts from 2 %, Response's is 2.2 %;
+  D32).
+- Views of the stress state without shear, three cases: M, principal tensile stress at the
+  last stage, 7.2 % (a strain offset of 0.005 mm/m next to the crack front; D29); N + M,
+  principal tensile stress at cracking, 51.5 % (the crack check where no bar crosses the
+  tension zone: thesis and binary differ; D30); −M, longitudinal strain and principal
+  tensile strain at the last stage, 5.3 and 5.9 % (they go with −M's ending, 20 %, a
+  Should).
 
 **What follows describes all 85 cases as they stood in the sixth run of 2026-11-21**, the
-last that ran the parked cases. Peak and rising branch of the 17 have not moved since.
+last run of record with the parked cases, on the kernel before A2. The parked cases were
+run once on the kernel of A2 (2026-11-22, not a run of record): of the 57 that it still
+solves, four I-girder cases with shear went outside on peak, rising branch or shape (the
+softening models Vecchio-Collins 1982 and 1992-A, Kaufmann-Marti with its peak at −8 %,
+Hsu-Zhang) and four came inside (softening 7, 11 and 15, and the I-girder at M/V = 2 m);
+check by check 119 came inside and 80 went outside. Not looked into: parked.
 
 **All 85 cases, after increment S** (sixth run of 2026-11-21: the 32, and the 53 scope
 cases; Response's own stage control in place of r2c's for the cases with shear). No case
@@ -126,11 +140,6 @@ Marshall and the Newbeam with N₀ = −2000 kN, both without shear, are inside 
 every check. Principal tensile stress is outside at 28 stages in 18 cases (58 in 23
 before); in seven cases without shear it is the only view outside, by one point at the
 crack front (option F2).
-
-**Known deviation, shear cases (cracking under compression).** Response lowers the cracking
-strain and the principal tension of a node by the compression across it; r2c draws the
-lowered line and does not apply it in its node (`docs/kernel.md`, "Cracking under
-compression"; option F1).
 
 Stance (owner, 2026-11-21 and 2026-11-22): r2c reproduces Response's behaviour as
 documented; where they differ, documented Response is right, undocumented behaviour of the
@@ -213,10 +222,12 @@ one status. Completion is judged against Response as documented (owner, 2026-11-
   compression softening 4, 16 and 17; a segmental curve for reinforcing steel. A drape other
   than zero and a Hsu model with Tamai tension stiffening are refused too, where they were
   read and ignored. A shape with no outline is an input error (D6).
-- **Kept, waiting for the owner**: the softening models the manual names without a rule in
-  the documents (D21); the default softening of Response 1.9.7, later than the manual (D22);
-  several sections in one file and the horizontal tie, read as the nearest documented thing
-  (D23).
+- **Kept by the owner's decision** (2026-11-22): the softening models the manual names
+  without a rule in the documents (D21); the default softening of Response 1.9.7, later
+  than the manual (D22).
+- **Refused since 2026-11-22** (D23): several sections in one file, and the horizontal tie.
+  Response's sample inputs but dm-n1n hold several sections, so six parked cases are
+  refused for it.
 - r2c refuses as out of scope what is out by design or removed. Inputs Response itself
   rejects are input errors (curved outline rows, tension stiffening 5, `units="roman"`, a
   shape with no outline).
@@ -229,10 +240,11 @@ one status. Completion is judged against Response as documented (owner, 2026-11-
   captured once, with `--add`. r2x's clipboard helper can fail transiently (once in 25
   captures); a rerun of that case on its own then matched.
 
-**Where a next session picks up**: A2 parts 2 to 5 in `docs/summary.md` (D26), within the
-bounds in `docs/acceptance.md` (D28). Part 1, the measures, is done (D13, D25, D27; log
-2026-11-22-03). Next: refuse what D23 names, then the views without shear (options F1, F2
-and H below), then the two shape misses and the rising branch at M/V = 0.5 m.
+**Where a next session picks up**: the owner's answers to D29 to D33 in `docs/summary.md`.
+If D30 is "follow the program", it is one condition in `Analysis.crack_check` (a tension
+zone with no bar in it gets a limit of zero in place of none), measured already. D33
+proposes the ending of −M next, and a look at the parked cases that A2 moved before
+phase B.
 
 ## 5. Decisions that are the owner's
 
@@ -305,25 +317,16 @@ after the peak (`docs/verification.md`, "Quick Define sections"):
 **F. Detail views.** The cracking-stress line on the Principal Tensile Stress chart is drawn
 as Response draws it since 2026-11-21. Left: crack spacing on multi-layer sections; signed
 shear on crack; transverse bond; and
-- F1. **Cracking under compression in the node** (kernel; the owner's word is given, D14:
-  yes, after the stage matching is fixed, D13). Response's rule
-  (`docs/kernel.md`) also lowers the cracking strain and caps f1; r2c does not apply that.
-  Tried 2026-11-21 (three lines in `node.evaluate`): against the present state 18 more
-  checks come inside (17 views, among them tensile stress on Liping LB1 at cracking and
-  M/V = 1 m at the peak; and the shape of Marshall with shear) and 15 go outside, 11 of them
-  because one stage of the shear-alone case is matched to a different r2c stage, 4 by a
-  point or two (`docs/verification.md`, "Principal tensile stress"). Peaks stay inside
-  target.
-- F2. **Node spacing at the crack front** (kernel, layering). Response has nodes every
-  0.34 mm at the crack front, r2c every 0.67 to 1.1 mm; one point of Response's f1 there
-  lies off r2c's line (10 stages; the only view outside in seven cases). Layers down to
-  h/1024 were tried: six stages come inside, one goes outside, Marshall stays at 8 %.
-  Response's own layering rule has not been read; that is the next step.
+- F1. Cracking under compression in the node: **done 2026-11-22** (A2 part 2).
+- F2. Node spacing at the crack front: **done 2026-11-22** (A2 part 2): Response's own
+  layering, read from the binary. Left of it: the layer 0.1 mm thick that Response puts
+  across a step in width, and its limit on the number of layers, neither taken over.
+- F3. The crack check where no bar crosses the tension zone (N + M at cracking): the
+  thesis and the binary differ; D30.
 
-**H. Steel stress at a crack, found 2026-11-17.** At the Newbeam's peak with CSA factors
-Response shows the bottom bar at 340 MPa at a crack and r2c shows 0; the Newbeam with N and M
-differs the same way. Not investigated (see `docs/verification.md`, Detail views). Display or
-kernel: unknown. The peak loads in these cases agree.
+**H. Steel stress at a crack: done 2026-11-22** (A2 part 3; `docs/kernel.md`, "Steel stress
+at a crack"). The Newbeam with CSA factors, where it was first seen, is parked and was not
+looked at again.
 
 **I. Detail views of the sample-input cases, found 2026-11-19.** Not investigated, except
 Principal Tensile Stress under axial compression alone (Marshall 1900 %, Newbeam 371 %):
@@ -377,8 +380,9 @@ repository).
 | `004ae520`, `004ac830` | steel capacity at a crack, concentrated strain |
 | `004bc470`, `004bd930` | steel ratio for strain concentration: layers, table for stirrups |
 | `004a79d0`, `004a80e0`, `004a8b20` | stirrups, transverse resultant, εy solve |
-| `004a9d90` | section forces and layering |
-| `00441d80`, `00440400` | flexural crack check |
+| `004a9d90`, `004a9be0`, `00434eb0` | section forces and the splitting of layers; the split itself; the base layers |
+| `00442e50`, `00442cd0`, `00440c70`, `004409d0` | steel stress at a crack: the routine, its solve for the extra curvature, the bars' moment at an extra curvature, the most the bars can add |
+| `00441d80`, `00440400` | flexural crack check: the zones and their capacity moments; the limit profile of a zone (zero where the capacity moment is zero) |
 | `004fec60`, `004ff1a0` | bond parameter tables |
 | `00424a90`, `00423e50` | cracking strength table |
 | `0041e840`, `0041fe20` | shear distribution: calculated profile and profile update; the change of strain along the member |
@@ -389,7 +393,7 @@ repository).
 | `00418af0`, `00418860`, `00415e30`, `0041a870` | load stage control: a pass on a stage, its wrapper (step growth, the peak, the end), a new stage and the closing in on an event, the next target |
 | `00422de0`, `00419250`, `004162d0` | the control variable, its base step, the change of control variable |
 | `00419990`, `00420f20`, `004204b0` | the end of the response; the profile error; the stage's state code |
-| `00424c60`, `004276a0`, `00425f10` | the single-state solve; the global solve with shear (not read); the stage solve without shear (read in part) |
+| `00424c60`, `004276a0`, `00425f10` | the single-state solve; the global solve with shear (not read); the stage solve without shear (read in part: balanced when the unbalanced force is under 0.1 % of the sum of the loads plus 1 N, a tenth of that under axial strain control; it gives up after twenty iterations) |
 | `0040e9f0` | set-up of another analysis class that steps in the shear strain from the start (taken to be the one for shear alone) |
 | `004ac190`, `004ab4e0`, `004fbf70` | concrete set-up (Kf, n), derived steel properties (segmental curve), the steel ratio η of the Hsu models |
 | `004f96e0`, `00448d90` | the reader of shape.dat and the outline dialog's width field: the only users of UP and DOWN |

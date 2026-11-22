@@ -33,6 +33,8 @@ class OutOfScope(ValueError):
 UNDOCUMENTED_SOFTENING = (4, 16, 17)
 # The Hsu models, which Response runs in another mode with Tamai tension stiffening (D5)
 HSU_SOFTENING = (9, 14, 15)
+# A stirrup pattern a file can carry that the manual's list (A-27) does not have (D23)
+HORIZONTAL_TIE = 7
 
 
 @dataclass
@@ -211,9 +213,16 @@ def parse(data: bytes) -> SectionInput:
             raise OutOfScope("Response's older text format (Ver_0.8) is not read; save the "
                              "section from Response-2000 as .rsp or .r2t (XML)") from None
         raise InputError(f"not a Response-2000 XML input: {e}") from None
-    beam = root if root.tag == "r3g_beam" else root.find("r3g_beam")
-    if beam is None:
+    beams = [root] if root.tag == "r3g_beam" else root.findall("r3g_beam")
+    if not beams:
         raise InputError("no <r3g_beam> section in the input")
+    if len(beams) > 1:
+        # Response-2000's manual has one cross section to a file (A-7, A-28); its sample
+        # inputs carry several (docs/scope.md 1.1; docs/summary.md D23)
+        raise OutOfScope(f"the file holds {len(beams)} sections: several sections in one "
+                         "file are not in Response-2000's manual and are not read; save the "
+                         "one to analyse in a file of its own")
+    beam = beams[0]
 
     s = SectionInput(name=beam.get("name", "New Cross Section"))
     s.units = _units_of(beam.get("units"))
@@ -331,6 +340,10 @@ def parse(data: bytes) -> SectionInput:
                        distbot=_f(el, "distbot", 0.0) * u.length,
                        pattern=int(_f(el, "pattern", 0)), db=db,
                        dep=_f(el, "dep", 0.0) * 1e-3, bartitle=title)
+        if t.pattern == HORIZONTAL_TIE:
+            raise OutOfScope(f"transverse reinforcement {t.name!r}: the horizontal tie "
+                             "(pattern 7) is not in Response-2000's manual and is not "
+                             "implemented")
         s.material(t.type)
         s.trans.append(t)
 

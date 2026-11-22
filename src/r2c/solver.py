@@ -93,26 +93,42 @@ class Analysis:
 
     # -- layers ---------------------------------------------------------------------------------
     def _initial_bounds(self) -> np.ndarray:
+        """The layers every stage starts from, as Response-2000 builds them (docs/kernel.md,
+        "Layers"): each stretch of the outline in equal layers, about seven to the depth of
+        the section, then a boundary at the upper and at the lower edge of every bar."""
         sec = self.sec
-        grid = [sec.zbot + sec.h * i / 14.0 for i in range(15)]
-        fixed = set(sec.breaks())
+        h = sec.h
+        bd: list[float] = []
+        for z1, z2, *_ in sec.segs:
+            n = int((z1 - z2) * 8.0 / (h + 0.1) + 0.99)
+            nl = max(n - 1, 1)
+            bd.extend(z1 - (z1 - z2) * i / nl for i in range(nl))
+        bd.append(sec.zbot)
+        bd = sorted(set(round(z, 9) for z in bd) | set(sec.breaks()), reverse=True)
+        sliver = h / 2048.0
+        near = 0.2          # mm
         for l in sec.layers:
-            for z in (l.z - l.db / 2.0, l.z + l.db / 2.0):
-                if sec.zbot + 1e-6 < z < sec.ztop - 1e-6:
-                    fixed.add(round(z, 9))
-        tol = sec.h / 56.0
-        pts = sorted(fixed)
-        # zone edges closer together than a sliver are merged
-        merged = []
-        for z in pts:
-            if merged and z - merged[-1] < sec.h / 400.0 and z not in sec.breaks():
-                continue
-            merged.append(z)
-        pts = merged
-        for g in grid:
-            if all(abs(g - z) > tol for z in pts):
-                pts.append(g)
-        return np.array(sorted(pts, reverse=True))
+            for second in (False, True):
+                for i in range(len(bd) - 1):
+                    lt, lb = bd[i], bd[i + 1]
+                    if not (abs(lt - l.z) < 1.0 or l.z <= lt):
+                        continue
+                    if second:
+                        if not lb < l.z:
+                            continue
+                    elif not (l.z < lt and (lb < l.z or abs(lb - l.z) < 0.1)):
+                        continue
+                    top = min(l.z + l.db / 2.0, lt)
+                    bot = max(l.z - l.db / 2.0, lb)
+                    if abs(top - lt) >= near:
+                        if top < lt and bot != lb and abs(lb - top) > sliver \
+                                and abs(lt - top) > sliver:
+                            bd.insert(i + 1, top)
+                    elif abs(bot - lb) >= near and bot > lb and abs(lb - bot) > sliver \
+                            and abs(lt - bot) > sliver:
+                        bd.insert(i + 1, bot)
+                    break
+        return np.array(bd)
 
     def _elastic_shape(self) -> np.ndarray:
         """Shear strain profile of the uncracked section (VQ/Ib), scaled to a mean of one."""
@@ -302,6 +318,12 @@ class Analysis:
                 tt = np.clip(np.abs(z - zn) / abs(face - zn), 0.0, 1.0)
                 out = np.where(inside, np.minimum(out, fna + (fface - fna) * tt), out)
             return out
+        # the zone the steel stress at a crack is worked out for: the deeper of the two, its
+        # capacity moment and its neutral axis; a section all in tension counts as no depth
+        # and gives the upper zone, with its axis far below
+        dtop = ztop - z3 if abs(z3) < FAR else 0.0
+        dbot = z4 - zbot if abs(z4) < FAR else 0.0
+        f1cx.mcap, f1cx.zref = (mtop, z3) if dbot <= dtop else (mbot, z4)
         return f1cx
 
     # -- nodes ----------------------------------------------------------------------------------
@@ -517,24 +539,30 @@ class Analysis:
         return n, m, v, (z, b, out, ex, g, smx, smt, es, fs, f1cx, eyn)
 
     def refine(self, e0, phi, gam):
-        """Dynamic layering: split every layer whose stresses are not interpolated well by a
-        parabola through its three nodes, or that the crack front passes through. Returns True
-        if any layer was split."""
+        """Dynamic layering, as Response-2000 does it (docs/kernel.md, "Layers"): each half of
+        a layer is checked at its middle against the parabola through the layer's three nodes,
+        and a layer with a half that fails is split in two; a half that passed is not looked
+        at again. The layers are built from the base layers each time, for this strain state
+        alone. Returns True if they are not the layers there were."""
         sec = self.sec
-        changed = False
+        before = self.bounds
+        self.bounds = self._initial_bounds()
         es, fs = self.steel(e0, phi)
         f1cx = self.crack_check(e0, phi, es, fs)
-        hmin = sec.h / 512.0
-        for _ in range(12):
+        hmin = sec.h / 1024.0
+        z, _b = self.layer_nodes()
+        out, *_ = self.eval_nodes(e0, phi, gam, z, f1cx)
+        tol1 = 0.002 * max(float(np.max(np.abs(out.f1))), 1e-6)
+        tol2 = 0.002 * max(float(np.max(np.abs(out.f2))), 1e-6)
+        done = np.zeros(len(z), dtype=bool)
+        for _ in range(16):
             z, _b = self.layer_nodes()
-            if len(z) >= self.max_layers:
+            if len(z) >= self.max_layers - 2 or done.all():
                 break
             out, *_ = self.eval_nodes(e0, phi, gam, z, f1cx)
             f1 = out.f1.reshape(z.shape)
             f2 = out.f2.reshape(z.shape)
-            cr = out.cracked.reshape(z.shape)
-            tol1 = 0.002 * max(float(np.max(np.abs(f1))), 1e-6)
-            tol2 = 0.002 * max(float(np.max(np.abs(f2))), 1e-6)
+            over = (out.e1 - out.ecr).reshape(z.shape)
             zq = np.stack([0.75 * z[:, 0] + 0.25 * z[:, 2], 0.25 * z[:, 0] + 0.75 * z[:, 2]],
                           axis=1)
             oq, *_ = self.eval_nodes(e0, phi, gam, zq, f1cx)
@@ -546,19 +574,35 @@ class Analysis:
                 a = 0.375 * f[:, 0] + 0.75 * f[:, 1] - 0.125 * f[:, 2]
                 c = -0.125 * f[:, 0] + 0.75 * f[:, 1] + 0.375 * f[:, 2]
                 return np.stack([a, c], axis=1)
-            bad = (np.abs(interp(f1) - q1) > tol1).any(axis=1)
-            bad |= (np.abs(interp(f2) - q2) > tol2).any(axis=1)
-            bad |= ~(cr.all(axis=1) | (~cr).all(axis=1))
-            thick = (z[:, 0] - z[:, 2]) > 2.0 * hmin
-            split = bad & thick
+            bad = np.abs(interp(f1) - q1) > tol1
+            bad |= np.abs(interp(f2) - q2) > tol2
+            # the crack front passes through the half
+            a, m, c = over[:, 0], over[:, 1], over[:, 2]
+            bad[:, 0] |= ((a < 0) & (m > 0)) | ((a > 0) & (m < 0))
+            bad[:, 1] |= ((m < 0) & (c > 0)) | ((m > 0) & (c < 0))
+            thick = 0.5 * (z[:, 0] - z[:, 2]) > hmin
+            bad &= (thick & ~done)[:, None]
+            split = bad.any(axis=1)
+            done |= ~split
             if not split.any():
                 break
-            room = self.max_layers - len(z)
+            room = self.max_layers - 2 - len(z)
             idx = np.nonzero(split)[0][:room]
-            self.bounds = np.array(sorted(set(self.bounds.tolist()) | set(z[idx, 1].tolist()),
-                                          reverse=True))
-            changed = True
-        return changed
+            keep = np.zeros(len(z), dtype=bool)
+            keep[idx] = True
+            bounds, flags = [], []
+            for i in range(len(z)):
+                bounds.append(z[i, 0])
+                if keep[i]:
+                    flags.append(not bad[i, 0])
+                    bounds.append(z[i, 1])
+                    flags.append(not bad[i, 1])
+                else:
+                    flags.append(bool(done[i]))
+            bounds.append(z[-1, 2])
+            self.bounds = np.array(bounds)
+            done = np.array(flags)
+        return len(before) != len(self.bounds) or not np.array_equal(before, self.bounds)
 
     def coarsen(self):
         """Start a stage from the base layers again (the crack front has moved on)."""
@@ -576,7 +620,7 @@ class Analysis:
         sel = np.nonzero(keep)[0]
         o2 = nodelib.NodeOut(**{k: val[sel] for k, val in out.__dict__.items()})
         zz = zf[sel]
-        fscr = self.steel_at_crack(e0, phi, es, fs, zz, o2, b.ravel()[sel])
+        fscr = self.steel_at_crack(e0, phi, es, fs, zz, o2, b.ravel()[sel], f1cx)
         rhov = sec.tab(sec.t_rhov, zz)
         ey = eyn[sel]
         fsy = np.zeros(len(sel))
@@ -599,71 +643,111 @@ class Analysis:
                       fsycr=fsycr, rhov=rhov, fs=fs, fscr=fscr, es=es,
                       f1cx=f1cx(zz))
 
-    def steel_at_crack(self, e0, phi, es, fs, z, out, b):
-        """Stress of each longitudinal layer at a crack (thesis 4-5, last part): the moment of
-        the average concrete tension about the crack front is taken by an extra curvature of
-        the bars crossing the cracked zone."""
+    def steel_at_crack(self, e0, phi, es, fs, z, out, b, f1cx):
+        """Stress of each longitudinal layer at a crack (thesis 4-5, last part; the details
+        are Response-2000's, docs/kernel.md "Steel stress at a crack"): the moment about the
+        neutral axis of the concrete tension the cracks do not carry is taken by an extra
+        curvature about that axis, of every bar in tension. nan: no value (a bar ruptured, or
+        the bars cannot take the moment)."""
         sec = self.sec
         res = np.zeros(len(sec.layers))
         if not len(sec.layers):
             return res
-        cr = out.cracked
-        if not cr.any():
-            return res
-        # cracked zones: contiguous runs of cracked nodes (nodes run from the top down)
-        runs = []
-        start = None
-        for i, c in enumerate(cr):
-            if c and start is None:
-                start = i
-            if (not c or i == len(cr) - 1) and start is not None:
-                end = i if c else i - 1
-                runs.append((start, end))
-                start = None
-        for a, e in runs:
-            if e <= a:
+        zref, mcap = f1cx.zref, f1cx.mcap
+        # the concrete's moment: the tension above the floor, and the shear on the crack,
+        # over the halves of layers that are cracked at both ends, on the tension side
+        law = sec.conc0
+        ft = np.maximum(law.ft, np.interp(z, sec.tz, self.t_ft)) * law.phi
+        fl = ft / (1.0 + 250.0 * out.w)
+        g = np.maximum(out.f1 - fl, 0.0) + out.vci / out.tan
+        cr = out.e1 > out.ecr
+        side = (z >= zref) if phi <= 0 else (z <= zref)
+        ok = cr & side
+        d = np.abs(zref - z)
+        k = ok[:-1] & ok[1:]
+        g1, g2, b1, b2, d1, d2 = g[:-1], g[1:], b[:-1], b[1:], d[:-1], d[1:]
+        mom = float(np.sum(((g1 + g2) * (b1 + b2) * (d1 + d2) * 0.5 + g1 * b1 * d1
+                            + g2 * b2 * d2)[k] * (z[:-1] - z[1:])[k] / 6.0))
+        # the bars in tension, and the extra curvature that uses up the first one's reserve
+        bars = []
+        dmin = 1e-3         # 1/mm
+        lin = 0.0
+        for i, l in enumerate(sec.layers):
+            e = float(self.strain(e0, phi, l.z))
+            if e - float(sec.shrinkage(np.array([l.z]))[0]) <= 0:
                 continue
-            zt, zb = z[a], z[e]
-            # the crack front is the end of the run nearer the neutral axis
-            ext = self.strain(e0, phi, zt)
-            exb = self.strain(e0, phi, zb)
-            front = zt if abs(ext) < abs(exb) else zb
-            zz = z[a:e + 1]
-            ff = out.f1crack[a:e + 1] * np.abs(np.sin(out.theta[a:e + 1])) ** 2
-            ff = np.maximum(out.f1[a:e + 1], 0.0)
-            mom = abs(np.trapezoid(ff * b[a:e + 1] * np.abs(zz - front), zz))
-            bars = [(i, l) for i, l in enumerate(sec.layers)
-                    if min(zt, zb) - 1e-6 <= l.z <= max(zt, zb) + 1e-6 and not math.isnan(fs[i])]
-            if not bars or mom <= 0:
+            arm = abs(zref - l.z)
+            bars.append((i, l, e, arm))
+            if math.isnan(fs[i]):
                 continue
+            cap = float(l.steel.crack_capacity(e, l.prestrain, l.rho, l.strand))
+            room = 0.0 if math.isnan(cap) else max(cap - fs[i], 0.0)
+            if arm > 0:
+                dmin = min(dmin, room / (l.steel.E * l.steel.phi) / arm)
+        for i, l, e, arm in bars:
+            if e < l.steel.fy / l.steel.E:
+                lin += l.steel.E * l.steel.phi * dmin * arm * arm * l.area
 
-            def resist(dphi):
-                tot = 0.0
-                for i, l in bars:
-                    arm = abs(l.z - front)
-                    s = float(l.steel.stress(es[i] + dphi * arm))
-                    if math.isnan(s):
-                        s = l.steel.fu * l.steel.phi
-                    tot += (s - fs[i]) * l.area * arm
-                return tot
-            lo, hi = 0.0, 1e-9
-            for _ in range(60):
-                if resist(hi) >= mom:
-                    break
-                hi *= 2.0
-            else:
-                for i, l in bars:
-                    res[i] = float("nan")
-                continue
-            for _ in range(60):
-                mid = 0.5 * (lo + hi)
-                if resist(mid) >= mom:
-                    hi = mid
+        def at(i, l, e, extra):
+            """The bar's stress with an extra strain at the crack; nan when it ruptures."""
+            if math.isnan(fs[i]):
+                return float("nan")
+            s = float(l.steel.stress(es[i] + extra))
+            cap = float(l.steel.crack_capacity(e + extra, l.prestrain, l.rho, l.strand))
+            if math.isnan(cap):
+                return float("nan")
+            return cap if math.isnan(s) else min(s, cap)
+
+        def resist(dphi):
+            tot = 0.0
+            for i, l, e, arm in bars:
+                s = at(i, l, e, dphi * arm)
+                if not math.isnan(s):
+                    tot += arm * (s - fs[i]) * l.area
+            return tot
+
+        dphi = None
+        if lin < mom:
+            # past what the bars take elastically: solved, if it is within the capacity
+            # moment of the crack check (2 N m over)
+            if mom < 1.001 * mcap + 2000.0:
+                step = 1e-6 / sec.h if abs(zref) <= 20.0 * sec.h else 5e-10
+                hi = step
+                for _ in range(50):
+                    hi += step
+                    if resist(hi) >= mom:
+                        break
                 else:
-                    lo = mid
-            for i, l in bars:
-                s = float(l.steel.stress(es[i] + hi * abs(l.z - front)))
-                res[i] = s
+                    best = 0.0
+                    for i, l, e, arm in bars:
+                        x = ((l.steel.eu - l.prestrain) * 1.01 - e) / (arm + 0.1)
+                        if resist(x) > best:
+                            best, hi = resist(x), x
+                    if best < mom:
+                        hi = 0.0
+                    step = hi
+                lo = hi - step
+                for _ in range(10):
+                    mid = 0.5 * (lo + hi)
+                    if resist(mid) > mom:
+                        hi = mid
+                    else:
+                        lo = mid
+                dphi = 0.5 * (lo + hi)
+        elif lin <= 0:
+            dphi = dmin
+        else:
+            dphi = mom / lin * dmin
+        tension = {i for i, *_ in bars}
+        if dphi is None:
+            # no value: the bars in compression show their own stress
+            for i in range(len(sec.layers)):
+                res[i] = float("nan") if i in tension else fs[i]
+            return res
+        for i, l, e, arm in bars:
+            ecr = max(float(np.interp(l.z, sec.tz, self.t_ft)) / law.Ec, law.ecr)
+            if e + arm * dphi - float(sec.shrinkage(np.array([l.z]))[0]) >= ecr:
+                res[i] = at(i, l, e, arm * dphi)
         return res
 
 

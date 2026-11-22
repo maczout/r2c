@@ -5,9 +5,10 @@
 current at the end of every session (CLAUDE.md, "Ending a session"). Everything else in
 `docs/` is the developer's working record and backs this page; it does not replace it.
 
-Last updated: 2026-11-22, by the owner and the developer, after the measures were put right
-with the owner (A2 part 1; log 2026-11-22-03). **No decision waits for the owner.** Next: a
-development session on A2 parts 2 to 5, within the bounds in `docs/acceptance.md`.
+Last updated: 2026-11-22, by the developer, at the end of the session on A2 parts 2 to 5
+(log 2026-11-22-04). **Five decisions wait for the owner: D29 to D33.** D29 comes first: it
+is the developer's reading of the no-regression bound, on which one of the kernel changes
+of this session was kept.
 
 ## Aim
 
@@ -21,7 +22,7 @@ outside r2c and r2x. (Owner, 2026-11-22.)
 
 | Phase | What | State |
 |---|---|---|
-| **A. Develop the kernel** | Newbeam only, varied in its loads (the 17 cases below). Other sections, reinforcement, material models and units are parked. | **Now.** The working set is reset (2026-11-22: D16, D18, D19 carried out). Next: the first increment on the exit criteria, proposed in D26 |
+| **A. Develop the kernel** | Newbeam only, varied in its loads (the 17 cases below). Other sections, reinforcement, material models and units are parked. | **Now.** Increment A2 is done as far as its bounds allow (2026-11-22): peak and rising branch are met on all 17 cases; shape on 15; the Must views on 5 of the 8 cases without shear. What is left is in D29 to D33 |
 | **B. Validate and refine** | The parked cases come back; the test set and targets are reviewed; r2c is held to them. | Not started. Starts when Phase A meets its exit criteria (D1, D2). |
 
 ### The phase A set
@@ -44,34 +45,52 @@ differ. Confirmed against the fixtures on 2026-11-22: 17 cases.
 Parked until phase B, kept and not run by default (68 cases): other sections (T-beam,
 column, I-girder), other materials and reinforcement, units, material factors, More Detail,
 no input, and Response's sample inputs. They sit in a folder of their own and can be run on
-request. Five of them need something that has now been removed, and r2c refuses them.
+request. Eleven of them need something that has been removed, and r2c refuses them: five
+since the removals of D18, six more (all on Response's sample inputs) since D23.
 
 ## Progress against the Phase A exit criteria
 
 Cases inside target, counted by `tools/targets.py --counts` from the run of 2026-11-22 made
-with the measures of A2 part 1 (`docs/verification-results.md`). r2c itself did not change.
+at the end of A2 parts 2 to 5 (`docs/verification-results.md`). "Before" is the run made
+with the measures of A2 part 1, before any change to the kernel.
 
-| Check | Inside | Exit tier (D1, D2, D27) |
-|---|---:|---|
-| Peak | 17 of 17 | Must |
-| Rising branch | 16 of 17 | Must |
-| Shape | 15 of 17 | Must (a shear case's ending left out: D25) |
-| Views of the stress state, without shear | **2 of 8** | Must |
-| Post-peak | 10 of 17 (7 of the 8 without shear) | Should, without shear |
-| Views related to shear, and stress-state views with shear | 8 of 17 | Should |
-| Views related to cracking | 7 of 17 | Could |
+| Check | Before | Now | Exit tier (D1, D2, D27) |
+|---|---:|---:|---|
+| Peak | 17 of 17 | **17 of 17** | Must: met |
+| Rising branch | 16 of 17 | **17 of 17** | Must: met |
+| Shape | 15 of 17 | 15 of 17 | Must (a shear case's ending left out: D25) |
+| Views of the stress state, without shear | 2 of 8 | **5 of 8** | Must |
+| Post-peak | 10 of 17 | 11 of 17 (7 of the 8 without shear) | Should, without shear |
+| Views related to shear, and stress-state views with shear | 8 of 17 | 8 of 17 | Should |
+| Views related to cracking | 7 of 17 | 7 of 17 | Could |
+
+Check by check over all 17 cases, 47 came inside target and 7 went outside: six Should
+views by a point or at one stage, and one stage of a Must view (D29).
 
 What keeps the misses outside:
 
-- *Rising branch:* M/V = 0.5 m (6.1 %), on the recovery after a fall of load.
-- *Shape:* V alone: Response has a fall of load before the peak, r2c none. Tension:
-  cracking and a fall of load come at one step and are read in a different order.
+- *Shape:* tension, and V alone. In both, r2c's curve has the same features as Response's
+  and the loads agree within 0.4 %; they are read differently at one stage (D31, D32).
+- *Views of the stress state without shear* (the Must), three cases:
+  - M: principal tensile stress at the last stage, 7.2 % (D29).
+  - N + M: principal tensile stress at cracking, 51.5 % (D30: the thesis and the program
+    differ there; with the program's rule it is 0.3 %).
+  - −M: longitudinal strain and principal tensile strain at the last stage, 5.3 and 5.9 %.
+    They follow from how −M ends, which is a Should and was not in A2 (D33).
 - *Post-peak without shear:* −M, 20 %.
-- *Views of the stress state without shear* (the Must): 6 of the 8 cases are outside.
-  Principal tensile stress on five: M 18 %, −M 24 %, N 10 %, N + M 52 %, N (+200 kN) then
-  M 24 %. Steel stress at a crack on two: N + M 100 %, tension 78 %. −M also by a point on
-  its longitudinal and principal tensile strain (5.3 %, 5.9 %). The worst stages are at or
-  after the peak, except N + M (stages 14 and 22).
+
+### Increment A2, part by part
+
+| Part | What was done | Outcome |
+|---|---|---|
+| D23 | A file with several sections, and the horizontal tie, are refused with a reason | Done. Six more parked cases refused and kept |
+| 2. Principal tensile stress at the crack front | (a) Response's cracking under compression inside the node (D14). (b) Response's own rule for where it puts its points over the depth, read from the program | **Inside at four of five stages** (M and −M at the peak: 18 and 24 % to 0.0 %). The stage flips that blocked (a) before did not recur. (a) also brought the last rising-branch miss inside (M/V = 0.5 m, 6.1 to 2.4 %). Left: D29, D30 |
+| 3. Steel stress at a crack | Response's way of working it out: the thesis for the method, the program for the particulars | **Inside, both cases**, at the first approach (100 and 78 % to 0.0 %) |
+| 4. Tension's shape | One approach tried (Response's own tolerance for calling a state balanced) and reverted | **Stopped.** The two programs' loads at cracking differ by 0.2 %; which side of the fall one stage lands on is the solver's doing, not a rule. D31 |
+| 5. V alone; M/V = 0.5 m | Investigated; no change to the kernel | M/V = 0.5 m: inside since part 2. V alone: r2c now has the fall of load, 4.1 kN deep where Response's is 4.7 and the measure asks 4.35. D32 |
+
+Every rule taken over is in `docs/kernel.md` with its source; the detail and the numbers are
+in `docs/verification.md`, "A2, parts 2 to 5".
 
 Known deviations are in `docs/status.md`: how shear responses end (a Won't, D1), and the
 circular column under axial load alone, which is not cloned (D12).
@@ -83,7 +102,7 @@ Each item of the scope inventory is now marked as documented or not, with the ma
 softening models combined with Tamai tension stiffening (D5); compression softening 4 (D10),
 16 and 17 (later than the manual); a segmental stress-strain curve for reinforcing steel. A
 shape with no outline is an input error (D6). Response's program folder was never read, and
-is not (D9). Three things were unclear and were put to the owner: the eleven softening models the manual names are kept (D21); 1.9.7's defaults are followed (D22); several sections in one file and the horizontal tie are to be refused (D23, in A2).
+is not (D9). Three things were unclear and were put to the owner: the eleven softening models the manual names are kept (D21); 1.9.7's defaults are followed (D22); several sections in one file and the horizontal tie are refused (D23, done 2026-11-22).
 
 ## Decisions
 
@@ -121,7 +140,7 @@ owner) · *open* (no suggestion yet).
 | D18 | Features built beyond the documented set (less common softening models, segmental steel, …) | decided, owner 2026-11-22 | Remove the code |
 | D21 | Compression softening models that the manual names but that neither the manual nor the thesis gives a rule for (eleven of them: Vecchio-Collins 1982, 1992-A and 1992-B, Mehlhorn, Maekawa, Noguchi, Belarbi-Hsu, Collins 1978, Kaufmann-Marti, Hsu-Zhang 1998, Hsu 1993). Their rules in r2c were read from the binary. D18 names "less common softening models" for removal; the manual lists them, so they were kept | decided, owner 2026-11-22 | **Keep them.** Being named in the manual counts as documented; their rules from the binary stay. (The developer had suggested removing them.) |
 | D22 | The default compression softening of Response 1.9.7 (Collins-Bentz 2011) is later than the manual and the thesis, so by D17 it is not documented. Every case uses it. For Newbeam's concrete it is the thesis' own equation; they differ above 57 MPa. The automatic tensile strength is another default where the program differs from the thesis | decided, owner 2026-11-22 (suggestion approved) | Keep. Where a default of Response 1.9.7 differs from the 2000 documents, r2c follows the program, because the oracle runs with its defaults |
-| D23 | Two things an input file can carry that the manual does not have, and that r2c reads as the nearest documented thing with no code of their own: several sections in one file (the first is read), and the horizontal tie (read as a stirrup). Both occur only in Response's sample inputs, which are parked | decided, owner 2026-11-22 | **Refuse them now**, with a reason, as for the other removals (D24). (The developer had suggested leaving them until phase B.) |
+| D23 | Two things an input file can carry that the manual does not have, and that r2c reads as the nearest documented thing with no code of their own: several sections in one file (the first is read), and the horizontal tie (read as a stirrup). Both occur only in Response's sample inputs, which are parked | decided, owner 2026-11-22 | **Refuse them now**, with a reason, as for the other removals (D24). (The developer had suggested leaving them until phase B.) **Done 2026-11-22:** the six parked cases on Response's sample files that hold several sections are refused and kept |
 | D24 | Reading of "out of scope" and "remove" (D4, D5, D10, D18): r2c refuses such an input and says why, where before it read a drape and ignored it, or ran a Hsu model with Tamai tension stiffening as two independent models | decided, owner 2026-11-22 (reading confirmed) | Yes: refuse, do not ignore silently |
 
 ### Measurement and test set (meta-development)
@@ -129,13 +148,23 @@ owner) · *open* (no suggestion yet).
 | # | Question | Status | Answer |
 |---|---|---|---|
 | D13 | Stage matching: a 0.5 % change in r2c's load can switch the matched stage and flip 11 view checks | decided, owner 2026-11-22 (suggestion approved) | Fix the measure before any work on views. **Done 2026-11-22:** a stage is matched between the same features of the two curves. Without shear only the no-load case's first stage was re-matched, and no check changed; with shear ten stages, mostly after the peak, are now matched to like states (one had been matched to r2c's stage 1) |
-| D14 | F1: Response's cracking-under-compression rule inside the node | decided, owner 2026-11-22 (suggestion approved) | Yes, after D13 |
+| D14 | F1: Response's cracking-under-compression rule inside the node | decided, owner 2026-11-22 (suggestion approved) | Yes, after D13. **Done 2026-11-22** (A2 part 2) |
 | D15 | The generated results JSON is committed on every run (~80,000 lines) | decided, owner 2026-11-22 (suggestion approved) | Build it in CI instead of storing it |
 | D16 | The test set has grown to 85 cases | decided, owner 2026-11-22 | Develop on Newbeam; the rest is parked until Phase B |
 | D19 | Parked fixtures: delete, or keep and not run by default? | decided, owner 2026-11-22 (suggestion approved) | Keep them, not run by default |
 | D25 | The shape check still counts how a shear response ends, against D1a. Two cases (M/V = 0.5 m and 2 m) are outside on shape for that reason alone | decided, owner 2026-11-22 (reading confirmed) | Change the measure so that shape leaves out the ending for shear cases. **Done 2026-11-22:** shape 13 → 15 of 17 |
 | D27 | Which of the 21 detail views are Must, Should or Could | decided, owner 2026-11-22 | Must: the stress-state views on cases without shear, including steel stress at a crack and the principal tensile strain and stress (the owner's choice). Should: shear views, and stress-state views on shear cases. Could: cracking views. Lists in `docs/acceptance.md` |
 | D28 | Bounds, in case a Must is harder than it looks | decided, owner 2026-11-22 | Two grounded approaches per part at most, no tuning to fit, no regression; on stopping, put it to the owner with options. In `docs/acceptance.md` |
+
+### Left by increment A2 (new, 2026-11-22)
+
+| # | Question | Status | Answer |
+|---|---|---|---|
+| D29 | Reading of the no-regression bound (D28: "no Must view that is inside may go outside"). With Response's layering, principal tensile stress on M went from 18.2 to 0.0 % at the peak and from 4.2 to 7.2 % at the last stage. The developer read the bound view by view on a case, as the report counts it: that view on M was outside before and is outside now, so the layering was kept. Stage by stage it is a regression | suggested (reading, for the owner to confirm) | **Confirm, and accept that stage as a known deviation.** At that stage r2c has Response's points, and gives Response's forces in Response's own state; the two states differ by 0.005 mm/m of strain, less than Response's own solve leaves unbalanced, and next to a crack front that is 7 % of the chart. Other options: take the layering out again (the four stages that came inside go back out), or measure this view differently at a crack front (meta-development, with the owner) |
+| D30 | Where no bar crosses the cracked zone (under N + M the zone is below the bottom bars), the thesis says the concrete tension is not reduced; Response 1.9.7 reduces it to the floor it keeps after cracking. r2c follows the thesis. This is the one principal-tension miss left that has a rule behind it: N + M at cracking, 51.5 % | suggested | **Follow the program**, as for the defaults in D22: the oracle runs the program. Tried and not kept: 51.5 to 0.3 %, nothing else moves, the Must views go to 6 of 8. One line of code |
+| D31 | Tension's shape (A2 part 4, stopped). Response's curve has one more rising point before the fall at cracking than r2c's (276.2 against 274.5 kN; r2c's own limit is about 275.6), and the measure reads the order of cracking and the fall from that point. Response's solve carries on with a state it has not balanced; r2c finds none there | suggested | **Accept as a known deviation.** Other options: read cracking and a fall at the same step as one feature (a change to the measure, with the owner); or clone how Response's solve gives up (a third approach: solver behaviour the documents do not describe, which the stance excludes) |
+| D32 | V alone's shape (A2 part 5, no kernel change). r2c now has the fall of load before the peak, 1.9 % of the peak deep; Response's is 2.2 % and the measure counts a fall from 2 % | suggested | **Accept as a known deviation**, or count a fall in r2c's curve where Response has one at the same place and r2c's is within the 5 % target of it (a change to the measure, with the owner). No third approach is proposed: every check at that stage is inside target |
+| D33 | What comes after A2. With D29 to D32 answered as suggested and D30 carried out, the Musts left are −M's two views at its last stage, which follow from how −M ends (a Should, 20 %) | suggested | **Next increment: the ending of −M**, then the views related to shear (Should). Before phase B, look at the parked cases the changes of A2 moved (Risks) |
 
 ### The next increment
 
@@ -148,18 +177,15 @@ shape, and the views of the stress state under moment and axial load). Peak is m
 
 1. **The measures, with the owner** (meta-development). **Done 2026-11-22** (D13, D25, D27,
    D28): shape 15 of 17; the view Must is counted on its own, 2 of 8 inside.
-2. **Principal tensile stress at the crack front** (kernel). Response's rule for cracking
-   under compression inside the node (D14), then how closely it spaces its points at the
-   crack front. *View Must: five of the six cases outside.*
-3. **Steel stress at a crack**, under N + M and under tension. Not yet investigated.
-   *View Must: two of the six.*
-4. **Tension: the order of cracking and the fall of load.** *Shape: one case, the last
-   shape miss without shear.*
+2. **Principal tensile stress at the crack front** (kernel). **Done 2026-11-22:** inside at
+   four of five stages; D29 and D30 for the rest.
+3. **Steel stress at a crack**, under N + M and under tension. **Done 2026-11-22:** inside.
+4. **Tension: the order of cracking and the fall of load.** **Stopped 2026-11-22:** D31.
 5. **V alone: the fall of load before the peak. M/V = 0.5 m: the recovery after a fall of
-   load.** *Shape: one case. Rising branch: one case, its only miss.* Both are shear cases
-   and the cause of neither is known, so this is the least certain part and comes last.
+   load.** **2026-11-22:** M/V = 0.5 m inside; V alone investigated, D32.
 
-Also in A2, before part 2: refuse several sections in one file and the horizontal tie (D23), as for the other removals.
+Also in A2, before part 2: several sections in one file and the horizontal tie are refused
+(D23). **Done 2026-11-22.**
 
 Not in A2: the ending of −M (a Should), the views related to shear (Should) and to cracking
 (Could), speed.
@@ -179,5 +205,14 @@ H and I (views are now covered by D2).
   not yet done).
 - **Newbeam only** leaves the paths built for steps in width, strands and hoops unexercised
   until Phase B. The parked cases are no longer run on every change, so a change that
-  breaks one of them will not show until they are run again; running them on request before
-  phase B starts will tell.
+  breaks one of them will not show until they are run again.
+- **The parked cases moved with A2** (run once before and once after, 2026-11-22; 57 cases
+  that both kernels run). Check by check 119 came inside and 80 went outside. On peak,
+  rising branch and shape: four I-girder cases with shear came inside on one of them and
+  four went outside, one of them far (the I-girder with Kaufmann-Marti softening: peak
+  −0.05 to −8 %). One parked regression test now fails by a hair (linear concrete: peak
+  0.09 % against a limit of 0.05 %). Nothing was done about either: parked cases are not in
+  A2. They are the first thing to look at before phase B (D33).
+- **Speed.** Building the layers again for each state costs time: the 17 cases together
+  take about a third longer (345 to 470 s of computing, measured on one machine). Speed was
+  not in A2.

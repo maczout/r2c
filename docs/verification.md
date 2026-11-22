@@ -33,6 +33,138 @@ input folder; the parked set needs `--inputs RESPONSE_FOLDER R2X/tests/reference
 `python tools/report.py OUT`; compare any two records with
 `python tools/compare.py REF SUBJECT --views`.
 
+## A2, parts 2 to 5 (2026-11-22)
+
+Four kernel changes, each measured against the run before it on the 17 phase A cases
+(`python tools/verify.py tests/oracle ...`, `python tools/targets.py OUT --counts`,
+`python tools/changes.py BEFORE AFTER`; this machine, 17 cases at a time). The baseline was
+run again on this machine first and gives the counts of the run of record of A2 part 1.
+
+| Check | Baseline | Part 2, the node | Part 2, the layers | Part 3 |
+|---|---:|---:|---:|---:|
+| Peak | 17 of 17 | 17 | 17 | 17 |
+| Rising branch | 16 of 17 | 17 | 17 | 17 |
+| Shape | 15 of 17 | 15 | 15 | 15 |
+| Views, Must (stress state, without shear) | 2 of 8 | 2 | 4 | 5 |
+| Post-peak | 10 of 17 | 10 | 11 | 11 |
+| Views, Should | 8 of 17 | 8 | 8 | 8 |
+| Views, Could | 7 of 17 | 7 | 7 | 7 |
+
+Parts 4 and 5 changed nothing in the kernel. The numbers of the last column are those of
+`docs/verification-results.md`.
+
+### A2, part 2: principal tensile stress at the crack front
+
+*First, Response's cracking under compression in the node* (`docs/kernel.md`, "Cracking
+under compression"; D14). Without shear nothing moves, as expected: there is no principal
+tension across compression. With shear, 36 checks come inside and 3 go outside:
+
+- the rising branch at M/V = 0.5 m, 6.1 to 2.7 % (the last rising-branch miss), and eleven
+  views of that case at its fall of load and its peak;
+- 14 views under N₀ then V at the peak and 10 under V alone at the fall of load at
+  cracking, which now compare like states (principal tensile strain 90 to 0.4 %, crack
+  widths 100 to 4 %);
+- outside, all Should: shear on crack at M/V = 0.5 m at the peak (4.9 to 5.5 %), average
+  angle under V alone at the last stage (3.7 to 5.1 %), transverse bond under N₀ then M + V
+  at the last stage (2.6 to 22.5 %).
+
+The stage that flipped in the trial of 2026-11-21 (V alone, stage 10) does not flip: with
+the stage matching of D13 it is matched to r2c's stage after the fall, and its views come
+inside.
+
+*Then, how Response spaces its nodes* (`docs/kernel.md`, "Layers"). With Response's base
+layers and splitting rule, r2c's nodes are Response's node for node at the stages looked at
+(`python tools/nodes.py FIXTURE RECORD --feature peak`: M at the peak and at the end, −M at
+the peak, N at the end; before, six of 65 nodes differed at M's peak, among them the four at
+the crack front). Principal tensile stress, without shear:
+
+| Case, stage | Before | After |
+|---|---:|---:|
+| M, peak | 18.2 % | 0.0 % |
+| −M, peak | 23.9 % | 0.0 % |
+| N, last stage | 10.0 % | 2.7 % |
+| N + M, last stage | 6.7 % | 0.0 % |
+| N₀ = +200 kN then M, last stage | 24.4 % | 1.1 % |
+| **M, last stage** | **4.2 %** | **7.2 %** |
+| N + M, cracking | 51.5 % | 51.5 % |
+
+N and N₀ = +200 kN then M are now inside on every Must view. Two stages stay outside:
+
+- *M at its last stage went outside* (4.2 to 7.2 %): the one Must check that was inside at
+  a stage and is not now. r2c's nodes there are Response's, and its longitudinal strain
+  differs from Response's by 0.005 mm/m over the whole depth (0.05 % of the strain at the
+  top). Next to the crack front f1 rises by 1.4 MPa per millimetre, so that offset is
+  0.135 MPa, 7 % of the chart. In Response's own strain state r2c's forces are Response's
+  (N −0.01 kN, M +0.00 %: `python tools/diagnose.py states`). After the peak the axial
+  force changes little with the axial strain: about 0.015 kN for 0.001 mm/m (estimated, from
+  r2c's last stage solved again from the stages before it), so an unbalanced axial force of
+  some 0.07 kN moves the strain that far. Response accepts a state without shear when the
+  unbalanced force is under 0.1 % of the loads plus 1 N, here 0.3 kN [B `00425f10`, read in
+  part 4]; r2c solves to 10⁻⁷ of the section's strength. So the offset is inside what
+  Response's own solve leaves, and it is not a difference of rule. `docs/summary.md`, D29.
+- *N + M at cracking* (51.5 %): not the nodes. Under N + M the tension zone at cracking is
+  18 mm deep and below the bottom bars. r2c leaves the concrete tension there unreduced,
+  as the thesis says it does where no bar crosses the crack [T 4-5, restriction 3]; in
+  Response's chart the tension there is down at the floor after cracking, and in the binary
+  the limit of a zone with no bar in it is zero [`00440400`]. Tried and not kept: with the
+  binary's rule the stage comes to 0.3 % and nothing else changes sides (view Must would be
+  6 of 8). The documents and the binary differ, so it is the owner's: D30.
+
+With shear the layers put ten views of M/V = 0.5 m outside again (eight at its fall of
+load, which the node had just brought inside, by one to five points) and one under V alone
+(Should and Could), and bring inside five views of M/V = 2 m, two of V alone and V alone's
+post-peak branch (8.4 to 3.7 %).
+
+### A2, part 3: steel stress at a crack
+
+The first approach brought both cases inside (`docs/kernel.md`, "Steel stress at a crack"):
+N + M at the peak 100 to 0.0 % (the bottom bar at a crack: Response 46.1 MPa, r2c 0 before),
+tension at the fall of load 78 to 0.0 % (Response 29.0 and 37.3 MPa on the two layers; r2c
+0 and 210 before). The view also comes inside at five stages of four shear cases (M/V = 1 m
+at the peak, N₀ then V at the peak, N + M + V at cracking, V alone at its fall and its peak)
+and goes outside at one (M/V = 0.5 m at the fall of load, 0.0 to 5.6 %; Should). Tension is
+now inside on every Must view.
+
+### A2, part 4: tension, the order of cracking and the fall of load
+
+Not resolved; one approach tried and dropped. Response's curve rises to 276.2 kN at a
+strain of 0.0646 mm/m and falls to 235.8 at the next stage; r2c's rises to 274.5 at 0.0642
+and has fallen to 239.1 at 0.0646. The measure reads Response's as "cracking, fall" and
+r2c's as "fall, cracking".
+
+- The kernel is not the difference: in Response's own state at 276.2 kN (the top of the
+  section already cracked) r2c gives 276.19 kN.
+- In r2c the states before the fall end at about 275.6 kN, at a strain of 0.06452 mm/m
+  (`python tools/branch.py tests/oracle/newbeam-tension.r2x.txt --stage 11`): 0.2 % under
+  Response's 276.2. At Response's control value, 0.06465, r2c has no state of equilibrium
+  next to the last one: the least unbalanced moment is 0.055 kNm.
+- *Tried:* Response's own tolerance for the solve without shear [B `00425f10`: the
+  unbalanced force under 0.1 % of the sum of the loads plus 1 N, a tenth of that under
+  axial strain control], which is 0.028 kNm here. The stage still falls; and the two last
+  stages at a crack front swap sides (M 7.2 to 2.6 %, N₀ = +200 kN then M 1.1 to 5.0 %),
+  which shows what those two are worth. Reverted.
+- Response's solve goes on with the state it has after twenty iterations under axial
+  strain control [B `00425f10`], which is how a stage can stand past r2c's limit point.
+  That is the solver's behaviour, not a rule of the method, and is not cloned
+  (`docs/acceptance.md`, Stance). No second approach with grounds was found. D31.
+
+### A2, part 5: V alone, and M/V = 0.5 m (investigated; no kernel change)
+
+*M/V = 0.5 m, the rising branch:* inside since part 2 (6.1 to 2.4 %), with the cracking
+under compression in the node.
+
+*V alone, the fall of load before the peak:* r2c has it since part 2. Response falls from
+189.4 to 184.7 kN (4.7 kN), r2c from 189.5 to 185.4 (4.1 kN). The measure counts a fall when
+the load is 2 % of Response's peak under the largest so far, 4.35 kN here: Response's is
+2.2 %, r2c's 1.9 %, so r2c's is read as no fall. In Response's own states before and after
+the fall r2c's shear is Response's (−0.00 %, `tools/diagnose.py states`), and its calculated
+shear stress profile is as far from the state's as Response's own (0.7 %,
+`tools/diagnose.py flow`). r2c's stage after the fall is its own: 185.42 kN at a shear
+strain of 0.1170 mm/m against 184.69 at 0.116, with a profile error of 0.8 %, inside the
+1 % at which a stage is accepted. Nothing was found to change within the bounds: every
+check of that stage is inside target, and the 0.7 kN is under what the stage's own
+convergence allows. D32.
+
 ## Phase A with the measures of A2 part 1 (2026-11-22)
 
 r2c unchanged; three measures changed with the owner (log 2026-11-22-03): the views are

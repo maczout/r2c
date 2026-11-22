@@ -84,8 +84,8 @@ thesis itself gives two rules, both in ε1 alone: 1/(0.8 + 170·ε1) for normal 
 concrete, which is number 10 and, up to 56.7 MPa, the default 18; and that times
 1/(0.9 + 0.0045·fc′) for high strength concrete [T 5-1, p. 58 to 59]. Not in the manual and
 refused as out of scope: 4 (no name in the dialogs), 16 (Zhu-Hsu-Lee 2001) and 17 (Zhang-Hsu
-1998, no eta) [owner, 2026-11-22, D10 and D18]. Whether the named models without a rule in
-the documents stay, and the default, are D21 and D22 in `docs/summary.md`.
+1998, no eta) [owner, 2026-11-22, D10 and D18]. The named models without a rule in the
+documents stay, and so does the default [owner, 2026-11-22, D21 and D22].
 
 | No. | Model | β (never above 1 unless said) | Strain at peak stress |
 |---:|---|---|---|
@@ -148,8 +148,9 @@ as the binary has them.
 * Interlocking hoops (stirrup pattern 6) are analysed as stirrups, not by the hoop rule
   below [O: on the circular column Response's result with pattern 6 is not its result with
   a hoop; r2c as stirrups is within 0.8 % in shear in Response's peak state]. Patterns 1, 2,
-  3 and 5 give the same charts byte for byte in Response on a rectangular section; a
-  horizontal tie (7) differs in the Transverse Average Bond chart only [O: the probes].
+  3 and 5 give the same charts byte for byte in Response on a rectangular section [O: the
+  probes]. A horizontal tie (7) is not in the manual and is refused [owner, 2026-11-22,
+  D23], as is a file that holds several sections.
 * Draped tendons are out of scope [owner, 2026-11-22, D4]: a layer with a drape other than
   zero is refused.
 * Unloading is elastic from a plastic strain kept per layer; it is tracked from the first load
@@ -175,7 +176,7 @@ Tables over the depth (100 stations) [B]:
   spacing away; M = 3.6·b·s/(π·db·legs) for stirrups; the lesser governs;
 * the steel ratio for the strain concentration of stirrups at a crack.
 
-### Cracking under compression [B `0046a960`; drawn only]
+### Cracking under compression [B `0046a960`]
 
 Response's crack-strain routine, called by the node [`0046aaa0`, `004a7b60`], scales the
 cracking strain and the cracking stress of a node by
@@ -190,14 +191,16 @@ the line on the Principal Tensile Stress chart is k times the cracking stress wh
 is uncracked. The rule is on in every analysis r2c covers (a flag, `00569f58`, clears it for
 one code-based analysis type only) and skipped for a concrete type named "steel".
 
-**r2c applies (c) only**: the drawn line (`NodeOut.f1draw`; for a cracked node, the node's
-own limit held under the lowered stress and above the floor). (a) and (b) are not applied:
-the node's cracking strain and f1 are as before. Measured 2026-11-21: with (a) and (b) in
-the node, nothing moves without shear (ε1 is not tensile where there is compression), but
-with shear 15 checks that are inside target go outside while 48 come inside
-(`docs/verification.md`, "Principal tensile stress"); taking it over is option F1 in
-`docs/status.md`. Whether the thesis describes this rule was not checked: the thesis was not
-at hand in the session that read it.
+**r2c applies all of it since 2026-11-22** (owner, D14; before, only the drawn line (c)).
+The thesis does not describe the rule: its node cracks at the cracking strength [T 3-2-2];
+this is one of the details where the program is followed. Measured on the phase A set
+(`tools/changes.py`, the run before against the run after): nothing moves without shear,
+where there is no principal tension across compression. With shear the rising branch at
+M/V = 0.5 m comes inside (6.1 to 2.7 %), and 35 view checks with it, 24 of them at two stages
+that are now like states (the peak under N₀ then V, the fall at cracking under V alone);
+three Should views go outside by a point (shear on crack 4.9 to 5.5 %, average angle 3.7 to
+5.1 %) or at one stage (transverse bond under N₀ then M + V at the last stage). The stage
+that flipped in the trial of 2026-11-21 does not flip with the stage matching of D13.
 
 ## Flexural cracking strength [B]
 
@@ -217,6 +220,47 @@ k·ε + prestrain + (εsh − fy/E), k = max(1, 0.014/ρ) (0.625 of that for str
 than yield; ρ is all the steel on the layer's side of the centroid over 0.8·Ag [B]. Steel
 that has yielded on average and whose concentrated strain passes the end of its curve
 ruptures at the crack and is removed.
+
+A tension zone that no bar crosses is not limited: "if there are no bars crossing the crack
+face, the concrete stress is not reduced" [T 4-5, restriction 3]. Response 1.9.7 does limit
+it: the capacity moment of such a zone is zero and so is its limit, which leaves the node
+at its floor after cracking [B `00441d80`, `00440400`; O: N + M at cracking]. r2c follows
+the thesis here until the owner decides (`docs/summary.md`, D30).
+
+### Steel stress at a crack [T 4-5; B `00442e50`, `00442cd0`, `00440c70`, `004409d0`, `00441d80`]
+
+"The moment caused by the combined principal tension and shear on the crack is computed
+about the crack face. An increase in curvature is then calculated about the crack front to
+induce the same moment" [T 4-5, last part]. The particulars are the program's, read
+2026-11-22 for the two cases where r2c showed no stress at a crack and Response did:
+
+* *About which point.* The neutral axis of the deeper of the two tension zones of the crack
+  check (where the strain, net of shrinkage, changes sign), not the crack front. A section
+  all in tension has no such axis: Response takes one 1000 m below the section, which makes
+  the extra strain the same for every bar, and counts the concrete only when the tension
+  grows upwards.
+* *The concrete's moment.* Over the halves of layers that are cracked at both ends, on the
+  tension side of that axis: (f1 less the floor after cracking, not below zero, plus
+  vci/tan θ) times the width times the distance from the axis. The floor here is
+  max(ft, the node's cracking strength)/(1 + 250·w).
+* *The bars.* Every bar whose strain (without prestrain, net of shrinkage) is tensile takes
+  part, cracked concrete around it or not. The extra curvature Δφ₁ that uses up the reserve
+  of the first bar to reach its capacity at a crack (reserve/E over its distance from the
+  axis; 1 /m at most) is found, and the moment the bars below yield add at it, elastically.
+  If that is at least the concrete's moment, the extra curvature is Δφ₁ in the proportion
+  of the two moments. If not, and the concrete's moment is within the capacity moment of
+  the crack check (0.1 % and 2 N m over), it is solved for with the bars' own curves, each
+  held to its capacity at a crack. Otherwise there is no value.
+* *What is shown.* A bar in compression shows nothing. A bar in tension shows its stress at
+  the extra strain, the lesser of its curve and its capacity at a crack, if the strain at
+  its depth with the extra strain reaches the cracking strain there; nothing if it does not.
+
+Before 2026-11-22 r2c took the moment of f1 itself about the crack front, by the bars inside
+the cracked depth alone [r2c's reading of the thesis]: a bar above the crack front showed
+nothing (N + M at the peak: Response 46 MPa), and under tension the two layers were
+treated as two zones (top bar 210 MPa where Response has 37). Measured on the phase A set:
+both come to 0.0 %, and the same view comes inside at five stages of four shear cases
+(`docs/verification.md`, "A2, part 3").
 
 ### At a step in width [O]
 
@@ -243,13 +287,39 @@ strain of 0.660 mm/m where sin²α = 0.652, and 110.1 MPa at 0.569 mm/m where it
 `disttop` and `distbot`). The plastic strain a stirrup unloads from (Reinforcement, above)
 is kept in the hoop's own strain.
 
-## Layers [T 7-3]
+## Layers [T 7-3; B `00434eb0`, `004a9d90`, `004a9be0`]
 
-Layers of three nodes, integrated by Simpson's rule: a base grid of h/14 with breaks at bar
-levels and outline corners; a layer is split when a quarter-point stress is more than 0.2 %
-(of the largest stress) off the parabola through its nodes, or the crack state differs across
-it; no thinner than h/512. The base grid and thresholds are r2c's [O]: Response's node depths
-are close to these but not the same.
+Layers of three nodes, integrated by Simpson's rule, divided in a binary tree where the
+stresses are not interpolated well [T 7-3]. The numbers are the program's, read 2026-11-22
+(before, r2c's own, inferred from Response's node depths).
+
+*The base layers* [B `00434eb0`]. Each stretch of the outline between two rows gets
+int(8·d/(h + 0.1 mm) + 0.99) − 1 equal layers, at least one (d its depth, h the section's):
+seven for a section with one stretch. (The thesis says eight.) Then, bar layer by bar layer,
+the layer that holds the bar gets a boundary at the bar's upper edge and one at its lower
+edge (the bar's height ± half its diameter, held inside that layer), unless that would
+leave a layer thinner than h/2048 or the edge is within 0.2 mm of a boundary. Response also
+puts a layer 0.1 mm thick across a step in width; r2c does not, and keeps the two sides of a
+step apart in its own way ("At a step in width").
+
+*Splitting* [B `004a9d90`, `004a9be0`]. Each time the section's forces are wanted, the layers
+start from the base layers. The middle of each half of a layer is worked out and compared
+with the parabola through the layer's three nodes, for f1 and for f2. A half fails when
+either is off by more than 0.2 % of the largest value at the nodes of the base layers, or
+when the crack front passes through it (ε1 below the cracking strain at one end of the half
+and above it at the other; the cracking strain here is not lowered by compression). A layer
+with a half that fails is divided in two, provided half its thickness is more than h/1024;
+a half that passed becomes a layer that is not looked at again. So the nodes at a crack
+front are h/1792 apart on Newbeam (0.33 mm), where r2c's were h/896 apart.
+
+r2c solves a stage on fixed layers, builds the layers again from the base layers for the
+state found, and solves again if they changed (up to five times without shear, three with)
+[r2c's own arrangement of the same rule]. No more than 220 layers [r2c's own; Response's
+limit was not read].
+
+Measured on the phase A set: at the stages looked at (M at the peak and at the end, −M at
+the peak, N at the end) r2c's node depths are Response's, node for node
+(`docs/verification.md`, "A2, part 2").
 
 ## Shear [T 6, 7]
 
@@ -494,7 +564,7 @@ Response shows when the solve ends is the one with the largest load.
 | What | Value | Basis |
 |---|---|---|
 | Stepping and end rules without shear | above | Response's control charts; they agree with the binary's rules as read |
-| Layering thresholds | above | chosen; results insensitive at the tolerances reported |
+| Largest number of layers | 220 | r2c's own; Response's limit was not read |
 | Start of unloading tracking | stage 1 | one prestressed case (Cm4) |
 | Stirrup plastic strain kept by depth | yes | one case (Newbeam, M/V = 2 m) |
 | The two sides of a step in width kept apart | profile and stirrup ratio | r2c's own; Response's charts show both sides (I-girder) |
@@ -517,7 +587,3 @@ Hsu softening models with Tamai tension stiffening (D5). Beyond the documented s
 taken out on 2026-11-22 (D10, D18): compression softening 4, 16 and 17, and a segmental
 curve for reinforcing steel. r2c refuses these as out of scope; what Response itself rejects
 is an input error (`docs/scope.md`, section 3). Response's program folder is not read (D9).
-
-Not applied in the node: the lowering of the cracking strain and of f1 by
-compression (above, "Cracking under compression": the chart's line is lowered, the node's
-cracking is not).
