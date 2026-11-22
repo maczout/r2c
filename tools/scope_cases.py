@@ -135,7 +135,9 @@ def main(argv=None) -> int:
     folder = archive / "scope-inputs"
     folder.mkdir(parents=True, exist_ok=True)
     fixtures = Path(a.fixtures)
-    todo = [c for c in cases if not (fixtures / f"{c['name']}.r2x.txt").exists()]
+    # a case has a fixture when it is in the folder or parked under it (tests/oracle/parked)
+    todo = [c for c in cases if not any((d / f"{c['name']}.r2x.txt").exists()
+                                        for d in (fixtures, fixtures / "parked"))]
     prefixes: queue.Queue = queue.Queue()
     for k in range(max(a.jobs, 1)):
         prefixes.put(Path.home() / ".cache" / "r2x" / f"prefix-scope-{k}")

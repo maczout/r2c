@@ -82,7 +82,8 @@ straight. Negative shear is refused, as in Response.
     tools/decompile.py     a routine of Response's binary, from a Ghidra project kept elsewhere
     tools/capture.py       rebuild the archive of full oracle captures with r2x
     tools/check.py         checks before pushing: results current, docs as generated
-    tests/oracle/          records captured from Response-2000 with r2x (control charts, peak)
+    tests/oracle/          records captured from Response-2000 with r2x: the phase A set
+    tests/oracle/parked/   the cases parked until phase B; not run by default
     docs/kernel.md         what the kernel does and where each rule comes from
     docs/verification.md   r2c against Response-2000: what the results mean
     docs/verification-results.md   the results, generated
