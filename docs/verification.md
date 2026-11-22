@@ -53,11 +53,9 @@ with shear is inside on its views.
 VERIFY_OUT --shear --tier must should`; and `python tools/diagnose.py states RECORD
 --views`, which puts r2c in Response's own states):
 
-- *The last stage*, on eight of the nine (not "M constant, then M + V", which ends at its
-  peak): r2c's response ends elsewhere than Response's (a Won't, D1), and the views are
-  compared there all the same (D40). Five of the nine are outside for this alone or with
-  one stage more: M/V = 1 m (only this), V with constant compression (only this), V alone,
-  "N constant, then M + V", "N + M + V together".
+- *The last stage*, on eight of the nine (all but "M constant, then M + V"): r2c's response ends elsewhere than Response's (a
+  Won't, D1), and the views are compared there all the same (D40). M/V = 1 m and V with
+  constant compression are outside for this alone.
 - *A state that differs although the curves agree.* The peak of "constant V, then M":
   shear stress 33 %, one node at the crack front, with the two states 0.00015 mm/m apart;
   in Response's own state r2c has Response's value. The peak of "N constant, then M + V":
