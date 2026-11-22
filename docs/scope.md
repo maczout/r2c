@@ -67,7 +67,7 @@ is inside target on the case is in `docs/verification-results.md` when its set w
 
 | Item | Documented | What Response does (measured) | r2c | Status | Case |
 |---|---|---|---|---|---|
-| Several sections in one file (the catalogue) | no: Response-2000 takes one cross section per file (A-7, A-28); see D23 | opens on the first | reads the first | compared | cm4-asis, liping-asis, marshall-*, se100-asis |
+| Several sections in one file (the catalogue) | no: Response-2000 takes one cross section per file (A-7, A-28) | opens on the first | refuses (since 2026-11-22, D23; before, it read the first) | removed | cm4-asis, liping-asis, marshall-*, se100-asis: refused, fixtures kept |
 | Title, analysis by, date (`name`, `doneby`, `date`) | yes: A-11 | text only | title read | no effect | |
 | Units of the file: SI (`units="metric"`) | yes: A-7, A-80 | | reads | compared | every fixture |
 | Units of the file: US (`units="US"`) | yes: A-7, A-80 | reads; solves (probe newbeam-usfile) | reads | compared since 2026-11-21 | **newbeam-usfile-mv** (A, the brief's), **newbeam-usfile-si-m** (B: `--units si` over a US file) |
@@ -152,7 +152,7 @@ peak by less than 0.3 % (probes newbeam-csoft0 … 17), on the I-girder by −9 
 | Pattern 1 single leg, 2 open, 3 closed, 5 T-headed single leg | yes: A-27 | on Newbeam every chart is the same byte for byte whichever of these (and 6) the stirrup is given as (probes newbeam-pattern1, 2, 3, 6) | the area is the file's | compared | 1: liping-asis; 2: dmn1n-asis, igirder-*; 3: marshall-*, se100-asis, tbeam-*, cm4-asis; 5: every Newbeam case |
 | Pattern 4, hoop | yes: A-27; thesis 7-6 | | implemented | compared | column-* |
 | Pattern 6, interlocking hoops | yes, in Quick Define: A-10 (D11) | on the circular column not what a hoop gives: peak +1.4 % (probe column-interlock) | treats it as stirrups (within 0.8 % in shear in Response's peak state) | compared since 2026-11-21 | **column-interlock-mv** (A, the brief's) |
-| Pattern 7, horizontal tie | no; see D23 | as a stirrup, but with no transverse bond (one chart differs, probe newbeam-pattern7) | treats it as a stirrup | compared | liping-asis (the ties there have no depth) |
+| Pattern 7, horizontal tie | no | as a stirrup, but with no transverse bond (one chart differs, probe newbeam-pattern7) | refuses (since 2026-11-22, D23; before, it treated it as a stirrup) | removed | liping-asis (the ties there have no depth): refused, fixture kept |
 | Prestrain on stirrups (`dep`) | yes: A-82 | solves; peak +0.9 % (probe newbeam-stirrupdep) | implemented | compared since 2026-11-21 | **newbeam-stirrupdep-mv** (A) |
 
 T-headed stirrups, in the brief's list of new cases, are compared already: Newbeam's own
@@ -248,15 +248,17 @@ outline built for a shape given without one. r2c now refuses or rejects each. Fi
 fixtures need one of them and cannot be run by r2c: igirder-csoft4-m2v, igirder-csoft16-m2v,
 igirder-csoft17-m2v, igirder-drape-m2v, newbeam-segsteel-m.
 
-**Kept although not documented, for the owner to decide** (`docs/summary.md`):
+**Refused since 2026-11-22** (owner, D23): several sections in one file, and the horizontal
+tie (stirrup pattern 7). Six more parked fixtures, all on Response's sample inputs, are
+refused for it and kept: cm4-asis, liping-asis, marshall-asis, marshall-m, marshall-nonly,
+se100-asis.
+
+**Kept although not documented, by the owner's decision** (`docs/summary.md`):
 
 - D21: the compression softening models the manual names and neither document gives a rule
   for (1, 3, 5 to 12, 14, 15). Their rules are the binary's.
 - D22: compression softening 18, the default of Response 1.9.7, which is later than the
   manual. Every phase A case uses it.
-- D23: what a file can carry that the manual does not have and that r2c reads as the
-  nearest documented thing, with no code of its own: several sections in one file (the
-  first is read), the horizontal tie (a stirrup).
 
 A shrinkage profile of more than three points is documented (A-34: "parabolically
 interpolates between these points") and has no case; the rule between points is r2c's

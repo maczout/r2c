@@ -148,8 +148,9 @@ as the binary has them.
 * Interlocking hoops (stirrup pattern 6) are analysed as stirrups, not by the hoop rule
   below [O: on the circular column Response's result with pattern 6 is not its result with
   a hoop; r2c as stirrups is within 0.8 % in shear in Response's peak state]. Patterns 1, 2,
-  3 and 5 give the same charts byte for byte in Response on a rectangular section; a
-  horizontal tie (7) differs in the Transverse Average Bond chart only [O: the probes].
+  3 and 5 give the same charts byte for byte in Response on a rectangular section [O: the
+  probes]. A horizontal tie (7) is not in the manual and is refused [owner, 2026-11-22,
+  D23], as is a file that holds several sections.
 * Draped tendons are out of scope [owner, 2026-11-22, D4]: a layer with a drape other than
   zero is refused.
 * Unloading is elastic from a plastic strain kept per layer; it is tracked from the first load

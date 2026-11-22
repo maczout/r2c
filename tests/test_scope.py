@@ -70,7 +70,7 @@ def test_a_shape_without_an_outline_is_rejected():
             inputs.parse(beam(outline="", shape=shape))
 
 
-# -- beyond the documented scope: refused (docs/scope.md; docs/summary.md D4, D5, D10, D18) ------
+# -- beyond the documented scope: refused (docs/scope.md; docs/summary.md D4, D5, D10, D18, D23) ------
 @pytest.mark.parametrize("model", [4, 16, 17])
 def test_softening_models_that_are_not_in_the_manual_are_refused(model):
     with pytest.raises(OutOfScope, match="softening"):
@@ -95,6 +95,26 @@ def test_draped_tendons_are_refused():
     with pytest.raises(OutOfScope, match="draped"):
         inputs.parse(beam(extra=layer.format('drape="0.05"')))
     inputs.parse(beam(extra=layer.format('drape="0.0"')))
+
+
+def test_several_sections_in_one_file_are_refused():
+    # the manual has one cross section to a file; Response's sample inputs carry several (D23)
+    one = beam().decode()
+    section = one[one.index("<r3g_beam"):one.index("</r3g_beam>") + len("</r3g_beam>")]
+    two = one.replace(section, section + "\n" + section).encode()
+    with pytest.raises(OutOfScope, match="several sections"):
+        inputs.parse(two)
+    inputs.parse(one.encode())
+
+
+def test_the_horizontal_tie_is_refused():
+    # stirrup pattern 7 is not in the manual's list of patterns (D23)
+    one = beam()
+    assert b'pattern="5"' in one
+    with pytest.raises(OutOfScope, match="horizontal tie"):
+        inputs.parse(one.replace(b'pattern="5"', b'pattern="7"'))
+    for pattern in (1, 2, 3, 4, 6):
+        inputs.parse(one.replace(b'pattern="5"', f'pattern="{pattern}"'.encode()))
 
 
 def test_out_of_scope_by_design_is_still_refused():

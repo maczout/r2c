@@ -20,3 +20,8 @@ or out of scope (D4, D10, D18), and r2c now refuses their inputs: `igirder-drape
 (draped tendons), `igirder-csoft4-m2v`, `igirder-csoft16-m2v` and `igirder-csoft17-m2v`
 (softening models that are not in the manual), `newbeam-segsteel-m` (a segmental curve for
 reinforcing steel). Their fixtures are kept, as the record of what Response does.
+
+Six more are refused since 2026-11-22 (D23) because Response's sample inputs hold several
+sections in one file, which the manual does not have: `cm4-asis`, `liping-asis` (which has
+horizontal ties besides, refused too), `marshall-asis`, `marshall-m`, `marshall-nonly` and
+`se100-asis`. Their fixtures are kept (D19).
