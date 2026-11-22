@@ -84,8 +84,8 @@ thesis itself gives two rules, both in ε1 alone: 1/(0.8 + 170·ε1) for normal 
 concrete, which is number 10 and, up to 56.7 MPa, the default 18; and that times
 1/(0.9 + 0.0045·fc′) for high strength concrete [T 5-1, p. 58 to 59]. Not in the manual and
 refused as out of scope: 4 (no name in the dialogs), 16 (Zhu-Hsu-Lee 2001) and 17 (Zhang-Hsu
-1998, no eta) [owner, 2026-11-22, D10 and D18]. Whether the named models without a rule in
-the documents stay, and the default, are D21 and D22 in `docs/summary.md`.
+1998, no eta) [owner, 2026-11-22, D10 and D18]. The named models without a rule in the
+documents stay, and so does the default [owner, 2026-11-22, D21 and D22].
 
 | No. | Model | β (never above 1 unless said) | Strain at peak stress |
 |---:|---|---|---|
@@ -220,6 +220,12 @@ k·ε + prestrain + (εsh − fy/E), k = max(1, 0.014/ρ) (0.625 of that for str
 than yield; ρ is all the steel on the layer's side of the centroid over 0.8·Ag [B]. Steel
 that has yielded on average and whose concentrated strain passes the end of its curve
 ruptures at the crack and is removed.
+
+A tension zone that no bar crosses is not limited: "if there are no bars crossing the crack
+face, the concrete stress is not reduced" [T 4-5, restriction 3]. Response 1.9.7 does limit
+it: the capacity moment of such a zone is zero and so is its limit, which leaves the node
+at its floor after cracking [B `00441d80`, `00440400`; O: N + M at cracking]. r2c follows
+the thesis here until the owner decides (`docs/summary.md`, D30).
 
 ### Steel stress at a crack [T 4-5; B `00442e50`, `00442cd0`, `00440c70`, `004409d0`, `00441d80`]
 
