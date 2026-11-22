@@ -141,9 +141,9 @@ every check. Principal tensile stress is outside at 28 stages in 18 cases (58 in
 before); in seven cases without shear it is the only view outside, by one point at the
 crack front (option F2).
 
-Stance (owner, 2026-11-21 and 2026-11-22): r2c reproduces Response's behaviour as
-documented; where they differ, documented Response is right, undocumented behaviour of the
-binary is not cloned, and no structural assessment of results is given. Once a case is inside target,
+Stance (owner, 2026-11-21 and 2026-11-22, D34): the manual decides which features exist; for
+those, r2c reproduces what the 1.9.7 binary does, apart from the owner's overrides in
+`docs/acceptance.md`; no structural assessment of results is given. Once a case is inside target,
 closing the gap further is not a goal: build out the scope.
 
 ### What is known about shear
@@ -258,9 +258,10 @@ phase B.
    M and −M; column N, N₀ + M, M + V; I-girder M, M + V) and "Newbeam with tendons added"
    dropped. Range and completeness are reviewed when the scope of development is complete.
 3. **Reverse engineering.** The original brief allowed it "to answer questions but not as the
-   primary development approach". CLAUDE.md ranks it below acceptance and the thesis, as the
-   means of finding out why r2c misses acceptance (the developer's wording, 2026-11-17, for
-   the owner to confirm).
+   primary development approach". Since 2026-11-22 (D34, owner) the binary is the spec for
+   how a feature in scope calculates and is read directly to solve problems; the manual
+   still decides which features exist. Rules are written fresh, not transliterated from
+   decompiled code.
 4. **Dependencies.** numpy only. Compiling the node routine (option D4) would add one.
 
 ## 6. Options for next steps

@@ -35,12 +35,20 @@ When these pull against each other, the higher one wins.
    engineer's agreement within tolerance, not mathematical equivalence. Where it sets a
    tolerance, that is the target. Where it is silent, the developer decides and records the
    decision (below).
-2. **Bentz's thesis** is the basis of the kernel: its method, its relations, its notation.
-3. **Response-2000's binary** may be read to find out why r2c does not reach acceptance where
-   the thesis leaves the answer open: a constant, a table, a detail of a routine, within
-   the documented scope (`docs/acceptance.md`, "Stance"). Every rule
-   taken from it is recorded in `docs/kernel.md` with its source. It is not the route to
-   matching Response beyond what acceptance asks.
+2. **What exists: the manual** (Appendix A of Bentz's thesis). It decides which features are
+   in scope (`docs/scope.md`). The binary does not add features.
+3. **How it calculates: Response-2000's binary** (1.9.7, the program the oracle runs). For a
+   feature in scope, the binary's rule is the spec: its method, constants, tables, layering,
+   solver and how the solve ends. Read it directly to solve a problem; it is the primary
+   route, not a last resort. Where the thesis and the binary differ, follow the binary
+   without asking. The thesis is the guide to reading the binary and the source of names,
+   notation and explanation. Exceptions are the owner's overrides only (`docs/acceptance.md`,
+   "Owner's overrides").
+   - **Write each rule fresh.** Understand what the routine does, then write it in r2c's own
+     code and words. Do not transliterate decompiled code, and never commit decompiled
+     output.
+   - **Record every rule's source** in `docs/kernel.md`: the binary's address, and the
+     thesis' equation or section where there is one.
 4. **The regression limits in `tests/`** guard what works. They are not acceptance.
 
 When a goal and a constraint conflict and this list does not settle it, stop that line of

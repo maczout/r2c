@@ -20,10 +20,13 @@ testing.
 
 What this means for the work:
 
-- r2c reproduces Response-2000's behaviour **as documented** (its manual and Bentz's thesis).
-  Where r2c and documented Response differ, Response is right. Behaviour of the 1.9.7 binary
-  that the documents do not describe, such as where its solver fails to converge, is not
-  cloned; where the documents and the binary differ, the owner decides (owner, 2026-11-22).
+- **What exists is documented; how it calculates is the program's** (owner, 2026-11-22, D34).
+  The manual (Appendix A of Bentz's thesis) decides which features are in scope. For those
+  features, r2c reproduces what Response-2000 1.9.7 does, read from the binary: where the
+  thesis and the binary differ, the binary is right. That includes how its solver behaves
+  and how a response ends. The only exceptions are the owner's overrides below. (This
+  replaces the rule of the same day that undocumented behaviour of the binary is not cloned
+  and that each difference between the documents and the binary goes to the owner.)
 - The aim is a really good sectional response calculator. Features beyond that are built
   outside r2c and r2x (owner, 2026-11-22).
 - Agreement within the targets below is enough. Once a case is inside them, closing the gap
@@ -47,8 +50,8 @@ until phase B (validate and refine). Phase A is done when, on that set:
 **Bounds** (owner, 2026-11-22: "in case I am wrong and we are spinning tires"). The Musts
 may prove harder than they look. Each part of an increment aimed at a Must gets:
 
-- **Two approaches, at most.** Each is grounded in the thesis or the manual, or in a rule
-  read from the binary within the documented scope. If neither brings the check inside
+- **Two approaches, at most.** Each is grounded in a rule read from the binary (or, where
+  the binary has not yet been read, the thesis). If neither brings the check inside
   target, stop that part. Don't try a third approach, and don't tune constants to fit.
 - **No regression.** Peak, rising branch and shape must not go outside on any phase A case,
   and no Must view that is inside may go outside.
@@ -57,6 +60,17 @@ may prove harder than they look. Each part of an increment aimed at a Must gets:
   down a tier, or a named third approach with its grounds. Carry on with the next part.
 
 The decisions behind these are D1 to D3 in `docs/summary.md`.
+
+## Owner's overrides
+
+Where Response's behaviour is not cloned although it is in scope. Only the owner adds to
+this list; the developer may suggest an entry as a decision in `docs/summary.md`.
+
+- **The circular column under axial load alone, after its peak** (C2): looks wrong in
+  Response; r2c's uniform post-peak stands (D12).
+- **The endings of shear responses** are a Won't for phase A (D1): not chased, recorded as
+  known deviations. This is a tier, not a ruling that Response is wrong; it may be revisited
+  in phase B.
 
 ## What matters (owner, 2026-11-21)
 
