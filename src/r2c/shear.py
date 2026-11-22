@@ -577,15 +577,6 @@ class Shear(Flexure):
                 _zb, ea, yb, db, _i = hit[0]
                 bond[i] = abs(ea * (de0 - dphi * yb)) / (l.num * math.pi * max(db, 1e-9))
         det.bond = bond
-        if self.sec.stirrups:
-            zs = np.asarray(det.z, dtype=float)
-            order = np.argsort(zs)
-            zu, iu = np.unique(zs[order], return_index=True)
-            fu = np.asarray(det.fsy, dtype=float)[order][iu]
-            grid = np.linspace(zu[0], zu[-1], 161)
-            fg = np.interp(grid, zu, fu)
-            dg = np.abs(np.gradient(fg, grid))
-            det.tbond = np.interp(zs, grid, dg) * self.sec.stirrups[0].db / 4.0
         st = Stage(e0, phi, gam, lam, n, m, v, det, control=c, cmode=self.mode)
         # the shear strain Response reports: weighted by the shear force over the depth
         num = np.trapezoid(det.out.v * det.gxy * det.b, det.z)
@@ -794,6 +785,7 @@ class Shear(Flexure):
             solves += 1
             try:
                 st = self.solve(target, prev)
+                st.parent = prev        # the stage it follows, for its envelope (export)
                 ok = True
                 if st.lam < 0.0 and len(self.stages) > 1:
                     # the loads reversed: not a state of this loading (Response's shear is

@@ -83,25 +83,82 @@ def control(key: str, stages: list[Stage], u: Units, gam_avg=None, axis: float =
 
 
 # -- detail views -----------------------------------------------------------------------------
-class Envelope:
-    """Largest and smallest value of a depth profile over the stages so far (the grey
-    envelopes Response draws behind the transverse and shear strain charts)."""
+def envelope(st: Stage, before: Stage | None):
+    """The grey envelopes behind the transverse and shear strain charts, as Response-2000
+    keeps them [B 0041b1d0]: each stage has its own, at its own nodes, made once from the
+    envelope of the stage it follows (interpolated to the new heights) and its own profile.
+    A stage put in between two others afterwards never enters the later one's envelope.
+    Returns {name: (upper, lower)} at st.detail.z."""
+    d = st.detail
+    z = np.asarray(d.z, dtype=float)
+    old = getattr(before, "envelope", None) if before is not None else None
+    out = {"z": z}
+    for name, own in (("gxy", d.gxy), ("ey", d.ey)):
+        own = np.asarray(own, dtype=float)
+        if old is None:
+            # the first stage: nothing at the two faces, and its own profile
+            hi, lo = np.maximum(own, 0.0), np.minimum(own, 0.0)
+        else:
+            zo = old["z"]
+            order = np.argsort(zo)
+            inside = (z >= zo[order][0] - 1e-9) & (z <= zo[order][-1] + 1e-9)
+            hi = np.where(inside, np.maximum(np.interp(z, zo[order], old[name][0][order]),
+                                             own), own)
+            lo = np.where(inside, np.minimum(np.interp(z, zo[order], old[name][1][order]),
+                                             own), own)
+        out[name] = (hi, lo)
+    return out
 
-    def __init__(self, zlo: float, zhi: float, n: int = 401):
-        self.z = np.linspace(zlo, zhi, n)
-        self.hi = np.zeros(n)
-        self.lo = np.zeros(n)
 
-    def update(self, z, val):
-        order = np.argsort(z)
-        v = np.interp(self.z, np.asarray(z)[order], np.asarray(val)[order])
-        self.hi = np.maximum(self.hi, v)
-        self.lo = np.minimum(self.lo, v)
+def bond_table(sec, d):
+    """Transverse bond over the depth as Response-2000 tabulates it [B 0047fcd0, 00485640]:
+    for each half layer the change of the average stirrup stress between its two nodes over
+    their distance, times the stirrups' area over their perimeter (taken at the layer's
+    bottom node), put at the top of the half layer; nothing where the layer's top or middle
+    node has no stirrups. Returns (z descending, value)."""
+    z = np.asarray(d.z, dtype=float)
+    fs = np.asarray(d.fsy, dtype=float)
+    rho = np.asarray(d.rhov, dtype=float)
 
-    def at(self, z, val):
-        hi = np.maximum(np.interp(z, self.z, self.hi), val)
-        lo = np.minimum(np.interp(z, self.z, self.lo), val)
-        return hi, lo
+    def k_at(zz):
+        num = den = 0.0
+        for s in sec.stirrups:
+            if s.space > 0 and s.bot - 1e-9 <= zz <= s.top + 1e-9:
+                num += s.area
+                den += math.pi * s.db * s.legs
+        return num / den if den > 0 else 0.0
+
+    zt, vt = [], []
+    n = (len(z) - 1) // 2
+    last = 0.0
+    for i in range(n):
+        t, m, b = 2 * i, 2 * i + 1, 2 * i + 2
+        k = k_at(z[b])
+        on = rho[t] > 0 and rho[m] > 0
+        up = abs(fs[t] - fs[m]) * k / (z[t] - z[m]) if on and z[t] > z[m] else 0.0
+        dn = abs(fs[m] - fs[b]) * k / (z[m] - z[b]) if on and z[m] > z[b] else 0.0
+        zt += [z[t], z[m]]
+        vt += [up, dn]
+        last = dn
+    if n:
+        zt.append(z[2 * n])
+        vt.append(last if rho[2 * n] > 0 else 0.0)
+    return np.array(zt), np.array(vt)
+
+
+def bond_window(sec, z):
+    """The length Response averages the bond over at a height [B 00484420]: five stirrup
+    diameters, at most an eighth of the depth; a twentieth of the depth where there are no
+    stirrups."""
+    h = sec.ztop - sec.zbot
+    num = den = 0.0
+    for s in sec.stirrups:
+        if s.space > 0 and s.bot - 1e-9 <= z <= s.top + 1e-9:
+            num += s.db * s.area
+            den += s.area
+    if den <= 0:
+        return h / 20.0
+    return min(5.0 * num / den, h / 8.0)
 
 
 class Views:
@@ -110,13 +167,17 @@ class Views:
     def __init__(self, sec, u: Units):
         self.sec = sec
         self.u = u
-        self.env_t = Envelope(sec.zbot, sec.ztop)
-        self.env_g = Envelope(sec.zbot, sec.ztop)
+        self.last = None
 
     def observe(self, st: Stage):
-        d = st.detail
-        self.env_t.update(d.z, d.ey)
-        self.env_g.update(d.z, d.gxy)
+        """Give the stage its envelope. Stages are observed in order; a stage that does not
+        say which stage it followed is taken to follow the one observed before it."""
+        if getattr(st, "envelope", None) is None:
+            before = getattr(st, "parent", None)
+            if before is None or getattr(before, "envelope", None) is None:
+                before = self.last
+            st.envelope = envelope(st, before)
+        self.last = st
 
     def charts(self, st: Stage, keys) -> dict[str, bytes]:
         sec, u = self.sec, self.u
@@ -149,12 +210,12 @@ class Views:
                 r = [(0.0, ytop)] + rows(d.ex * 1e3) + [(0.0, ybot)]
                 made[key] = chart("Longitudinal Strain", f"|e_x Strain ({u.l_strain})", depth, [(0, r)], 4)
             elif key == "transverse_strain":
-                hi, lo = self.env_t.at(d.z, d.ey)
+                hi, lo = st.envelope["ey"]
                 made[key] = chart("Transverse Strain", f"|e_t Strain ({u.l_strain})", depth,
                                   [(4, rows(hi * 1e3)), (None, rows(lo * 1e3)),
                                    (0, rows(d.ey * 1e3))], 3)
             elif key == "shear_strain":
-                hi, lo = self.env_g.at(d.z, d.gxy)
+                hi, lo = st.envelope["gxy"]
                 made[key] = chart("Shear Strain", f"|g_x_y Strain ({u.l_strain})", depth,
                                   [(4, rows(hi * 1e3)), (4, rows(lo * 1e3)),
                                    (0, rows(d.gxy * 1e3))], 4)
@@ -167,10 +228,16 @@ class Views:
                 made[key] = chart("Principal Compressive Stress", f"f_2 Stress ({u.l_conc})",
                                   depth, [(0, rows(o.f2 / cs)), (1, rows(o.f2max / cs))], 3)
             elif key == "shear_on_crack":
-                lines = [(0, rows(np.abs(o.vci) / cs))]
-                if d.vcalc is not None:
-                    # with shear Response adds the limit, on both sides of zero
-                    lines += [(1, rows(o.vcimax / cs)), (1, rows(-o.vcimax / cs))]
+                # the value with its sign; its limit on the side of the larger extreme, and
+                # on the other side too when that extreme is over a fiftieth of the larger
+                # one; no limit while neither passes 0.001 MPa [B 00480590]
+                lines = [(0, rows(o.vci / cs))]
+                neg, pos = max(0.0, -float(np.min(o.vci))), max(0.0, float(np.max(o.vci)))
+                if max(neg, pos) > 1e-3 and neg != pos:
+                    if pos > neg or pos > neg / 50.0:
+                        lines.append((1, rows(o.vcimax / cs)))
+                    if neg > pos or neg > pos / 50.0:
+                        lines.append((1, rows(-o.vcimax / cs)))
                 made[key] = chart("Shear on Crack", f"|n_c_i shear ({u.l_conc})", depth,
                                   lines, 4)
             elif key == "principal_tensile_stress":
@@ -212,10 +279,22 @@ class Views:
                 made[key] = chart("Stirrup Stress at Crack", f"Stress ({u.l_steel})", depth,
                                   [(0, rows(d.fsycr / ss))], 3)
             elif key == "transverse_average_bond":
-                yy = np.linspace(ytop, ybot, 41)
-                tb = getattr(d, "tbond", None)
-                vals = np.zeros(41) if tb is None else np.interp(
-                    -yy, -y, np.asarray(tb, dtype=float)) / cs
+                # the table of bond over the depth, averaged over a window at each of 41
+                # heights [B 0047fcd0]
+                zz = np.linspace(sec.ztop, sec.zbot, 41)
+                yy = (zz - sec.zaxial) / u.length
+                vals = np.zeros(41)
+                if sec.stirrups and len(d.z) >= 3:
+                    zt, vt = bond_table(sec, d)
+                    zt, vt = zt[::-1], vt[::-1]
+                    for j, zq in enumerate(zz):
+                        half = 0.5 * bond_window(sec, zq)
+                        lo_, hi_ = max(zq - half, sec.zbot), min(zq + half, sec.ztop)
+                        if hi_ - lo_ <= 0:
+                            continue
+                        inner = zt[(zt > lo_) & (zt < hi_)]
+                        zs = np.concatenate([[lo_], inner, [hi_]])
+                        vals[j] = np.trapezoid(np.interp(zs, zt, vt), zs) / (hi_ - lo_) / cs
                 made[key] = chart("Transverse Average Bond", f"Bond stress ({u.l_conc})", depth,
                                   [(0, list(zip(vals, yy)))], 4)
             elif key == "shrinkage_thermal_strain":

@@ -71,7 +71,7 @@ from r2c.solver import SolveError, Stage  # noqa: E402
 LOADS = {"moment_phi": "m", "moment_ex": "m", "axial_ex": "n", "shear_gxy": "v",
          "shear_ex": "v"}
 # bond stresses come from the change between stages in the shear driver: not at a lone state
-NOT_HERE = {"long_average_bond", "transverse_average_bond"}
+NOT_HERE = {"long_average_bond"}
 
 
 def _setup(ref, input_path):
