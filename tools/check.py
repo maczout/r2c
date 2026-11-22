@@ -27,8 +27,11 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import report  # noqa: E402
 
+# Each entry: a heading, or a tuple of headings any one of which will do. Logs from
+# 2026-11-22 on have "Questions for the owner" (numbers in docs/summary.md); earlier logs
+# have "Open questions for the owner".
 LOG_SECTIONS = ("## Goal", "## Done", "## Tried and dropped", "## Decisions",
-                "## Open questions for the owner")
+                ("## Questions for the owner", "## Open questions for the owner"))
 
 
 def git(*args) -> tuple[int, str]:
@@ -94,7 +97,8 @@ def main(argv=None) -> int:
     logs = sorted((ROOT / "docs" / "log").glob("2*.md"))
     for p in logs:
         text = p.read_text(encoding="utf-8")
-        missing = [s for s in LOG_SECTIONS if s not in text]
+        missing = [s if isinstance(s, str) else s[0] for s in LOG_SECTIONS
+                   if not any(h in text for h in ((s,) if isinstance(s, str) else s))]
         if missing:
             print(f"FAIL  {p.relative_to(ROOT)}: missing {', '.join(missing)}")
             bad += 1

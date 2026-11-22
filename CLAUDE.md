@@ -37,18 +37,34 @@ When these pull against each other, the higher one wins.
    decision (below).
 2. **Bentz's thesis** is the basis of the kernel: its method, its relations, its notation.
 3. **Response-2000's binary** may be read to find out why r2c does not reach acceptance where
-   the thesis leaves the answer open: a constant, a table, a detail of a routine. Every rule
+   the thesis leaves the answer open: a constant, a table, a detail of a routine, within
+   the documented scope (`docs/acceptance.md`, "Stance"). Every rule
    taken from it is recorded in `docs/kernel.md` with its source. It is not the route to
    matching Response beyond what acceptance asks.
 4. **The regression limits in `tests/`** guard what works. They are not acceptance.
 
 When a goal and a constraint conflict and this list does not settle it, stop that line of
-work, record the question under "Open questions for the owner" in the session log, and carry
-on with something else.
+work, add the question to the decisions in `docs/summary.md` (below), and carry on with
+something else.
+
+## The owner's summary
+
+`docs/summary.md` is the one page the owner reads: the aim, the phases, progress against the
+exit criteria, the risks, and every decision, open or made. The decisions there sit just
+under `docs/acceptance.md` in the hierarchy above.
+
+- **Every question for the owner goes there**, numbered (D1, D2, …, never renumbered), with
+  the developer's suggested answer. A session log refers to it by number; it does not hold
+  questions of its own.
+- **Answers are recorded there**, marked *decided*, with "owner" and the date. A developer's
+  reading of an answer is a new item marked *suggested*.
+- **Written for the owner.** Plain words, short, no tool names or addresses where a sentence
+  will do. Detail stays in `docs/status.md`, `docs/kernel.md` and the logs, and the summary
+  points to it.
 
 ## Starting a session
 
-Read this file, `docs/status.md`, and the latest file in `docs/log/`. Read anything else only
+Read this file, `docs/summary.md`, `docs/status.md`, and the latest file in `docs/log/`. Read anything else only
 when the work needs it (`docs/kernel.md` before changing the kernel; `docs/acceptance.md`
 before judging a result). Run `python tools/check.py` to see the state of the record.
 
@@ -80,11 +96,13 @@ before judging a result). Run `python tools/check.py` to see the state of the re
 1. Write `docs/log/YYYY-MM-DD-NN.md` from `docs/log/TEMPLATE.md`. Keep it short. The sections
    that matter most: what was tried and dropped (so it is not tried again) and the decisions
    made, each with who made it and why.
-2. Update `docs/status.md` to what is true now. It is a description of the present, not a
+2. Update `docs/summary.md`: progress, the phase, the decisions (new questions added, answers
+   recorded). The pull request's description opens with what changed on it.
+3. Update `docs/status.md` to what is true now. It is a description of the present, not a
    history; the history is in the logs and in git.
-3. If the kernel changed, rerun verify and report, or leave `tools/check.py` reporting the
+4. If the kernel changed, rerun verify and report, or leave `tools/check.py` reporting the
    results as stale and say so in the log.
-4. `pytest` and `python tools/check.py` pass. Push.
+5. `pytest` and `python tools/check.py` pass. Push.
 
 Not wanted: a changelog, a commit log, or recording commit IDs in files. Git keeps those.
 
@@ -92,7 +110,8 @@ Not wanted: a changelog, a commit log, or recording commit IDs in files. Git kee
 
 | What | Where |
 |---|---|
-| Present state, open options | `docs/status.md` |
+| **The owner's page: aim, phases, progress, decisions** | `docs/summary.md` |
+| Present state in detail, open options | `docs/status.md` |
 | What happened in each session | `docs/log/` |
 | What agreement means (the owner's) | `docs/acceptance.md` |
 | Each kernel rule and its source | `docs/kernel.md` |

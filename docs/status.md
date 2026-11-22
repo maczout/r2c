@@ -1,7 +1,8 @@
 # r2c: where it stands
 
-The present state of r2c and the options for what comes next. History is in `docs/log/` and
-in git. First written at the end of the 2026-11-15 build; kept in the repository since
+The present state of r2c in detail, and the options for what comes next. The owner reads
+`docs/summary.md`; this page backs it, and questions for the owner live there, not here.
+History is in `docs/log/` and in git. First written at the end of the 2026-11-15 build; kept in the repository since
 2026-11-17.
 
 r2c is the Python clone of Response-2000's sectional analysis; r2x (`maczout/r2x`, branch
