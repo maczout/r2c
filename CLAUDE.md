@@ -37,7 +37,8 @@ When these pull against each other, the higher one wins.
    decision (below).
 2. **Bentz's thesis** is the basis of the kernel: its method, its relations, its notation.
 3. **Response-2000's binary** may be read to find out why r2c does not reach acceptance where
-   the thesis leaves the answer open: a constant, a table, a detail of a routine. Every rule
+   the thesis leaves the answer open: a constant, a table, a detail of a routine, within
+   the documented scope (`docs/acceptance.md`, "Stance"). Every rule
    taken from it is recorded in `docs/kernel.md` with its source. It is not the route to
    matching Response beyond what acceptance asks.
 4. **The regression limits in `tests/`** guard what works. They are not acceptance.

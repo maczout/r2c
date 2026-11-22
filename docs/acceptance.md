@@ -20,13 +20,31 @@ testing.
 
 What this means for the work:
 
-- r2c reproduces Response-2000's behaviour, including where and how a response ends. Where
-  r2c and Response differ, Response is right; whether r2c's result is better for the section
-  is not a question this project asks.
+- r2c reproduces Response-2000's behaviour **as documented** (its manual and Bentz's thesis).
+  Where r2c and documented Response differ, Response is right. Behaviour of the 1.9.7 binary
+  that the documents do not describe, such as where its solver fails to converge, is not
+  cloned; where the documents and the binary differ, the owner decides (owner, 2026-11-22).
+- The aim is a really good sectional response calculator. Features beyond that are built
+  outside r2c and r2x (owner, 2026-11-22).
 - Agreement within the targets below is enough. Once a case is inside them, closing the gap
   further is not a goal: build out the scope instead.
 - No structural assessment of results will be given. Questions of the form "is this state
   real for the section?" are answered by "follow Response".
+
+## Phase A exit criteria (owner, 2026-11-22)
+
+Development (phase A) is on Newbeam alone, varied in its loads; the other cases are parked
+until phase B (validate and refine). Phase A is done when, on that set:
+
+- **Must:** peak, rising branch and shape inside target on every case; the detail views of
+  the stress state under moment and axial load inside target.
+- **Should:** the endings of responses without shear inside target; the detail views related
+  to shear.
+- **Could:** the detail views related to cracking.
+- **Won't:** the endings of shear responses. They are recorded as known deviations in
+  `docs/status.md`. For a shear case, "shape" leaves out how the response ends.
+
+The decisions behind these are D1 to D3 in `docs/summary.md`.
 
 ## What matters (owner, 2026-11-21)
 

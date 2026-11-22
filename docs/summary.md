@@ -54,36 +54,36 @@ owner) · *open* (no suggestion yet).
 | # | Question | Status | Answer |
 |---|---|---|---|
 | D1 | What "finished" means for Phase A | decided, owner 2026-11-22 | *Must:* peak, rising branch and shape inside on every case. *Should:* the endings of moment (and axial) responses inside on every case. *Won't:* shear endings; recorded as known deviations. |
-| D1a | Reading of D1: "shape" for a shear case leaves out how the response ends, since the ending is a Won't | suggested | Yes |
+| D1a | Reading of D1: "shape" for a shear case leaves out how the response ends, since the ending is a Won't | decided, owner 2026-11-22 (suggestion approved) | Yes |
 | D2 | Detail views and post-peak: chase them? | decided, owner 2026-11-22 | *Must:* views of the stress state under moment and axial load. *Should:* views related to shear. *Could:* views related to cracking. |
 | D3 | Shear endings: chase further or accept? | decided, owner 2026-11-22 | Accept: see D1 (Won't). |
-| D20 | `docs/acceptance.md` still says "where r2c and Response differ, Response is right", with no qualifier | suggested | Reword to "Response as documented is right; undocumented solver behaviour is not cloned", and add the tiers of D1 and D2. The owner's file: the owner makes the change. |
+| D20 | `docs/acceptance.md` still says "where r2c and Response differ, Response is right", with no qualifier | decided, owner 2026-11-22 (suggestion approved) | Reworded: "Response as documented is right; undocumented solver behaviour is not cloned"; the tiers of D1 and D2 added as the phase A exit criteria. Done 2026-11-22. |
 
 ### Scope
 
 | # | Question | Status | Answer |
 |---|---|---|---|
 | D4 | Draped tendons (rule not found; effect under 0.1 %) | decided, owner 2026-11-22 | Out of scope |
-| D5 | Hsu softening models with Tamai tension stiffening | suggested | Out: a research feature, not the calculator |
-| D6 | A shape with no outline (Response cannot solve it; r2c builds it) | suggested | Reject it, as Response does |
-| D7 | Inputs Response rejects are input errors in r2c | suggested | Confirm |
-| D8 | Two added scope statuses, "no effect" and "not solvable" | suggested | Confirm |
-| D9 | Response's program folder (`rebar.dat`, `r2k.r2k`): should r2c read it? | suggested | No: outside the calculator |
-| D10 | Compression softening 4 ("Unsupported Method") | suggested | Out: undocumented |
-| D11 | Interlocking hoops analysed as stirrups (inferred, within 0.8 %) | suggested | Confirm |
+| D5 | Hsu softening models with Tamai tension stiffening | decided, owner 2026-11-22 (suggestion approved) | Out: a research feature, not the calculator |
+| D6 | A shape with no outline (Response cannot solve it; r2c builds it) | decided, owner 2026-11-22 (suggestion approved) | Reject it, as Response does |
+| D7 | Inputs Response rejects are input errors in r2c | decided, owner 2026-11-22 (suggestion approved) | Confirm |
+| D8 | Two added scope statuses, "no effect" and "not solvable" | decided, owner 2026-11-22 (suggestion approved) | Confirm |
+| D9 | Response's program folder (`rebar.dat`, `r2k.r2k`): should r2c read it? | decided, owner 2026-11-22 (suggestion approved) | No: outside the calculator |
+| D10 | Compression softening 4 ("Unsupported Method") | decided, owner 2026-11-22 (suggestion approved) | Out: undocumented |
+| D11 | Interlocking hoops analysed as stirrups (inferred, within 0.8 %) | decided, owner 2026-11-22 (suggestion approved) | Confirm |
 | D12 | Circular column under axial load alone after its peak (C2) | decided, owner 2026-11-22 | Looks wrong in Response: not cloned; r2c's uniform post-peak stands. Pure N stays in Phase A on Newbeam. |
-| D17 | Which document defines a complete feature | suggested | The manual (thesis Appendix A) for which features exist; the thesis for how they calculate |
+| D17 | Which document defines a complete feature | decided, owner 2026-11-22 (suggestion approved) | The manual (thesis Appendix A) for which features exist; the thesis for how they calculate |
 | D18 | Features built beyond the documented set (less common softening models, segmental steel, …) | decided, owner 2026-11-22 | Remove the code |
 
 ### Measurement and test set (meta-development)
 
 | # | Question | Status | Answer |
 |---|---|---|---|
-| D13 | Stage matching: a 0.5 % change in r2c's load can switch the matched stage and flip 11 view checks | suggested | Fix the measure before any work on views |
-| D14 | F1: Response's cracking-under-compression rule inside the node | suggested | Yes, after D13 |
-| D15 | The generated results JSON is committed on every run (~80,000 lines) | suggested | Build it in CI instead of storing it |
+| D13 | Stage matching: a 0.5 % change in r2c's load can switch the matched stage and flip 11 view checks | decided, owner 2026-11-22 (suggestion approved) | Fix the measure before any work on views |
+| D14 | F1: Response's cracking-under-compression rule inside the node | decided, owner 2026-11-22 (suggestion approved) | Yes, after D13 |
+| D15 | The generated results JSON is committed on every run (~80,000 lines) | decided, owner 2026-11-22 (suggestion approved) | Build it in CI instead of storing it |
 | D16 | The test set has grown to 85 cases | decided, owner 2026-11-22 | Develop on Newbeam; the rest is parked until Phase B |
-| D19 | Parked fixtures: delete, or keep and not run by default? | suggested | Keep them, not run by default |
+| D19 | Parked fixtures: delete, or keep and not run by default? | decided, owner 2026-11-22 (suggestion approved) | Keep them, not run by default |
 
 ### Closed by the owner's stance
 
