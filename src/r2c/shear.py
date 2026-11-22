@@ -45,12 +45,13 @@ class Shear(Flexure):
         # diagnostics only (tools/diagnose.py flow --fit-layer): a layer's tangent stiffness
         # in the shear flow, in place of its own
         self.bar_stiffness: dict[int, float] = {}
+        # Response's acceptance of a stage [B 00418af0]: converged under 1 %; after 16 passes
+        # kept unless above 3 % with the load above the largest so far
         self.profile_tol = 0.01
-        # an iteration that does not converge is accepted at its closest iterate within this
         self.profile_accept = 0.03
+        self.passes = 16
         self.evals = 0
         self.budget = 600
-        self.ratio = 1.2        # reported (force-weighted) shear strain over the plain mean
 
     # -- tangent stiffness and the shear flow ---------------------------------------------------
     def bar_tangent(self, i, es):
@@ -323,15 +324,18 @@ class Shear(Flexure):
         gc = sec.conc0.Ec / 2.0
         use_sec = (sec_g > 1e-4 * gc) & (np.abs(vstate) > 1e-6)
         stiff = np.where(use_sec, sec_g, np.maximum(nn, 1e-4 * gc))
-        gnew = tau / stiff
-        # keep the step of each node bounded: the same sign as the shear, and no more than
-        # doubled or halved where the node already has a shear strain
+        # Response's update [B 0041e840]: where the node carries shear, its shear strain
+        # times the mean of one and (calculated stress / the state's stress), that factor
+        # held within ten either way. Where it carries none yet (r2c's own): the calculated
+        # stress over the tangent stiffness, no more than twice the largest strain so far.
         sgn = 1.0 if float(np.sum(vstate)) >= 0 else -1.0
-        gnew = np.maximum(gnew * sgn, 0.0)
         gold = g * sgn
-        big = gold > 0.02 * max(float(np.max(gold)), 1e-12)
-        gnew = np.where(big, np.clip(gnew, 0.5 * gold, 2.0 * gold),
-                        np.minimum(gnew, 2.0 * max(float(np.max(gold)), 1e-12))) * sgn
+        with np.errstate(divide="ignore", invalid="ignore"):
+            ratio = np.where(use_sec, 0.5 * (tau / np.where(use_sec, vstate, 1.0) + 1.0), 1.0)
+        ratio = np.clip(ratio, -10.0, 10.0)
+        gfree = np.minimum(np.maximum(tau / stiff * sgn, 0.0),
+                           2.0 * max(float(np.max(gold)), 1e-12))
+        gnew = np.where(use_sec, np.maximum(ratio * gold, 0.0), gfree) * sgn
         gnew[0, 0] = 0.0
         gnew[-1, 2] = 0.0
         # how far the calculated stresses are from those of the state: the shear force that
@@ -346,14 +350,35 @@ class Shear(Flexure):
         zf = an.profile_z(z).ravel()[::-1]
         gf = gnew.ravel()[::-1]
         zz, ii = np.unique(zf, return_index=True)
-        prof = np.interp(an.shape_z, zz, gf[ii])
-        bw = sec.width(an.shape_z)
-        mean = np.trapezoid(prof * bw, an.shape_z) / np.trapezoid(bw, an.shape_z)
+        # the profile is kept at the nodes' own heights as well as on its base grid: the
+        # shear strain changes sharply at a crack front, where the nodes are closest
+        grid = np.unique(np.concatenate([an.shape_z0, zz]))
+        prof = np.interp(grid, zz, gf[ii])
+        bw = sec.width(grid)
+        mean = np.trapezoid(prof * bw, grid) / np.trapezoid(bw, grid)
         if not np.isfinite(mean) or abs(mean) < 1e-15:
             return err, None
         new = prof / mean
-        an.shape = (1.0 - relax) * an.shape + relax * new
+        old = np.interp(grid, an.shape_z, an.shape)
+        an.shape_z, an.shape = grid, (1.0 - relax) * old + relax * new
         return err, mean
+
+    def profile_error(self, z, vstate, tau, v) -> float:
+        """Response's measure of how far the shear strain profile is from converged
+        [B 00420f20]: the standard deviation, over 50 points of the depth, of the calculated
+        shear stress less the state's, over the mean calculated shear stress. 0.9 % (which
+        counts as converged) where the shear is negligible."""
+        if abs(v) < 1e-3 * self.vscale:
+            return 0.009
+        sec = self.sec
+        zf = self.an.profile_z(z).ravel()[::-1]
+        zz, ii = np.unique(zf, return_index=True)
+        calc = np.interp(np.linspace(sec.zbot, sec.ztop, 50), zz, tau.ravel()[::-1][ii])
+        state = np.interp(np.linspace(sec.zbot, sec.ztop, 50), zz, vstate.ravel()[::-1][ii])
+        d = calc - state
+        mean = float(np.mean(calc))
+        sd = math.sqrt(max(float(np.sum(d * d) * 50.0 - np.sum(d) ** 2) / 50.0 / 49.0, 0.0))
+        return abs(sd / mean) if abs(mean) > 1e-12 else sd
 
     # -- one state ------------------------------------------------------------------------------
     def _residual(self, c, x):
@@ -363,7 +388,7 @@ class Shear(Flexure):
         elif self.mode == "e0":
             phi, gam, e0 = x[0], x[1], c
         else:
-            e0, phi, gam = x[0], x[1], c / self.ratio
+            e0, phi, gam = x[0], x[1], c
         self.evals += 1
         if self.evals > self.budget:
             raise SolveError("no equilibrium found within the iteration limit")
@@ -371,10 +396,14 @@ class Shear(Flexure):
         rn = lambda lam: (n - an.n0 - lam * an.dn) / self.nscale
         rm = lambda lam: (m - an.m0 - lam * an.dm) / self.mscale
         rv = lambda lam: (v - an.v0 - lam * an.dv) / self.vscale
-        if self.mode == "phi":
+        # the load factor comes from one load that is being increased (by preference the one
+        # that goes with the control variable), the other two are the equations
+        order = {"phi": "mvn", "e0": "nvm", "gam": "vmn"}[self.mode]
+        which = next(k for k in order if {"n": an.dn, "m": an.dm, "v": an.dv}[k] != 0.0)
+        if which == "m":
             lam = (m - an.m0) / an.dm
             r = np.array([rn(lam), rv(lam)])
-        elif self.mode == "e0":
+        elif which == "n":
             lam = (n - an.n0) / an.dn
             r = np.array([rm(lam), rv(lam)])
         else:
@@ -392,6 +421,7 @@ class Shear(Flexure):
         for it in range(40):
             nr = float(np.max(np.abs(r)))
             if nr < 2e-7:
+                self.unbalance = nr
                 return x, info, True
             jac = np.empty((2, 2))
             for j in range(2):
@@ -422,6 +452,7 @@ class Shear(Flexure):
         nr = float(np.max(np.abs(r)))
         if nr < best[0]:
             best = (nr, x.copy(), info)
+        self.unbalance = best[0]
         return best[1], best[2], best[0] < 2e-5
 
     def _nested(self, c, x0):
@@ -454,14 +485,19 @@ class Shear(Flexure):
         """The state at control value c: curvature, or the shear strain when there is no
         moment increment."""
         an = self.an
-        keep = (an.shape.copy(), self.ratio)
+        keep = an.profile()
         try:
             return self._solve(c, prev)
         except SolveError:
-            an.shape, self.ratio = keep
+            an.set_profile(keep)
             raise
 
     def _solve(self, c, prev: Stage | None) -> Stage:
+        """One load stage as Response works on it [B 00418af0]: up to 16 passes of solving the
+        global strains with the shear strain profile as it is, then updating the profile from
+        the calculated shear stress. The stage comes back converged (profile error under
+        1 %) or as the last pass left it, with its error in `perr`; whether it is kept is the
+        caller's decision. SolveError only where the global strains cannot be solved."""
         an = self.an
         if prev is None:
             x = [0.0, 0.0]
@@ -472,63 +508,59 @@ class Shear(Flexure):
         else:
             x = [prev.e0, prev.phi]
         an.coarsen()
-        saved_shape = an.shape.copy()
-        saved_ratio = self.ratio
+        saved_shape = an.profile()
         self.evals = 0
         info = None
         ok = False
-        best = None
         err = 1.0
-        for outer in range(30):
+        passes = refines = 0
+        used = saved_shape
+        while passes < self.passes:
             x0 = np.array(x, dtype=float)
             x, info, ok = self._newton(c, x0)
+            soft = False
             if not ok:
+                near = (x, info, self.unbalance)
                 x, info, ok = self._nested(c, x0)
-            if getattr(self, "debug", False):
-                print(f"   outer {outer}: newton ok={ok} x={x} lam={info[3]:.4f}")
-            if not ok:
-                break
+                if not ok:
+                    # Response carries on from a global solution that has not closed
+                    # [B 00418af0, the solve's status -2]: here, the nearest state found,
+                    # if it is out of balance by less than 2 % of the section's scale
+                    x, info, res = near
+                    if info is None or not all(math.isfinite(q) for q in info) or res > 0.02:
+                        ok = False
+                        break
+                    ok = soft = True
             e0, phi, gam, lam, n, m, v = info
-            if outer < 3 and an.refine(e0, phi, gam):
+            if refines < 3 and an.refine(e0, phi, gam):
+                refines += 1
                 continue
             z, vstate, tau, t, _d = self.shear_flow(e0, phi, gam, v)
-            prev_shape = an.shape.copy()
-            err, mean = self.update_shape(z, vstate, tau, t, relax=self.relax(outer))
+            used = an.profile()
+            _own, mean = self.update_shape(z, vstate, tau, t, relax=self.relax(passes))
+            err = self.profile_error(z, vstate, tau, v)
+            passes += 1
             if getattr(self, "debug", False):
-                print(f"   outer {outer}: profile err={err:.4f} mean={mean}")
-            if best is None or err < best[0]:
-                best = (err, info, prev_shape, tau.copy(), np.array(x, dtype=float))
-            if self.mode == "gam":
-                # keep the reported shear strain at the control value
-                zz_, b_ = t["z"].ravel(), t["b"].ravel()
-                vv_, gg_ = t["out"].v, t["g"]
-                den_ = np.trapezoid(vv_ * b_, zz_)
-                bm_ = np.trapezoid(b_, zz_)
-                if abs(den_) > 1e-9 and abs(gam) > 1e-15:
-                    rep_ = np.trapezoid(vv_ * gg_ * b_, zz_) / den_
-                    new_ratio = float(rep_ / gam)
-                    if 0.2 < new_ratio < 5.0:
-                        if abs(new_ratio - self.ratio) > 0.002 * self.ratio:
-                            err = max(err, self.profile_tol * 1.01)
-                        self.ratio = new_ratio
+                print(f"   pass {passes}: lam={lam:.4f} profile err={err:.4f}")
+            if soft:
+                if err <= 0.05:
+                    break               # kept as it is
+                continue
             if err < self.profile_tol:
                 break
             if mean is not None and self.mode != "gam" and abs(gam) < 1e-12:
                 x = [x[0], mean]
-        if ok and best is not None and err > self.profile_tol and best[0] < err:
-            # not converged: take the closest iterate
-            err, an.shape = best[0], best[2].copy()
-            x, info, ok = self._newton(c, best[4])
-            if not ok:
-                x, info, ok = self._nested(c, best[4])
-        if not ok or info is None or err > self.profile_accept:
-            an.shape = saved_shape
-            self.ratio = saved_ratio
+        if ok and soft:
+            err = max(err, self.profile_tol)
+        if not ok or info is None:
+            an.set_profile(saved_shape)
             raise SolveError(f"no equilibrium at control value {c:g}")
+        if err >= self.profile_tol:
+            # not converged: the state is the last pass's, with the profile it was solved on
+            an.set_profile(used)
         e0, phi, gam, lam, n, m, v = info
         if not all(math.isfinite(q) for q in info) or abs(gam) > 0.2 or abs(e0) > 0.2:
-            an.shape = saved_shape
-            self.ratio = saved_ratio
+            an.set_profile(saved_shape)
             raise SolveError(f"no equilibrium at control value {c:g}")
         det = an.detail(e0, phi, gam)
         # the calculated profile at the detail's nodes
@@ -560,41 +592,326 @@ class Shear(Flexure):
         den = np.trapezoid(det.out.v * det.b, det.z)
         st.gam_avg = float(num / den) if abs(den) > 1e-9 else 0.0
         st.perr = err
+        st.passes = passes
+        st.profile = an.profile()        # the profile the stage leaves for the next one
         return st
 
-    def switch_control(self, st: Stage) -> bool:
-        """From curvature to the shear strain. Where shear governs, the curvature stops
-        growing, or turns back, while the shear strain and the load still rise: Response's
-        stages there step in the shear strain (inferred from its control charts)."""
-        rep = getattr(st, "gam_avg", 0.0)
-        if self.mode != "phi" or self.an.dv == 0.0 or st.gam == 0.0 or rep == 0.0:
-            return False
-        sts = self.sec.stirrups
-        if sts and not float(np.max(self.an.epy)) > 0.0:
-            # only once the stirrups are working hard (past half of yield, or yielded
-            # before): a state missed earlier, at first cracking say, is not shear taking over
-            fy = sts[0].steel.fy * sts[0].steel.phi
-            if float(np.max(np.abs(st.detail.fsy))) < 0.5 * fy:
-                return False
-        self.mode = "gam"
-        self.ratio = rep / st.gam
-        self.sign = 1.0 if rep > 0 else -1.0
-        self.step0 = 0.024e-3
-        st.control = rep
-        st.cmode = "gam"
-        return True
-
     def more_detail(self, stages, peak, limit):
+        # between stages found in the first control variable
         mode, self.mode = self.mode, self.mode0
         try:
             return super().more_detail(stages, peak, limit)
         finally:
             self.mode = mode
 
-    def relax(self, outer: int) -> float:
-        return 1.0 if outer == 0 else 0.5
+    def relax(self, passes: int) -> float:
+        """The share of the updated profile taken: all of it (the update is Response's, which
+        is damped in itself). Under shear alone, half of it in the second half of the passes
+        [O, r2c's own: without it the stage past the peak does not settle, where Response's
+        does; with it everywhere, r2c settles where Response's stages stand still]."""
+        if self.mode0 == "gam" and passes >= self.passes // 2:
+            return 0.5
+        return 1.0
 
-    def collapsed(self, st: Stage, peak: float) -> bool:
-        """After a shear failure the load falls away: the response ends once less than half of
-        the peak load is left."""
-        return peak > 0 and st.lam < 0.5 * peak
+    # -- Response's load stage control [B; docs/kernel.md "Response's own load stage control"] ---
+    def control_of(self, st: Stage, mode: str | None = None) -> float:
+        return {"phi": st.phi, "e0": st.e0, "gam": st.gam}[mode or self.mode]
+
+    def _weights(self):
+        """a, b, c of Response's choice of control variable: |dN|, 3|dM|/h, |dV|."""
+        an = self.an
+        return abs(an.dn), 3.0 * abs(an.dm) / self.sec.h, abs(an.dv)
+
+    def first_control(self) -> str:
+        """The curvature where the moment dominates, else the axial strain [B 00422de0];
+        the shear strain for shear alone [O: Response's stages under shear alone are evenly
+        spaced in the shear strain while the axial strain stays at nothing]."""
+        a, b, c = self._weights()
+        if a == 0.0 and b == 0.0:
+            return "gam"
+        return "phi" if (a <= b and c <= b) else "e0"
+
+    def other_control(self) -> str:
+        """The control variable Response changes to when the present one stalls."""
+        a, b, c = self._weights()
+        if c < b or c < a:
+            if a <= b and c <= b:
+                return "gam"                  # the moment dominates and there is shear
+            return "gam" if b < c else "phi"
+        return "e0" if (b < a or b <= 0.0) else "phi"
+
+    def base_step(self, mode: str) -> float:
+        """Response's base step of a control variable, signed towards loading [B 00419250]."""
+        an, sec = self.an, self.sec
+        sgn = lambda v: 1.0 if v > 0 else -1.0 if v < 0 else 0.0
+        if mode == "phi":
+            d = 0.004 / sec.h / 50.0          # rad/mm (0.004/h/50 with h in metres, per metre)
+            if abs(an.dv) * 0.5 < abs(an.dn) and abs(an.dv) > 1e-3:
+                d *= 0.5
+            if abs(an.n0) > 0.1 * sec.area:   # a constant axial load above 0.1 MPa on the area
+                d *= 0.5
+            if abs(an.dv) > 1e-3 and abs(an.dm / an.dv) < sec.h:
+                d *= 0.5
+            return d * (sgn(an.dm) or 1.0)
+        if mode == "e0":
+            d = abs(sec.conc0.e0) / 20.0
+            return d * (sgn(an.dn) or 1.0)
+        # the shear strain: finer where the member has at least minimum stirrups
+        deep = any(st.top - st.bot > 0.5 * sec.h for st in sec.stirrups)
+        strong = False
+        if sec.stirrups:
+            bw = float(np.min(sec.width(np.linspace(sec.zbot, sec.ztop, 41)[1:-1])))
+            strength = sum(st.area / (bw * st.space) * st.steel.fy for st in sec.stirrups)
+            strong = strength >= 0.08 * math.sqrt(sec.conc0.fcp)
+        d = 2e-5 if (deep and strong) or (an.dn == 0.0 and an.dm == 0.0) else 5e-5
+        if an.dn == 0.0 and an.dm == 0.0 and an.n0 < 0.0:
+            d *= 0.5      # [O] shear alone under a constant compression: half the step
+        return d * (sgn(an.dv) or 1.0)
+
+    def state_code(self, st: Stage) -> int:
+        """Response's code for what has gone wrong in a state [B 004204b0]: 1 a crack
+        slipping where there are no stirrups, 4 a stirrup past rupture, 3 the web crushing,
+        2 an extreme fibre far past its peak strain; 0 nothing."""
+        d, sec = st.detail, self.sec
+        o = d.out
+        # the shear on the crack at its limit (what then governs the tension at the node,
+        # docs/kernel.md "The node") where no stirrup crosses
+        slip = (o.gov == nodelib.GOV_VCI_X) | (o.gov == nodelib.GOV_VCI_Y)
+        if d.rhov is not None:
+            slip = slip & (np.asarray(d.rhov) <= 0.0)
+        if slip.any():
+            return 1
+        if sec.stirrups:
+            lim = max(0.01, max(s.steel.rupture for s in sec.stirrups))
+            if float(np.max(d.ey)) > lim:
+                return 4
+        e0s = np.array([sec.law_at(float(z)).e0 for z in d.z])
+        crush = (np.abs(o.f2 - o.f2max) < 0.015 * np.abs(o.f2max)) | (o.e2 < -e0s)
+        shear = np.abs(o.v) > 0.0
+        n = len(crush)
+        if crush[0] or crush[-1]:
+            # the crushing zone that starts at that face is flexure's; beyond it, any
+            # crushing node that carries shear is the web's
+            order = range(n) if crush[0] else range(n - 1, -1, -1)
+            zone = True
+            for i in order:
+                if zone and not crush[i]:
+                    zone = False
+                elif not zone and crush[i] and shear[i]:
+                    return 3
+            if zone and st.v > 0.0:
+                return 3
+        elif (crush & shear).any():
+            return 3
+        far = min(-0.01, -5.0 * float(np.max(e0s)))
+        if o.e2[0] >= far and o.e2[-1] >= far:
+            return 3 if bool(np.all(o.e2 <= -e0s)) else 0
+        return 2
+
+    def _event(self, a: Stage, b: Stage) -> int:
+        """What sets stage b apart from the one before [B 00415e30]: 1 newly cracked, 2
+        cracked before and not now, 3 newly crushing, 5 a crack slipping, 4 a change in what
+        has ruptured; 0 nothing."""
+        ca, cb = bool(a.detail.out.cracked.any()), bool(b.detail.out.cracked.any())
+        if cb and not ca:
+            return 1
+        if ca and not cb:
+            return 2
+
+        def crushing(st):
+            e0s = np.array([self.sec.law_at(float(z)).e0 for z in st.detail.z])
+            return bool(np.any(st.detail.out.e2 < -e0s))
+
+        if crushing(b) and not crushing(a):
+            return 3
+        if not self.sec.stirrups and self.state_code(b) == 1 and self.state_code(a) != 1:
+            return 5
+        if self._marks(a)[2] != self._marks(b)[2]:
+            return 4
+        return 0
+
+    def _ends(self, last: Stage, prev: Stage, peak: float, count: int) -> bool:
+        """Response's end of a response, tested after each accepted stage [B 00419990]."""
+        an, sec = self.an, self.sec
+        if self.state_code(last) != 0 and abs(last.lam) < 0.8 * abs(peak):
+            return True
+        if self._event(prev, last):
+            return False
+        if abs(last.lam) < 0.2 * abs(peak) and count >= 11:
+            return True
+        if an.n0 != 0.0 or an.m0 != 0.0 or an.v0 != 0.0:
+            # a load that is being increased has all but gone
+            top = [max(abs(getattr(s, k)) for s in self.stages) for k in "nmv"]
+            big = max(top) / 1000.0
+            for k, mx, inc, con in zip("nmv", top, (an.dn, an.dm, an.dv),
+                                       (an.n0, an.m0, an.v0)):
+                if mx < big or mx <= 1.0:
+                    continue
+                if abs(getattr(last, k)) < mx / 100.0 and (abs(inc) > 1e-3 or abs(con) > 1e-3) \
+                        and (con + 0.01) * (inc + 0.01) > 0.0:
+                    return True
+        d = last.detail
+        e0max = max(law.e0 for law in sec.laws)
+        if float(-np.min(d.out.e2)) > 4.0 * e0max:
+            return True
+        if float(np.max(d.ey)) > 0.05:
+            return True
+        rup = max((l.steel.rupture for l in sec.layers), default=0.0)
+        if rup > 0.0:
+            net = np.asarray(d.ex)          # net of shrinkage
+            if net[0] > 5.0 * rup or net[-1] > 5.0 * rup:
+                return True
+        return False
+
+    def run(self, max_stages=400) -> list[Stage]:
+        """The response, stage by stage, as Response-2000 finds it: its control variable and
+        steps, its bracketing of events, its acceptance of a stage, what it does when a stage
+        is refused, and its end tests (docs/kernel.md, "Response's own load stage control")."""
+        an = self.an
+        if an.dn == 0.0 and an.dm == 0.0 and an.dv == 0.0:
+            self.mode = "none"
+            return super().run(max_stages)
+        self.mode = self.mode0 = self.first_control()
+        st0 = self.initial()
+        st0.control, st0.cmode = self.control_of(st0), self.mode
+        st0.profile = an.profile()
+        self.accept(st0)
+        unit = lambda: 1e-3 if self.mode == "phi" else 1.0     # Response's rad/m against rad/mm
+        d0 = self.base_step(self.mode)
+        mult = 1.0
+        target = st0.control + d0 / 6.0
+        pending: list[Stage] = []       # stages set aside while an event is closed in on
+        peak = 0.0
+        retries = 0
+        solves = 0
+        while len(self.stages) + len(pending) < max_stages and solves < 327:
+            prev = self.stages[-1]
+            n_st = len(self.stages)
+            # the step grows to a tenth of the control value [B 00418860]
+            if n_st > 4 and mult <= 1.0 and abs(target) > 1e-4 * unit() \
+                    and abs(d0) < abs(target) / 10.0:
+                d0 = math.copysign(abs(target) / 10.0, d0)
+            solves += 1
+            try:
+                st = self.solve(target, prev)
+                ok = True
+                if st.lam < 0.0 and len(self.stages) > 1:
+                    # the loads reversed: not a state of this loading (Response's shear is
+                    # never negative, the manual 3-5)
+                    st, ok = None, False
+            except SolveError:
+                st, ok = None, False
+            code = 0
+            if ok:
+                st.cmode = self.mode
+                code = self.state_code(st)
+                if st.perr >= self.profile_tol and st.perr > self.profile_accept \
+                        and st.lam > peak:
+                    ok = False          # not converged after 16 passes, with the load above
+                if code != 0 and mult >= 0.5:
+                    ok = False
+                if code == 3 and st.lam > peak:
+                    ok = False
+            if getattr(self, "trace", None) is not None:
+                self.trace.append(dict(
+                    n=len(self.stages), mode=self.mode, target=target, mult=mult, kept=ok,
+                    solved=st is not None, code=code, peak=peak,
+                    lam=None if st is None else st.lam, perr=None if st is None else st.perr,
+                    passes=None if st is None else st.passes))
+            if not ok:
+                retries += 1
+                # back to the state of the stage before [B 004190a0]
+                if getattr(prev, "profile", None) is not None:
+                    an.set_profile(prev.profile)
+                other = self.other_control() if self.mode0 != "gam" else self.mode
+                if mult < (0.05 if self.mode == "e0" else 0.2) and other != self.mode:
+                    # change the control variable [B 004162d0]
+                    old = self.mode
+                    self.mode = other
+                    n_st = len(self.stages)
+                    ref = self.stages[0] if n_st < 3 else \
+                        self.stages[n_st - 3 if n_st - 2 <= 2 else n_st // 3]
+                    here = self.control_of(prev)
+                    move = here if n_st < 3 else here - self.control_of(ref)
+                    d0 = abs(self.base_step(other)) * (1.0 if move >= 0 else -1.0)
+                    if n_st > 4 and abs(here) > 1e-6 * unit() and abs(d0) < abs(here) / 10.0:
+                        d0 = math.copysign(abs(here) / 10.0, d0)
+                    mult = 1.0
+                    target = here + d0 * mult
+                    pending.clear()
+                    if getattr(self, "debug", False):
+                        print(f"  control {old} -> {other} at stage {n_st}")
+                    continue
+                # closer to the stage before [B 0041a870, 1]
+                last_c = prev.control if prev.cmode == self.mode else self.control_of(prev)
+                if pending:
+                    gap = pending[-1].control - last_c
+                elif n_st >= 2:
+                    gap = last_c - self.control_of(self.stages[-2])
+                else:
+                    gap = d0 / 6.0
+                if abs(gap) + 1e-6 * unit() < abs(mult * d0) and mult < 1.01:
+                    target = last_c + 0.5 * gap
+                    mult *= 0.5
+                elif mult == 1.0:
+                    target -= 0.5 * d0
+                    mult = 1.5
+                else:
+                    mult *= 0.5
+                    target = target * 0.5 if n_st == 1 else target - mult * d0
+                if mult < 0.005:
+                    break
+                continue
+            # accepted
+            if mult == 1.5:
+                mult = 1.0
+            if retries == 0 and mult < 0.25:
+                mult *= 2.0
+            retries = 0
+            self.accept(st)
+            peak = max(peak, st.lam)
+            if len(self.stages) >= 2 and self._ends(st, prev, peak, len(self.stages)):
+                break
+            if abs(st.lam) < 0.01 * abs(prev.lam) and len(self.stages) > 2:
+                self.stages.pop()       # the load has run out: not a load stage
+                break
+            # the next stage [B 00415e30]: close in on an event, take up a stage set aside,
+            # or step on
+            while True:
+                a, b = self.stages[-2], self.stages[-1]
+                ev = self._event(a, b)
+                travel = abs(self.control_of(b) - self.control_of(self.stages[0]))
+                gap = self.control_of(b) - self.control_of(a)
+                share = {1: 0.02, 2: 0.02, 3: 0.005, 4: 0.01, 5: 0.02}.get(ev, 0.0)
+                if ev and abs(gap) >= 1e-10 and abs(gap) > share * travel \
+                        and len(pending) < 60:
+                    pending.append(self.stages.pop())
+                    self._uncommit()
+                    if getattr(a, "profile", None) is not None:
+                        an.set_profile(a.profile)
+                    target = self.control_of(a) + (0.8 if ev == 2 else 0.2) * gap
+                    break
+                if pending:
+                    nxt = pending.pop()
+                    self.accept(nxt)
+                    if getattr(nxt, "profile", None) is not None:
+                        an.set_profile(nxt.profile)
+                    peak = max(peak, nxt.lam)
+                    target = nxt.control
+                    continue
+                target += d0 * mult
+                break
+        return self.stages[:max_stages]
+
+    def _uncommit(self):
+        """Put the history (plastic strains, ruptured bars) back to that of the stages kept,
+        after a stage has been set aside."""
+        an = self.an
+        an.ep[:] = an.ep0
+        an.epy[:] = 0.0
+        an.dead[:] = False
+        for i, st in enumerate(self.stages):
+            if i:
+                an.commit(st.e0, st.phi)
+                if st.gam != 0.0:
+                    an.commit_stirrups(st.detail)

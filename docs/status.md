@@ -17,8 +17,8 @@ developer's. Items that need a structural judgement are marked **(structural)**.
 - `r2c solve` with r2x's options, exit statuses and record format (r2x-raw 1, all views).
   Left out as agreed: `--report`, `define`/sessions, `setup`; `health` prints a version line.
 - Kernel in Python (numpy only): MCFT node with crack check, dynamic layering, flexure and axial
-  driver, shear by the longitudinal stiffness method with Response's own stiffness rules,
-  stepping in curvature and then in the shear strain.
+  driver, shear by the longitudinal stiffness method with Response's own stiffness rules
+  and, since 2026-11-21, Response's own load stage control.
 - Tools: `compare.py` (any two records: peak, rising and post-peak measured both ways,
   curve shape, detail views at the features of Response's curve), `verify.py` (r2c on a set of oracle records),
   `report.py` (verification results from a verify run), `dashboard.py` (the same results as
@@ -31,7 +31,7 @@ developer's. Items that need a structural judgement are marked **(structural)**.
   `retrim.py` (re-cut the fixtures from the archive to hold the feature stages),
   `capture.py` (rebuild the oracle archive with r2x; `--add` captures a new case and cuts
   its fixture), `curves.py` (the control curves of two records point by point), `ends.py`
-  (how each shear response ends in r2c and in Response), `scope.py` (which fixture has which
+  (how each shear response ends in Response and in r2c, from a verify run), `scope.py` (which fixture has which
   input feature), `variants.py` (inputs derived from present ones by stated text edits),
   `probe.py` (what Response does with an input, through r2x), `scope_cases.py` (the 53
   scope cases and their first capture), `targets.py` (which cases are inside on peak,
@@ -64,23 +64,40 @@ post-peak 10, shape 10, views 30. On the 25, no check changed sides against the 
 on peak and rising branch; the five without shear are inside on shape too
 (`docs/verification.md`, "Quick Define sections").
 
-**The 53 scope cases** (fifth run of 2026-11-21, all 85 cases, after step 3 of increment
-S): no case fails or is refused; the first 32 are as above, no check changed sides. Of the
-53, 21 are inside on peak, rising branch and shape (17 in the baseline before anything was
-built) and 32 are outside, **every one on the shape, at the end of the response**: 11 of
-them also on the peak, where r2c carries on past the point where Response's response ends
-(+5 to +22 %), 5 on the rising branch. None is outside for its feature's own rule: in
-Response's own peak states r2c's moment is within 0.4 % and its shear within 1 to 3 %
-(`docs/verification.md`, "The scope cases after step 3"; `python tools/targets.py
-VERIFY_OUT --new`). They are what step 4 works on; none is recorded as a known deviation yet.
+**All 85 cases, after increment S** (sixth run of 2026-11-21: the 32, and the 53 scope
+cases; Response's own stage control in place of r2c's for the cases with shear). No case
+fails or is refused. **51 of 85 are inside on peak, rising branch and shape** (39 in the
+baseline before the increment), 27 of the 53 scope cases. By check, cases outside: peak 5,
+rising 6, shape 33, post-peak 42. On the 32 earlier cases peak and rising branch are as
+before; two shape checks came inside (`docs/verification.md`, "How a response ends").
 
-**Known deviation, shear cases (the last stage).** Response's response to moment and shear
-often ends on a collapsed stage, at 4 to 66 % of the peak load (5 of the 12 shear cases:
-both new ones, the column at M/V = 1 m and the I-girder at M/V = 2 m, and dm-n1n and the
-Newbeam at M/V = 0.5 m and 1 m). r2c never finds such a state (`tools/ends.py`) and ends at
-its last stage near the peak, so the shape check reads "ends falling" against "ends
-standing still" on the two new cases; the rest of their shape is the same. This is
-Response's acceptance of a stage (option A3).
+**Known deviations, shear cases** (owner's brief of 2026-11-21: a shear case outside target
+is recorded here). All of them are about where and how a response ends; in Response's own
+peak states r2c's forces agree within 1 to 3 % on every one.
+
+1. *r2c goes on past Response's end; the peak is outside* (5 cases): softening 0 and 8
+   (+19.0 %), 5 (+10.1 %) and 6 (+5.5 %) on the I-girder at M/V = 2 m; the T-beam at
+   M/V = 2 m (+7.4 %). Response's response ends while its load is still rising: on the
+   I-girder just after the web cracks (its next stages do not converge and are kept because
+   their load is under the peak; the third has collapsed), on the T-beam with stages
+   standing still. r2c's profile iteration converges at those states, and under Response's
+   own rules a converged stage is accepted. Inside target but the same thing: Newbeam at
+   M/V = 2 m (+3.3 %; Response's stages stand still at a curvature of 39 rad/km).
+2. *The rising branch* (6 cases): softening 7, 9 and 11 on the I-girder (5.3, 14.2 and
+   6.5 %); Newbeam at M/V = 0.5 m (6.1 %; 18.2 % before step 4); the two cases in US units
+   at M/V = 1 ft (13.1 and 7.3 %: one fall of load fewer than Response's on the way up).
+3. *The last stage; the shape alone is outside* (22 shear cases). Response's response ends on a
+   collapsed stage in most (a stage that had not converged after sixteen passes, kept
+   because its load was under the peak); r2c's ends with stages standing still at the same
+   plateau, or the other way round. r2c follows the same rule since step 4; which stage
+   fails to converge is not always the same. 23 of the 50 shear responses now end as
+   Response's does (14 before; `python tools/ends.py VERIFY_OUT`).
+
+**Known deviation, the column under axial load alone after its peak (C2).** Response
+leaves the uniform state (a curved state with no moment, the load falling by a quarter in
+one step); r2c stays on it. Not resolved in step 4: on the two rectangular sections under
+axial load alone Response keeps the uniform state to the end, as r2c does, and its control
+variable does not change; what makes the circular column different was not found.
 
 Marshall and the Newbeam with N₀ = −2000 kN, both without shear, are inside on
 every check. Principal tensile stress is outside at 28 stages in 18 cases (58 in 23
@@ -111,20 +128,28 @@ M/V = 0.5 m to stage 39.
 to 2 % at the end of M/V = 2 m. Not explained. The peaks of these cases agree within 1 %
 all the same.
 
-**Where the response ends is r2c's own guess, and now decides two results.**
-- *M/V = 2 m:* Response's stages stand still at a curvature of 39 rad/km and its response
-  ends; r2c goes on to 67 rad/km on closest iterates (profile error 1.8 to 2.7 %), 3.7 %
-  more load.
-- *M/V = 1 m:* with the new stiffness r2c found converged states up to 22 % beyond
-  Response's failure, through its own rule of searching beyond a state it could not find.
-  That rule is removed and r2c ends where Response does. Whether those states are real for
-  the section is a structural question.
-Response's own acceptance of a stage and its step control are in `00418af0` and `00424c60`,
-read in passing and not taken over.
+**Where a response ends is Response's own rule since 2026-11-21** (step 4 of increment S;
+`docs/kernel.md`, "Load stages" and "Response's own load stage control", read from the
+binary: `00418af0`, `00418860`, `00415e30`, `0041a870`, `00422de0`, `00419250`, `004162d0`,
+`00419990`, `00420f20`, `004204b0`). r2c steps as Response steps (control variable, base
+step, a tenth of the control value, a fifth of the way to an event), works on a stage in up
+to sixteen passes, keeps a stage that has not converged when its load is not above the
+largest so far, refuses it otherwise and tries closer, changes the control variable when
+the step has been cut five times, and ends by Response's tests. Two things of r2c's own
+changed with it: the shear strain profile is kept at the nodes' own heights (on a fixed
+grid the profile iteration could not converge below 1.6 to 3.8 % in Response's measure; now
+under 0.1 %), and the profile update is Response's own form.
 
-**dm-n1n.** The curves coincide to Response's peak. At the next step Response's shear strain
-jumps and its load falls; r2c carries on to 3.2 % more. r2c's calculated shear stress in
-Response's states agrees as Response's does, so it is not the stiffness.
+- *M/V = 1 m (Newbeam):* r2c's stages are Response's stage for stage to the peak, the
+  control changes to the shear strain at the same stage, the plateau after the peak is the
+  same (193 kN). Response then has two collapsed stages; r2c's step dies on the plateau.
+- *M/V = 2 m:* Response's stages stand still at a curvature of 39 rad/km; r2c converges
+  there and goes on (+3.3 %; known deviation 1).
+- *Shear alone:* the whole response is Response's, falling branch included.
+
+**dm-n1n** (option B; reported, not chased): inside on every one of peak (+0.10 %; it was
++3.2 %), rising branch, shape and post-peak since step 4. What governs that section's
+failure was not looked at.
 
 ## 3. Performance
 
@@ -140,10 +165,10 @@ start-up plus solve (estimated by subtracting chart reading from all-stage captu
 So: without shear the two are in the same range. With shear r2c is several times slower on the
 stages it finds and roughly 10 to 50 times slower overall (estimated).
 
-Shear cases in the third run of 2026-11-19 (Response's stiffness rules; no search beyond a
-state not found): 25 to 109 s, 12 at a time on 32 cores, against 56 to 126 s in the second
-run (8 at a time). The breakdown below has not been measured again; the failing tail it
-describes is shorter now, by how much was not measured.
+Shear cases in the sixth run of 2026-11-21 (Response's own stage control; 50 cases, 22 at
+a time on 32 cores): a median of 66 s each, 126 s at most (measured; 78 s median in the
+fifth run, with r2c's own stage control). The breakdown below is of 2026-11-15 and has not
+been measured again; the driver it describes is gone.
 
 Where the shear time goes (measured 2026-11-15): about 90 % after the last stage found,
 retrying smaller steps and looking beyond a target, each attempt running to its iteration
@@ -187,12 +212,26 @@ brief of 2026-11-21):
   r2x's clipboard helper can fail transiently (once in 25 captures); a rerun of that case
   on its own then matched.
 
-**Where increment S stands** (2026-11-21): steps 1 to 3 are done (the inventory; the 53
-cases and the baseline; what was missing, built). **The scope is not complete yet**, judged
-against `docs/scope.md`: draped tendons are left (the rule is not found), and 32 of the 53
-cases are outside target on the shape of the curve, at the end of the response. Next is
-step 4: Response's own acceptance of a stage, its step control and its end-of-response
-rules (A3, G, C2) in place of r2c's. Reading, for the owner to confirm.
+**Where increment S stands** (2026-11-21): all four steps are done as far as they could be
+taken. **The scope is not complete, judged against `docs/scope.md`** (reading, for the
+owner to confirm). What is left, and why:
+
+1. **Draped tendons** are read and ignored: the rule was not found in the thesis or in a
+   few steps of the binary (open question for the owner; effect in Response under 0.1 % on
+   the peak of the case that has it).
+2. **26 of the 53 scope cases are outside target on a chased check** (peak, rising branch
+   or shape), all of them at the end of the response or on the way a shear response
+   steps; with eight of the 32 earlier cases they are the known deviations of section 2. Response's own rules are in; what is left is that r2c's profile iteration
+   converges at some states where Response's does not, and the other way round.
+3. **Not built, no case**: the Hsu softening models combined with Tamai tension stiffening;
+   a shrinkage profile of more than three points.
+4. **Not resolved**: the column under axial load alone after its peak (C2).
+
+Where a next session picks up: (a) the owner's answers to the open questions in the logs of
+2026-11-21-04 to -07; (b) if the endings are to be chased further, the next thing to read
+is Response's global solve (`004276a0`) and how its relaxation factor (the driver's field at
+0x14) enters, since r2c's own solve and damping are what still differ from Response's; (c)
+otherwise the move to verification: the owner's review of the test set and the targets.
 
 ## 5. Decisions that are the owner's
 
@@ -220,19 +259,16 @@ longer do: post-peak and every view are in the targets, and where r2c and Respon
 Response is right (owner, 2026-11-21). Reading, for the owner to confirm: that this puts A3
 and G in scope for development sessions.
 
-**A. Shear: where the response ends, and how a stage is accepted.** The stiffness is done
-(section 2). What is left decides M/V = 2 m (+3.7 %) and bears on dm-n1n (B).
-- A3. Read Response's acceptance of a stage and its step control (`00418af0`, `00424c60`,
-  `00420f20`, `004276a0`; `0041e840` for the profile update) and take them over in place of
-  r2c's own iteration, closest-iterate rule and change to shear strain control. Read in
-  passing 2026-11-19: up to 16 passes a stage, converged under 1 %, a stage refused above
-  3 % after 16 passes under a condition not yet understood. This overlaps option G.
-  **Needs the owner's word**: G was out of scope for the 2026-11-19 step.
+**A. Shear: where the response ends, and how a stage is accepted.**
+- A3. **Done 2026-11-21** (step 4 of increment S): Response's acceptance of a stage, its
+  step control and its end tests are r2c's (section 2). Left of it: Response's global solve
+  (`004276a0`) and its relaxation factor were not read; r2c's own solve converges at some
+  states where Response's does not (known deviations 1 and 3).
 - A4. The differences left in Response's states (after a fall of load; Liping LB1 from
   stage 13): `tools/diagnose.py flow --profile` shows where over the depth.
 
-**B. dm-n1n** (errs high, +3.2 %). Not the stiffness (section 2). Next: Response's stage
-acceptance (A3), then a structural read of what governs that section's failure.
+**B. dm-n1n.** Inside on peak, rising branch, shape and post-peak since step 4 (section 2).
+A structural read of what governs that section's failure is still open.
 
 **C. The Quick Define sections: done for peak, rising branch and shape** (2026-11-21), but
 for the last stage of the two shear cases (A3). Left on these sections, all in the views or
@@ -243,7 +279,7 @@ after the peak (`docs/verification.md`, "Quick Define sections"):
   `004bc470` and what calls them) and have not been read.
 - C2. The column under axial load alone after its peak: Response leaves the uniform state
   (a curved state with no moment, the load falling by a quarter in one step); r2c stays on
-  it.
+  it. Looked at in step 4 and not resolved (section 2, known deviation).
 - C3. The I-girder with shear: a fall of load at V = 26 kN and another at a curvature of
   0.39 rad/km in Response, neither in r2c (1.7 % and 4.3 % of the peak; inside target).
 - C4. Curved outline segments: fall away. An input file cannot carry one (measured
@@ -294,8 +330,9 @@ strains 5 to 8 %. Part may come from comparing at slightly different states (pea
 0.1 to 4.5 %). Details in `docs/verification.md`. Whether they matter depends on what
 acceptance says about detail views **(structural)**.
 
-**G. End-of-response rules.** r2c's rules after a shear failure and after rupture are its own
-guesses. Depends on what acceptance says about post-peak.
+**G. End-of-response rules.** With shear: Response's own since 2026-11-21 (A3). Without
+shear: r2c's own, which come to the same as Response's tests on the cases compared
+(`docs/kernel.md`, "Load stages").
 
 ## 7. Reference for a working session
 
@@ -346,5 +383,11 @@ repository).
 | `004201e0`, `004a8710` | stiffness of bars and of stirrups in that calculation |
 | `00424da0`, `004252c0`, `00422570` | assembly of the 3 × 3 system and its right-hand side |
 | `00440ea0` | the depth range with stiffness (in the flexural crack check) |
-| `00418af0`, `00424c60`, `00420f20` | load stage control, profile iteration, profile error: read in passing |
+| `00418af0`, `00418860`, `00415e30`, `0041a870` | load stage control: a pass on a stage, its wrapper (step growth, the peak, the end), a new stage and the closing in on an event, the next target |
+| `00422de0`, `00419250`, `004162d0` | the control variable, its base step, the change of control variable |
+| `00419990`, `00420f20`, `004204b0` | the end of the response; the profile error; the stage's state code |
+| `00424c60`, `004276a0`, `00425f10` | the single-state solve; the global solve with shear (not read); the stage solve without shear (read in part) |
+| `0040e9f0` | set-up of another analysis class that steps in the shear strain from the start (taken to be the one for shear alone) |
+| `004ac190`, `004ab4e0`, `004fbf70` | concrete set-up (Kf, n), derived steel properties (segmental curve), the steel ratio η of the Hsu models |
+| `004f96e0`, `00448d90` | the reader of shape.dat and the outline dialog's width field: the only users of UP and DOWN |
 | `00417290` | a secant stiffness of the section ("error in moment calculation"); not the shear driver it was taken for |

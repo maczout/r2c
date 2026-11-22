@@ -81,6 +81,7 @@ class Analysis:
                                > 1e-6])
         self.shape_z = np.array(sorted(set(sec.tz.tolist())
                                        | {z + d for z in self.steps for d in (-STEP, STEP)}))
+        self.shape_z0 = self.shape_z.copy()      # the profile's base grid
         self.shape = self._elastic_shape()
         self.max_layers = 220
         # plastic strain of each layer, from which it unloads elastically
@@ -128,6 +129,13 @@ class Analysis:
         tau[0] = tau[-1] = 0.0
         mean = np.trapezoid(tau * b, z) / np.trapezoid(b, z)
         return tau / mean if mean > 0 else np.ones_like(z)
+
+    def profile(self):
+        """The shear strain profile as it is: (heights, values), to put back later."""
+        return self.shape_z.copy(), self.shape.copy()
+
+    def set_profile(self, p):
+        self.shape_z, self.shape = p[0].copy(), p[1].copy()
 
     def profile_z(self, z):
         """Heights at which the shear strain profile is read for nodes z of shape (L, 3): a

@@ -46,7 +46,8 @@ T4 = "\r\n\t\t\t\t"   # a new attribute line inside an element, as Response lays
 
 def attr(key: str, value: str) -> str:
     """An attribute as Response writes it: the key, one or two tabs, ="value"."""
-    return f"{key}{'\t\t' if len(key) < 6 else '\t'}=\"{value}\""
+    tabs = "\t\t" if len(key) < 6 else "\t"
+    return f'{key}{tabs}="{value}"'
 
 
 @dataclass
