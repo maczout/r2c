@@ -27,6 +27,14 @@ class OutOfScope(ValueError):
     """The input asks for something r2c does not implement."""
 
 
+# Compression softening numbers a file can carry that Response-2000's manual (Table 2-1) does
+# not list: 4 has no name in Response's dialogs, 16 and 17 came after the manual
+# (docs/scope.md 1.2; docs/summary.md D10, D18)
+UNDOCUMENTED_SOFTENING = (4, 16, 17)
+# The Hsu models, which Response runs in another mode with Tamai tension stiffening (D5)
+HSU_SOFTENING = (9, 14, 15)
+
+
 @dataclass
 class Concrete:
     name: str = "Concrete 1"
@@ -54,7 +62,6 @@ class Rebar:
     A: float = 0.025
     B: float = 118.0
     C: float = 10.0
-    segments: list[tuple[float, float]] = field(default_factory=list)
 
 
 @dataclass
@@ -66,7 +73,6 @@ class LongLayer:
     num: float               # number of bars
     db: float                # bar diameter, mm
     dep: float = 0.0         # prestrain (plain strain)
-    drape: float = 0.0       # rise over run
     space: float = 0.0
     bartitle: str = ""
     pattern: int = 0
@@ -240,6 +246,13 @@ def parse(data: bytes) -> SectionInput:
         if not 0 <= c.t_stiff <= 7 or not 0 <= c.c_soft <= 18 or not 0 <= c.c_mod <= 4:
             raise InputError(f"concrete {c.name!r}: c_mod={c.c_mod}, c_soft={c.c_soft}, "
                              f"t_stiff={c.t_stiff} are not all models of Response-2000")
+        if c.c_soft in UNDOCUMENTED_SOFTENING:
+            raise OutOfScope(f"concrete {c.name!r}: compression softening model {c.c_soft} is "
+                             "not in Response-2000's manual and is not implemented")
+        if c.c_soft in HSU_SOFTENING and c.t_stiff == 4:
+            raise OutOfScope(f"concrete {c.name!r}: a Hsu softening model ({c.c_soft}) with "
+                             "Tamai tension stiffening (Response-2000's RA-STM mode) is not "
+                             "implemented")
         nums = [float(x) for x in _NUM.findall(el.text or "")]
         c.segments = [(nums[i] * 1e-3, nums[i + 1] * u.conc_stress)
                       for i in range(0, len(nums) - 1, 2)]
@@ -254,9 +267,10 @@ def parse(data: bytes) -> SectionInput:
         r.fu = _f(el, "fu", 600.0 / u.steel_stress) * u.steel_stress
         r.esh = _f(el, "esh", 15.0) * 1e-3
         r.eu = _f(el, "eu", 80.0) * 1e-3
-        nums = [float(x) for x in _NUM.findall(el.text or "")]
-        r.segments = [(nums[i] * 1e-3, nums[i + 1] * u.steel_stress)
-                      for i in range(0, len(nums) - 1, 2)]
+        if len(_NUM.findall(el.text or "")) >= 4:
+            raise OutOfScope(f"reinforcement {r.name!r}: a segmental stress-strain curve for "
+                             "reinforcing steel is not in Response-2000's manual and is not "
+                             "implemented")
         s.rebars.append(r)
     for el in beam.findall("prestress"):
         r = Rebar(name=el.get("name", "Low Relax"), prestress=True)
@@ -273,10 +287,9 @@ def parse(data: bytes) -> SectionInput:
     if solid is not None and (solid.text or "").strip():
         s.outline = _outline(solid.text, u, s.concretes[0].name)
     else:
-        shape = beam.find("shapesection")
-        if shape is None:
-            raise InputError("the section has no concrete outline (<sectionSOLID>)")
-        s.outline = _shape(shape, u, s.concretes[0].name)
+        # a shape given without its outline is no section to Response-2000 either: it opens
+        # the file with no concrete and cannot solve it (docs/scope.md 1.4)
+        raise InputError("the section has no concrete outline (<sectionSOLID>)")
     hollow = beam.find("sectionHOLLOW")
     if hollow is not None and (hollow.text or "").strip():
         raise OutOfScope("hollow sections (<sectionHOLLOW>) are not implemented")
@@ -294,9 +307,12 @@ def parse(data: bytes) -> SectionInput:
             # no title and no diameter: take the diameter from the area of one bar
             one = area / max(num, 1.0) if el.get("Ai") is None else ai
             db = math.sqrt(4.0 * one / math.pi)
+        if _f(el, "drape", 0.0) != 0.0:
+            raise OutOfScope(f"layer {el.get('name', 'bot')!r}: draped tendons are not "
+                             "implemented")
         lay = LongLayer(name=el.get("name", "bot"), z=_f(el, "z", 0.0) * u.length,
                         type=el.get("type", ""), area=area, num=num, db=db,
-                        dep=_f(el, "dep", 0.0) * 1e-3, drape=_f(el, "drape", 0.0),
+                        dep=_f(el, "dep", 0.0) * 1e-3,
                         space=_f(el, "space", 0.0) * u.length, bartitle=title,
                         pattern=int(_f(el, "pattern", 0)))
         s.material(lay.type)
@@ -380,33 +396,3 @@ def _outline(text: str, u: Units, first: str):
     # Response lists rows from the top down; a row's concrete type applies upwards from it.
     rows.sort(key=lambda r: -r[0])
     return [(elev, width, name or first) for elev, width, name in rows]
-
-
-def _shape(el, u: Units, first: str):
-    """The outline of a shape given without one. Response-2000 itself opens such a file
-    with no concrete and cannot solve it (docs/scope.md 1.4), so this is not compared; the
-    rows are those Response writes when the shape is defined in it."""
-    name = (el.get("name") or "").upper()
-    p = [_f(el, f"par{i}", 0.0) * u.length for i in range(1, 7)]
-    if name == "RECT":
-        b, h = p[0], p[1]
-        return [(h, b, first), (0.0, b, first)]
-    if name == "TBEAM":
-        btop, h, bweb, ttop = p[:4]
-        return [(h, btop, first), (h - ttop, btop, first), (h - ttop, bweb, first),
-                (0.0, bweb, first)]
-    if name == "IBEAM":
-        btop, h, bweb, ttop, tbot, bbot = p
-        return [(h, btop, first), (h - ttop, btop, first), (h - ttop, bweb, first),
-                (tbot, bweb, first), (tbot, bbot, first), (0.0, bbot, first)]
-    if name == "CIRCLE":
-        # as Response writes a circle: 13 rows, every 15 degrees, 0.1 mm wide at the poles
-        d = p[0]
-        rows = []
-        for i in range(13):
-            a = math.radians(15.0 * i)
-            w = d * math.sin(a)
-            rows.append((0.5 * d * (1.0 + math.cos(a)), w if 0 < i < 12 else 0.1, first))
-        return rows
-    raise InputError(f"shape {name!r} has no outline in the file, and is not one of RECT, "
-                     "TBEAM, IBEAM, CIRCLE")

@@ -54,14 +54,18 @@ can differ after the peak.
 
 ### Scope
 
-In: sections Response-2000 saves as XML (`.rsp`, `.r2t`): any solid outline, several concrete
-types, bars and tendons, stirrups; the base curves, compression softening and tension
-stiffening models of Response; SI, US and kg-cm units; CSA material factors; More Detail.
+In: Response-2000 as documented in its manual (Appendix A of Bentz's thesis). Sections
+Response-2000 saves as XML (`.rsp`, `.r2t`): any solid outline, several concrete types, bars
+and tendons, stirrups; the base curves, compression softening and tension stiffening models
+the manual names; shrinkage and thermal strains; SI, US and kg-cm units; CSA material factors;
+More Detail. `docs/scope.md` lists every input and where r2c stands on it.
 
 Out (exit status 3): the older text format (`Ver_0.8`), hollow sections, long-term effects
-(shrinkage, creep, relaxation, thermal strains), strain discontinuity, and what r2x also leaves
-out: interaction diagrams, member response, pushover. Curved outline segments are read as
-straight. Negative shear is refused, as in Response.
+(creep, relaxation), strain discontinuity, draped tendons, the Hsu softening models with Tamai
+tension stiffening, what is not in the manual (compression softening 4, 16 and 17, a segmental
+curve for reinforcing steel), and what r2x also leaves out: interaction diagrams, member
+response, pushover. What Response itself rejects is an input error: curved outline rows in a
+file, a shape without an outline. Negative shear is refused, as in Response.
 
 ## Layout
 

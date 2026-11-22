@@ -67,7 +67,6 @@ DEFINE_SLOW = {
 # r2x's (tools/variants.py), found by name or SHA-256 under R2C_SCOPE_DIR; the two on Newbeam
 # itself need none.
 SCOPE = {
-    "newbeam-segsteel-m": (0.05, 0.1),
     "newbeam-cmod0-m": (0.05, 0.1),
     "newbeam-cmod3-m": (0.05, 0.1),
     "newbeam-axialloc-nm": (0.05, 0.1),

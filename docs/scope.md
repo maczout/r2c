@@ -37,19 +37,27 @@ document, the column says so. Completion is judged against the documented items 
 | **missing** | r2x solves it; r2c refuses it, or reads it and ignores it (its oracle case is named) |
 | **by design** | out of scope by the owner's decision: hollow sections, long-term effects, strain discontinuity, the old text format |
 
-and two that the measurements made necessary (the developer's addition; reading, for the
-owner to confirm):
+two that the measurements made necessary (the developer's addition; confirmed by the owner,
+2026-11-22, D8):
 
 | Status | Meaning |
 |---|---|
 | **no effect** | Response accepts it and no chart changes: it does not reach the analysis |
 | **not solvable** | r2x cannot solve it: Response rejects the input or fails on it, or r2x's own checks stop the solve. There is nothing to compare with |
 
+and one that follows from the owner's decisions of 2026-11-22 (D4, D5, D10, D18):
+
+| Status | Meaning |
+|---|---|
+| **removed** | beyond the documented scope, or out of scope by a decision: r2c had it and it was taken out on 2026-11-22. r2c refuses the input as out of scope (exit status 3), although Response solves it. Its fixture, if it has one, is parked |
+
 Case names in bold are the 53 fixtures step 2 of increment S added (2026-11-21; listed by
 `tools/scope_cases.py --list`). They come in two groups: **A**, those that exercise a kernel
 path no earlier case reaches, and **B**, combinations of paths that are each reached already.
-"Compared" says that an oracle case has the item and r2c is run against it; whether r2c is
-inside target on the case is in `docs/verification-results.md`, not here.
+"Compared" says that an oracle case has the item and r2c can be run against it; whether r2c
+is inside target on the case is in `docs/verification-results.md` when its set was run. Since
+2026-11-22 only the 17 load cases on Newbeam are run by default (the phase A set, in
+`tests/oracle`); every other case named here is parked in `tests/oracle/parked`.
 
 ---
 
@@ -88,8 +96,10 @@ inside target on the case is in `docs/verification-results.md`, not here.
 | Compression softening 18, Collins-Bentz 2011 (default) | no: later than the manual. Up to 56.7 MPa it is the thesis' own equation (p. 58 to 59); see D22 | | implemented | compared | every shear case |
 | Compression softening 0, none | yes: A-16 | solves | implemented | compared since 2026-11-21 (cm4-asis has it too, but without shear nothing softens) | **igirder-csoft0-m2v** (A) |
 | Compression softening 2 (Vecchio-Collins 1986), 6 (Mehlhorn et al), 7 (Maekawa et al), 10 (CAN CSA A23.3 M84), 13 (Porasz-Collins 1988) | named: A-16 (10 as "CAN CSA S474"). Rule in the thesis for 2 and 13 (p. 58 to 59, in ε1 alone); the others' rules are the binary's; see D21 | solves each (probes igirder-csoft2, 6, 7, 10, 13) | implemented; the formulas r2c had are the binary's (checked 2026-11-21) | compared since 2026-11-21 | **igirder-csoft2-m2v, -csoft6-, -csoft7-, -csoft10-, -csoft13-** (A) |
-| Compression softening 1 (Vecchio-Collins 1982), 3 (Vecchio-Collins 1992-A), 5 (1992-B), 8 (Noguchi et al), 9 (Belarbi-Hsu proportional), 11 (Collins 1978), 12 (Kaufmann-Marti 1998), 14 (Zhang-Hsu 1998 with eta), 15 (Hsu 1993), 16 (Zhu-Hsu-Lee 2001), 17 (Zhang-Hsu 1998, no eta) | 1, 3, 5, 8, 9, 11, 12, 14, 15 named: A-16; their rules are the binary's; see D21. **16 and 17: no** | solves each on the I-girder (probes igirder-csoft1 … 17; 9 and 11 at M/V = 1 m, since r2x's own check stops them at 2 m). On Newbeam, 1 ends in Response's "No closure on shear distribution" | implemented since 2026-11-21 (`docs/kernel.md`, "Compression softening") | compared since 2026-11-21 | **igirder-csoft1-m2v, -csoft3-, -csoft5-, -csoft8-, -csoft12-, -csoft14-, -csoft15-, -csoft16-, -csoft17-m2v; igirder-csoft9-mv, -csoft11-mv** (A) |
-| Compression softening 4 (no name in the dialogs; printed as "Unsupported Method") | no | solves, with a result of its own (probe igirder-csoft4) | implemented since 2026-11-21 | compared since 2026-11-21 | **igirder-csoft4-m2v** (A) |
+| Compression softening 1 (Vecchio-Collins 1982), 3 (Vecchio-Collins 1992-A), 5 (1992-B), 8 (Noguchi et al), 9 (Belarbi-Hsu proportional), 11 (Collins 1978), 12 (Kaufmann-Marti 1998), 14 (Hsu-Zhang 1998; "Zhang-Hsu 1998 with eta" in the program), 15 (Hsu 1993) | named: A-16; their rules are the binary's; see D21 | solves each on the I-girder (probes igirder-csoft1 … 15; 9 and 11 at M/V = 1 m, since r2x's own check stops them at 2 m). On Newbeam, 1 ends in Response's "No closure on shear distribution" | implemented since 2026-11-21 (`docs/kernel.md`, "Compression softening"); kept until D21 is answered | compared since 2026-11-21 (parked) | **igirder-csoft1-m2v, -csoft3-, -csoft5-, -csoft8-, -csoft12-, -csoft14-, -csoft15-m2v; igirder-csoft9-mv, -csoft11-mv** (A) |
+| Compression softening 16 (Zhu-Hsu-Lee 2001), 17 (Zhang-Hsu 1998, no eta) | no: both are later than the manual | solves each (probes igirder-csoft16, 17) | refuses the file as out of scope (built 2026-11-21, taken out 2026-11-22: D18) | **removed** | **igirder-csoft16-m2v, -csoft17-m2v** (parked; r2c refuses their inputs) |
+| Compression softening 4 (no name in the dialogs; printed as "Unsupported Method") | no | solves, with a result of its own (probe igirder-csoft4) | refuses the file as out of scope (built 2026-11-21, taken out 2026-11-22: D10) | **removed** | **igirder-csoft4-m2v** (parked; r2c refuses its input) |
+| A Hsu softening model (9, 14, 15) with Tamai tension stiffening (4): Response's "RA-STM mode" | yes: A-16. Out of scope by the owner's decision (D5) | runs with a steel ratio and a tensile strength of its own (the binary; not probed) | refuses the file as out of scope (never built; before 2026-11-22 it ran the two models as if they were independent) | **removed** | |
 | Tension stiffening 7, Bentz 1999 (default) | yes: A-16 ("Bentz 2000"); thesis 5-3, 5-4 | | implemented | compared | all |
 | Tension stiffening 1 (Vecchio-Collins 1982), 2 (Collins-Mitchell 1987), 3 (Izumo et al), 4 (Tamai et al), 6 (elasto-plastic) | yes: A-16 | solves each; peaks −4 to +9 % (probes newbeam-tstiff1 … 6) | implemented | compared since 2026-11-21 | **newbeam-tstiff1-mv, -tstiff2-, -tstiff3-, -tstiff4-, -tstiff6-mv** (A) |
 | Tension stiffening 0, none | yes: A-16 | Response asks "Do you wish to leave tension off?" before solving; r2x stops at the question (probe newbeam-tstiff0) | implemented | not solvable | |
@@ -104,7 +114,7 @@ peak by less than 0.3 % (probes newbeam-csoft0 … 17), on the I-girder by −9 
 | Item | Documented | What Response does (measured) | r2c | Status | Case |
 |---|---|---|---|---|---|
 | Reinforcing steel: fy, E, fu, εsh, εu | yes: A-17 | | implemented | compared | all |
-| Reinforcing steel with a segmental curve | no: the manual's curve is "linear to yield, flat post yield, and quadratic after strain hardening" (A-17) | reads the curve, rewrites fy and εsh from it, solves; peak +6 % (probe newbeam-segsteel) | implemented since 2026-11-21 | compared since 2026-11-21 | **newbeam-segsteel-m** (A) |
+| Reinforcing steel with a segmental curve | no: the manual's curve is "linear to yield, flat post yield, and quadratic after strain hardening" (A-17) | reads the curve, rewrites fy and εsh from it, solves; peak +6 % (probe newbeam-segsteel) | refuses the file as out of scope (built 2026-11-21, taken out 2026-11-22: D18) | **removed** | **newbeam-segsteel-m** (parked; r2c refuses its input) |
 | Prestressing steel: fu, E, εu, Ramberg-Osgood A, B, C | yes: A-18 | | implemented | compared | igirder-* (defaults), cm4-asis (A, B, C given) |
 | Prestressing steel with a segmental curve | no | drops the curve on reading; no chart changes (probe igirder-segstrand) | does not read it | no effect | |
 | Predefined steel types | yes: A-17, A-18 | they are sets of the numbers above | | compared | |
@@ -117,7 +127,7 @@ peak by less than 0.3 % (probes newbeam-csoft0 … 17), on the I-girder by −9 
 | A circle, as Response writes one: 13 straight rows | yes: A-20 (rows); A-21 for how a circle is entered | analyses the polygon | implemented | compared | column-* |
 | Elevations below zero | yes: A-20 | shifts the section to start at zero; same charts but one rounding (probe newbeam-negelev) | implemented | compared since 2026-11-21 | **newbeam-negelev-m** (B) |
 | Curved rows: a lone `UP` or `DOWN` line, or a width of `UP` or `DOWN` | yes, in the outline dialog and shape.dat: A-20, A-21, A-77; not in an input file | rejects the file: "Error in Quotes!" (probes column-curved, column-curvedwidth). Curves exist in shape.dat and in the outline dialog only; Response turns them into straight rows there, and writes the rows | rejects the file as an input error (since 2026-11-21; before, it read a lone line and ignored it) | not solvable (see below) | |
-| A shape without an outline (`<shapesection>` alone: RECT, CIRCLE, TBEAM, IBEAM) | no | opens the file with an empty outline; the solve fails: "bad request" (probes newbeam-, tbeam-, column-nooutline) | builds the outline from the shape's dimensions, as Response writes it (a circle: 13 rows) | not solvable (see below) | |
+| A shape without an outline (`<shapesection>` alone: RECT, CIRCLE, TBEAM, IBEAM) | no | opens the file with an empty outline; the solve fails: "bad request" (probes newbeam-, tbeam-, column-nooutline) | rejects the file as an input error, as Response in effect does (since 2026-11-22: D6; before, it built the outline from the shape's dimensions) | not solvable | |
 | A shape beside an outline | yes: A-19, A-20 | the outline is the section; the shape is a label | reads the outline | compared | all |
 | Hollow sections (`<sectionHOLLOW>`) | yes: A-9; "unsupported for now" in the text format (A-81) | | refuses | by design | |
 
@@ -128,7 +138,7 @@ peak by less than 0.3 % (probes newbeam-csoft0 … 17), on the I-girder by −9 
 | Layers of bars by title or by area; number, area, elevation | yes: A-22 | | implemented | compared | all; by area: cm4-asis, liping-asis |
 | Tendons with a prestrain (`dep`) | yes: A-26 | | implemented | compared | igirder-*, cm4-asis |
 | A prestrain on bars that are not prestressing steel | yes: A-81 (a prestrain on any layer), A-35 | solves; peak +0.6 % (probe newbeam-bardep) | implemented (the tendons' path) | compared since 2026-11-21 | **newbeam-bardep-m** (B) |
-| Draped tendons (`drape`) | yes: A-26. Out of scope by the owner's decision (D4) | solves; every chart changes, the peak by less than 0.1 % (probe igirder-drape) | reads it and ignores it: the rule was not found in the thesis or in a few steps of the binary (`docs/kernel.md`, Reinforcement) | **missing**; the case is inside on peak and rising branch all the same | **igirder-drape-m2v** (A) |
+| Draped tendons (`drape`) | yes: A-26. Out of scope by the owner's decision (D4) | solves; every chart changes, the peak by less than 0.1 % (probe igirder-drape) | refuses a file with a drape other than zero as out of scope (since 2026-11-22: D4; before, it read the drape and ignored it) | **removed** | **igirder-drape-m2v** (parked; r2c refuses its input) |
 | Circular pattern (`pattern="1"`, `nround`, `aligned`, `index`) | yes: A-25 | the layers are in the file one by one | reads the layers | compared | column-* |
 | Distributed pattern (`pattern="2"`, `index`) | yes: A-25 | no chart changes (probe newbeam-longpattern2) | reads the layers | no effect | |
 | Bar spacing in a layer (`space`) | no (Response-2000 asks for the number of bars: A-22) | no chart changes (probe newbeam-barspace) | reads it, does not use it | no effect | (liping-asis has it) |
@@ -167,9 +177,9 @@ Newbeam fixtures (reading, for the owner to confirm).
 
 | Item | Documented | What r2x does | r2c | Status |
 |---|---|---|---|---|
-| `rebar.dat`, the bar list | yes: A-76 | passes the linked folder's file to Response | has the shipped list built in (all 125 bars the same, checked against the shipped file 2026-11-21) | compared for the shipped list; an edited list is not read (see open questions) |
+| `rebar.dat`, the bar list | yes: A-76 | passes the linked folder's file to Response | has the shipped list built in (all 125 bars the same, checked against the shipped file 2026-11-21) | compared for the shipped list; an edited list is not read (owner, 2026-11-22: D9) |
 | `shape.dat`, the shapes of Quick Define | yes: A-77 | used when a section is defined, not when one is solved | | no effect on a solve |
-| `r2k.r2k`, the template for File > New | yes: A-79 | a solve without an input starts from it if the folder has one | always starts from Newbeam | compared without a template (newbeam-new); with one: see open questions |
+| `r2k.r2k`, the template for File > New | yes: A-79 | a solve without an input starts from it if the folder has one | always starts from Newbeam | compared without a template (newbeam-new); a template is not read (owner, 2026-11-22: D9) |
 
 ---
 
@@ -216,56 +226,63 @@ Other sections under shear, from the brief's list:
 
 ## 3. What "scope complete" needs
 
-Judged against this inventory, the scope is complete when
+Completion is judged against Response-2000 **as documented** (owner, 2026-11-22;
+`docs/summary.md`, Aim and D17): the items marked "yes" in the Documented column. Judged
+against this inventory, the scope is complete when
 
-1. every **missing** item is built, with its rule and source in `docs/kernel.md`. Done
-   2026-11-21 for the eleven named compression softening models and number 4, the segmental
-   steel curve, and shrinkage and thermal strains of the concrete. **Left: draped tendons**
-   (the rule was not found; the drape is ignored);
-2. every **missing** and **not compared** item has its case in `tests/oracle` and is
-   reported in `docs/verification-results.md` (done 2026-11-21: 53 cases);
-3. r2c refuses only what is **by design**, and treats as input errors the files Response
-   itself rejects (done 2026-11-21; see below).
+1. every documented item that reaches the analysis is built, with its rule and source in
+   `docs/kernel.md`, unless it is out of scope by a decision of the owner's (hollow
+   sections, long-term effects, strain discontinuity, the old text format; draped tendons,
+   D4; the Hsu models with Tamai tension stiffening, D5). **Nothing documented is missing**
+   (2026-11-22);
+2. every such item has its case in `tests/oracle` or `tests/oracle/parked` and is reported
+   when its set is run. The phase A set (the 17 load cases on Newbeam) is in `tests/oracle`;
+   everything else is parked until phase B (D16, D19). One documented item has no case and
+   cannot have one with r2x as it is: tension stiffening "None";
+3. r2c refuses as out of scope what is out by design or **removed**, and treats as input
+   errors the files Response itself rejects (D7).
 
-Two items came up while building and have no case: **the Hsu softening models with Tamai
-tension stiffening** (softening 9, 14 to 17 with tension stiffening 4), which Response runs
-with a steel ratio η and a tensile strength of its own (`docs/kernel.md`, "Compression
-softening"): not built, not captured; and **a shrinkage profile of more than three points**
-(the rule between points is r2c's reading of the manual).
+**What was taken out on 2026-11-22** (D18, with D4, D5, D6, D10): compression softening 4,
+16 and 17; the segmental curve for reinforcing steel; the reading of a tendon's drape; the
+outline built for a shape given without one. r2c now refuses or rejects each. Five parked
+fixtures need one of them and cannot be run by r2c: igirder-csoft4-m2v, igirder-csoft16-m2v,
+igirder-csoft17-m2v, igirder-drape-m2v, newbeam-segsteel-m.
+
+**Kept although not documented, for the owner to decide** (`docs/summary.md`):
+
+- D21: the compression softening models the manual names and neither document gives a rule
+  for (1, 3, 5 to 12, 14, 15). Their rules are the binary's.
+- D22: compression softening 18, the default of Response 1.9.7, which is later than the
+  manual. Every phase A case uses it.
+- D23: what a file can carry that the manual does not have and that r2c reads as the
+  nearest documented thing, with no code of its own: several sections in one file (the
+  first is read), the horizontal tie (a stirrup).
+
+A shrinkage profile of more than three points is documented (A-34: "parabolically
+interpolates between these points") and has no case; the rule between points is r2c's
+reading of that sentence.
 
 ### Items Response or r2x does not solve
 
-These were on the brief's list of refusals to build ("curved and elliptical outline rows",
-"shapes given without an explicit outline") or follow from it, and the measurement says
-r2x does not solve them. No case can be captured. What r2c does with each since 2026-11-21
-is the developer's decision, for the owner to confirm.
+The measurement says r2x does not solve these, so no case can be captured. What r2c does
+with each was confirmed by the owner on 2026-11-22 (D6, D7).
 
 - **Curved outline rows in an input file.** Response's XML reader rejects both forms. In
   the binary the words UP and DOWN are used by the reader of shape.dat (`004f96e0`) and by
   the width field of the outline dialog (`00448d90`) only; a circle defined in Response is
   saved as 13 straight rows (r2x's `quick-column/hand.r2t`). So a curved row never reaches
-  the analysis: option C4 of `docs/status.md` falls away. r2c rejects both forms as an
-  input error, as Response does (before, it read a lone UP or DOWN line and ignored it,
-  analysing another section without saying so).
+  the analysis. r2c rejects both forms as an input error, as Response does.
 - **A shape without an outline.** Response opens the file with no concrete and the solve
-  fails. r2c builds the outline from the shape's dimensions, as a convenience that is not
-  compared; for a circle it now builds the 13 rows Response writes (before: three rows, a
-  rhombus). Say if it should reject such a file instead, as Response in effect does.
+  fails. r2c rejects the file as an input error (D6).
 - **Tension stiffening "None"** needs an answer to Response's question that r2x does not
-  give. r2c implements it (the thesis' base case). It stays not compared until r2x answers
-  the question.
+  give. r2c implements it (the thesis' base case; the manual, A-16). It stays not compared
+  until r2x answers the question.
 - **Tension stiffening 5**: Response refuses the file; so does r2c, as an input error.
 - **`units="roman"`**: see the table. r2c rejects it as an input error.
 - **Three load combinations on Newbeam** (table in section 2): they may solve on another
   section; not pursued.
 
-### Open questions for the owner
+### Questions for the owner
 
-1. The two added statuses, **no effect** and **not solvable**, and the proposals above.
-2. Response's program folder: is an edited `rebar.dat`, or a template `r2k.r2k`, an input
-   r2c should read? r2x passes the folder to Response; r2c has no notion of a program
-   folder. Not built in this increment.
-3. Compression softening 4 has no name in Response's dialogs and prints as "Unsupported
-   Method", but a file can carry it and Response solves it. It is in the inventory as
-   missing; say if it should be by design instead.
-4. T-headed stirrups are counted as compared already (section 1.6).
+In `docs/summary.md`: D6 to D10 (answered 2026-11-22) and D21 to D23 (suggested).
+T-headed stirrups are counted as compared already (section 1.6).
