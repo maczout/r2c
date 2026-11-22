@@ -313,13 +313,24 @@ class Analysis:
                 fface = (mcap - ma - mb) / i3 + p4 if i3 > 0 else p4
             zones.append((zn, face, fna, fface))
 
+        # between the two zones' axes (each the face itself where that face is not in
+        # tension) the limit is three times the tensile strength of the concrete at each
+        # axis, linear between them [B 00441d80, 004b5470]: it is what holds a node that
+        # cracks diagonally above the flexural tension zone
+        za, zb = min(max(z3, zbot), ztop), min(max(z4, zbot), ztop)
+        la, lb = sec.law_at(za), sec.law_at(zb)
+        pa, pb = 3.0 * la.ft * la.phi, 3.0 * lb.ft * lb.phi
+
         def f1cx(z):
             z = np.asarray(z, dtype=float)
-            out = np.full(z.shape, BIG)
+            if za > zb:
+                out = pb + (pa - pb) * np.clip((z - zb) / (za - zb), 0.0, 1.0)
+            else:
+                out = np.full(z.shape, BIG)     # all in tension: the zones cover the depth
             for zn, face, fna, fface in zones:
                 inside = (z > zn) if face == ztop else (z < zn)
                 tt = np.clip(np.abs(z - zn) / abs(face - zn), 0.0, 1.0)
-                out = np.where(inside, np.minimum(out, fna + (fface - fna) * tt), out)
+                out = np.where(inside, fna + (fface - fna) * tt, out)
             return out
         # the zone the steel stress at a crack is worked out for: the deeper of the two, its
         # capacity moment and its neutral axis; a section all in tension counts as no depth
