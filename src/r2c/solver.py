@@ -842,6 +842,7 @@ class Flexure:
         self.sec = an.sec
         self.stages: list[Stage] = []
         self.on_stage = on_stage
+        self.slope = None     # of the unbalanced force, carried from solve to solve
         sec = self.sec
         # scales for convergence
         self.nscale = max(sec.conc0.fcp * sec.area, 1.0)
@@ -886,8 +887,9 @@ class Flexure:
         x, ok = _root(res, guess, 1e-9, tol)
         return e0, x, ok
 
-    def solve(self, c, prev: Stage | None) -> Stage:
-        """The state at control value c (curvature, or strain at the centroid)."""
+    def _solve_balanced(self, c, prev: Stage | None) -> Stage:
+        """The balanced state at control value c (curvature, or strain at the centroid):
+        r2c's own solve, to a root of the unbalanced force."""
         an = self.an
         if prev is None:
             guess = 0.0
@@ -907,6 +909,197 @@ class Flexure:
             e0, phi, ok = self._solve_fixed_layers(c, guess)
         if not ok:
             raise SolveError(f"no equilibrium at control value {c:g}")
+        n, m, v = an.forces(e0, phi)
+        if self.mode == "phi":
+            lam = (m - an.m0) / an.dm
+        else:
+            lam = (n - an.n0) / an.dn
+        det = an.detail(e0, phi, 0.0)
+        return Stage(e0, phi, 0.0, lam, n, m, v, det, control=c)
+
+    # Response-2000's solve of a stage without shear [B 00425f10, 0041e1e0, 00425af0;
+    # docs/kernel.md "The stage solve without shear"]. It works in N, N m and 1/m; so does
+    # this, because its tolerance and its guard against a zero slope are not dimensionless.
+    def _unbalanced(self, e0, phi):
+        """(unbalanced force, tolerance, (N, M, V)) of a state, on the layers built for it:
+        the axial force off the loading line when the curvature is stepped (N), the moment
+        when the axial strain is (N m)."""
+        an = self.an
+        an.refine(e0, phi, 0.0)
+        n, m, v = an.forces(e0, phi)
+        tol = (abs(n) + abs(m) / 1e3 + abs(v)) * 1e-3 + 1.0
+        if self.mode == "phi":
+            lam = (m - an.m0) / an.dm
+            return n - (an.n0 + lam * an.dn), tol, (n, m, v)
+        lam = (n - an.n0) / an.dn if an.dn else 0.0
+        return (m - (an.m0 + lam * an.dm)) / 1e3, tol / 10.0, (n, m, v)
+
+    def _secant(self, c, x, fresh):
+        """The unknown strain (the axial strain when the curvature c is given, the curvature
+        in 1/m when the axial strain is) that brings the unbalanced force inside the
+        tolerance, from the estimate x. The slope is carried from one stage to the next.
+        Returns (x, found)."""
+        phi_mode = self.mode == "phi"
+        at = (lambda x: self._unbalanced(x, c)) if phi_mode \
+            else (lambda x: self._unbalanced(c, x / 1e3))
+        d = 1e-5 if phi_mode else 1e-6
+        r1 = None
+        if fresh or self.slope is None:
+            self.slope = None
+            r1 = at(x + d)[0]
+        r, tol, _ = at(x)
+        if self.slope is None and r1 != r:
+            self.slope = (r - r1) / d
+        if self.slope is None:
+            self.slope = 0.0
+        cap = self.sec.conc0.e0
+        relax = 1.0
+        count = 0
+        while abs(r) >= tol:
+            step = r / (self.slope + 1.0)
+            if abs(step) > cap:
+                step = math.copysign(0.5 * cap, step)
+            x += relax * step
+            rn, tol, _ = at(x)
+            count += 1
+            self.slope = (r - rn) / step
+            if abs(x) > 1.0 or abs(c * (1e3 if phi_mode else 1.0)) > 1.0:
+                count = 20
+            r = rn
+            if count == 20 or abs(r) < tol:
+                break
+            if count > 15:
+                # the later tries: half steps, on the section's own stiffness
+                relax = 0.5
+                h = 1e-7
+                e0, phi = (x, c) if phi_mode else (c, x / 1e3)
+                fa = self.an.forces(e0 + h, phi) if phi_mode \
+                    else self.an.forces(e0, phi + h / 1e3)
+                fb = self.an.forces(e0 - h, phi) if phi_mode \
+                    else self.an.forces(e0, phi - h / 1e3)
+                self.slope = -(fa[0] - fb[0]) / (2 * h) if phi_mode \
+                    else -(fa[1] - fb[1]) / 1e3 / (2 * h)
+        if count == 20:
+            self.slope = None
+            return x, False
+        return x, True
+
+    def _bisect(self, c):
+        """What Response falls back on when the secant gives up under a stepped curvature:
+        the axial strain is bracketed in steps of the concrete's strain at peak stress and
+        halved until the unbalanced force is inside the tolerance. Returns (e0, found)."""
+        an, sec = self.an, self.sec
+        step = sec.conc0.e0
+
+        def at(e0):
+            r, _tol, (n, m, _v) = self._unbalanced(e0, c)
+            return -r, n, m
+        target_n = lambda m: an.n0 + (m - an.m0) / an.dm * an.dn
+        lo = -step - float(sec.shrinkage(np.array([sec.zc]))[0])
+        hi = 0.0
+        x = lo
+        r0, n, m = at(lo)
+        tn = target_n(m)
+        found = abs(r0) < ((tn if tn > 1.0 else abs(m) / 1e3) * 1e-3 + 1.0)
+        k = -1
+        while r0 < 0.0:
+            lo -= step
+            hi -= step
+            x = lo
+            r0, n, m = at(lo)
+            tn = target_n(m)
+            found = found or abs(r0) < ((tn if tn > 1.0 else abs(m) / 1e3) * 1e-3 + 1.0)
+            k -= 1
+            if k < -12:
+                return x, False
+        nxt = 0.0
+        while not found and -13 < k < 31:
+            x = nxt
+            r, n, m = at(x)
+            if k < 0:
+                if r / r0 < 0.0:
+                    k = 1
+                    nxt = 0.5 * (hi + lo)
+                else:
+                    k -= 1
+                    lo = hi
+                    nxt = hi = hi + step
+            else:
+                if r / r0 >= 0.0:
+                    lo = x
+                else:
+                    hi = x
+                k += 1
+                nxt = 0.5 * (hi + lo)
+            tn = target_n(m)
+            found = abs(r) < ((tn if tn > 1.0 else abs(n)) * 1e-3 + 1.0)
+        return x, found and -13 < k <= 30
+
+    def _general(self, c, x):
+        """Response-2000's solve when the axial strain c is stepped [B 004276a0]: half steps
+        of Newton's method on the curvature x (1/m), at least one, until the unbalanced
+        moment is inside a tolerance that is wide next to the secant's. Returns (x, found)."""
+        an, sec = self.an, self.sec
+        hh = (sec.h / 1e3 + 1e-4) ** 2
+        floor = 1.0 + (1000.0 * sec.area / 1e6) ** 2
+        ratio = an.dm / 1e3 / an.dn
+        count = 0
+        while True:
+            phi = x / 1e3
+            an.refine(c, phi, 0.0)
+            n, m, _v = an.forces(c, phi)
+            off = (m - (an.m0 + (n - an.n0) * an.dm / an.dn)) / 1e3
+            tol = (n * n + (m / 1e3) ** 2 / hh) * 1e-6 + floor
+            err = off * off / hh
+            if err < tol and count:
+                return x, True
+            h = 1e-7
+            fa, fb = an.forces(c, (x + h) / 1e3), an.forces(c, (x - h) / 1e3)
+            den = (fa[1] - fb[1]) / 1e3 / (2 * h) - ratio * (fa[0] - fb[0]) / (2 * h)
+            if den == 0.0:
+                return x, False
+            dx = -off / den
+            if abs(dx) > 0.5:
+                return x, False
+            x += 0.5 * dx
+            count += 1
+            if count > 50:
+                return x, False
+            if not tol < err:
+                return x, True
+
+    # which of Response's own solves are in use (docs/kernel.md, "The stage solve without
+    # shear"): under a stepped axial strain, and under a stepped curvature
+    own_axial = False
+    own_curvature = False
+
+    def response_solve(self) -> bool:
+        return self.own_axial if self.mode == "e0" else self.own_curvature
+
+    def solve(self, c, prev: Stage | None, aside: Stage | None = None,
+              fresh: bool = True) -> Stage:
+        """The state at control value c (curvature, or strain at the centroid). Where
+        Response-2000's own solve is in use: started from the stage before (or from a stage
+        set aside beyond c, if that one is nearer) and taken as soon as its unbalanced force
+        is inside the tolerance. fresh: the secant's slope is found again and not taken
+        from the last solve."""
+        if not self.response_solve():
+            return self._solve_balanced(c, prev)
+        an = self.an
+        src = prev
+        if aside is not None and prev is not None \
+                and abs(aside.control - c) < abs(prev.control - c):
+            src = aside
+        if self.mode == "e0":
+            x, ok = self._general(c, 0.0 if src is None else src.phi * 1e3)
+        else:
+            x, ok = self._secant(c, 0.0 if src is None else src.e0, fresh)
+            if not ok:
+                x, ok = self._bisect(c)
+        if not ok:
+            raise SolveError(f"no equilibrium at control value {c:g}")
+        e0, phi = (x, c) if self.mode == "phi" else (c, x / 1e3)
+        an.refine(e0, phi, 0.0)
         n, m, v = an.forces(e0, phi)
         if self.mode == "phi":
             lam = (m - an.m0) / an.dm
@@ -1029,10 +1222,14 @@ class Flexure:
         if self.on_stage:
             self.on_stage(len(self.stages))
 
-    def advance(self, cur: Stage, target: float, depth: int) -> Stage:
+    def advance(self, cur: Stage, target: float, depth: int,
+                aside: Stage | None = None) -> Stage:
         """Accept a stage at the target, approaching it in geometric steps when something
-        happens on the way (first cracking, the extreme fibre reaching its peak strain)."""
-        trial = self.solve(target, cur)
+        happens on the way (first cracking, the extreme fibre reaching its peak strain).
+        aside: the stage beyond the target that was set aside for this one."""
+        # only a plain next stage is solved on the slope left by the last one [B 00415e30]
+        fresh = depth != 0 or aside is not None or len(self.stages) < 2
+        trial = self.solve(target, cur, aside=aside, fresh=fresh)
         kind = self.has_event(cur, trial)
         if kind == "rupture" and depth == 0:
             # steel ruptures within the step [B 00415e30, 00419ff0]: the stage is set aside
@@ -1058,12 +1255,21 @@ class Flexure:
                 if kind == "crack" and abs(t1 - cur.control) < max(
                         0.004 * abs(cur.control), 0.0036 * self.step0):
                     break
-                sub = self.advance(cur, t1, depth + 1)
+                try:
+                    sub = self.advance(cur, t1, depth + 1, aside=trial)
+                except SolveError:
+                    if not self.response_solve():
+                        raise
+                    # a stage put in between that cannot be solved is dropped, and the
+                    # event is closed in on no further [B 00418af0]
+                    break
                 passed = self.has_event(cur, sub)
                 cur = sub
                 if passed:
                     break
-            trial = self.solve(target, cur)
+            if not self.response_solve():
+                trial = self.solve(target, cur)
+            # else the stage set aside is taken as it was found [B 00415e30]
         self.accept(trial)
         return trial
 
