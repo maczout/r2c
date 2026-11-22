@@ -14,7 +14,7 @@ here. A case r2c failed on or refused is listed with r2c's words.
 outside on one of the three, or failed.
 
 --counts answers "how many cases are inside, check by check?": for each of tools/report.py's
-checks (peak, rising branch, shape, post-peak, views) the number of cases not outside target
+checks (peak, rising branch, shape, post-peak, and the views tier by tier) the number of cases not outside target
 and the names of those outside. It is the progress table of docs/summary.md. A case on which
 a check cannot be made (no curve after the peak, no load at all) counts as inside on it.
 """
@@ -64,9 +64,15 @@ def counts(names, results: dict, acc: dict) -> int:
         print(f"{n}: r2c: {results[n].get('failed') or results[n].get('skipped')}")
     ran = [n for n in names if n not in failed]
     checks = {n: report.assess(results[n], acc) for n in ran}
-    for k in ("peak", "curve", "shape", "post_peak", "views"):
+    for k in ("peak", "curve", "shape", "post_peak", "views", "views_should", "views_could"):
+        if not any(k in checks[n] for n in ran):
+            continue
         out = [n for n in ran if k in checks[n] and checks[n][k][2] is False]
-        print(f"{report.NAMES.get(k, k)}: {len(ran) - len(out)} of {len(names)} inside"
+        # a view tier counts only the cases it applies to (docs/acceptance.md, view tiers)
+        of = ([n for n in ran if k in checks[n]] if k.startswith("views") and "must" in
+              acc.get("views", {}) else names)
+        inside = len([n for n in of if n in ran]) - len(out)
+        print(f"{report.NAMES.get(k, k)}: {inside} of {len(of)} inside"
               + (f"; outside: {', '.join(out)}" if out else ""))
     return 0
 

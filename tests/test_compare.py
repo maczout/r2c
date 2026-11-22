@@ -54,3 +54,33 @@ def test_shape():
     assert [f for f, _ in compare.shape(cracked, 100.0, 4.0)] == [
         "cracking", "peak", "ends standing still"]
     assert [f for f, _ in compare.shape(REF[:3], 100.0, 4.0)] == ["peak", "ends at peak"]
+
+
+# D13 (owner, 2026-11-22): stage matching respects the features of the curves.
+class _Rec:
+    def __init__(self, n):
+        self._n = n
+
+    def stages(self):
+        return list(range(self._n))
+
+
+def test_matching_does_not_jump_back_across_a_fall():
+    # cracking at stage 3, a fall of load at stage 5; the reference's stage after the fall
+    # (5) has a load close to the subject's uncracked stage 2, but must match the subject's
+    # stage after its own fall (5)
+    ref = np.array([[0, 0], [1, 40], [2, 80], [3, 90], [4, 100], [5, 82], [6, 105],
+                    [7, 110]], dtype=float)
+    sub = np.array([[0, 0], [1, 40], [2, 81], [3, 90], [4, 99], [5, 70], [6, 104],
+                    [7, 110]], dtype=float)
+    xs, ys = 7.0, 110.0
+    assert compare._nearest_stage.__doc__  # the old rule is kept as the fallback
+    ss = compare._segment_stage(_Rec(8), None, 5, ref, sub, 5.0, 82.0, xs, ys)
+    assert ss == 5
+
+
+def test_matching_falls_back_to_nearest_when_the_features_differ():
+    ref = np.array([[0, 0], [1, 50], [2, 100], [3, 80]], dtype=float)
+    sub = np.array([[0, 0], [1, 50], [2, 60], [3, 100]], dtype=float)  # no cracking
+    ss = compare._segment_stage(_Rec(4), None, 1, ref, sub, 1.0, 50.0, 3.0, 100.0)
+    assert ss == 1

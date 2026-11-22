@@ -75,11 +75,11 @@ Outside on a Must (D1, D2), on the phase A set:
 
 - Rising branch: M/V = 0.5 m (6.1 %; known deviation 2 below).
 - Shape: V alone (Response has a fall of load before the peak, r2c none) and tension
-  (cracking and a fall of load at one step, read in a different order). M/V = 0.5 m and
-  2 m are outside only by how the response ends, which is a Won't; the measure still
-  counts it (D25).
-- Views of the stress state under moment and axial load: 7 of the 8 cases without shear
-  are outside; principal tensile stress in five, steel stress at a crack in two.
+  (cracking and a fall of load at one step, read in a different order). A shear case's
+  ending is no longer counted (D25).
+- Views of the stress state without shear (the tiers of D27): 6 of the 8 cases are
+  outside; principal tensile stress in five, steel stress at a crack in two, −M's strains by
+  a point.
 
 **What follows describes all 85 cases as they stood in the sixth run of 2026-11-21**, the
 last that ran the parked cases. Peak and rising branch of the 17 have not moved since.
@@ -229,12 +229,10 @@ one status. Completion is judged against Response as documented (owner, 2026-11-
   captured once, with `--add`. r2x's clipboard helper can fail transiently (once in 25
   captures); a rerun of that case on its own then matched.
 
-**Where a next session picks up**: the owner's answers to D21 to D26 in `docs/summary.md`.
-D26 proposes the first increment on the exit criteria (A2): the measures first, with the
-owner (stage matching, D13; shape without the ending of shear responses, D25; the views
-sorted into the tiers of D2), then the views without shear (options F1, F2 and H below),
-then the two shape misses and the rising branch at M/V = 0.5 m. Nothing was started on the
-exit criteria in the session of the reset.
+**Where a next session picks up**: A2 parts 2 to 5 in `docs/summary.md` (D26), within the
+bounds in `docs/acceptance.md` (D28). Part 1, the measures, is done (D13, D25, D27; log
+2026-11-22-03). Next: refuse what D23 names, then the views without shear (options F1, F2
+and H below), then the two shape misses and the rising branch at M/V = 0.5 m.
 
 ## 5. Decisions that are the owner's
 

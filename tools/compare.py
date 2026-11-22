@@ -20,7 +20,8 @@ What is compared:
   falls of load before the peak, the peak, and how the response ends);
 * with --views, every detail view at each of the reference's detail stages (the features of
   its curve: cracking, falls of load, the peak, the last stage; see feature_stages): the
-  subject's stage nearest the reference's in load and control value together; for each
+  subject's stage nearest the reference's in load and control value together, between the
+  same features of the curves when both have them (D13, _segment_stage); for each
   chart the largest distance of the reference's points from the subject's curve, as a percentage of the chart's largest value (depth scaled by the section
   depth).
 
@@ -248,6 +249,38 @@ def _nearest_stage(sub, key, x, y, xs, ys):
     return min(have, key=lambda n: np.hypot((c[n, 0] - x) / xs, (c[n, 1] - y) / ys))
 
 
+def _segment_stage(sub, key, rs, a, b, x, y, xs, ys):
+    """D13 (owner, 2026-11-22): the subject's stage matched to the reference's stage rs,
+    respecting the features of the curves. Nearest by load and control value alone can jump
+    across a fall of load: r2c's stage before the fall, still uncracked, can be nearer than
+    its stage after it. So when the two curves have the same features before the end, a
+    reference stage at a feature is matched to the subject's stage at that feature, and any
+    other stage to the nearest subject stage between the same two features. Otherwise, or if
+    there is no subject stage there, the nearest stage overall, as _nearest_stage."""
+    fa = [(f, i) for f, i in shape(a, ys, xs) if not f.startswith("ends")]
+    fb = [(f, i) for f, i in shape(b, ys, xs) if not f.startswith("ends")]
+    have = [n for n in sub.stages() if n < len(b)]
+    if not have:
+        return None
+
+    def nearest(ns):
+        return min(ns, key=lambda n: np.hypot((b[n, 0] - x) / xs, (b[n, 1] - y) / ys))
+
+    if [f for f, _ in fa] != [f for f, _ in fb]:
+        return nearest(have)
+    ia, ib = [i for _f, i in fa], [i for _f, i in fb]
+    if rs in ia:
+        t = ib[ia.index(rs)]
+        if t in have:
+            return t
+    # the segment: between the features on either side of rs
+    k = sum(1 for i in ia if i < rs)
+    lo = ib[k - 1] if k > 0 else -1
+    hi = ib[k] if k < len(ib) else len(b)
+    cand = [n for n in have if lo < n < hi] or [n for n in have if lo <= n <= hi]
+    return nearest(cand or have)
+
+
 def feature_stages(rec, key=None) -> dict[int, str]:
     """The stages at the features of a record's control curve (the bottom chart unless key is
     given), with the peak stage from its header: {stage: feature}. The stages whose detail
@@ -326,7 +359,7 @@ def compare(ref, sub, views=False):
             if rs >= len(a):
                 continue
             x, y = float(a[rs, 0]), float(a[rs, 1])
-            ss = _nearest_stage(sub, key, x, y, xs or 1.0, pk or 1.0)
+            ss = _segment_stage(sub, key, rs, a, b, x, y, xs or 1.0, pk or 1.0)
             if ss is None:
                 continue
             at = {"ref_stage": rs, "sub_stage": ss, "feature": feats.get(rs, ""),

@@ -33,6 +33,29 @@ input folder; the parked set needs `--inputs RESPONSE_FOLDER R2X/tests/reference
 `python tools/report.py OUT`; compare any two records with
 `python tools/compare.py REF SUBJECT --views`.
 
+## Phase A with the measures of A2 part 1 (2026-11-22)
+
+r2c unchanged; three measures changed with the owner (log 2026-11-22-03): the views are
+assessed in the tiers of `docs/acceptance.md` (D27), a shear case's shape leaves out its
+ending (D25), and a stage is matched between the same features of the two curves (D13).
+Measured: `python tools/targets.py VERIFY_OUT --counts`.
+
+| Check | Inside |
+|---|---:|
+| Peak | 17 of 17 |
+| Rising branch | 16 of 17 |
+| Shape | 15 of 17 (M/V = 0.5 m and 2 m now inside) |
+| Views, Must (stress state, without shear) | 2 of 8 |
+| Post-peak | 10 of 17 |
+| Views, Should | 8 of 17 |
+| Views, Could | 7 of 17 |
+
+The new stage matching re-matched eleven stages, ten of them on shear cases and mostly after
+the peak, where nearest by load and control value had matched late stages to early ones (on
+M/V = 0.5 m, Response's stage 55 to r2c's stage 1). Without shear only the no-load case's
+first stage moved, and no check changed. With shear, M/V = 2 m's cracking views (Could) went
+outside, as its last stages are now compared with r2c's last stages.
+
 ## Phase A baseline (run of 2026-11-22)
 
 The 17 phase A cases, run after the parking of the other cases and the removal of what is

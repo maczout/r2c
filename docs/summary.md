@@ -5,10 +5,9 @@
 current at the end of every session (CLAUDE.md, "Ending a session"). Everything else in
 `docs/` is the developer's working record and backs this page; it does not replace it.
 
-Last updated: 2026-11-22, by the owner and the developer: D21 to D26 answered after the
-session that reset the working set (log 2026-11-22-02). **No decision waits for the owner.**
-Next: the measures with the owner (A2, part 1), then a development session on A2's other
-parts.
+Last updated: 2026-11-22, by the owner and the developer, after the measures were put right
+with the owner (A2 part 1; log 2026-11-22-03). **No decision waits for the owner.** Next: a
+development session on A2 parts 2 to 5, within the bounds in `docs/acceptance.md`.
 
 ## Aim
 
@@ -49,30 +48,30 @@ request. Five of them need something that has now been removed, and r2c refuses 
 
 ## Progress against the Phase A exit criteria
 
-On the 17 cases, cases inside target. Measured from the baseline run of 2026-11-22, made
-after the reset (`docs/verification-results.md`; the count is a tool's now, not by hand).
-**The reset moved nothing**: r2c's results on the 17 are identical, to the last digit, to
-those of a run made before it.
+Cases inside target, counted by `tools/targets.py --counts` from the run of 2026-11-22 made
+with the measures of A2 part 1 (`docs/verification-results.md`). r2c itself did not change.
 
-| Check | Inside, of 17 | Exit tier (D1, D2) |
+| Check | Inside | Exit tier (D1, D2, D27) |
 |---|---:|---|
-| Peak | 17 | Must |
-| Rising branch | 16 | Must |
-| Shape | 13 (15 once the measure follows D1a; see D25) | Must |
-| Post-peak | 10 (7 of the 8 without shear) | Should, without shear |
-| Detail views | 1 | Must for stress state under moment and axial load |
+| Peak | 17 of 17 | Must |
+| Rising branch | 16 of 17 | Must |
+| Shape | 15 of 17 | Must (a shear case's ending left out: D25) |
+| Views of the stress state, without shear | **2 of 8** | Must |
+| Post-peak | 10 of 17 (7 of the 8 without shear) | Should, without shear |
+| Views related to shear, and stress-state views with shear | 8 of 17 | Should |
+| Views related to cracking | 7 of 17 | Could |
 
 What keeps the misses outside:
 
 - *Rising branch:* M/V = 0.5 m (6.1 %), on the recovery after a fall of load.
-- *Shape:* M/V = 0.5 m and 2 m differ only in how the response ends, which is a Won't; the
-  measure still counts it (D25). V alone: Response has a fall of load before the peak, r2c
-  none. Tension: cracking and a fall of load come at one step and are read in a different
-  order.
+- *Shape:* V alone: Response has a fall of load before the peak, r2c none. Tension:
+  cracking and a fall of load come at one step and are read in a different order.
 - *Post-peak without shear:* −M, 20 %.
-- *Views without shear* (the Must): 7 of the 8 cases are outside. In five it is the
-  principal tensile stress chart, mostly by one point; in two the steel stress at a crack.
-  Detail in `docs/verification.md`, "Phase A baseline".
+- *Views of the stress state without shear* (the Must): 6 of the 8 cases are outside.
+  Principal tensile stress on five: M 18 %, −M 24 %, N 10 %, N + M 52 %, N (+200 kN) then
+  M 24 %. Steel stress at a crack on two: N + M 100 %, tension 78 %. −M also by a point on
+  its longitudinal and principal tensile strain (5.3 %, 5.9 %). The worst stages are at or
+  after the peak, except N + M (stages 14 and 22).
 
 Known deviations are in `docs/status.md`: how shear responses end (a Won't, D1), and the
 circular column under axial load alone, which is not cloned (D12).
@@ -129,12 +128,14 @@ owner) · *open* (no suggestion yet).
 
 | # | Question | Status | Answer |
 |---|---|---|---|
-| D13 | Stage matching: a 0.5 % change in r2c's load can switch the matched stage and flip 11 view checks | decided, owner 2026-11-22 (suggestion approved) | Fix the measure before any work on views |
+| D13 | Stage matching: a 0.5 % change in r2c's load can switch the matched stage and flip 11 view checks | decided, owner 2026-11-22 (suggestion approved) | Fix the measure before any work on views. **Done 2026-11-22:** a stage is matched between the same features of the two curves. Without shear only the no-load case's first stage was re-matched, and no check changed; with shear ten stages, mostly after the peak, are now matched to like states (one had been matched to r2c's stage 1) |
 | D14 | F1: Response's cracking-under-compression rule inside the node | decided, owner 2026-11-22 (suggestion approved) | Yes, after D13 |
 | D15 | The generated results JSON is committed on every run (~80,000 lines) | decided, owner 2026-11-22 (suggestion approved) | Build it in CI instead of storing it |
 | D16 | The test set has grown to 85 cases | decided, owner 2026-11-22 | Develop on Newbeam; the rest is parked until Phase B |
 | D19 | Parked fixtures: delete, or keep and not run by default? | decided, owner 2026-11-22 (suggestion approved) | Keep them, not run by default |
-| D25 | The shape check still counts how a shear response ends, against D1a. Two cases (M/V = 0.5 m and 2 m) are outside on shape for that reason alone | decided, owner 2026-11-22 (reading confirmed) | Change the measure so that shape leaves out the ending for shear cases, in the same piece of work as D13, with the owner |
+| D25 | The shape check still counts how a shear response ends, against D1a. Two cases (M/V = 0.5 m and 2 m) are outside on shape for that reason alone | decided, owner 2026-11-22 (reading confirmed) | Change the measure so that shape leaves out the ending for shear cases. **Done 2026-11-22:** shape 13 → 15 of 17 |
+| D27 | Which of the 21 detail views are Must, Should or Could | decided, owner 2026-11-22 | Must: the stress-state views on cases without shear, including steel stress at a crack and the principal tensile strain and stress (the owner's choice). Should: shear views, and stress-state views on shear cases. Could: cracking views. Lists in `docs/acceptance.md` |
+| D28 | Bounds, in case a Must is harder than it looks | decided, owner 2026-11-22 | Two grounded approaches per part at most, no tuning to fit, no regression; on stopping, put it to the owner with options. In `docs/acceptance.md` |
 
 ### The next increment
 
@@ -145,16 +146,13 @@ owner) · *open* (no suggestion yet).
 The parts of A2, ranked by how much of a Must each closes (the Musts: peak, rising branch,
 shape, and the views of the stress state under moment and axial load). Peak is met.
 
-1. **The measures, with the owner** (meta-development). First, because two Musts are counted
-   with them. Stage matching (D13). Shape without the ending for shear cases (D25): shape
-   goes from 13 to 15 of 17. The owner sorts the 21 detail views into the three tiers of D2,
-   which is a structural judgement; the developer lists them. The report then counts each
-   tier and writes the progress table itself.
+1. **The measures, with the owner** (meta-development). **Done 2026-11-22** (D13, D25, D27,
+   D28): shape 15 of 17; the view Must is counted on its own, 2 of 8 inside.
 2. **Principal tensile stress at the crack front** (kernel). Response's rule for cracking
    under compression inside the node (D14), then how closely it spaces its points at the
-   crack front. *Views under M and N: five of the seven cases outside.*
+   crack front. *View Must: five of the six cases outside.*
 3. **Steel stress at a crack**, under N + M and under tension. Not yet investigated.
-   *Views under M and N: two of the seven.*
+   *View Must: two of the six.*
 4. **Tension: the order of cracking and the fall of load.** *Shape: one case, the last
    shape miss without shear.*
 5. **V alone: the fall of load before the peak. M/V = 0.5 m: the recovery after a fall of

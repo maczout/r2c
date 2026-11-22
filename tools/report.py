@@ -70,18 +70,48 @@ def assess(res: dict, acc: dict) -> dict:
             pl = lim.get("post_peak_pct")
             out["post_peak"] = (pv, pl, None if pl is None else pv <= max(pl, fl))
         if "shape_same" in c:
-            out["shape"] = (c["shape_same"], True, c["shape_same"])
+            same = c["shape_same"]
+            if g == "shear" and "shape_ref" in c:
+                # owner, 2026-11-22 (D1a, D25): for a shear case the shape leaves out how the
+                # response ends, which is a Won't
+                same = _no_ending(c["shape_ref"]) == _no_ending(c["shape_sub"])
+            out["shape"] = (same, True, same)
     vacc = acc.get("views", {})
     exempt = set(vacc.get("views_exempt", []))
-    # a view within the printed-precision floor counts as no difference
-    vals = [0.0 if v["max_diff"] <= v.get("floor", 0.0) else v["max_diff_pct"]
-            for v in res.get("views", [])
-            if not v.get("missing") and v["view"] not in exempt]
-    if vals:
-        vw = max(vals)
-        vl = vacc.get("views_pct")
-        out["views"] = (vw, vl, None if vl is None else vw <= vl)
+    vl = vacc.get("views_pct")
+
+    def worst(names=None):
+        # a view within the printed-precision floor counts as no difference
+        vals = [0.0 if v["max_diff"] <= v.get("floor", 0.0) else v["max_diff_pct"]
+                for v in res.get("views", [])
+                if not v.get("missing") and v["view"] not in exempt
+                and (names is None or v["view"] in names)]
+        if vals:
+            vw = max(vals)
+            return (vw, vl, None if vl is None else vw <= vl)
+        return None
+
+    if "must" not in vacc:
+        w = worst()
+        if w:
+            out["views"] = w
+        return out
+    # owner, 2026-11-22 (D2): views in tiers. Must: the stress-state views, on cases without
+    # shear. Should: the shear views, and the stress-state views on shear cases. Could: the
+    # cracking views, on every case.
+    must, should, could = (set(vacc.get(k, [])) for k in ("must", "should", "could"))
+    tiers = {"views": must if g == "flexure" else set(),
+             "views_should": should | (must if g == "shear" else set()),
+             "views_could": could}
+    for k, names in tiers.items():
+        w = worst(names) if names else None
+        if w:
+            out[k] = w
     return out
+
+
+def _no_ending(feats):
+    return [f for f in feats if not f.startswith("ends")]
 
 
 def verdict(checks: dict) -> str:
@@ -96,7 +126,8 @@ def verdict(checks: dict) -> str:
     return "not assessed"
 
 
-NAMES = {"curve": "rising", "post_peak": "post-peak"}
+NAMES = {"curve": "rising", "post_peak": "post-peak", "views": "views (Must)",
+         "views_should": "views (Should)", "views_could": "views (Could)"}
 
 
 def label(ref: dict) -> str:
@@ -115,12 +146,15 @@ def cell(check, signed=True) -> str:
     return f"{s} {'≤' if ok else '>'} {lim:g}"
 
 
-def shape_cell(c) -> str:
+def shape_cell(c, g="flexure") -> str:
     if "shape_same" not in c:
         return ""
     if c["shape_same"]:
         return "same"
-    return f"different: Resp. {', '.join(c['shape_ref'])}; r2c {', '.join(c['shape_sub'])}"
+    diff = f"Resp. {', '.join(c['shape_ref'])}; r2c {', '.join(c['shape_sub'])}"
+    if g == "shear" and _no_ending(c["shape_ref"]) == _no_ending(c["shape_sub"]):
+        return f"same but the ending (not assessed): {diff}"
+    return f"different: {diff}"
 
 
 def render(results: dict, run: dict, acc: dict, acc_path: str) -> str:
@@ -177,7 +211,7 @@ def render(results: dict, run: dict, acc: dict, acc_path: str) -> str:
                 f"{h['stage-count']} / {r['sub']['stage-count']} | {c['chart']} | "
                 f"{c['ref_peak_load']:.1f} | {c['sub_peak_load']:.1f} | "
                 f"{cell(chk.get('peak'))} | {cell(chk.get('curve'), signed=False)} | "
-                f"{cell(chk.get('post_peak'), signed=False)} | {shape_cell(c)} | {worst} | "
+                f"{cell(chk.get('post_peak'), signed=False)} | {shape_cell(c, g)} | {worst} | "
                 f"{verdict(chk)} | {r.get('seconds', '')} |")
         out.append("")
     if skipped:
