@@ -5,6 +5,7 @@ were lost with that session's workspace; these are rebuilt from the description 
 docs/status.md.
 
     python tools/diagnose.py states   RECORD [--input FILE] [--stages 5,10,peak] [--views]
+                                      [--out RECORD]
     python tools/diagnose.py controls RECORD [--input FILE] [--upto N]
     python tools/diagnose.py flow     RECORD [--input FILE] [--from N] [--upto N]
     python tools/diagnose.py own      RECORD [--input FILE] [--from N]
@@ -202,6 +203,7 @@ def cmd_states(a) -> int:
     views = export.Views(su.section, u)
     order = sorted(set(want)) if not contiguous else list(range(max(want) + 1))
     rows = []
+    kept = []                                   # r2c's views in Response's states (--out)
     for s in order:
         e0, phi, prof, resid = strain_state(ref, su, s)
         st = evaluate(su, e0, phi, prof)
@@ -226,6 +228,7 @@ def cmd_states(a) -> int:
             sub = record.decode(record.encode(
                 dict(ref.header), [(record.stage_section(s, k), b) for k, b in made.items()]))
             row["views"] = cmp.compare_views(ref, sub, s, s)
+            kept.extend((record.stage_section(s, k), b) for k, b in made.items())
             for v in row["views"]:
                 if v["view"] in NOT_HERE:
                     v["not_computed"] = True
@@ -254,6 +257,10 @@ def cmd_states(a) -> int:
           "held constant (no chart), the plain difference in the units in effect.")
     if a.json:
         Path(a.json).write_text(json.dumps(rows, indent=1))
+    if a.out:
+        # the control charts are Response's own, so that tools/viewlines.py finds the stages
+        ctl = [(k, b) for k, b in ref.sections.items() if not k.startswith("stage/")]
+        Path(a.out).write_bytes(record.encode(dict(ref.header), ctl + kept))
     return 0
 
 
@@ -458,6 +465,8 @@ def main(argv=None) -> int:
                    "detail stages in the record)")
     p.add_argument("--views", action="store_true", help="also compare the detail views")
     p.add_argument("--json")
+    p.add_argument("--out", help="with --views: write r2c's views in Response's states as "
+                                 "a record (for tools/viewlines.py)")
     p.set_defaults(fn=cmd_states)
     p = sub.add_parser("controls", help="r2c solved at Response's control values")
     p.add_argument("record")
