@@ -236,6 +236,16 @@ O: N + M at cracking, 51.5 to 0.3 %]. The thesis has it the other way ("if there
 bars crossing the crack face, the concrete stress is not reduced", T 4-5, restriction 3);
 r2c followed the thesis until 2026-11-22 and follows the program since (D30, D34).
 
+*Between the zones* [B `00441d80`, `004b5470`, `00440400`], since 2026-11-22 (increment
+A4). The limit over the depth is a table: each tension zone's values at its face and at its
+axis, and between the two axes (an axis is the face itself where that face is not in
+tension) three times the tensile strength of the concrete at each axis, linear between.
+r2c had no limit there, so a node that cracks diagonally above the flexural tension zone
+was not held by the longitudinal steel's limit. Measured on "N + M + V together" at the
+stage of diagonal cracking, in Response's own state: the limit line 0.30 MPa off before,
+0.025 after. Read and not checked against output: a section all in tension (the table
+runs from one face value to the other), and special concretes.
+
 ### Steel stress at a crack [T 4-5; B `00442e50`, `00442cd0`, `00440c70`, `004409d0`, `00441d80`]
 
 "The moment caused by the combined principal tension and shear on the crack is computed
@@ -338,8 +348,79 @@ shear; integrated from the top it gives the shear flow, hence a shear stress pro
 turned into a new strain profile by the nodes' secant stiffness (tangent where there is no
 shear yet) and the state is solved again, until the calculated stresses and those of the state
 differ by less than 1 % of the shear force. The reported shear strain is the average weighted
-by the shear stress [O]. Bond charts are the change of bar (or stirrup) force along the member
-over the bar surface; r2c's transverse bond is a numerical derivative and is approximate.
+by the shear stress [O]. The longitudinal bond chart is the change of bar force along the
+member over the bar surface.
+
+### The shear charts [B], read 2026-11-22 (increment A4)
+
+The chart data are filled by one routine (`00480590`, reached from `004837e0`); nothing is
+calculated when a chart is drawn except as said here.
+
+*The envelopes behind the Shear Strain and Transverse Strain charts* [`0041b1d0`, called
+once when a stage is accepted, from `00418af0`]. Each stage has its own: at each of its own
+nodes, the larger (upper line) or smaller (lower line) of its own value and the envelope of
+the stage it followed, read linearly at that height. The first stage starts from zero. A
+stage set aside while an event is closed in on was made before the stages put in between,
+and is not accepted a second time: those stages never enter its envelope, nor any later
+one. r2c: a stage records the stage it was solved from (`Shear.run`), and
+`export.envelope` builds the lines. Before, r2c drew the running extreme of every stage in
+order. Measured on M/V = 1 m: Response's envelope at stage 11 is that of stage 3 with its
+own profile (stages 4 to 10 were put in between); the reading fits every stage of the 20
+captures with shear in the archive within the printed precision.
+
+*Shear on Crack* [`00480590`]. The node's value with its sign (r2c drew its size). The
+limit is drawn once the larger of the largest positive and the largest negative value over
+the depth passes 0.001 MPa: on the side of the larger of the two, and on the other side as
+well when that side's extreme is over a fiftieth of the larger. The negative line is minus
+the positive one. Where a chart's values are within a few thousandths of a MPa the two
+programs can fall on either side of that rule, and one draws a line the other does not
+(two phase A stages; `docs/summary.md`, D38).
+
+*Transverse Average Bond* [`0047fcd0`; the factor `00485640`, the window `00484420`]. A
+table over the depth is made first: for each half layer, the change of the average stirrup
+stress between its two nodes over their distance, as a size, times the stirrups' area over
+their perimeter (for one bar type the area of a bar over π times its diameter; taken at
+the layer's bottom node, so nothing where that node is beyond the stirrups); zero unless
+there are stirrups at the layer's top and middle nodes. Each value is put at the top of its
+half layer and the table is read linearly between. The chart is that table averaged over a
+window at 41 evenly spaced heights: five stirrup diameters long, at most an eighth of the
+depth, a twentieth of the depth where there are no stirrups, cut off at the faces. r2c:
+`export.bond_table`, `export.bond_window`. Before, r2c drew a numerical derivative of the
+stirrup stress. Measured: from Response's own stirrup stress chart the rule gives its bond
+chart within 0.01 MPa at 469 of 470 stages of the nine phase A captures. Not checked with
+more than one stirrup type or with stirrups over part of the depth (one parked case moved
+far: `docs/status.md`).
+
+*Average Angle: one rule not taken over* [`004a9d90`, its end]. After the angles are found,
+Response turns some of them by 180°, by a test on the mean angle of the nodes made first
+(the base nodes, before layers are split): nodes made later keep an angle near 180° where
+the shear strain is next to nothing and negative, and r2c draws 0°. Seen at two nodes at
+the peak of M/V = 2 m. r2c does not keep its nodes in the order Response makes them, so
+this was left (`docs/status.md`).
+
+### The history of the stirrups [B `0041e310`, `004a9d90`, `004aea40`], read 2026-11-22: written, off
+
+Response keeps the plastic strain of the stirrups as a table over height that belongs to a
+stage: written when the stage is accepted, from the stage's own state at its own nodes
+(strain less stress over modulus), in place of the table it had; a new stage starts from
+the table of the stage before it and reads it linearly at its own nodes. A stress above the
+unloading line through that plastic strain is brought down to the line, not below minus
+the yield stress; in compression there is no line. With two or more stirrup types Response
+keeps no history. r2c keeps the largest plastic strain so far on the fixed heights of its
+tables (about 6 mm apart on Newbeam) [O], which near a sharp change over the depth gives a
+plastic strain that is too large beside it: in Response's own states at the last stage of
+three cases the stirrup stress is then up to 94, 93 and 143 MPa off, and within 3, 16 and
+10 MPa with Response's table [measured, 2026-11-22, a copy of r2c outside the repository].
+
+**Response's rule is in the kernel and off** (`Analysis.own_stirrup_history`;
+`docs/summary.md`, D39). With it on, on the 17 cases: the peak of "N constant, then M + V"
+comes inside (shear stress 15.5 to 1.3 %, transverse bond 6.1 to 0.3 %) and four checks at
+the fall of load of M/V = 0.5 m; but **the rising branch of M/V = 0.5 m goes outside (3.7
+to 7.6 %)**, with six other checks on M/V = 0.5 m and 2 m. Keeping the largest value at the
+same heights in place of replacing gives the same results, check for check. Not taken over
+in either: the stress at a crack on the same line, the factor for wide spacing on the
+average stress, and the prestrain inside the plastic strain (none of them at work on
+Newbeam).
 
 ### The stiffness in the shear flow calculation [B]
 

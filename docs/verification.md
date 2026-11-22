@@ -33,6 +33,48 @@ input folder; the parked set needs `--inputs RESPONSE_FOLDER R2X/tests/reference
 `python tools/report.py OUT`; compare any two records with
 `python tools/compare.py REF SUBJECT --views`.
 
+## A4 (2026-11-22)
+
+The run of record of increment A4 (`docs/verification-results.md`), against that of A3
+(`python tools/changes.py`; all measured, one machine). The rules are in `docs/kernel.md`.
+
+| Change | Came inside | Went outside |
+|---|---|---|
+| Response's solve under a stepped curvature, on (D35) | M, principal tensile stress at the last stage, 7.2 to 0.4 % | "constant N +200 kN, then M", the same view at its last stage, 1.1 to 6.2 % (known deviation, the owner's) |
+| The longitudinal limit between the tension zones | 11 checks: nine at diagonal cracking on "N + M + V together" (5.9 to 13.2 % before, 1.5 to 4.4 % after), principal tensile stress and stirrup stress at the peak of M/V = 0.5 m (15.7 and 15.2 to 3.6 and 3.5 %) | none |
+| The envelopes, shear on crack, transverse bond as the program draws them | shear strain at cracking on M/V = 1 m and 2 m (8.8 and 8.2 to 1.4 and 0.0 %); shear on crack at the last stage of "N constant, then M + V"; transverse bond at the fall of V alone | shear on crack at one stage each of "M constant, then M + V" and M/V = 2 m (a limit line one program draws and the other does not, at values under 0.002 MPa; D38); transverse bond at the peak of "M constant, then M + V", 2.6 to 7.7 % (the stirrup stress steps by 380 MPa in r2c's state, 428 in Response's) |
+
+In all, 16 checks came inside and 4 went outside. By case nothing changed: peak and rising
+branch 17 of 17, shape 15, post-peak 12, the view Must 7 of 8 (M in, "constant N +200 kN,
+then M" out), views Should 8 of 17: the eight cases without shear. None of the nine cases
+with shear is inside on its views.
+
+**What keeps the nine shear cases outside on the views** (`python tools/viewmisses.py
+VERIFY_OUT --shear --tier must should`; and `python tools/diagnose.py states RECORD
+--views`, which puts r2c in Response's own states):
+
+- *The last stage*, on eight of the nine (not "M constant, then M + V", which ends at its
+  peak): r2c's response ends elsewhere than Response's (a Won't, D1), and the views are
+  compared there all the same (D40). Five of the nine are outside for this alone or with
+  one stage more: M/V = 1 m (only this), V with constant compression (only this), V alone,
+  "N constant, then M + V", "N + M + V together".
+- *A state that differs although the curves agree.* The peak of "constant V, then M":
+  shear stress 33 %, one node at the crack front, with the two states 0.00015 mm/m apart;
+  in Response's own state r2c has Response's value. The peak of "N constant, then M + V":
+  shear stress 15.5 %, also one node; this one is the stirrups' history (D39). The peak of
+  "M constant, then M + V", which r2c reaches seven stages later.
+- *Known deviations of the curve*: M/V = 0.5 m at its fall of load and M/V = 2 m at its
+  peak are compared in different states (`docs/status.md`); V alone at its fall (D32).
+- *A rule not taken over*: the angle of 180° at two nodes (M/V = 2 m at its peak).
+- *Transverse bond at diagonal cracking* on "N + M + V together", 70 %: a step in stirrup
+  stress at a slightly different place; the stage is one neither program has converged
+  (profile error 1.3 % in Response's state, 1.9 % in r2c's).
+
+In Response's own states, at the stages that are not a collapsed last stage, r2c's views of
+shear are within target but for: shear stress at the fall of M/V = 0.5 m (5.9 %, the
+calculated line; `docs/status.md`, option A4), stirrup stress at the last stages of V alone
+and "constant V, then M" (7.2 and 6.4 %; the stirrups' history), and the angle above.
+
 ## A3 (2026-11-22)
 
 Measured on the 17 phase A cases, each change against the run before it (`python
