@@ -33,6 +33,42 @@ input folder; the parked set needs `--inputs RESPONSE_FOLDER R2X/tests/reference
 `python tools/report.py OUT`; compare any two records with
 `python tools/compare.py REF SUBJECT --views`.
 
+## A3 (2026-11-22)
+
+Measured on the 17 phase A cases, each change against the run before it (`python
+tools/verify.py tests/oracle ...`, `python tools/targets.py OUT --counts`, `python
+tools/changes.py BEFORE AFTER`; this machine). The baseline is the run of record of A2.
+
+| Check | A2 | Part 1 (D30) | Part 2 (−M's ending) |
+|---|---:|---:|---:|
+| Peak | 17 of 17 | 17 | 17 |
+| Rising branch | 17 of 17 | 17 | 17 |
+| Shape | 15 of 17 | 15 | 15 |
+| Views, Must (stress state, without shear) | 5 of 8 | 6 | 7 |
+| Post-peak | 11 of 17 | 11 | 12 |
+| Views, Should | 8 of 17 | 8 | 8 |
+| Views, Could | 7 of 17 | 7 | 8 |
+
+* **Part 1.** A tension zone that no bar crosses is limited to zero, as in the program
+  (D30). N + M, principal tensile stress at cracking: 51.5 to 0.3 %. No other check changes
+  side.
+* **Part 2.** A bar that ruptures at a crack is gone in the state where it ruptures;
+  Response's stepping at a rupture and its end test (`docs/kernel.md`, "Flexural crack
+  check" and "Load stages"). −M's last two stages are Response's: post-peak 20.3 to 0.0 %,
+  longitudinal strain and principal tensile strain at the last stage 5.3 and 5.9 to 0.0 %,
+  crack widths there 5.7 to 0.5 %. No check went outside. Every case without shear is now
+  inside on post-peak.
+* **Parts 3 and 4.** Response's two stage solves without shear were read and written
+  (`docs/kernel.md`, "The stage solve without shear", with the table of what each moved).
+  Neither is in use: each moves a Must view outside. The run of record is with r2c's own
+  solve, so M's last stage (7.2 %) and tension's shape stand as they were.
+
+What the reading explains, whether or not the solves are switched on: Response does not
+balance a stage, it stops inside a tolerance. Under a stepped curvature the tolerance is
+0.1 % of the loads and the last stages of M sit 0.005 mm/m from balance, which is the whole
+of the 7.2 % next to a crack front. Under a stepped axial strain it is far wider and the
+steps are half steps: that is the extra rising stage under tension.
+
 ## A2, parts 2 to 5 (2026-11-22)
 
 Four kernel changes, each measured against the run before it on the 17 phase A cases

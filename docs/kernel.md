@@ -478,11 +478,73 @@ peak load and at which nothing new has happened (cracking, crushing, a rupture) 
 stage before. Before, r2c tried a fifth and a twenty-fifth and then kept the whole step,
 and ended at the second stage under a fifth of the peak. Measured on −M: the last two
 stages are Response's (curvatures 52.25 and 58.02 rad/km, 16.7 and 16.5 kNm); post-peak
-20.3 to 0.0 %.
+20.3 to 0.0 %. Not right yet for a section with several layers of strand: on the parked
+I-girder under M the response ended as Response's does before this change and does not
+now [O, one run of the parked cases, 2026-11-22; not looked into].
 
 The control variable's value at the initial stage is the curvature or the centroid's strain
 there. More Detail adds a stage between every two up to the peak, among the stages found in
 the first control variable, to at most 327 stages. A response has at most 101 stages [O].
+
+## The stage solve without shear [B], read 2026-11-22
+
+How Response-2000 finds the state of a stage when there is no shear. Read for increment A3
+(`00425f10`, `0041e1e0`, `00425af0`, `004276a0`, `00416730`, `00433c50`, `00418af0`,
+`004a9030`). **Written in r2c and not in use**: each of the two solves brings the check it
+was read for inside target and moves another Must view outside, so r2c's own solve (the
+balanced state, to a root of the unbalanced force) is still the default
+(`docs/summary.md`, D35 and D36; `Flexure.own_curvature`, `Flexure.own_axial`).
+
+*Which solve.* Under a stepped curvature, the secant below. Under a stepped axial strain
+Response sets its relaxation flag, and with that flag the stage goes to the general solve it
+uses with shear.
+
+*The first estimate* of a stage is the strains of the stage before with the stepped one set
+to its target (a new stage is a copy of the last; the extrapolation in `00416730` multiplies
+by a difference that is zero). When a stage has been set aside beyond the target, the
+strains of whichever of the two is nearer in the stepped strain.
+
+*The secant, under a stepped curvature* [`00425f10`]. One unknown, the axial strain. The
+unbalanced force is the axial force off the loading line. The state is taken as soon as that
+is under 0.1 % of |N| + |M| + |V| plus 1 (N and N m): Response does not go on to the
+balanced state. A step is the unbalanced force over the slope, which is the secant's
+slope and is carried from one stage's solve to the next; it is found again, by a change
+of 0.01 mm/m, for the first stage, for a stage put in between two others and after a
+failure. A step is no more than half the concrete's strain at peak stress. After sixteen
+tries the steps are halved and the slope is the section's own stiffness; after twenty it
+gives up and falls back on halving [`00425af0`]: the axial strain is bracketed in steps of
+the strain at peak stress, twelve at most each way, and halved up to thirty times.
+
+*The general solve, under a stepped axial strain* [`004276a0`]. Newton's method on the
+section's stiffness, in half steps (the relaxation factor is 0.5 with the flag), and
+always at least one. It stops when the squared unbalanced forces over (h + 0.1 mm)² are
+under 10⁻⁶·(N² + V² + M²/h²) + 1 + (1000·A)² (N, m; A the gross area, the same quantity
+that decides what a large constant axial load is), or after 50 steps, or when a step is
+larger than 0.5 in all. The tolerance is wide: on Newbeam under tension the states before
+cracking carry 40 to 130 N m of unbalanced moment, each about half a step short of balance
+[O: the same figures come out of r2c in Response's states and out of this solve]. That is
+how Response has one more rising stage before the fall at cracking than r2c's balanced
+solve can find (D31). Still r2c's own in this solve: the stiffness is taken numerically
+(Response's is `00427cd0`, which r2c has for the shear cases), and the step for a moment
+that grows with the axial load is r2c's reading (`004267c0` was not read).
+
+*A stage put in between that is not solved* [`00418af0`] is dropped, the stage set aside is
+taken as it was found, and the event is closed in on no further. A stage set aside and
+taken up again is not solved again.
+
+*The sums* [`004a9030`]: Simpson's rule over each layer's three nodes, with the mean of the
+top and bottom widths at the middle and a correction where the width tapers; a bar's force
+less the concrete it displaces, the concrete's stress there read from the profile. As in
+r2c, apart from the correction (no phase A section tapers).
+
+Measured on the eight phase A cases without shear (2026-11-22, `tools/changes.py` against
+the run after part 2; `tools/offsets.py` for the strains):
+
+| | The secant on | The general solve on |
+|---|---|---|
+| Came inside | M, principal tensile stress at the last stage, 7.2 to 0.4 % | tension's shape; its rising branch 0.48 to 0.08 % |
+| Went outside | N +200 kN then M, principal tensile stress at the last stage, 1.1 to 6.2 % | at the peak: tension, longitudinal concrete stress and principal tensile stress, 0.2 to 7.6 %; N + M, steel stress at a crack 0.0 to 22.7 % and principal tensile stress 1.7 to 7.7 % |
+| r2c's state against Response's | last stage of M: 0.005 to 0.0003 mm/m of axial strain; of N +200 kN then M: 0.024 to 0.005 | N + M: the curvature is off by as much as before (0.003 to 0.025 rad/km), on either side |
 
 ## Response's own load stage control [B], read 2026-11-21
 
