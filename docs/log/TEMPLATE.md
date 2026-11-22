@@ -20,9 +20,10 @@ What was tried and did not work, and why. This is the section a later session ne
 Each decision, who made it (the owner, or the developer where acceptance.md was silent), and
 why.
 
-## Open questions for the owner
+## Questions for the owner
 
-Structural judgements needed, and anything blocked on one. "None" if none.
+The numbers (D…) of the decisions this session added to or answered in `docs/summary.md`.
+The questions themselves go there, not here. "None" if none.
 
 ## Evidence
 
