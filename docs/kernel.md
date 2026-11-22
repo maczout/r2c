@@ -221,6 +221,15 @@ than yield; ρ is all the steel on the layer's side of the centroid over 0.8·Ag
 that has yielded on average and whose concentrated strain passes the end of its curve
 ruptures at the crack and is removed.
 
+*When it is removed* [B `004aaf70`, `004ae520`, `0041e310`, `00434c80`]. A bar's stress in
+a state is the lesser of its average stress and its capacity at a crack, and nothing at all
+when the capacity says it has ruptured: the bar is gone in the state where it ruptures, not
+from the stage after. An accepted stage marks its ruptured bars as gone for the stages that
+follow; a stage that is set aside marks nothing (the marks are put back from the stage
+before). Until 2026-11-22 r2c removed the bar only from the next stage on, so the stage
+where it ruptured still carried it [O: −M, the stage after the peak, 84 kNm where Response
+has 17].
+
 A tension zone that no bar crosses is limited to zero: its capacity moment is zero and so
 is its limit, which leaves the node at its floor after cracking [B `00441d80`, `00440400`;
 O: N + M at cracking, 51.5 to 0.3 %]. The thesis has it the other way ("if there are no
@@ -452,11 +461,24 @@ the binary was read, and now seen to be Response's rule (the next section): the 
 the centroid if the axial load is being increased, else the curvature; a first step of Δ0/6
 (Δ0 = 0.2 mm/m ÷ h in curvature, ε0/20 in axial strain), then Δ0, growing to a tenth of the
 control value; an event (first cracking, the extreme fibre reaching ε0) approached in fifths
-of what remains; bar rupture approached at a fifth and a twenty-fifth of the step. The
+of what remains. The
 response ends when the extreme compressive strain passes 4·ε0, when no state is found at a
-target nor at a half, quarter and eighth of the step, when the load has run out, and (r2c's
-own) when less than a fifth of the peak is left after a rupture. Response's end tests for
-these cases (the next section, 3 to 6) come to the same on the cases compared.
+target nor at a half, quarter and eighth of the step, and when the load has run out.
+Response's end tests for these cases (the next section, 3 to 6) come to the same on the
+cases compared.
+
+*Bar rupture within a step, and the end after it* [B `00415e30`, `00419ff0`, `00418fd0`,
+`00419990`], since 2026-11-22. A stage in which the number of ruptured bars has changed is
+set aside (deleted, unlike the stage set aside at cracking or crushing, which is kept for
+later) and a stage is tried a fifth of the way to it, again and again while the step is
+more than 1 % of the control variable's travel from the first stage. A stage short of the
+rupture is kept and the stepping goes on from it; the last stage tried is kept, ruptured or
+not. The response ends at a stage, the eleventh or later, that has less than a fifth of the
+peak load and at which nothing new has happened (cracking, crushing, a rupture) since the
+stage before. Before, r2c tried a fifth and a twenty-fifth and then kept the whole step,
+and ended at the second stage under a fifth of the peak. Measured on −M: the last two
+stages are Response's (curvatures 52.25 and 58.02 rad/km, 16.7 and 16.5 kNm); post-peak
+20.3 to 0.0 %.
 
 The control variable's value at the initial stage is the curvature or the centroid's strain
 there. More Detail adds a stage between every two up to the peak, among the stages found in
