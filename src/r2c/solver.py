@@ -233,7 +233,7 @@ class Analysis:
                 self.ep[i] = min(self.ep[i], ep) if self.ep[i] <= 0 else ep
 
     def crack_check(self, e0, phi, es, fs):
-        """The flexural crack check (thesis 4-5): the largest average concrete tension each
+        """The flexural crack check (thesis 4-5; details Response-2000's): the largest average concrete tension each
         tension zone can carry without the bars crossing it exceeding their capacity at a
         crack. Returns a function f1cx(z)."""
         sec = self.sec
@@ -258,7 +258,6 @@ class Analysis:
         else:
             z4 = zbot
         mtop = mbot = 0.0
-        ntop = nbot = 0
         for l, e, f in zip(sec.layers, es, fs):
             if not (l.z > z3 or l.z < z4):
                 continue
@@ -269,14 +268,13 @@ class Analysis:
             near = min(min(abs(l.z - z4), abs(l.z - z3)) / (l.db + 0.1), 1.0)
             if l.z > z3:
                 mtop += abs(z3 - l.z) * near * l.area * df + 100.0
-                ntop += 1
             if l.z < z4:
                 mbot += abs(z4 - l.z) * near * l.area * df + 100.0
-                nbot += 1
         zones = []
-        for zn, face, mcap, count in ((z3, ztop, mtop, ntop), (z4, zbot, mbot, nbot)):
+        # a zone no bar crosses has no capacity moment and a limit of zero (docs/kernel.md)
+        for zn, face, mcap in ((z3, ztop, mtop), (z4, zbot, mbot)):
             hh = abs(face - zn)
-            if hh < 0.1 or count == 0:
+            if hh < 0.1:
                 continue
             lo, hi = (max(zn, zbot), ztop) if face == ztop else (zbot, min(zn, ztop))
             i1 = i2 = i3 = ma = mb = 0.0

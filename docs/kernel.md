@@ -221,11 +221,11 @@ than yield; ρ is all the steel on the layer's side of the centroid over 0.8·Ag
 that has yielded on average and whose concentrated strain passes the end of its curve
 ruptures at the crack and is removed.
 
-A tension zone that no bar crosses is not limited: "if there are no bars crossing the crack
-face, the concrete stress is not reduced" [T 4-5, restriction 3]. Response 1.9.7 does limit
-it: the capacity moment of such a zone is zero and so is its limit, which leaves the node
-at its floor after cracking [B `00441d80`, `00440400`; O: N + M at cracking]. r2c follows
-the thesis here until the owner decides (`docs/summary.md`, D30).
+A tension zone that no bar crosses is limited to zero: its capacity moment is zero and so
+is its limit, which leaves the node at its floor after cracking [B `00441d80`, `00440400`;
+O: N + M at cracking, 51.5 to 0.3 %]. The thesis has it the other way ("if there are no
+bars crossing the crack face, the concrete stress is not reduced", T 4-5, restriction 3);
+r2c followed the thesis until 2026-11-22 and follows the program since (D30, D34).
 
 ### Steel stress at a crack [T 4-5; B `00442e50`, `00442cd0`, `00440c70`, `004409d0`, `00441d80`]
 
