@@ -900,7 +900,7 @@ class Shear(Flexure):
         after a stage has been set aside."""
         an = self.an
         an.ep[:] = an.ep0
-        an.epy[:] = 0.0
+        an.epy = np.zeros(len(an.epy))
         an.dead[:] = False
         for i, st in enumerate(self.stages):
             if i:

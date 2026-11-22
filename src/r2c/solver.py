@@ -87,7 +87,9 @@ class Analysis:
         # plastic strain of each layer, from which it unloads elastically
         self.ep0 = np.zeros(len(sec.layers))
         self.ep = self.ep0.copy()
-        self.epy = np.zeros(len(sec.tz))        # plastic strain of the stirrups, by depth
+        # plastic strain of the stirrups over the depth, as a table over height
+        self.epy_z = np.array([sec.zbot, sec.ztop])
+        self.epy = np.zeros(2)
         self.dead = np.zeros(len(sec.layers), dtype=bool)   # ruptured at a crack
         self.last_ey = None
 
@@ -208,8 +210,13 @@ class Analysis:
             fs[i] = float("nan") if math.isnan(cap) or math.isnan(f) else min(f, cap)
         return es, fs
 
+    # Response's own history of the stirrups' plastic strain (off: docs/summary.md, D39)
+    own_stirrup_history = False
+
     def commit_stirrups(self, det):
-        """Record the plastic strain of the stirrups over the depth at an accepted stage."""
+        """Record the plastic strain of the stirrups over the depth at an accepted stage.
+        Response-2000's rule [B 0041e310] is the stage's own, at its own nodes, in place of
+        what was there; it is written and off (docs/kernel.md, "Shear": D39)."""
         sec = self.sec
         if not sec.stirrups:
             return
@@ -219,9 +226,15 @@ class Analysis:
         fac = self.stirrups_at(z, det.b)[0][2]
         ep = np.asarray(det.ey, dtype=float) * fac \
             - np.asarray(det.fsy, dtype=float) / (st.E * st.phi)
+        zu, iu = np.unique(z, return_index=True)
+        if self.own_stirrup_history:
+            ep = np.where(np.asarray(det.rhov) > 0, ep, 0.0)
+            self.epy_z, self.epy = zu, ep[iu]
+            return
+        # r2c's own: the largest so far, on the fixed heights of the tables
         ep = np.where((np.asarray(det.rhov) > 0) & (ep > 1e-9), ep, 0.0)
-        order = np.argsort(z)
-        self.epy = np.maximum(self.epy, np.interp(sec.tz, z[order], ep[order]))
+        old = np.interp(sec.tz, self.epy_z, self.epy)
+        self.epy_z, self.epy = sec.tz, np.maximum(old, np.interp(sec.tz, zu, ep[iu]))
 
     def commit(self, e0, phi):
         """Record what an accepted load stage leaves behind: the bars that have ruptured, and
@@ -458,7 +471,7 @@ class Analysis:
         sec = self.sec
         sts = self.stirrups_at(zf, self.node_width(z))
         rcrit = sec.tab(sec.t_rhocrit, zf)
-        epy = np.interp(zf, sec.tz, self.epy)
+        epy = np.interp(zf, self.epy_z, self.epy)
         idx = self.law_index(zf, z)
         n = len(zf)
 
@@ -642,7 +655,7 @@ class Analysis:
         if self.shear and sec.stirrups:
             tot, _res, rho_t = self.stirrup_stress(self.stirrups_at(zz, b.ravel()[sel]), ey,
                                                    sec.tab(sec.t_rhocrit, zz),
-                                                   np.interp(zz, sec.tz, self.epy))
+                                                   np.interp(zz, self.epy_z, self.epy))
             has = rho_t > 0
             fsy[has] = tot[has] / rho_t[has]
             # at a crack the stirrups also carry what the concrete carries between cracks
@@ -1373,9 +1386,9 @@ class Flexure:
         out = [stages[0]]
         added = 0
         saved = self.an.ep.copy()
-        saved_y = self.an.epy.copy()
+        saved_y = (self.an.epy_z, self.an.epy)
         self.an.ep[:] = self.an.ep0
-        self.an.epy[:] = 0.0
+        self.an.epy = np.zeros(len(self.an.epy))
         try:
             for i in range(1, len(stages)):
                 a, b = stages[i - 1], stages[i]
@@ -1391,6 +1404,6 @@ class Flexure:
                 out.append(stages[i])
         finally:
             self.an.ep[:] = saved
-            self.an.epy[:] = saved_y
+            self.an.epy_z, self.an.epy = saved_y
         newpeak = out.index(stages[peak])
         return out, newpeak
