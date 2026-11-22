@@ -23,7 +23,7 @@ exercise which feature is from `tools/scope.py` (it reads the fixtures' inputs).
 
 **Documented.** Each item is marked as documented or not (2026-11-22), by the owner's rule
 (D17 in `docs/summary.md`): the manual, Appendix A of Bentz's thesis, says which features
-exist; the thesis says how they calculate. "A-16" is the manual's page; "no" means the manual
+exist; the binary says how they calculate (D34; it was the thesis until 2026-11-22). "A-16" is the manual's page; "no" means the manual
 does not have the item. Where an item is named in the manual and its rule is in neither
 document, the column says so. Completion is judged against the documented items (owner,
 2026-11-22); what r2c had built beyond them is removed (D18).

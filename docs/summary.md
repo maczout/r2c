@@ -6,17 +6,19 @@ current at the end of every session (CLAUDE.md, "Ending a session"). Everything 
 `docs/` is the developer's working record and backs this page; it does not replace it.
 
 Last updated: 2026-11-22, by the developer, at the end of the session on A2 parts 2 to 5
-(log 2026-11-22-04). **Five decisions wait for the owner: D29 to D33.** D29 comes first: it
+(log 2026-11-22-04). **Four decisions wait for the owner: D29, D31 to D33** (D30 settled by D34, the owner's
+change to the source rule after this session). D29 comes first: it
 is the developer's reading of the no-regression bound, on which one of the kernel changes
 of this session was kept.
 
 ## Aim
 
-A really good sectional response calculator, interchangeable with r2x. Completion is judged
-against Response-2000 **as documented** (its manual and Bentz's thesis), not against
-everything the 1.9.7 binary does. Where the documents and the binary differ, that is put to
-the owner (a decision below), not settled by reading the binary. Bells and whistles are built
-outside r2c and r2x. (Owner, 2026-11-22.)
+A really good sectional response calculator, interchangeable with r2x. **What exists** is
+judged against Response-2000 as documented (the manual, Appendix A of Bentz's thesis).
+**How it calculates** is the 1.9.7 program's, read from the binary: where the thesis and the
+binary differ, the binary is followed without asking, apart from the owner's overrides in
+`docs/acceptance.md` (D34). Bells and whistles are built outside r2c and r2x. (Owner,
+2026-11-22.)
 
 ## Phases
 
@@ -121,7 +123,7 @@ owner) · *open* (no suggestion yet).
 | D1a | Reading of D1: "shape" for a shear case leaves out how the response ends, since the ending is a Won't | decided, owner 2026-11-22 (suggestion approved) | Yes |
 | D2 | Detail views and post-peak: chase them? | decided, owner 2026-11-22 | *Must:* views of the stress state under moment and axial load. *Should:* views related to shear. *Could:* views related to cracking. |
 | D3 | Shear endings: chase further or accept? | decided, owner 2026-11-22 | Accept: see D1 (Won't). |
-| D20 | `docs/acceptance.md` still says "where r2c and Response differ, Response is right", with no qualifier | decided, owner 2026-11-22 (suggestion approved) | Reworded: "Response as documented is right; undocumented solver behaviour is not cloned"; the tiers of D1 and D2 added as the phase A exit criteria. Done 2026-11-22. |
+| D20 | `docs/acceptance.md` still says "where r2c and Response differ, Response is right", with no qualifier | decided, owner 2026-11-22 (suggestion approved) | Reworded: "Response as documented is right; undocumented solver behaviour is not cloned"; the tiers of D1 and D2 added as the phase A exit criteria. Done 2026-11-22. The first half is superseded by D34. |
 
 ### Scope
 
@@ -136,7 +138,7 @@ owner) · *open* (no suggestion yet).
 | D10 | Compression softening 4 ("Unsupported Method") | decided, owner 2026-11-22 (suggestion approved) | Out: undocumented |
 | D11 | Interlocking hoops analysed as stirrups (inferred, within 0.8 %) | decided, owner 2026-11-22 (suggestion approved) | Confirm |
 | D12 | Circular column under axial load alone after its peak (C2) | decided, owner 2026-11-22 | Looks wrong in Response: not cloned; r2c's uniform post-peak stands. Pure N stays in Phase A on Newbeam. |
-| D17 | Which document defines a complete feature | decided, owner 2026-11-22 (suggestion approved) | The manual (thesis Appendix A) for which features exist; the thesis for how they calculate |
+| D17 | Which document defines a complete feature | decided, owner 2026-11-22 (suggestion approved); amended by D34 | The manual (thesis Appendix A) for which features exist; ~~the thesis~~ the binary for how they calculate (D34) |
 | D18 | Features built beyond the documented set (less common softening models, segmental steel, …) | decided, owner 2026-11-22 | Remove the code |
 | D21 | Compression softening models that the manual names but that neither the manual nor the thesis gives a rule for (eleven of them: Vecchio-Collins 1982, 1992-A and 1992-B, Mehlhorn, Maekawa, Noguchi, Belarbi-Hsu, Collins 1978, Kaufmann-Marti, Hsu-Zhang 1998, Hsu 1993). Their rules in r2c were read from the binary. D18 names "less common softening models" for removal; the manual lists them, so they were kept | decided, owner 2026-11-22 | **Keep them.** Being named in the manual counts as documented; their rules from the binary stay. (The developer had suggested removing them.) |
 | D22 | The default compression softening of Response 1.9.7 (Collins-Bentz 2011) is later than the manual and the thesis, so by D17 it is not documented. Every case uses it. For Newbeam's concrete it is the thesis' own equation; they differ above 57 MPa. The automatic tensile strength is another default where the program differs from the thesis | decided, owner 2026-11-22 (suggestion approved) | Keep. Where a default of Response 1.9.7 differs from the 2000 documents, r2c follows the program, because the oracle runs with its defaults |
@@ -161,10 +163,17 @@ owner) · *open* (no suggestion yet).
 | # | Question | Status | Answer |
 |---|---|---|---|
 | D29 | Reading of the no-regression bound (D28: "no Must view that is inside may go outside"). With Response's layering, principal tensile stress on M went from 18.2 to 0.0 % at the peak and from 4.2 to 7.2 % at the last stage. The developer read the bound view by view on a case, as the report counts it: that view on M was outside before and is outside now, so the layering was kept. Stage by stage it is a regression | suggested (reading, for the owner to confirm) | **Confirm, and accept that stage as a known deviation.** At that stage r2c has Response's points, and gives Response's forces in Response's own state; the two states differ by 0.005 mm/m of strain, less than Response's own solve leaves unbalanced, and next to a crack front that is 7 % of the chart. Other options: take the layering out again (the four stages that came inside go back out), or measure this view differently at a crack front (meta-development, with the owner) |
-| D30 | Where no bar crosses the cracked zone (under N + M the zone is below the bottom bars), the thesis says the concrete tension is not reduced; Response 1.9.7 reduces it to the floor it keeps after cracking. r2c follows the thesis. This is the one principal-tension miss left that has a rule behind it: N + M at cracking, 51.5 % | suggested | **Follow the program**, as for the defaults in D22: the oracle runs the program. Tried and not kept: 51.5 to 0.3 %, nothing else moves, the Must views go to 6 of 8. One line of code |
-| D31 | Tension's shape (A2 part 4, stopped). Response's curve has one more rising point before the fall at cracking than r2c's (276.2 against 274.5 kN; r2c's own limit is about 275.6), and the measure reads the order of cracking and the fall from that point. Response's solve carries on with a state it has not balanced; r2c finds none there | suggested | **Accept as a known deviation.** Other options: read cracking and a fall at the same step as one feature (a change to the measure, with the owner); or clone how Response's solve gives up (a third approach: solver behaviour the documents do not describe, which the stance excludes) |
+| D30 | Where no bar crosses the cracked zone (under N + M the zone is below the bottom bars), the thesis says the concrete tension is not reduced; Response 1.9.7 reduces it to the floor it keeps after cracking. r2c follows the thesis. This is the one principal-tension miss left that has a rule behind it: N + M at cracking, 51.5 % | decided by D34 (owner 2026-11-22) | **Follow the program** (D34: the binary is followed where it and the thesis differ), as for the defaults in D22: the oracle runs the program. Tried and not kept: 51.5 to 0.3 %, nothing else moves, the Must views go to 6 of 8. One line of code |
+| D31 | Tension's shape (A2 part 4, stopped). Response's curve has one more rising point before the fall at cracking than r2c's (276.2 against 274.5 kN; r2c's own limit is about 275.6), and the measure reads the order of cracking and the fall from that point. Response's solve carries on with a state it has not balanced; r2c finds none there | suggested | **Accept as a known deviation.** Other options: read cracking and a fall at the same step as one feature (a change to the measure, with the owner); or clone how Response's solve gives up (a third approach). **Since D34 the stance no longer excludes this option:** solver behaviour read from the binary is in |
 | D32 | V alone's shape (A2 part 5, no kernel change). r2c now has the fall of load before the peak, 1.9 % of the peak deep; Response's is 2.2 % and the measure counts a fall from 2 % | suggested | **Accept as a known deviation**, or count a fall in r2c's curve where Response has one at the same place and r2c's is within the 5 % target of it (a change to the measure, with the owner). No third approach is proposed: every check at that stage is inside target |
 | D33 | What comes after A2. With D29 to D32 answered as suggested and D30 carried out, the Musts left are −M's two views at its last stage, which follow from how −M ends (a Should, 20 %) | suggested | **Next increment: the ending of −M**, then the views related to shear (Should). Before phase B, look at the parked cases the changes of A2 moved (Risks) |
+
+
+### The source rule (2026-11-22, after A2)
+
+| # | Question | Status | Answer |
+|---|---|---|---|
+| D34 | Which source decides how r2c calculates. Until now the thesis was the basis and the binary was read only to answer questions, so every difference between them came to the owner (D21, D22, D30 and others) | decided, owner 2026-11-22 | **The manual decides what exists; the binary decides how it calculates**, including the solver and how a response ends. Where they differ, follow the binary without asking. The thesis guides reading the binary and supplies names and explanation. Exceptions: the owner's overrides only (`docs/acceptance.md`: C2, D12; shear endings stay a Won't, D1). Each rule is written fresh from understanding the routine, not transliterated from decompiled code, and its source recorded in `docs/kernel.md`. In CLAUDE.md and `docs/acceptance.md` |
 
 ### The next increment
 
@@ -201,8 +210,8 @@ H and I (views are now covered by D2).
 
 - **Review load.** Development runs faster than the owner can review it. This page is the
   answer: one page per session, not one log per step.
-- **Unattended runs** without a scoped GitHub token or branch protection on `main` (setup,
-  not yet done).
+- **Unattended runs** without a scoped GitHub token (setup, not yet done). Branch protection on
+  `main` and auto-delete of merged branches are on (owner, 2026-11-22).
 - **Newbeam only** leaves the paths built for steps in width, strands and hoops unexercised
   until Phase B. The parked cases are no longer run on every change, so a change that
   breaks one of them will not show until they are run again.
