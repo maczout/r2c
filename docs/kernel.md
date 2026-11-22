@@ -221,6 +221,41 @@ than yield; ρ is all the steel on the layer's side of the centroid over 0.8·Ag
 that has yielded on average and whose concentrated strain passes the end of its curve
 ruptures at the crack and is removed.
 
+### Steel stress at a crack [T 4-5; B `00442e50`, `00442cd0`, `00440c70`, `004409d0`, `00441d80`]
+
+"The moment caused by the combined principal tension and shear on the crack is computed
+about the crack face. An increase in curvature is then calculated about the crack front to
+induce the same moment" [T 4-5, last part]. The particulars are the program's, read
+2026-11-22 for the two cases where r2c showed no stress at a crack and Response did:
+
+* *About which point.* The neutral axis of the deeper of the two tension zones of the crack
+  check (where the strain, net of shrinkage, changes sign), not the crack front. A section
+  all in tension has no such axis: Response takes one 1000 m below the section, which makes
+  the extra strain the same for every bar, and counts the concrete only when the tension
+  grows upwards.
+* *The concrete's moment.* Over the halves of layers that are cracked at both ends, on the
+  tension side of that axis: (f1 less the floor after cracking, not below zero, plus
+  vci/tan θ) times the width times the distance from the axis. The floor here is
+  max(ft, the node's cracking strength)/(1 + 250·w).
+* *The bars.* Every bar whose strain (without prestrain, net of shrinkage) is tensile takes
+  part, cracked concrete around it or not. The extra curvature Δφ₁ that uses up the reserve
+  of the first bar to reach its capacity at a crack (reserve/E over its distance from the
+  axis; 1 /m at most) is found, and the moment the bars below yield add at it, elastically.
+  If that is at least the concrete's moment, the extra curvature is Δφ₁ in the proportion
+  of the two moments. If not, and the concrete's moment is within the capacity moment of
+  the crack check (0.1 % and 2 N m over), it is solved for with the bars' own curves, each
+  held to its capacity at a crack. Otherwise there is no value.
+* *What is shown.* A bar in compression shows nothing. A bar in tension shows its stress at
+  the extra strain, the lesser of its curve and its capacity at a crack, if the strain at
+  its depth with the extra strain reaches the cracking strain there; nothing if it does not.
+
+Before 2026-11-22 r2c took the moment of f1 itself about the crack front, by the bars inside
+the cracked depth alone [r2c's reading of the thesis]: a bar above the crack front showed
+nothing (N + M at the peak: Response 46 MPa), and under tension the two layers were
+treated as two zones (top bar 210 MPa where Response has 37). Measured on the phase A set:
+both come to 0.0 %, and the same view comes inside at five stages of four shear cases
+(`docs/verification.md`, "A2, part 3").
+
 ### At a step in width [O]
 
 Where the width steps (web to flange) the shear stress and the shear strain jump with it, and
