@@ -182,11 +182,17 @@ class Analysis:
         return e0 - phi * (np.asarray(z) - self.sec.zc)
 
     def steel(self, e0, phi):
-        """(strain incl. prestrain, average stress) of every longitudinal layer."""
+        """(strain incl. prestrain, average stress) of every longitudinal layer. The stress is
+        Response-2000's (docs/kernel.md, "Bars"): never above what the bar can carry at a
+        crack, and nan (no bar) once the bar has ruptured, in the state where its strain at a
+        crack passes the end of its curve as much as in the states after it."""
         sec = self.sec
         es = np.array([float(self.strain(e0, phi, l.z)) + l.prestrain for l in sec.layers])
         fs = np.empty(len(es))
         for i, (l, e) in enumerate(zip(sec.layers, es)):
+            if self.dead[i]:
+                fs[i] = float("nan")
+                continue
             env = float(l.steel.raw(e))
             if not math.isnan(env):
                 # a bar that has yielded unloads along its elastic stiffness
@@ -197,7 +203,9 @@ class Analysis:
                     env = max(env, -l.steel.fy)
                 elif env < 0:
                     env = min(max(lin, env), l.steel.fy)
-            fs[i] = float("nan") if self.dead[i] else env * l.steel.phi
+            cap = float(l.steel.crack_capacity(e - l.prestrain, l.prestrain, l.rho, l.strand))
+            f = env * l.steel.phi
+            fs[i] = float("nan") if math.isnan(cap) or math.isnan(f) else min(f, cap)
         return es, fs
 
     def commit_stirrups(self, det):
@@ -216,15 +224,12 @@ class Analysis:
         self.epy = np.maximum(self.epy, np.interp(sec.tz, z[order], ep[order]))
 
     def commit(self, e0, phi):
-        """Record the plastic strain of each bar at an accepted load stage."""
+        """Record what an accepted load stage leaves behind: the bars that have ruptured, and
+        the plastic strain of the others."""
         es, fs = self.steel(e0, phi)
         for i, l in enumerate(self.sec.layers):
-            if not math.isnan(fs[i]) and es[i] > 0:
-                cap = float(l.steel.crack_capacity(es[i] - l.prestrain, l.prestrain, l.rho,
-                                                   l.strand))
-                if math.isnan(cap):
-                    self.dead[i] = True      # the bar has ruptured at a crack
             if math.isnan(fs[i]):
+                self.dead[i] = True
                 continue
             ep = es[i] - fs[i] / l.steel.phi / l.steel.E
             if es[i] > 0:
@@ -233,7 +238,7 @@ class Analysis:
                 self.ep[i] = min(self.ep[i], ep) if self.ep[i] <= 0 else ep
 
     def crack_check(self, e0, phi, es, fs):
-        """The flexural crack check (thesis 4-5): the largest average concrete tension each
+        """The flexural crack check (thesis 4-5; details Response-2000's): the largest average concrete tension each
         tension zone can carry without the bars crossing it exceeding their capacity at a
         crack. Returns a function f1cx(z)."""
         sec = self.sec
@@ -258,7 +263,6 @@ class Analysis:
         else:
             z4 = zbot
         mtop = mbot = 0.0
-        ntop = nbot = 0
         for l, e, f in zip(sec.layers, es, fs):
             if not (l.z > z3 or l.z < z4):
                 continue
@@ -269,14 +273,13 @@ class Analysis:
             near = min(min(abs(l.z - z4), abs(l.z - z3)) / (l.db + 0.1), 1.0)
             if l.z > z3:
                 mtop += abs(z3 - l.z) * near * l.area * df + 100.0
-                ntop += 1
             if l.z < z4:
                 mbot += abs(z4 - l.z) * near * l.area * df + 100.0
-                nbot += 1
         zones = []
-        for zn, face, mcap, count in ((z3, ztop, mtop, ntop), (z4, zbot, mbot, nbot)):
+        # a zone no bar crosses has no capacity moment and a limit of zero (docs/kernel.md)
+        for zn, face, mcap in ((z3, ztop, mtop), (z4, zbot, mbot)):
             hh = abs(face - zn)
-            if hh < 0.1 or count == 0:
+            if hh < 0.1:
                 continue
             lo, hi = (max(zn, zbot), ztop) if face == ztop else (zbot, min(zn, ztop))
             i1 = i2 = i3 = ma = mb = 0.0
@@ -839,6 +842,7 @@ class Flexure:
         self.sec = an.sec
         self.stages: list[Stage] = []
         self.on_stage = on_stage
+        self.slope = None     # of the unbalanced force, carried from solve to solve
         sec = self.sec
         # scales for convergence
         self.nscale = max(sec.conc0.fcp * sec.area, 1.0)
@@ -883,8 +887,9 @@ class Flexure:
         x, ok = _root(res, guess, 1e-9, tol)
         return e0, x, ok
 
-    def solve(self, c, prev: Stage | None) -> Stage:
-        """The state at control value c (curvature, or strain at the centroid)."""
+    def _solve_balanced(self, c, prev: Stage | None) -> Stage:
+        """The balanced state at control value c (curvature, or strain at the centroid):
+        r2c's own solve, to a root of the unbalanced force."""
         an = self.an
         if prev is None:
             guess = 0.0
@@ -904,6 +909,197 @@ class Flexure:
             e0, phi, ok = self._solve_fixed_layers(c, guess)
         if not ok:
             raise SolveError(f"no equilibrium at control value {c:g}")
+        n, m, v = an.forces(e0, phi)
+        if self.mode == "phi":
+            lam = (m - an.m0) / an.dm
+        else:
+            lam = (n - an.n0) / an.dn
+        det = an.detail(e0, phi, 0.0)
+        return Stage(e0, phi, 0.0, lam, n, m, v, det, control=c)
+
+    # Response-2000's solve of a stage without shear [B 00425f10, 0041e1e0, 00425af0;
+    # docs/kernel.md "The stage solve without shear"]. It works in N, N m and 1/m; so does
+    # this, because its tolerance and its guard against a zero slope are not dimensionless.
+    def _unbalanced(self, e0, phi):
+        """(unbalanced force, tolerance, (N, M, V)) of a state, on the layers built for it:
+        the axial force off the loading line when the curvature is stepped (N), the moment
+        when the axial strain is (N m)."""
+        an = self.an
+        an.refine(e0, phi, 0.0)
+        n, m, v = an.forces(e0, phi)
+        tol = (abs(n) + abs(m) / 1e3 + abs(v)) * 1e-3 + 1.0
+        if self.mode == "phi":
+            lam = (m - an.m0) / an.dm
+            return n - (an.n0 + lam * an.dn), tol, (n, m, v)
+        lam = (n - an.n0) / an.dn if an.dn else 0.0
+        return (m - (an.m0 + lam * an.dm)) / 1e3, tol / 10.0, (n, m, v)
+
+    def _secant(self, c, x, fresh):
+        """The unknown strain (the axial strain when the curvature c is given, the curvature
+        in 1/m when the axial strain is) that brings the unbalanced force inside the
+        tolerance, from the estimate x. The slope is carried from one stage to the next.
+        Returns (x, found)."""
+        phi_mode = self.mode == "phi"
+        at = (lambda x: self._unbalanced(x, c)) if phi_mode \
+            else (lambda x: self._unbalanced(c, x / 1e3))
+        d = 1e-5 if phi_mode else 1e-6
+        r1 = None
+        if fresh or self.slope is None:
+            self.slope = None
+            r1 = at(x + d)[0]
+        r, tol, _ = at(x)
+        if self.slope is None and r1 != r:
+            self.slope = (r - r1) / d
+        if self.slope is None:
+            self.slope = 0.0
+        cap = self.sec.conc0.e0
+        relax = 1.0
+        count = 0
+        while abs(r) >= tol:
+            step = r / (self.slope + 1.0)
+            if abs(step) > cap:
+                step = math.copysign(0.5 * cap, step)
+            x += relax * step
+            rn, tol, _ = at(x)
+            count += 1
+            self.slope = (r - rn) / step
+            if abs(x) > 1.0 or abs(c * (1e3 if phi_mode else 1.0)) > 1.0:
+                count = 20
+            r = rn
+            if count == 20 or abs(r) < tol:
+                break
+            if count > 15:
+                # the later tries: half steps, on the section's own stiffness
+                relax = 0.5
+                h = 1e-7
+                e0, phi = (x, c) if phi_mode else (c, x / 1e3)
+                fa = self.an.forces(e0 + h, phi) if phi_mode \
+                    else self.an.forces(e0, phi + h / 1e3)
+                fb = self.an.forces(e0 - h, phi) if phi_mode \
+                    else self.an.forces(e0, phi - h / 1e3)
+                self.slope = -(fa[0] - fb[0]) / (2 * h) if phi_mode \
+                    else -(fa[1] - fb[1]) / 1e3 / (2 * h)
+        if count == 20:
+            self.slope = None
+            return x, False
+        return x, True
+
+    def _bisect(self, c):
+        """What Response falls back on when the secant gives up under a stepped curvature:
+        the axial strain is bracketed in steps of the concrete's strain at peak stress and
+        halved until the unbalanced force is inside the tolerance. Returns (e0, found)."""
+        an, sec = self.an, self.sec
+        step = sec.conc0.e0
+
+        def at(e0):
+            r, _tol, (n, m, _v) = self._unbalanced(e0, c)
+            return -r, n, m
+        target_n = lambda m: an.n0 + (m - an.m0) / an.dm * an.dn
+        lo = -step - float(sec.shrinkage(np.array([sec.zc]))[0])
+        hi = 0.0
+        x = lo
+        r0, n, m = at(lo)
+        tn = target_n(m)
+        found = abs(r0) < ((tn if tn > 1.0 else abs(m) / 1e3) * 1e-3 + 1.0)
+        k = -1
+        while r0 < 0.0:
+            lo -= step
+            hi -= step
+            x = lo
+            r0, n, m = at(lo)
+            tn = target_n(m)
+            found = found or abs(r0) < ((tn if tn > 1.0 else abs(m) / 1e3) * 1e-3 + 1.0)
+            k -= 1
+            if k < -12:
+                return x, False
+        nxt = 0.0
+        while not found and -13 < k < 31:
+            x = nxt
+            r, n, m = at(x)
+            if k < 0:
+                if r / r0 < 0.0:
+                    k = 1
+                    nxt = 0.5 * (hi + lo)
+                else:
+                    k -= 1
+                    lo = hi
+                    nxt = hi = hi + step
+            else:
+                if r / r0 >= 0.0:
+                    lo = x
+                else:
+                    hi = x
+                k += 1
+                nxt = 0.5 * (hi + lo)
+            tn = target_n(m)
+            found = abs(r) < ((tn if tn > 1.0 else abs(n)) * 1e-3 + 1.0)
+        return x, found and -13 < k <= 30
+
+    def _general(self, c, x):
+        """Response-2000's solve when the axial strain c is stepped [B 004276a0]: half steps
+        of Newton's method on the curvature x (1/m), at least one, until the unbalanced
+        moment is inside a tolerance that is wide next to the secant's. Returns (x, found)."""
+        an, sec = self.an, self.sec
+        hh = (sec.h / 1e3 + 1e-4) ** 2
+        floor = 1.0 + (1000.0 * sec.area / 1e6) ** 2
+        ratio = an.dm / 1e3 / an.dn
+        count = 0
+        while True:
+            phi = x / 1e3
+            an.refine(c, phi, 0.0)
+            n, m, _v = an.forces(c, phi)
+            off = (m - (an.m0 + (n - an.n0) * an.dm / an.dn)) / 1e3
+            tol = (n * n + (m / 1e3) ** 2 / hh) * 1e-6 + floor
+            err = off * off / hh
+            if err < tol and count:
+                return x, True
+            h = 1e-7
+            fa, fb = an.forces(c, (x + h) / 1e3), an.forces(c, (x - h) / 1e3)
+            den = (fa[1] - fb[1]) / 1e3 / (2 * h) - ratio * (fa[0] - fb[0]) / (2 * h)
+            if den == 0.0:
+                return x, False
+            dx = -off / den
+            if abs(dx) > 0.5:
+                return x, False
+            x += 0.5 * dx
+            count += 1
+            if count > 50:
+                return x, False
+            if not tol < err:
+                return x, True
+
+    # which of Response's own solves are in use (docs/kernel.md, "The stage solve without
+    # shear"): under a stepped axial strain, and under a stepped curvature
+    own_axial = False
+    own_curvature = False
+
+    def response_solve(self) -> bool:
+        return self.own_axial if self.mode == "e0" else self.own_curvature
+
+    def solve(self, c, prev: Stage | None, aside: Stage | None = None,
+              fresh: bool = True) -> Stage:
+        """The state at control value c (curvature, or strain at the centroid). Where
+        Response-2000's own solve is in use: started from the stage before (or from a stage
+        set aside beyond c, if that one is nearer) and taken as soon as its unbalanced force
+        is inside the tolerance. fresh: the secant's slope is found again and not taken
+        from the last solve."""
+        if not self.response_solve():
+            return self._solve_balanced(c, prev)
+        an = self.an
+        src = prev
+        if aside is not None and prev is not None \
+                and abs(aside.control - c) < abs(prev.control - c):
+            src = aside
+        if self.mode == "e0":
+            x, ok = self._general(c, 0.0 if src is None else src.phi * 1e3)
+        else:
+            x, ok = self._secant(c, 0.0 if src is None else src.e0, fresh)
+            if not ok:
+                x, ok = self._bisect(c)
+        if not ok:
+            raise SolveError(f"no equilibrium at control value {c:g}")
+        e0, phi = (x, c) if self.mode == "phi" else (c, x / 1e3)
+        an.refine(e0, phi, 0.0)
         n, m, v = an.forces(e0, phi)
         if self.mode == "phi":
             lam = (m - an.m0) / an.dm
@@ -1000,15 +1196,8 @@ class Flexure:
         cracked = bool(d.out.cracked.any())
         i = int(np.argmin(d.ex))
         crush = float(d.ex[i]) <= -self.sec.law_at(float(d.z[i])).e0
-        # layers that have ruptured, or would at a crack in this state
-        es, fs = self.an.steel(st.e0, st.phi)
-        gone = 0
-        for l, e, f in zip(self.sec.layers, es, fs):
-            if math.isnan(f):
-                gone += 1
-            elif e > 0 and math.isnan(float(l.steel.crack_capacity(
-                    e - l.prestrain, l.prestrain, l.rho, l.strand))):
-                gone += 1
+        # the layers that have ruptured, as the state itself has them
+        gone = int(np.isnan(d.fs).sum())
         return cracked, crush, gone
 
     def has_event(self, a: Stage, b: Stage) -> str:
@@ -1033,23 +1222,31 @@ class Flexure:
         if self.on_stage:
             self.on_stage(len(self.stages))
 
-    def advance(self, cur: Stage, target: float, depth: int) -> Stage:
+    def advance(self, cur: Stage, target: float, depth: int,
+                aside: Stage | None = None) -> Stage:
         """Accept a stage at the target, approaching it in geometric steps when something
-        happens on the way (first cracking, the extreme fibre reaching its peak strain)."""
-        trial = self.solve(target, cur)
+        happens on the way (first cracking, the extreme fibre reaching its peak strain).
+        aside: the stage beyond the target that was set aside for this one."""
+        # only a plain next stage is solved on the slope left by the last one [B 00415e30]
+        fresh = depth != 0 or aside is not None or len(self.stages) < 2
+        trial = self.solve(target, cur, aside=aside, fresh=fresh)
         kind = self.has_event(cur, trial)
         if kind == "rupture" and depth == 0:
-            # steel ruptures within the step: take a fifth of it, or a twenty-fifth, if that
-            # stops short of the rupture; otherwise the whole step, rupture included
+            # steel ruptures within the step [B 00415e30, 00419ff0]: the stage is set aside
+            # and one a fifth of the way there is tried, and so on while the step is more
+            # than 1 % of the way come from the first stage. A stage short of the rupture
+            # is kept and the stepping goes on from it; so is the last one tried.
+            first = self.stages[0].control
             step = target - cur.control
-            for frac in (0.2, 0.04):
+            while abs(step) >= 1e-10 and abs(step) > 0.01 * abs(trial.control - first):
+                step *= 0.2
                 try:
-                    sub = self.solve(cur.control + frac * step, cur)
+                    sub = self.solve(cur.control + step, cur)
                 except SolveError:
                     continue
+                trial = sub
                 if self.has_event(cur, sub) != "rupture":
-                    self.accept(sub)
-                    return sub
+                    break
             self.accept(trial)
             return trial
         if depth < 2 and kind and kind != "rupture":
@@ -1058,12 +1255,21 @@ class Flexure:
                 if kind == "crack" and abs(t1 - cur.control) < max(
                         0.004 * abs(cur.control), 0.0036 * self.step0):
                     break
-                sub = self.advance(cur, t1, depth + 1)
+                try:
+                    sub = self.advance(cur, t1, depth + 1, aside=trial)
+                except SolveError:
+                    if not self.response_solve():
+                        raise
+                    # a stage put in between that cannot be solved is dropped, and the
+                    # event is closed in on no further [B 00418af0]
+                    break
                 passed = self.has_event(cur, sub)
                 cur = sub
                 if passed:
                     break
-            trial = self.solve(target, cur)
+            if not self.response_solve():
+                trial = self.solve(target, cur)
+            # else the stage set aside is taken as it was found [B 00415e30]
         self.accept(trial)
         return trial
 
@@ -1081,7 +1287,6 @@ class Flexure:
             cur = self.advance(cur, c0 + sgn * d0 / 6.0, 2)
             target = c0 + sgn * 7.0 * d0 / 6.0
             peak = 0.0
-            spent = 0
             while len(self.stages) < max_stages:
                 try:
                     cur = self.advance(cur, target, 0)
@@ -1119,9 +1324,7 @@ class Flexure:
                 if self.crushed(cur):
                     break
                 if self.spent(cur, peak):
-                    spent += 1
-                    if spent >= 2:
-                        break
+                    break
                 # the next step is sized by the target just tried, from the stage reached
                 target = cur.control + sgn * max(d0, 0.1 * abs(target))
         except SolveError:
@@ -1137,8 +1340,11 @@ class Flexure:
         return False
 
     def spent(self, st: Stage, peak: float) -> bool:
-        """Steel has ruptured and less than a fifth of the peak load is left."""
-        return bool(self.an.dead.any()) and peak > 0 and st.lam < 0.2 * peak
+        """Less than a fifth of the peak load is left at a stage, the eleventh or later, at
+        which nothing new has happened since the one before [B 00419990]."""
+        if len(self.stages) < 11 or not (peak > 0 and st.lam < 0.2 * peak):
+            return False
+        return self.has_event(self.stages[-2], st) == ""
 
     def crushed(self, st: Stage) -> bool:
         """The response ends once the extreme fibre is strained to four times the strain at
