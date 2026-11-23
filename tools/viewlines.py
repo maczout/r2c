@@ -6,13 +6,15 @@ differ?" The comparison in tools/compare.py gives one number per view; this show
 behind it.
 
     python tools/viewlines.py REFERENCE.r2x.txt SUBJECT.r2x.txt principal_tensile_stress
-        [--stage N | --feature peak] [--sub-stage M]
+        [--stage N | --feature peak] [--sub-stage M] [--raw]
 
 The reference's stage is N, or the stage at the named feature of its curve (cracking, fall,
 peak, ends ...; default: the peak). The subject's stage is the one tools/compare.py matches
-to it (nearest in load and control value) unless --sub-stage is given. Each line of the
-reference's chart is printed at its own depths, with the subject's same-numbered line
-interpolated to those depths and the difference.
+to it (between the same features of the curves, D13) unless --sub-stage is given. Each line
+of the reference's chart is printed at its own depths, with the subject's same-numbered line
+interpolated to those depths and the difference. --raw prints each record's own points as
+(value, depth) in the order they are drawn, which is what to read for a chart drawn as
+boxes (the steel stresses) or with several points at one depth (a step in width).
 """
 
 from __future__ import annotations
@@ -35,7 +37,8 @@ def matched_stage(ref, sub, ref_stage: int) -> int:
     c = cmp._curve(ref, key)
     pk = float(np.max(np.abs(c[:, 1]))) or 1.0
     xs = float(np.max(np.abs(c[:, 0]))) or 1.0
-    return cmp._nearest_stage(sub, key, c[ref_stage, 0], c[ref_stage, 1], xs, pk)
+    return cmp._segment_stage(sub, key, ref_stage, c, cmp._curve(sub, key), c[ref_stage, 0],
+                              c[ref_stage, 1], xs, pk)
 
 
 def main(argv=None) -> int:
@@ -46,6 +49,8 @@ def main(argv=None) -> int:
     ap.add_argument("--stage", type=int)
     ap.add_argument("--feature", default="peak")
     ap.add_argument("--sub-stage", type=int)
+    ap.add_argument("--raw", action="store_true",
+                    help="each record's own points in the order drawn, nothing interpolated")
     a = ap.parse_args(argv)
     ref, sub = record.read(a.reference), record.read(a.subject)
     feats = cmp.feature_stages(ref)
@@ -60,6 +65,11 @@ def main(argv=None) -> int:
     lb = cmp.parse_chart(sub.stage(ss, a.view))[3]
     print(f"{a.view}: reference stage {a.stage} ({feats.get(a.stage, '-')}), subject stage {ss}; "
           f"lines {len(la)} / {len(lb)}")
+    if a.raw:
+        for who, lines in (("reference", la), ("subject", lb)):
+            for i, ln in enumerate(lines):
+                print(f"{who} line {i}: " + " ".join(f"({x:.4f},{y:.2f})" for x, y in ln))
+        return 0
     for i, ln in enumerate(la):
         print(f"line {i}: {len(ln)} points" + (f" / {len(lb[i])}" if i < len(lb) else " / none"))
         other = lb[i] if i < len(lb) and len(lb[i]) else None
