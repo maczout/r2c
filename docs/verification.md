@@ -33,6 +33,50 @@ input folder; the parked set needs `--inputs RESPONSE_FOLDER R2X/tests/reference
 `python tools/report.py OUT`; compare any two records with
 `python tools/compare.py REF SUBJECT --views`.
 
+## Step A-1c: the longitudinal crack spacing table; the shear profile iteration (2026-11-22)
+
+The run of record of step A-1c (`docs/verification-results.md`, 24 cases) against the run
+of record of step A-1b (`python tools/changes.py`; all measured, one machine). One thing
+changed in what r2c calculates: Response's longitudinal crack spacing table is in use
+(owner, D46). The run the owner asked to be recorded as "before" in this step is that
+kernel; the run of record is the same kernel with rules added that are switched off, and
+the two agree check for check.
+
+**The longitudinal table: 43 checks came inside, seven went outside**, as measured in step
+A-1b before it was switched on. Inside: every check of longitudinal crack spacing (17),
+with the crack widths and diagonal spacing that follow from it; shear stress at the peak
+of the column with shear (7.7 to 2.6 %); the last-stage point of "constant N +200 kN,
+then M" (6.2 to 1.4 %, the known deviation of D35, a Must); shear on the crack at
+cracking of M/V = 2 m (100 to 0.0 %; inferred: the limit line of D38, which both programs now draw). Outside, and
+known deviations by D46 (`docs/status.md`): the rising branch of M/V = 0.5 m (2.7 to
+9.9 %, r2c's last stage counted with the rising branch); transverse bond at the peak of
+the I-girder with shear (2.5 to 49.8 %) and of M/V = 2 m (3.7 to 22.5 %); longitudinal
+strain at the fall of M/V = 0.5 m (2.4 to 5.2 %) and shear on the crack at its peak (4.7
+to 5.7 %); the post-peak of V alone (3.7 to 6.9 %). By case: rising branch 24 to 23,
+Must views 11 to 12 of 13, post-peak 17 to 16, Should views 15 to 14, Could views 15 to
+20.
+
+**The shear profile iteration: read, written, tried, and left off.** The rules are in
+`docs/kernel.md`, "The shear strain profile between passes", with a table of what each
+does when switched on by itself: on the 24 cases, and on the 16 parked I-girders with
+shear, which are the diagnostic the owner set for this part (`python tools/earlyends.py`:
+how many end early, and where). In short:
+
+* nothing read changes the column with shear at its flat peak (D47) or the stage the
+  I-girder with shear keeps at M/V = 1 m (D48);
+* the program's handling of the profile brings the rising branch of M/V = 0.5 m back
+  inside (9.9 to 3.6 %) and moves 22 checks outside, 11 of them one stage of V alone
+  that is compared across cracking (D49);
+* the program's own solve of a stage, corrected for its step factor, removes the
+  transverse bond spike at the I-girder's peak (49.8 to 0.0 %) and leaves r2c with fewer
+  of Response's stages (`python tools/stagematch.py`: M/V = 2 m 59 to 47 of 87);
+* of the 16 parked I-girders, 3 end early on the kernel of record (softening 12, 7 and
+  9), 2 with the profile handling, 1 with the profile handling and the solve together.
+  Softening 12 ends early in every trial.
+
+The parked I-girders are not set members and are not assessed; the figures above are
+counts of the tool, not results against a target.
+
 ## Step A-1b: the measure, the stage control, crack spacing (2026-11-22)
 
 The run of record of step A-1b (`docs/verification-results.md`, 24 cases) against the run

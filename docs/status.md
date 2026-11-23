@@ -44,6 +44,8 @@ developer's. Items that need a structural judgement are marked **(structural)**.
   (is a view outside because of the stage it is compared at), `trace.py` (what the stage
   control did, try by try, with shear), `stagematch.py` (does r2c have its stages where
   Response has them), `spacing.py` (r2c's crack spacing tables against a record's charts),
+  `earlyends.py` (which shear responses r2c ends early, and where: the diagnostic of the
+  shear profile iteration on the parked I-girders),
   `check.py` (checks before pushing). `diagnose.py states --out` writes r2c's views in
   Response's states as a record, for `viewlines.py`. `decompile.py` also lists
   a routine's instructions (`a:ADDRESS`).
@@ -60,7 +62,7 @@ developer's. Items that need a structural judgement are marked **(structural)**.
   the parked cases (`R2C_RESPONSE_DIR` for Response's sample inputs, `R2C_SCOPE_DIR` for
   the inputs of the scope cases). Eleven parked fixtures need something removed: five have
   no test, and the six on Response's sample inputs that hold several sections have a test
-  that they are refused (D23). The parked tests were not run in steps A-1 and A-1b.
+  that they are refused (D23). The parked tests were not run in steps A-1, A-1b and A-1c.
 - Docs: `kernel.md` (each rule and its source), `verification.md` (what the results mean),
   `verification-results.md` (generated), `acceptance.md` (the owner's development targets),
   `scope.md` (every input an r2x solve can take, whether the manual documents it, and
@@ -74,72 +76,121 @@ The numbers are in `docs/verification-results.md`, what they mean in `docs/verif
 each case is assessed against the owner's development targets in `docs/acceptance.md`: ±5 %
 on every metric, the curve's shape the same, views at the features of the curve.
 
-**The development set after step A-1b** (run of record of 2026-11-22, the 24 cases;
+**The development set after step A-1c** (run of record of 2026-11-22, the 24 cases;
 measured, `python tools/targets.py VERIFY_OUT --counts`; views compared at the stage at the
 same place since D42, the last stage of a shear case left out since D40). Cases inside
-target: peak 24 of 24, rising branch 24, shape 21, post-peak 17 (12 of the 13 without
-shear), views of the stress state without shear (Must) 11 of 13, views Should 15 of 24 (3
-of the 11 with shear), views Could 15 of 24. Against the "before" run of the step (the
-kernel of step A-1 with the measure of D42), 14 checks came inside and one went outside.
-What changed is in `docs/verification.md`, "Step A-1b"; the rules are in `docs/kernel.md`
-("Response's own load stage control": "Cracked, for an event", "A stage put in between";
-"Crack spacing over the depth").
+target: peak 24 of 24, rising branch 23, shape 21, post-peak 16 (12 of the 13 without
+shear), views of the stress state without shear (Must) 12 of 13, views Should 14 of 24 (2
+of the 11 with shear), views Could 20 of 24. The one change to what r2c calculates in
+step A-1c is Response's longitudinal crack spacing table, switched on by the owner's
+decision (D46): against the run of record of step A-1b, 43 checks came inside and seven
+went outside, which are known deviations (below). What changed is in
+`docs/verification.md`, "Step A-1c"; the rule is in `docs/kernel.md` ("Crack spacing over
+the depth").
 
 Outside on a Must (D1, D2):
 
+- **Rising branch: M/V = 0.5 m, 9.9 %.** A known deviation (owner, 2026-11-22, D46): the
+  point the measure counts is r2c's last stage, after its own peak. It comes inside
+  (3.6 %) with Response's handling of the shear strain profile, which is written and off
+  (D49).
 - **Shape: tension** (one rising point fewer before the fall at cracking). A known
   deviation for phase A (owner, 2026-11-22, D36); the solve that has the point stays off.
 - **Shape: V alone** (r2c's fall of load before the peak is 1.9 % of the peak, the measure
   counts from 2 %, Response's is 2.2 %). A known deviation for now (owner, 2026-11-22, D32).
-- **Shape: the I-girder with shear.** A known deviation for now (owner, 2026-11-22, D43);
-  read in step A-1b and not resolved (D48). The girder's top is cracked under no load and
-  the cracks close at a shear of about 34 kN. r2c closes in on that event and keeps the
-  stages it puts in between, two of them with the top still cracked (49.5 and 51.8 kN),
-  from which the load falls to 32.5 kN: 2.9 % of the peak (2.5 % before the stage control
-  rules of step A-1b, which added the second of them). Response has no stage there at
-  M/V = 1 m (30.9, then 34.5 kN), and has exactly r2c's stages at M/V = 2 m. `python
-  tools/trace.py tests/oracle/igirder-mv.r2x.txt --input INPUT` shows r2c's tries;
-  `docs/kernel.md`, "Open: the same girder at M/V = 1 m", says what was ruled out and
-  what was not read.
-- **Views of the stress state without shear: "constant N +200 kN, then M", principal
-  tensile stress at the last stage, 6.2 %.** A known deviation (owner, 2026-11-22, D35).
-  It comes inside (1.4 %) with Response's longitudinal crack spacing table, which is off
-  (D46).
+- **Shape: the I-girder with shear.** Part of the known deviation "the shear profile
+  iteration" (below).
 - **Views of the stress state without shear: the column under N alone, at its last stage.**
   The owner's override (C2, D12): r2c's uniform state after the peak stands. Up to the
   peak every Must and Should view is inside.
 
-**The views related to shear** (Should). Inside on 3 of the 11 shear cases (Newbeam at
-M/V = 1 m, V with constant compression, the I-girder with shear). On the nine Newbeam
-cases what keeps seven outside is in `docs/verification.md`, "A4"; D42 changed which
-stages are compared on two of them (M/V = 0.5 m and 2 m). The two on other shapes:
+The last-stage point of "constant N +200 kN, then M" (D35) is inside since the
+longitudinal table went on (6.2 to 1.4 %).
 
-- *The column with shear.* At cracking every Must and Should view is inside. At the peak
-  ten are 7.7 to 14 % off at the same curvature and a load 0.15 % apart: a different state
-  on a flat top (D47). In Response's own state there (`python tools/diagnose.py states`)
-  every such view is within 2 % but shear on the crack (6.4 %; 1.5 % with the longitudinal
-  table on) and transverse bond (12.5 %; the bond rule was not checked on a hoop).
-- *The I-girder with shear.* Every assessed view inside, the worst 2.5 %.
+**Known deviation: the shear profile iteration** (owner, 2026-11-22, D47 and D48: these
+are recorded as one open item; it was taken up in step A-1c with the two approaches the
+bound allows and is not resolved). Within a stage Response solves the global strains,
+updates the shear strain profile from the calculated shear stress, and repeats up to 16
+times; r2c does the same with a solve and an update of its own. Where the iteration
+settles the two agree. Where it does not, or where a state sits on a flat part of the
+curve, they differ, and three things follow from it:
 
-Written and off: Response's longitudinal crack spacing table (`Section.response_smx`,
-D46); Response's solve of the global strains with shear (`Shear.own_solve`; it moves
-checks both ways); Response's history of the stirrups' plastic strain
-(`Analysis.own_stirrup_history`, D39); Response's general solve under a stepped axial
-strain (`Flexure.own_axial`, D36). Not taken over: the turn of an angle by 180° at nodes
-made late.
+1. *The column with shear, views at its peak* (a Should; D47). Eleven views are 6 to 28 %
+   off at the same curvature and a load 0.2 % apart (nine of the Must or Should tier):
+   the top of the curve is flat within 0.2 % over three stages and the two programs sit
+   in different states on it. In Response's own state there r2c agrees on every such view
+   within 2 % but transverse bond (the bond rule was not checked on a hoop).
+2. *The I-girder with shear, shape* (a Must; D43, D48). The girder's top is cracked under
+   no load and the cracks close at a shear of about 34 kN. r2c closes in on that event
+   and keeps the stages it puts in between, two of them with the top still cracked (49.5
+   and 51.8 kN), from which the load falls to 32.5 kN: 2.9 % of the peak. Response has no
+   stage there at M/V = 1 m (30.9, then 34.5 kN), and has exactly r2c's stages at
+   M/V = 2 m. `python tools/trace.py tests/oracle/igirder-mv.r2x.txt --input INPUT`.
+3. *Parked I-girders with shear that end early* (not set members; they come into the set
+   with the material models). Of the 16 that r2c solves, 3 end early on the kernel of
+   record: softening 12 (peak −10.7 %, at a curvature of 0.71 rad/km where Response goes
+   to 2.34), softening 7 (−6.9 %, at 2.05 against 3.77) and softening 9 at M/V = 1 m
+   (−5.1 %, at 0.06 against 0.16). `python tools/earlyends.py VERIFY_OUT`. On softening
+   12 the trace shows what it is: after the web cracks both programs have a stage that
+   has not converged, and then one whose load is within 0.2 % of the largest so far;
+   Response's is just under it and is kept, r2c's is just over it and is refused.
 
-**Crack spacing** (Could). The transverse spacing is Response's table on every shape
-(0.0 % at every assessed stage). The longitudinal spacing is r2c's earlier table while
-Response's is off: 21 % off on the circular column, 6 to 8 % on the T-beam, about 5 % at
-some stages of the I-girder. `python tools/spacing.py RECORD [--response-smx]` sets r2c's
-tables against a record's charts without solving anything.
+*What was read* (step A-1c, all in `docs/kernel.md`, "The shear strain profile between
+passes"): the profile update and its cap; when the update reports a stage as not solved
+(the 3 × 3 solve and its fall-backs); what the stage control tests on every pass; what a
+stage leaves for the next and what is put back after a failure; the step factor of the
+global solve. Each is written in r2c behind a switch and measured on the 24 cases and on
+the 16 parked I-girders. *What was not read:* the forces routine's iteration mode against
+its final mode (`004a9d90`), the right-hand side of the shear flow calculation
+(`004252c0`, `00422570`, taken as read on 2026-11-19), the start of the global solve
+before its loop. *Not followed up:* the I-girder is exactly 1 m deep, so at M/V = 1 m
+every test of M/V against the depth in the program hangs on the last digit of the depth
+as it holds it; that sets this case apart from M/V = 2 m.
+
+**Known deviations that came with the longitudinal crack spacing table** (owner,
+2026-11-22, D46: the table is switched on and these are accepted). Measured on the 24
+cases, the run of record of step A-1b against the "before" run of step A-1c
+(`python tools/changes.py`): 43 checks came inside and seven went outside.
+
+1. *The rising branch of M/V = 0.5 m, 2.7 to 9.9 %* (a Must). The point the measure counts
+   is r2c's last stage, after its own peak: it falls back to a point nearest to Response's
+   fall of load before its peak. It belongs to how the shear response ends (a Won't, D1).
+   Response's own rising points stay within 2.7 % of r2c's curve.
+2. *Transverse bond at the peak of the I-girder with shear, 2.5 to 49.8 %*, which takes
+   that case's Should views outside, and *of M/V = 2 m, 3.7 to 22.5 %*: a spike at the end
+   of the stirrups in a stage r2c has not converged. Looked at again in step A-1c: with
+   the program's own global solve the I-girder's is gone (49.8 to 0.0 %); with the
+   program's profile handling M/V = 2 m's is 8.1 %. Both are off.
+3. *M/V = 0.5 m by a point:* longitudinal strain at its fall of load (2.4 to 5.2 %) and
+   shear on the crack at its peak (4.7 to 5.7 %).
+4. *The post-peak of V alone, 3.7 to 6.9 %.*
+
+**The views related to shear** (Should). Inside on 2 of the 11 shear cases (Newbeam at
+M/V = 1 m, V with constant compression). On the nine Newbeam cases what keeps seven
+outside is in `docs/verification.md`, "A4"; the column with shear and the I-girder with
+shear are in the two lists above.
+
+Written and off: Response's handling of the shear strain profile (`Shear.own_profile`,
+D49); its tests on every pass of a stage (`Shear.pass_code`); its solve of the global
+strains with shear, with its step factor since step A-1c (`Shear.own_solve`; r2c has
+fewer of Response's stages with it); its history of the stirrups' plastic strain
+(`Analysis.own_stirrup_history`, D39); its general solve under a stepped axial strain
+(`Flexure.own_axial`, D36). Not taken over: the turn of an angle by 180° at nodes made
+late.
+
+**Crack spacing** (Could). Both spacings are Response's tables on every shape (within
+0.001 mm of its charts but at one node of the I-girder and one of the T-beam). `python
+tools/spacing.py RECORD` sets r2c's tables against a record's charts without solving
+anything.
 
 **Known to be not the program's, and left** (found in step A-1b while reading the solve):
 with shear, r2c carries on from a solve of the global strains that has not closed when it
 is out of balance by less than 2 % (`Shear._solve`, "soft"). The status that was read for
 (−2) is returned by the program's solve only without shear; with shear a solve that has
 not closed is a stage not solved. Not changed: nothing on the 24 cases says which way it
-would move them, and it wants its own measured step.
+would move them, and it wants its own measured step. Also r2c's own in the profile
+iteration: the update itself (above), half of the update under shear alone in the second
+half of the passes, and the re-layering between passes.
 
 **What follows describes all 85 cases as they stood in the sixth run of 2026-11-21**, the
 last run of record with the parked cases, on the kernel before A2. The parked cases were
@@ -291,24 +342,21 @@ one status. Completion is judged against Response as documented (owner, 2026-11-
   captured once, with `--add`. r2x's clipboard helper can fail transiently (once in 25
   captures); a rerun of that case on its own then matched.
 
-**The parked cases after step A-1b** (run once, 2026-11-22, not a run of record; the 50
-parked cases r2c solves; against the run at the end of step A-1 measured again with the
-measure of D42, `python tools/changes.py`): 54 checks came inside and 64 went outside,
-all on I-girder cases with shear. Softening model 6 at M/V = 2 m no longer ends early
-(peak −10.7 to +4.1 %); models 10, 13 and 7 now do (peak −9.4, −8.9 and −6.8 %), and model
-14's rising branch is at 17.9 %. With the two kernel changes apart, on six of these cases:
-the stage control rules moved model 7, the transverse crack spacing the others. In r2c's
-trace of model 6 before the change (`python tools/trace.py`), the early end starts at a
-curvature of 0.47 rad/km, just after the web cracks: the shear profile is 9 % off after
-sixteen passes with the load above the largest so far, the stage is refused, and so are
-the tries after it; Response keeps a stage there at a lower load.
+**The parked cases.** All 50 that r2c solves were last run at the end of step A-1b
+(2026-11-22, not a run of record; `docs/log/2026-11-22-08.md`). In step A-1c only the 16
+parked I-girders with shear were run, as the diagnostic of the shear profile iteration,
+every time that part changed (section 2, "Known deviation: the shear profile iteration";
+`docs/kernel.md` has the table). With the longitudinal crack spacing table on, which of
+them end early changed again: softening 12, 7 and 9 now (10, 13 and 7 at the end of step
+A-1b). On the kernel of record, of those 16: peak outside on 6, rising branch on 3, shape
+on 9.
 
-**Where a next session picks up**: the owner's answers to D46, D47 and D48 in
-`docs/summary.md`. If the shape of the I-girder with shear is taken up again: the routines
-not read are named in `docs/kernel.md` ("Open: the same girder at M/V = 1 m"), and the
-shear profile iteration (`0041e840`, `0041fe20`, with the 3 × 3 solve `004688b0` and its
-fall-back `00467f20`) has not been set against r2c's `update_shape` at a state where
-r2c's does not settle. `python tools/stagematch.py` counts Response's stages that r2c has.
+**Where a next session picks up**: the owner's answers to D49 and D50 in
+`docs/summary.md`. The suggestion there is reinforcement as the next variable. If the
+shear profile iteration is taken up again, start from what was not read (section 2) and
+from the depth of exactly 1 m; `python tools/trace.py RECORD --set own_profile=1 --set
+own_solve=1 --set pass_code=1` runs a case with any of the program's rules that are
+written and off, and shows the state code by pass and why the program's solve gave up.
 
 ## 5. Decisions that are the owner's
 
@@ -354,8 +402,8 @@ A structural read of what governs that section's failure is still open.
 **C. The Quick Define sections: done for peak, rising branch and shape** (2026-11-21), but
 for the last stage of the two shear cases (A3). Left on these sections, all in the views or
 after the peak (`docs/verification.md`, "Quick Define sections"):
-- C1. Crack spacing tables: **read 2026-11-22** (step A-1b). The transverse table is in
-  use; the longitudinal one is written and off (D46).
+- C1. Crack spacing tables: **read 2026-11-22** (step A-1b); both in use since step A-1c
+  (D46).
 - C2. The column under axial load alone after its peak: Response leaves the uniform state
   (a curved state with no moment, the load falling by a quarter in one step); r2c stays on
   it. Looked at in step 4 and not resolved (section 2, known deviation).
@@ -471,7 +519,8 @@ repository).
 | `004ac190`, `004ab4e0`, `004fbf70` | concrete set-up (Kf, n), derived steel properties (segmental curve), the steel ratio η of the Hsu models |
 | `004f96e0`, `00448d90` | the reader of shape.dat and the outline dialog's width field: the only users of UP and DOWN |
 | `004181d0`, `004ff4e0`, `00419ff0` | "cracked" for an event between stages; the cracking strain before it is lowered by compression; whether an event is closed in on |
-| `004267c0`, `004688b0`, `00467f20` | the step of the general solve; the 3 × 3 solve and the 2 × 2 one (not read) |
+| `004267c0`, `004688b0`, `00467f20` | the step of the general solve; the 3 × 3 solve by elimination with pivoting, and the 2 × 2 one |
+| `004b67e0`, `00426f10`, `0041c060`, `004357d0` | a table's integral by Simpson's rule; the concrete area within the depth that has stiffness; the profile rebuilt from a stage's node strains; the profile of the uncracked section |
 | `0043fa20`, `0043f570`, `0043faf0`, `0043e8d0`, `00440100`, `0043f0d0` | crack spacing over the depth: both tables; a layer's term; the longitudinal spacing at a height and its table; the transverse spacing at a height and its table |
 | `004440d0`, `00423110` | steel stress at a crack as left during iterations; the shear strain a stage reports |
 | `00417290` | a secant stiffness of the section ("error in moment calculation"); not the shear driver it was taken for |

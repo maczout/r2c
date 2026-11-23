@@ -96,7 +96,7 @@ before judging a result). Run `python tools/check.py` to see the state of the re
   `python tools/verify.py tests/oracle --inputs RESPONSE_FOLDER --out VERIFY_OUT --jobs N`,
   then `python tools/report.py VERIFY_OUT`. Prose in `docs/verification.md` interprets it and
   cites it. The results pages (GitHub Pages) are rebuilt from the same JSON by CI after every
-  push: `main` at the root, each branch at `branches/<branch>/`. Nothing to do by hand; a pull
+  push: `main` at the root, each branch at `branches/<slug>/`, the branch name with `/` as `-` (`dev/a-1c` → `branches/dev-a-1c/`). Nothing to do by hand; a pull
   request links its branch's page.
 
 ## Ending a session
@@ -125,7 +125,7 @@ Not wanted: a changelog, a commit log, or recording commit IDs in files. Git kee
 | Each kernel rule and its source | `docs/kernel.md` |
 | Results against Response (generated) | `docs/verification-results.md` |
 | What the results mean | `docs/verification.md` |
-| The results as pictures, for review | https://maczout.github.io/r2c/ (`tools/dashboard.py`); a branch's at `branches/<branch>/` (`tools/site.py`) |
+| The results as pictures, for review | https://maczout.github.io/r2c/ (`tools/dashboard.py`); a branch's at `branches/<slug>/`, `/` as `-` (`tools/site.py`) |
 | Diagnostics: r2c in Response's states | `tools/diagnose.py` |
 | Rebuild the oracle archive | `tools/capture.py` |
 | Checks before pushing | `tools/check.py`, `pytest` |

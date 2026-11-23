@@ -379,6 +379,53 @@ class Shear(Flexure):
         an.shape_z, an.shape = grid, (1.0 - relax) * old + relax * new
         return err, mean
 
+    # Response's own handling of the shear strain profile [B 0041e840, 00418af0, 0041c060]:
+    # written, off until verified (docs/kernel.md, "The shear strain profile between passes")
+    own_profile = False
+
+    def update_profile(self, z, vstate, tau, t, gam, relax=1.0):
+        """The shear strain profile for the next pass, as Response-2000 updates it
+        [B 0041e840]. At every node: the profile's value times the mean of one and
+        (calculated stress over the state's stress), that factor within ten either way and
+        the value within a hundred; unchanged where the node carries no shear or the
+        section has no shear strain yet. Nothing at the two faces. Then divided by its mean
+        over the depth (Simpson's rule over each layer's three nodes, no width in it; the
+        divisor kept between 0.1 and 10), and no value above eight times the gross area
+        over the concrete area within the depth that has stiffness."""
+        an, sec = self.an, self.sec
+        zp = an.profile_z(z)
+        old = np.interp(zp, an.shape_z, an.shape)
+        carries = np.abs(vstate) > 1e-14
+        with np.errstate(divide="ignore", invalid="ignore"):
+            ratio = np.where(carries, 0.5 * (tau + vstate) / np.where(carries, vstate, 1.0), 1.0)
+        ratio = np.clip(ratio, -10.0, 10.0)
+        new = np.clip(ratio * old, -100.0, 100.0)
+        if abs(gam) < 1e-8:
+            new = old.copy()
+        new = np.where(carries, new, old + 1e-6)
+        new[0, 0] = 0.0
+        new[-1, 2] = 0.0
+        dzl = z[:, 0] - z[:, 2]
+        mean = float(np.sum(dzl * (new[:, 0] + 4.0 * new[:, 1] + new[:, 2]) / 6.0)) / sec.h
+        if not math.isfinite(mean):
+            return
+        if mean == 0.0:
+            an.shape_z = an.shape_z0.copy()
+            an.shape = an._elastic_shape()
+            return
+        div = min(max(mean, 0.1), 10.0)
+        zlo, zhi = t["zone"]
+        inside = sec.area_between(min(zlo, zhi), max(zlo, zhi)) if zhi > zlo else 0.0
+        cap = 8.0 * sec.area / max(inside, 1e-2)        # 1e-8 m2 at the least, in mm2
+        new = np.minimum(new / div, cap)
+        zf = zp.ravel()[::-1]
+        zz, ii = np.unique(zf, return_index=True)
+        grid = np.unique(np.concatenate([an.shape_z0, zz]))
+        prof = np.interp(grid, zz, new.ravel()[::-1][ii])
+        if relax != 1.0:
+            prof = (1.0 - relax) * np.interp(grid, an.shape_z, an.shape) + relax * prof
+        an.shape_z, an.shape = grid, prof
+
     def profile_error(self, z, vstate, tau, v) -> float:
         """Response's measure of how far the shear strain profile is from converged
         [B 00420f20]: the standard deviation, over 50 points of the depth, of the calculated
@@ -499,7 +546,6 @@ class Shear(Flexure):
         hh = (hm + 1e-4) ** 2
         floor = 1.0 + (1000.0 * sec.area / 1e6) ** 2
         si = np.array([1.0, 1e-3, 1.0])            # N, N mm, N to N, N m, N
-        share = self.step_share
         count = 0
         found = False
 
@@ -513,6 +559,7 @@ class Shear(Flexure):
         while True:
             f, lam, rhs = state()
             if not np.all(np.isfinite(f)):
+                self.why = "forces not finite"
                 break
             err = float(np.sum((rhs * si) ** 2)) / hh
             tol = (f[0] ** 2 + f[2] ** 2 + (f[1] / 1e3) ** 2 / hh) * 1e-6 + floor
@@ -533,19 +580,26 @@ class Shear(Flexure):
             try:
                 step[idx] = np.linalg.solve(k[np.ix_(idx, idx)], rhs[idx])
             except np.linalg.LinAlgError:
+                self.why = "singular stiffness"
                 break
             if not np.all(np.isfinite(step)) or \
                     abs(step[0]) + abs(step[1] * 1e3) + abs(step[2]) > 0.5:
+                self.why = "step too large"
                 break
-            e += share * step
+            e += self.step_share * step
             count += 1
+            if count > 10 and hm < 5.0:
+                self.step_share = 0.5       # half steps from the eleventh on [B 004276a0]
             if count > 50:
+                self.why = f"50 steps, out of balance by {math.sqrt(err / tol):.3g} of the tolerance"
                 break
             if not tol < err:
                 found = True
                 break
         if found and count:
             f, lam, rhs = state()
+        if self.mode != "gam" and not self.half_steps:
+            self.step_share = 1.0           # whole steps again for the next solve
         self.unbalance = float(np.max(np.abs(rhs * si))) if np.all(np.isfinite(rhs)) else math.inf
         info = (float(e[0]), float(e[1]), float(e[2]), float(lam), float(f[0]), float(f[1]),
                 float(f[2]))
@@ -553,10 +607,12 @@ class Shear(Flexure):
         return np.array(x), info, found
 
     trace = None             # tools/trace.py: a list to which each try is added
+    why = ""                 # why the program's solve gave up, for tools/trace.py
     # Response's own solve of the global strains [B 004276a0]: written and off
     # (docs/kernel.md, "The global solve with shear")
     own_solve = False
     step_share = 1.0         # the share of a step of that solve that is taken
+    half_steps = False       # Response's flag that keeps that share at one half
 
     def _nested(self, c, x0):
         """Fallback for the Newton iteration: the two unknowns one inside the other, each by
@@ -584,18 +640,23 @@ class Shear(Flexure):
         good = ok and abs(float(r[0])) < 1e-4 and abs(r1) < 1e-3
         return np.array([state["inner"], x1]), state["info"], good
 
-    def solve(self, c, prev: Stage | None) -> Stage:
+    def solve(self, c, prev: Stage | None, ctx=None) -> Stage:
         """The state at control value c: curvature, or the shear strain when there is no
-        moment increment. prev: the stage whose strains are the first estimate."""
+        moment increment. prev: the stage whose strains are the first estimate. ctx: what
+        the stage control knows when it asks (the step multiplier, the largest load so far,
+        the load of the stage before), for the tests Response makes on every pass."""
         an = self.an
         keep = an.profile()
         try:
-            return self._solve(c, prev)
+            return self._solve(c, prev, ctx)
         except SolveError:
             an.set_profile(keep)
             raise
 
-    def _solve(self, c, prev: Stage | None) -> Stage:
+    # Response's tests on every pass of a stage [B 00418af0]: written, off until verified
+    pass_code = False
+
+    def _solve(self, c, prev: Stage | None, ctx=None) -> Stage:
         """One load stage as Response works on it [B 00418af0]: up to 16 passes of solving the
         global strains with the shear strain profile as it is, then updating the profile from
         the calculated shear stress. The stage comes back converged (profile error under
@@ -618,6 +679,8 @@ class Shear(Flexure):
         err = 1.0
         passes = refines = 0
         used = saved_shape
+        codes = []
+        failed = None
         while passes < self.passes:
             x0 = np.array(x, dtype=float)
             soft = False
@@ -645,11 +708,35 @@ class Shear(Flexure):
                 continue
             z, vstate, tau, t, _d = self.shear_flow(e0, phi, gam, v)
             used = an.profile()
-            _own, mean = self.update_shape(z, vstate, tau, t, relax=self.relax(passes))
+            if self.own_profile:
+                mean = None
+                self.update_profile(z, vstate, tau, t, gam, relax=self.relax(passes))
+            else:
+                _own, mean = self.update_shape(z, vstate, tau, t, relax=self.relax(passes))
             err = self.profile_error(z, vstate, tau, v)
             passes += 1
+            if self.own_profile and err > 10.0 and passes > 3:
+                # far off after three passes: the profile of the uncracked section again
+                # [B 00418af0, 004357d0]
+                an.shape_z = an.shape_z0.copy()
+                an.shape = an._elastic_shape()
+                self.half_steps, self.step_share = True, 0.5
             if getattr(self, "debug", False):
                 print(f"   pass {passes}: lam={lam:.4f} profile err={err:.4f}")
+            if self.pass_code and ctx is not None:
+                # the state code of this pass's state, acted on at once [B 00418af0]
+                code = self.state_code(Stage(e0, phi, gam, lam, n, m, v,
+                                             an.detail(e0, phi, gam), control=c,
+                                             cmode=self.mode))
+                codes.append(code)
+                if code != 0 and ctx["mult"] >= 0.5:
+                    failed = f"state code {code} in pass {passes}"
+                    break
+                if code == 3 and lam > ctx["peak"]:
+                    failed = f"state code 3 above the largest load in pass {passes}"
+                    break
+                if code != 0 and ctx["last"] is not None and lam < ctx["last"]:
+                    break               # taken as it is: the load is under the stage before
             if soft:
                 if err <= 0.05:
                     break               # kept as it is
@@ -663,8 +750,9 @@ class Shear(Flexure):
         if not ok or info is None:
             an.set_profile(saved_shape)
             raise SolveError(f"no equilibrium at control value {c:g}")
-        if err >= self.profile_tol:
-            # not converged: the state is the last pass's, with the profile it was solved on
+        left = an.profile()
+        if err >= self.profile_tol or self.own_profile:
+            # the state is the last pass's, with the profile it was solved on
             an.set_profile(used)
         e0, phi, gam, lam, n, m, v = info
         if not all(math.isfinite(q) for q in info) or abs(gam) > 0.2 or abs(e0) > 0.2:
@@ -692,7 +780,14 @@ class Shear(Flexure):
         st.gam_avg = float(num / den) if abs(den) > 1e-9 else 0.0
         st.perr = err
         st.passes = passes
+        st.codes = codes
+        st.failed = failed
         st.profile = an.profile()        # the profile the stage leaves for the next one
+        if self.own_profile:
+            # the stage keeps the profile of its own state, which is what is put back when
+            # a later stage fails or is put in between [B 0041c060]; the next stage starts
+            # from the last update, converged or not [B 00418af0]
+            an.set_profile(left)
         return st
 
     def more_detail(self, stages, peak, limit):
@@ -880,6 +975,11 @@ class Shear(Flexure):
             self.mode = "none"
             return super().run(max_stages)
         self.mode = self.mode0 = self.first_control()
+        # half steps in the program's solve throughout: under control of the axial strain,
+        # and where M/V is between 0.15 and 0.75 of the depth [B 00419250]
+        arm = abs(an.dm / an.dv) if an.dv != 0.0 else 0.0
+        self.half_steps = self.mode0 == "e0" or 0.15 * self.sec.h < arm < 0.75 * self.sec.h
+        self.step_share = 0.5 if self.half_steps else 1.0
         st0 = self.initial()
         st0.control, st0.cmode = self.control_of(st0), self.mode
         st0.profile = an.profile()
@@ -938,10 +1038,13 @@ class Shear(Flexure):
                     and abs(d0) < abs(target) / 10.0:
                 d0 = math.copysign(abs(target) / 10.0, d0)
             solves += 1
+            self.why = ""
             try:
-                st = self.solve(target, start or prev)
+                st = self.solve(target, start or prev, dict(
+                    mult=mult, peak=peak,
+                    last=prev.lam if len(self.stages) > 1 else None))
                 st.parent = prev        # the stage it follows, for its envelope (export)
-                ok = True
+                ok = st.failed is None
                 if st.lam < 0.0 and len(self.stages) > 1:
                     # the loads reversed: not a state of this loading (Response's shear is
                     # never negative, the manual 3-5)
@@ -964,7 +1067,9 @@ class Shear(Flexure):
                     n=len(self.stages), mode=self.mode, target=target, mult=mult, kept=ok,
                     solved=st is not None, code=code, peak=peak,
                     lam=None if st is None else st.lam, perr=None if st is None else st.perr,
-                    passes=None if st is None else st.passes, stage=st))
+                    passes=None if st is None else st.passes, stage=st,
+                    codes=None if st is None else st.codes,
+                    why=self.why if st is None else ""))
             if not ok:
                 if pending:
                     # a stage put in between that is refused or not solved is dropped; the
@@ -984,6 +1089,7 @@ class Shear(Flexure):
                     # change the control variable [B 004162d0]
                     old = self.mode
                     self.mode = other
+                    self.half_steps, self.step_share = True, 0.5    # [B 004162d0]
                     n_st = len(self.stages)
                     ref = self.stages[0] if n_st < 3 else \
                         self.stages[n_st - 3 if n_st - 2 <= 2 else n_st // 3]
@@ -998,7 +1104,9 @@ class Shear(Flexure):
                     if getattr(self, "debug", False):
                         print(f"  control {old} -> {other} at stage {n_st}")
                     continue
-                # closer to the stage before [B 0041a870, 1]
+                # closer to the stage before [B 0041a870, 1]; the next solve starts on half
+                # steps [B 00418af0]
+                self.step_share = 0.5
                 last_c = prev.control if prev.cmode == self.mode else self.control_of(prev)
                 if pending:
                     gap = pending[-1].control - last_c

@@ -355,28 +355,6 @@ class Section:
             return big
         return max(math.hypot(b - 100.0, space) + 0.1 * db / rho, self._aggregate_floor(z))
 
-    # Response's longitudinal crack spacing table: written and off (docs/kernel.md, "Crack
-    # spacing over the depth"; docs/summary.md, D46)
-    response_smx = False
-
-    def _long_spacing_before(self):
-        """r2c's longitudinal crack spacing before Response's table was read, at 100 evenly
-        spaced heights: least over the layers of 2 c + 0.1 db / rho, c the diagonal distance
-        to the nearest bar, rho the steel within 7.5 db of the layer over the concrete
-        there. In use while Response's table is off."""
-        if not self.layers:
-            return np.full(NTAB, 5.0 * self.h)
-        best = np.full(NTAB, np.inf)
-        for l in self.layers:
-            up = min(l.z + 7.5 * l.db, self.ztop)
-            dn = max(l.z - 7.5 * l.db, self.zbot)
-            ac = max(self.area_between(dn, up), 1e-6)
-            steel = sum(o.area for o in self.layers if dn - 1e-9 <= o.z <= up + 1e-9)
-            dx = float(self.width(np.array([l.z]))[0]) / (2.0 * l.num)
-            c = np.sqrt((self.tz - l.z) ** 2 + dx * dx)
-            best = np.minimum(best, 2.0 * c + 0.1 * l.db / (steel / ac))
-        return best
-
     def _spacing_tables(self):
         """Both crack spacings as tables of points over the depth, read linearly between
         them, as Response-2000 builds them (docs/kernel.md, "Crack spacing over the depth").
@@ -386,8 +364,6 @@ class Section:
         0.1 mm apart) and one stirrup diameter above and below each end of a stirrup."""
         if self.smx_user > 0:
             pts = [(self.zbot, self.smx_user), (self.ztop, self.smx_user)]
-        elif not self.response_smx:
-            pts = list(zip(self.tz, self._long_spacing_before()))
         else:
             terms = self._bar_terms()
             keys = sorted({l.z for l in self.layers} | {self.segs[0][0]}

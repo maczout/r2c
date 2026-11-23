@@ -63,7 +63,10 @@ def main() -> int:
             tail = (f"{crk:>3} {st.phi * 1e6:8.4f} {st.e0 * 1e3:8.4f} "
                     f"{getattr(st, 'gam_avg', st.gam) * 1e3:8.4f}")
         print(f"{t['n']:4d} {t['mode']:>3} {t['target'] * k:9.4f} {t['mult']:6.3f} {what:<9} "
-              f"{lam:>8} {err:>7} {t['passes'] or 0:4d} {t['code']:4d} {tail}")
+              f"{lam:>8} {err:>7} {t['passes'] or 0:4d} {t['code']:4d} {tail}"
+              + ("" if not t.get("codes") or not any(t["codes"])
+                 else "  codes by pass " + "".join(str(c) for c in t["codes"]))
+              + (f"  ({t['why']})" if t.get("why") else ""))
     print(f"{len(stages)} stages")
     return 0
 

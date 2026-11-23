@@ -4,14 +4,13 @@ spacing depends on the section alone, so r2c's tables are read at the heights of
 of a reference record's Longitudinal and Transverse Crack Spacing charts and set against
 the chart.
 
-    python tools/spacing.py RECORD [--input FILE] [--stages N,N] [--response-smx] [-v]
+    python tools/spacing.py RECORD [--input FILE] [--stages N,N] [-v]
 
 RECORD is an r2x-raw record with those charts (a fixture or a capture); --input the
 section file where it is not Response's built-in one; --stages the stages whose charts are
-read (default: every stage of the record that has them). --response-smx switches on
-Response's longitudinal table, which is written and off (docs/kernel.md, "Crack spacing
-over the depth"). Per stage and chart: the number of nodes and the largest difference in
-mm, with the height it is at; -v lists every node.
+read (default: every stage of the record that has them). Both tables are Response's
+(docs/kernel.md, "Crack spacing over the depth"). Per stage and chart: the number of nodes
+and the largest difference in mm, with the height it is at; -v lists every node.
 """
 
 from __future__ import annotations
@@ -36,12 +35,9 @@ def main(argv=None) -> int:
     ap.add_argument("record")
     ap.add_argument("--input")
     ap.add_argument("--stages")
-    ap.add_argument("--response-smx", action="store_true")
     ap.add_argument("-v", action="store_true")
     a = ap.parse_args(argv)
     rec = record.read(a.record)
-    if a.response_smx:
-        Section.response_smx = True
     sec = Section(inputs.read(a.input) if a.input else inputs.default_section())
     stages = [int(x) for x in a.stages.split(",")] if a.stages else rec.stages()
     for st in stages:
