@@ -6,6 +6,8 @@ bring inside?" The two folders are tools/verify.py outputs (before, after) on th
 fixtures. A check is a case's peak, rising branch, post-peak branch or shape, or one detail
 view at one feature stage of Response's curve; inside and outside are decided as
 tools/report.py decides them (docs/acceptance.md, the printed-precision floor included).
+The views at the last stage of a shear case are not assessed (D40): those that changed
+side are listed on their own and do not count as gone outside or come inside.
 
     python tools/changes.py VERIFY_BEFORE VERIFY_AFTER [--view principal_tensile_stress]
 
@@ -27,6 +29,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import report  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
+NOT_ASSESSED = ", not assessed"
 
 
 def checks(res: dict, acc: dict) -> dict:
@@ -38,11 +41,15 @@ def checks(res: dict, acc: dict) -> dict:
         out[report.NAMES.get(k, k)] = (ok, f"{v:.2f}" if not isinstance(v, bool) else str(v))
     lim = acc.get("views", {}).get("views_pct")
     exempt = set(acc.get("views", {}).get("views_exempt", []))
+    shear = report.group(res["ref"]) == "shear"
     for s in res.get("views_stages", []):
         for v in s["views"]:
             if v["view"] in exempt or lim is None:
                 continue
             name = f"{v['view']} at stage {s['ref_stage']} ({s['feature']})"
+            if shear and report.is_ending(s):
+                # D40: the last stage of a shear case is reported, not assessed
+                name += NOT_ASSESSED
             if v.get("missing"):
                 out[name] = (False, "missing")
                 continue
@@ -65,7 +72,7 @@ def main(argv=None) -> int:
     a = ap.parse_args(argv)
     acc = report.read_acceptance(Path(a.acceptance))
     before, after = load(Path(a.before)), load(Path(a.after))
-    worse, better, still = [], [], []
+    worse, better, still, ends = [], [], [], []
     nb, na = Counter(), Counter()
     for case in sorted(set(before) & set(after)):
         if "control" not in before[case] or "control" not in after[case]:
@@ -79,7 +86,10 @@ def main(argv=None) -> int:
             nb[view] += ob is False
             na[view] += oa is False
             line = f"  {case}: {k}: {tb} -> {ta}"
-            if ob is not False and oa is False:
+            if k.endswith(NOT_ASSESSED):
+                if (ob is False) != (oa is False):
+                    ends.append(line)
+            elif ob is not False and oa is False:
                 worse.append(line)
             elif ob is False and oa is not False:
                 better.append(line)
@@ -90,6 +100,8 @@ def main(argv=None) -> int:
         print("in one run only:", ", ".join(only))
     print(f"went outside target ({len(worse)}):", *worse, sep="\n")
     print(f"came inside target ({len(better)}):", *better, sep="\n")
+    print(f"last stage of a shear case, not assessed, changed side ({len(ends)}):", *ends,
+          sep="\n")
     if a.view:
         print(f"{a.view} still outside ({len(still)}):", *still, sep="\n")
     print("checks outside, before -> after:")

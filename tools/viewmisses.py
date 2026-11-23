@@ -13,8 +13,9 @@ that a difference in the state reached can be told from a difference in a view's
 Nothing is measured here: the differences are tools/compare.py's, as tools/verify.py stored
 them, the limit is views_pct of docs/acceptance.md, and a difference within the printed
 precision counts as none, as in tools/report.py. --shear lists only cases with shear;
---tier only views of those tiers of docs/acceptance.md; --no-endings leaves out the last
-stage, to see what is left apart from how a response ends (it changes no count anywhere).
+--tier only views of those tiers of docs/acceptance.md. The last stage of a shear case is
+listed as "not assessed" and left out of the total (owner, 2026-11-22, D40); --no-endings
+leaves the last stage out of the listing altogether, for cases without shear too.
 """
 
 from __future__ import annotations
@@ -59,19 +60,22 @@ def main(argv=None) -> int:
         print(f"{name}: stages {res['ref']['stage-count']} (Response), "
               f"{res['sub']['stage-count']} (r2c)")
         for vs in res.get("views_stages", []):
-            if a.no_endings and vs["feature"].startswith("ends"):
+            ending = report.is_ending(vs)
+            if a.no_endings and ending:
                 continue
+            # D40: the last stage of a shear case is reported, not assessed
+            aside = ending and has_shear(res)
             out = [(v["view"], v["max_diff_pct"]) for v in vs["views"]
                    if not v.get("missing") and v["max_diff"] > v.get("floor", 0.0)
                    and v["max_diff_pct"] > limit
                    and (not a.tier or tier.get(v["view"]) in a.tier)]
-            total += len(out)
-            print(f"  {vs['feature']}: stage {vs['ref_stage']} at ({vs['ref_x']:g}, "
+            total += 0 if aside else len(out)
+            print(f"  {vs['feature']}{' (not assessed)' if aside else ''}: stage {vs['ref_stage']} at ({vs['ref_x']:g}, "
                   f"{vs['ref_y']:g}), r2c's {vs['sub_stage']} at ({vs['sub_x']:g}, "
                   f"{vs['sub_y']:g})" + ("" if out else ": all inside"))
             for view, pct in out:
                 print(f"      {view} ({tier.get(view, '-')}): {pct:.1f} %")
-    print(f"{total} views outside at the stages listed")
+    print(f"{total} views outside at the stages assessed")
     return 0
 
 

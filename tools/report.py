@@ -45,6 +45,35 @@ def group(ref: dict) -> str:
     return "shear" if inc[2] != 0.0 or ini[2] != 0.0 else "flexure"
 
 
+def is_ending(stage: dict) -> bool:
+    """Is this compared stage the last stage of the reference's curve, and nothing else? A
+    last stage that is also the peak is the peak (tools/compare.py, feature_stages)."""
+    return stage.get("feature", "").startswith("ends")
+
+
+def view_rows(res: dict, endings: bool = False) -> list[dict]:
+    """Each view's worst row over the compared stages of a case, as tools/compare.py's
+    "views" but split as the owner decided (2026-11-22, D40, the counterpart of D25): for a
+    shear case the last stage is left out of the view checks, since how a shear response
+    ends is a Won't, and is reported separately. endings=False gives the rows that are
+    assessed (a case without shear: every stage; with shear: all but the last);
+    endings=True the rows of the last stage of a shear case, which are not assessed (none
+    for a case without shear). A result without the stages listed is taken whole."""
+    shear = group(res["ref"]) == "shear"
+    if "views_stages" not in res:
+        return [] if endings else list(res.get("views", []))
+    worst: dict[str, dict] = {}
+    for st in res["views_stages"]:
+        if (shear and is_ending(st)) != endings:
+            continue
+        for row in st["views"]:
+            w = worst.get(row["view"])
+            if (w is None or row.get("missing")
+                    or (not w.get("missing") and row["max_diff_pct"] > w["max_diff_pct"])):
+                worst[row["view"]] = dict(row, ref_stage=st["ref_stage"])
+    return list(worst.values())
+
+
 def assess(res: dict, acc: dict) -> dict:
     """{check: (value, limit, ok)} for each tolerance that is set; ok is None if unset."""
     g = group(res["ref"])
@@ -83,7 +112,7 @@ def assess(res: dict, acc: dict) -> dict:
     def worst(names=None):
         # a view within the printed-precision floor counts as no difference
         vals = [0.0 if v["max_diff"] <= v.get("floor", 0.0) else v["max_diff_pct"]
-                for v in res.get("views", [])
+                for v in view_rows(res)
                 if not v.get("missing") and v["view"] not in exempt
                 and (names is None or v["view"] in names)]
         if vals:
@@ -191,11 +220,10 @@ def render(results: dict, run: dict, acc: dict, acc_path: str) -> str:
             c = r["control"][-1]
             chk = assess(r, acc)
             worst = ""
-            if r.get("views"):
-                vv = [v for v in r["views"] if not v.get("missing")]
-                if vv:
-                    w = max(vv, key=lambda v: v["max_diff_pct"])
-                    worst = f"{w['max_diff_pct']:.1f} ({w['view']})"
+            vv = [v for v in view_rows(r) if not v.get("missing")]
+            if vv:
+                w = max(vv, key=lambda v: v["max_diff_pct"])
+                worst = f"{w['max_diff_pct']:.1f} ({w['view']})"
             inp = h["input-name"]
             extra = []
             if h.get("units") not in (None, "si"):
@@ -220,20 +248,25 @@ def render(results: dict, run: dict, acc: dict, acc_path: str) -> str:
             out.append(f"- {n}: {skipped[n].get('skipped') or skipped[n].get('failed')}")
         out.append("")
     # the detail views, worst case per view
-    rows = {}
-    for n, r in ran.items():
-        for v in r.get("views", []):
-            if v.get("missing"):
-                continue
-            k = v["view"]
-            if k not in rows or v["max_diff_pct"] > rows[k][0]:
-                rows[k] = (v["max_diff_pct"], n)
-    if rows:
-        out += ["## Detail views at the features of the curve, worst case per view", "",
-                "| View | Worst % | Case |", "|---|---:|---|"]
-        for k in sorted(rows, key=lambda k: -rows[k][0]):
-            out.append(f"| {k} | {rows[k][0]:.1f} | {rows[k][1]} |")
-        out.append("")
+    for endings, title, lead in (
+            (False, "## Detail views at the features of the curve, worst case per view", ""),
+            (True, "## Detail views at the last stage of the shear cases, worst case per view",
+             "Reported, not assessed (owner, 2026-11-22, D40): how a shear response ends is a "
+             "Won't, so the last stage of a shear case is left out of the view checks above.")):
+        rows = {}
+        for n, r in ran.items():
+            for v in view_rows(r, endings):
+                if v.get("missing"):
+                    continue
+                k = v["view"]
+                if k not in rows or v["max_diff_pct"] > rows[k][0]:
+                    rows[k] = (v["max_diff_pct"], n)
+        if rows:
+            out += [title, ""] + ([lead, ""] if lead else [])
+            out += ["| View | Worst % | Case |", "|---|---:|---|"]
+            for k in sorted(rows, key=lambda k: -rows[k][0]):
+                out.append(f"| {k} | {rows[k][0]:.1f} | {rows[k][1]} |")
+            out.append("")
     out += ["## How the numbers are measured", "",
             "See `tools/compare.py`. Peak: the largest load on the bottom control chart. "
             "Rising and post-peak: the largest distance between the two curves, measured both "
@@ -245,7 +278,8 @@ def render(results: dict, run: dict, acc: dict, acc_path: str) -> str:
             "Views: at each feature stage of Response's curve (cracking, falls of load, peak, "
             "last stage) and r2c's stage nearest it in load and control value, the largest "
             "distance of Response's points from r2c's curve, relative to the chart's largest "
-            "value. Shape: the curve's features in order (cracking, falls of load before the "
+            "value. For a case with shear the last stage is not assessed and is listed on "
+            "its own (a last stage that is also the peak is the peak, and is assessed). Shape: the curve's features in order (cracking, falls of load before the "
             "peak, the peak, how the response ends), read alike from both curves; it matches "
             "when they are the same. Stage counts are not compared.", ""]
     return "\n".join(out)

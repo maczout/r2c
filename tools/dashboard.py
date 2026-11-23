@@ -204,15 +204,18 @@ def build(run: dict, results: dict, acc: dict, curves_dir: Path | None, ref_dir:
             case["views_at"] = va
             # how far r2c's nearest stage is from Response's peak, in control value
             case["views_gap_pct"] = abs(sx - rx) / abs(rx) * 100 if rx else 0.0
-        for v in r.get("views", []):
-            if v.get("missing"):
-                case["views"].append({"view": v["view"], "missing": True})
-            else:
-                feat = {s["ref_stage"]: s["feature"] for s in r.get("views_stages", [])}
-                case["views"].append({"view": v["view"], "pct": round(v["max_diff_pct"], 3),
-                                      "stage": v.get("ref_stage"),
-                                      "feature": feat.get(v.get("ref_stage"), ""),
-                                      "ref_max": v["ref_max"], "diff": v["max_diff"]})
+        # the views that are assessed, and (D40) the last stage of a shear case on its own
+        feat = {s["ref_stage"]: s["feature"] for s in r.get("views_stages", [])}
+        for key, endings in (("views", False), ("views_end", True)):
+            for v in report.view_rows(r, endings):
+                if v.get("missing"):
+                    case.setdefault(key, []).append({"view": v["view"], "missing": True})
+                else:
+                    case.setdefault(key, []).append(
+                        {"view": v["view"], "pct": round(v["max_diff_pct"], 3),
+                         "stage": v.get("ref_stage"),
+                         "feature": feat.get(v.get("ref_stage"), ""),
+                         "ref_max": v["ref_max"], "diff": v["max_diff"]})
         # curves
         # a parked case's fixture is under the folder (tests/oracle/parked)
         refp = ref_dir / f"{name}.r2x.txt"
@@ -424,29 +427,35 @@ const bins = [[1,"<1"],[2,"1–2"],[5,"2–5"],[10,"5–10"],[25,"10–25"],[100
 const binOf = p => bins.findIndex(b => p < b[0]);
 const cs = 18, lw = 112, th = 150;
 H += `<h2>Detail views at the features of the curve</h2>
-<p class="sub">Largest difference in each chart, as % of that chart's largest value, over the stages compared: cracking, falls of load, the peak and the last stage of Response's curve, each against r2c's stage nearest it in load and control value (the tooltip names the stage). Hatched rows: at the peak, r2c's nearest stage is more than 5 % away in control value, so the two are different states.</p>
+<p class="sub">Largest difference in each chart, as % of that chart's largest value, over the stages compared: cracking, falls of load, the peak and the last stage of Response's curve, each against r2c's stage nearest it in load and control value (the tooltip names the stage). For a case with shear the last stage is not assessed and is drawn on its own below. Hatched rows: at the peak, r2c's nearest stage is more than 5 % away in control value, so the two are different states.</p>
 <div class="legend">${bins.map((b,i)=>`<span><span class="sw" style="background:var(--s${i+1})"></span>${b[1]} %</span>`).join("")}
 <span><span class="sw" style="background:var(--surface);border:1px solid var(--border)"></span>chart all zero</span></div>`;
-let hm = `<svg width="${lw + views.length*cs + 4}" height="${th + cases.length*cs + 4}" role="img" aria-label="heatmap of detail-view differences">
+function heat(rows, key, hatch) {
+ let hm = `<svg width="${lw + views.length*cs + 4}" height="${th + rows.length*cs + 4}" role="img" aria-label="heatmap of detail-view differences">
 <defs><pattern id="hatch" width="5" height="5" patternTransform="rotate(45)" patternUnits="userSpaceOnUse"><line x1="0" y1="0" x2="0" y2="5" stroke="var(--surface)" stroke-width="2"/></pattern></defs>`;
-views.forEach((v, j) => { const x = lw + j*cs + cs/2; hm += `<text transform="translate(${x+3},${th-4}) rotate(-70)">${esc(v.replaceAll("_"," "))}</text>`; });
-cases.forEach((c, i) => {
- const y = th + i*cs;
- hm += `<text x="${lw-4}" y="${y+13}" text-anchor="end">${esc(c.name)}</text>`;
- const far = (c.views_gap_pct ?? 0) > 5;
- views.forEach((v, j) => {
-  const x = lw + j*cs, r = c.views.find(w => w.view === v);
-  if (!r) return;
-  let fill, tip;
-  if (r.missing) { fill = "var(--surface)"; tip = `${c.name} · ${v}\nmissing in r2c`; }
-  else if (r.ref_max === 0) { fill = "var(--surface)"; tip = `${c.name} · ${v}\nchart all zero in Response`; }
-  else { fill = `var(--s${binOf(r.pct)+1})`; tip = `${c.name} · ${v}\n${f(r.pct,1)} % (${f(r.diff,3)} of ${f(r.ref_max,3)})${r.stage!=null?`\nworst at Response's stage ${r.stage}${r.feature?" ("+r.feature+")":""}`:""}${far?`\nstages differ by ${f(c.views_gap_pct,0)} % in control value`:""}`; }
-  hm += `<rect x="${x+1}" y="${y+1}" width="${cs-2}" height="${cs-2}" rx="2" fill="${fill}" stroke="${fill==="var(--surface)"?"var(--border)":"none"}" data-tip="${esc(tip)}"/>`;
-  if (r.missing) hm += `<text x="${x+cs/2}" y="${y+11}" text-anchor="middle">×</text>`;
-  if (far && !r.missing) hm += `<rect x="${x+1}" y="${y+1}" width="${cs-2}" height="${cs-2}" fill="url(#hatch)" opacity="0.6" pointer-events="none"/>`;
+ views.forEach((v, j) => { const x = lw + j*cs + cs/2; hm += `<text transform="translate(${x+3},${th-4}) rotate(-70)">${esc(v.replaceAll("_"," "))}</text>`; });
+ rows.forEach((c, i) => {
+  const y = th + i*cs;
+  hm += `<text x="${lw-4}" y="${y+13}" text-anchor="end">${esc(c.name)}</text>`;
+  const far = hatch && (c.views_gap_pct ?? 0) > 5;
+  views.forEach((v, j) => {
+   const x = lw + j*cs, r = c[key].find(w => w.view === v);
+   if (!r) return;
+   let fill, tip;
+   if (r.missing) { fill = "var(--surface)"; tip = `${c.name} · ${v}\nmissing in r2c`; }
+   else if (r.ref_max === 0) { fill = "var(--surface)"; tip = `${c.name} · ${v}\nchart all zero in Response`; }
+   else { fill = `var(--s${binOf(r.pct)+1})`; tip = `${c.name} · ${v}\n${f(r.pct,1)} % (${f(r.diff,3)} of ${f(r.ref_max,3)})${r.stage!=null?`\nworst at Response's stage ${r.stage}${r.feature?" ("+r.feature+")":""}`:""}${far?`\nstages differ by ${f(c.views_gap_pct,0)} % in control value`:""}`; }
+   hm += `<rect x="${x+1}" y="${y+1}" width="${cs-2}" height="${cs-2}" rx="2" fill="${fill}" stroke="${fill==="var(--surface)"?"var(--border)":"none"}" data-tip="${esc(tip)}"/>`;
+   if (r.missing) hm += `<text x="${x+cs/2}" y="${y+11}" text-anchor="middle">×</text>`;
+   if (far && !r.missing) hm += `<rect x="${x+1}" y="${y+1}" width="${cs-2}" height="${cs-2}" fill="url(#hatch)" opacity="0.6" pointer-events="none"/>`;
+  });
  });
-});
-H += `<div class="scroll">${hm}</svg></div>`;
+ return `<div class="scroll">${hm}</svg></div>`;
+}
+H += heat(cases, "views", true);
+const enders = cases.filter(c => (c.views_end || []).length);
+if (enders.length) H += `<h2>Detail views at the last stage of the shear cases</h2>
+<p class="sub">Reported, not assessed: how a shear response ends is not chased in this phase, so the two programs are often in different states at the last stage.</p>` + heat(enders, "views_end", false);
 
 // ---------- curves
 H += `<h2>Control curves</h2><p class="sub">The chart each case is compared on. Dots: each one's peak.</p>

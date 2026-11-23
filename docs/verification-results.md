@@ -26,15 +26,15 @@ Times are measured wall-clock seconds for r2c on that machine. Nothing here time
 
 | Case | Input | Initial; increment | Stages Resp. / r2c | Chart | Peak Resp. | Peak r2c | Peak diff % | Rising % | Post-peak % | Shape | Views % (worst) | Assessment | Time s |
 |---|---|---|---|---|---:|---:|---:|---:|---:|---|---:|---|---:|
-| newbeam-m05v: Newbeam, M + V, M/V = 0.5 m | input.r2t | 0.00,0.00,0.00; 0.00,0.50,1.00 | 56 / 52 | moment_phi | 128.5 | 128.8 | +0.21 ≤ 5 | 3.72 ≤ 5 | 10.37 > 5 | same but the ending (not assessed): Resp. cracking, fall, peak, ends falling; r2c cracking, fall, peak, ends standing still | 100.0 (stirrup_stress) | outside: post-peak, views (Should), views (Could) | 72.2 |
+| newbeam-m05v: Newbeam, M + V, M/V = 0.5 m | input.r2t | 0.00,0.00,0.00; 0.00,0.50,1.00 | 56 / 52 | moment_phi | 128.5 | 128.8 | +0.21 ≤ 5 | 3.72 ≤ 5 | 10.37 > 5 | same but the ending (not assessed): Resp. cracking, fall, peak, ends falling; r2c cracking, fall, peak, ends standing still | 22.6 (transverse_average_bond) | outside: post-peak, views (Should), views (Could) | 72.2 |
 | newbeam-m0neg-mv: Newbeam, M₀, then M + V, M/V = 1 m | input.r2t | 0.00,-50.00,0.00; 0.00,1.00,1.00 | 44 / 51 | moment_phi | 169.3 | 169.2 | -0.06 ≤ 5 | 0.82 ≤ 5 | 0.16 ≤ 5 | same | 100.0 (shear_on_crack) | outside: views (Should) | 41.6 |
 | newbeam-m2v: Newbeam, M + V, M/V = 2 m | input.r2t | 0.00,0.00,0.00; 0.00,2.00,1.00 | 88 / 69 | moment_phi | 297.7 | 306.9 | +3.10 ≤ 5 | 0.08 ≤ 5 | 51.83 > 5 | same | 100.0 (shear_on_crack) | outside: post-peak, views (Should), views (Could) | 123.5 |
-| newbeam-mv: Newbeam, M + V, M/V = 1 m | input.r2t | 0.00,0.00,0.00; 0.00,1.00,1.00 | 43 / 43 | moment_phi | 201.5 | 201.6 | +0.04 ≤ 5 | 0.03 ≤ 5 | 9.81 > 5 | same | 100.0 (stirrup_stress) | outside: post-peak, views (Should), views (Could) | 39.3 |
-| newbeam-ncomp-v: Newbeam, N₀, then V, N₀ = -500 kN | input.r2t | -500.00,0.00,0.00; 0.00,0.00,1.00 | 39 / 41 | shear_ex | 320.2 | 320.1 | -0.05 ≤ 5 | 0.53 ≤ 5 | 15.44 > 5 | same | 100.0 (stirrup_stress) | outside: post-peak, views (Should), views (Could) | 23.2 |
+| newbeam-mv: Newbeam, M + V, M/V = 1 m | input.r2t | 0.00,0.00,0.00; 0.00,1.00,1.00 | 43 / 43 | moment_phi | 201.5 | 201.6 | +0.04 ≤ 5 | 0.03 ≤ 5 | 9.81 > 5 | same | 4.4 (transverse_average_bond) | outside: post-peak | 39.3 |
+| newbeam-ncomp-v: Newbeam, N₀, then V, N₀ = -500 kN | input.r2t | -500.00,0.00,0.00; 0.00,0.00,1.00 | 39 / 41 | shear_ex | 320.2 | 320.1 | -0.05 ≤ 5 | 0.53 ≤ 5 | 15.44 > 5 | same | 3.3 (transverse_average_bond) | outside: post-peak | 23.2 |
 | newbeam-nmv: Newbeam, N₀, then M + V, N₀ = -500 kN, M/V = 1 m | input.r2t | -500.00,0.00,0.00; 0.00,1.00,1.00 | 45 / 44 | moment_phi | 253.5 | 252.9 | -0.21 ≤ 5 | 0.24 ≤ 5 | 0.23 ≤ 5 | same | 15.5 (shear_stress) | outside: views (Should) | 38.2 |
-| newbeam-nmv-incr: Newbeam, N comp. + M + V, M/V = 1 m, N/M = -5 /m | input.r2t | 0.00,0.00,0.00; -5.00,1.00,1.00 | 42 / 41 | moment_phi | 330.4 | 331.1 | +0.21 ≤ 5 | 0.18 ≤ 5 | 0.82 ≤ 5 | same | 100.0 (stirrup_stress) | outside: views (Should), views (Could) | 46.5 |
-| newbeam-v0-m: Newbeam, V₀, then M | input.r2t | 0.00,0.00,50.00; 0.00,1.00,0.00 | 70 / 65 | moment_phi | 333.2 | 333.2 | +0.00 ≤ 5 | 0.01 ≤ 5 | 5.90 > 5 | same | 83.4 (shear_stress) | outside: post-peak, views (Should), views (Could) | 44.1 |
-| newbeam-vonly: Newbeam, V | input.r2t | 0.00,0.00,0.00; 0.00,0.00,1.00 | 52 / 50 | shear_ex | 217.7 | 217.7 | -0.01 ≤ 5 | 0.17 ≤ 5 | 3.73 ≤ 5 | different: Resp. fall, peak, ends falling; r2c peak, ends falling | 49.7 (transverse_average_bond) | outside: shape, views (Should), views (Could) | 46.6 |
+| newbeam-nmv-incr: Newbeam, N comp. + M + V, M/V = 1 m, N/M = -5 /m | input.r2t | 0.00,0.00,0.00; -5.00,1.00,1.00 | 42 / 41 | moment_phi | 330.4 | 331.1 | +0.21 ≤ 5 | 0.18 ≤ 5 | 0.82 ≤ 5 | same | 69.9 (transverse_average_bond) | outside: views (Should) | 46.5 |
+| newbeam-v0-m: Newbeam, V₀, then M | input.r2t | 0.00,0.00,50.00; 0.00,1.00,0.00 | 70 / 65 | moment_phi | 333.2 | 333.2 | +0.00 ≤ 5 | 0.01 ≤ 5 | 5.90 > 5 | same | 33.1 (shear_stress) | outside: post-peak, views (Should) | 44.1 |
+| newbeam-vonly: Newbeam, V | input.r2t | 0.00,0.00,0.00; 0.00,0.00,1.00 | 52 / 50 | shear_ex | 217.7 | 217.7 | -0.01 ≤ 5 | 0.17 ≤ 5 | 3.73 ≤ 5 | different: Resp. fall, peak, ends falling; r2c peak, ends falling | 7.9 (long_reinforcement_stress) | outside: shape, views (Should) | 46.6 |
 
 ## Detail views at the features of the curve, worst case per view
 
@@ -44,24 +44,52 @@ Times are measured wall-clock seconds for r2c on that machine. Nothing here time
 | crack_widths | 100.0 | newbeam-tension |
 | diagonal_spacing | 100.0 | newbeam-tension |
 | long_average_bond | 100.0 | newbeam-zero |
+| average_angle | 79.0 | newbeam-m2v |
+| transverse_average_bond | 69.9 | newbeam-nmv-incr |
+| shear_stress | 33.1 | newbeam-v0-m |
+| principal_tensile_stress | 31.1 | newbeam-m2v |
+| principal_tensile_strain | 20.7 | newbeam-m2v |
+| transverse_strain | 20.0 | newbeam-m2v |
+| longitudinal_strain | 18.8 | newbeam-m2v |
+| shear_strain | 17.9 | newbeam-m2v |
+| stirrup_stress | 10.8 | newbeam-m05v |
+| stirrup_stress_at_crack | 9.1 | newbeam-m2v |
+| long_reinforcement_stress | 7.9 | newbeam-vonly |
+| principal_compressive_stress | 6.3 | newbeam-m2v |
+| longitudinal_concrete_stress | 5.9 | newbeam-m2v |
+| long_reinf_stress_at_crack | 5.6 | newbeam-m05v |
+| transverse_crack_spacing | 1.4 | newbeam-tension |
+| long_crack_spacing | 1.1 | newbeam-m05v |
+| shrinkage_thermal_strain | 0.0 | newbeam-m |
+
+## Detail views at the last stage of the shear cases, worst case per view
+
+Reported, not assessed (owner, 2026-11-22, D40): how a shear response ends is a Won't, so the last stage of a shear case is left out of the view checks above.
+
+| View | Worst % | Case |
+|---|---:|---|
 | stirrup_stress | 100.0 | newbeam-m05v |
+| crack_widths | 99.6 | newbeam-nmv-incr |
 | transverse_strain | 99.3 | newbeam-nmv-incr |
 | principal_tensile_strain | 99.2 | newbeam-nmv-incr |
 | principal_tensile_stress | 85.5 | newbeam-mv |
 | shear_stress | 83.4 | newbeam-v0-m |
 | average_angle | 79.1 | newbeam-m2v |
 | shear_strain | 74.6 | newbeam-nmv-incr |
-| transverse_average_bond | 69.9 | newbeam-nmv-incr |
 | principal_compressive_stress | 66.2 | newbeam-nmv-incr |
+| shear_on_crack | 56.2 | newbeam-mv |
+| diagonal_spacing | 53.5 | newbeam-m05v |
 | longitudinal_strain | 50.0 | newbeam-m05v |
+| transverse_average_bond | 49.7 | newbeam-vonly |
 | longitudinal_concrete_stress | 45.1 | newbeam-ncomp-v |
 | long_reinforcement_stress | 17.4 | newbeam-ncomp-v |
 | long_reinf_stress_at_crack | 17.4 | newbeam-ncomp-v |
 | stirrup_stress_at_crack | 9.1 | newbeam-m2v |
-| transverse_crack_spacing | 1.4 | newbeam-tension |
-| long_crack_spacing | 1.1 | newbeam-m05v |
-| shrinkage_thermal_strain | 0.0 | newbeam-m |
+| long_average_bond | 1.7 | newbeam-vonly |
+| transverse_crack_spacing | 1.4 | newbeam-v0-m |
+| long_crack_spacing | 1.1 | newbeam-mv |
+| shrinkage_thermal_strain | 0.0 | newbeam-m05v |
 
 ## How the numbers are measured
 
-See `tools/compare.py`. Peak: the largest load on the bottom control chart. Rising and post-peak: the largest distance between the two curves, measured both ways (Response's points from r2c's curve and r2c's from Response's), split at Response's peak; load scaled by Response's peak, control value by its largest value over the whole curve. An r2c point counts as post-peak when its nearest point on Response's curve is at or after Response's peak, so a response that runs on past Response's end, or stops short of it, shows as post-peak distance. Views: at each feature stage of Response's curve (cracking, falls of load, peak, last stage) and r2c's stage nearest it in load and control value, the largest distance of Response's points from r2c's curve, relative to the chart's largest value. Shape: the curve's features in order (cracking, falls of load before the peak, the peak, how the response ends), read alike from both curves; it matches when they are the same. Stage counts are not compared.
+See `tools/compare.py`. Peak: the largest load on the bottom control chart. Rising and post-peak: the largest distance between the two curves, measured both ways (Response's points from r2c's curve and r2c's from Response's), split at Response's peak; load scaled by Response's peak, control value by its largest value over the whole curve. An r2c point counts as post-peak when its nearest point on Response's curve is at or after Response's peak, so a response that runs on past Response's end, or stops short of it, shows as post-peak distance. Views: at each feature stage of Response's curve (cracking, falls of load, peak, last stage) and r2c's stage nearest it in load and control value, the largest distance of Response's points from r2c's curve, relative to the chart's largest value. For a case with shear the last stage is not assessed and is listed on its own (a last stage that is also the peak is the peak, and is assessed). Shape: the curve's features in order (cracking, falls of load before the peak, the peak, how the response ends), read alike from both curves; it matches when they are the same. Stage counts are not compared.
