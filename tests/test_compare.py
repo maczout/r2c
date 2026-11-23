@@ -114,3 +114,77 @@ def test_far_stages_are_matched_by_feature():
                     [7, 110]], dtype=float)
     assert compare.match_stage(_Rec(8), None, 5, ref, sub, 7.0, 110.0, 0.05) == (5, "feature")
 
+
+
+# -- where the reference is unstable (D54) -------------------------------------------------------
+
+def test_place_is_by_distance_along_the_curve():
+    a = np.array([[0, 0], [1, 50], [2, 100], [3, 50], [4, 0]], dtype=float)
+    assert compare.place(a, 0, 4.0, 100.0) is None      # no stage before
+    assert compare.place(a, 4, 4.0, 100.0) is None      # no stage after
+    assert compare.place(a, 1, 4.0, 100.0) == pytest.approx(0.5)
+    # at a peak the load turns back: distance along the curve still places the stage
+    assert compare.place(a, 2, 4.0, 100.0) == pytest.approx(0.5)
+    b = np.array([[0, 0], [1, 25], [4, 100]], dtype=float)
+    assert compare.place(b, 1, 4.0, 100.0) == pytest.approx(0.25)
+
+
+def test_blend_of_lines_with_the_same_points():
+    p = np.array([[0, 10], [2, 0], [2, 5], [0, 5]], dtype=float)     # a box: depth turns back
+    q = p * [2, 1]
+    b = compare.blend_line(p, q, 0.25)
+    assert b[:, 0] == pytest.approx([0, 2.5, 2.5, 0]) and b[:, 1] == pytest.approx(p[:, 1])
+
+
+def test_blend_by_depth_keeps_a_step():
+    p = np.array([[0, 10], [4, 10], [4, 0]], dtype=float)            # steps at the top
+    q = np.array([[0, 10], [8, 10], [8, 5], [0, 0]], dtype=float)    # other points in depth
+    b = compare.blend_line(p, q, 0.5)
+    # top: 0 then (4 + 8) / 2; depth 5: (4 + 8) / 2; bottom: (4 + 0) / 2
+    assert b.tolist() == [[0, 10], [6, 10], [6, 5], [2, 0]]
+    # a line whose depth turns back cannot be blended by depth
+    assert compare.blend_line(p, np.array([[0, 10], [1, 0], [1, 4], [0, 4], [0, 3]], float),
+                              0.5) is None
+
+
+def test_a_line_that_comes_or_goes_is_blended_with_zero():
+    one = np.array([[4, 10], [4, 0]], dtype=float)
+    lines = compare.blend_lines([one], [one, one], 0.25)
+    assert lines[1][:, 0] == pytest.approx([1, 1])
+    assert len(compare.blend_lines([one], [one, one], 0.25, lines="both")[1]) == 0
+
+
+def _chart(points):
+    return ("Title : v\r\nLine type : 0\r\n"
+            + "".join(f"   {x:.3f}   \t   {y:.3f}\r\n" for x, y in points)).encode()
+
+
+def _record(tops, near=True):
+    """A reference with three stages on a straight control curve; its one view is a line
+    from 0 at depth 0 to tops[i] at depth 10. The middle stage is the one compared."""
+    from r2c import record
+    sections = [("control/c", _chart([(0, 0), (1, 10), (2, 20)]))]
+    for i, top in enumerate(tops):
+        name = f"stage/{i}/v" if i == 1 or not near else f"neighbour/{i}/v"
+        if i == 1 or near is not None:
+            sections.append((name, _chart([(0, 0), (top, 10)])))
+    return record.decode(record.encode({"peak-stage": "1"}, sections))
+
+
+def test_departure_of_a_steady_change_and_of_a_spike():
+    steady, spike = _record([1.0, 2.0, 3.0]), _record([1.0, 4.0, 3.0])
+    assert compare.departure(steady, 1, "v", 0.5) == pytest.approx(0.0, abs=1e-9)
+    assert compare.departure(spike, 1, "v", 0.5) == pytest.approx(2.0)
+    # the neighbours may also be held as stages (a full capture)
+    assert compare.departure(_record([1.0, 4.0, 3.0], near=False), 1, "v", 0.5) == \
+        pytest.approx(2.0)
+    # without them there is nothing to test
+    assert compare.departure(_record([1.0, 4.0, 3.0], near=None), 1, "v", 0.5) is None
+
+
+def test_views_carry_the_references_departure():
+    ref = _record([1.0, 4.0, 3.0])
+    row = compare.compare_views(ref, ref, 1, 1, 0.5)[0]
+    assert row["max_diff"] == pytest.approx(0.0)
+    assert row["departure"] == pytest.approx(2.0) and row["departure_pct"] == pytest.approx(50.0)
+    assert "departure" not in compare.compare_views(ref, ref, 1, 1)[0]

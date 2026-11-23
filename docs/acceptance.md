@@ -149,16 +149,22 @@ a crack and the principal tensile strain and stress are in the Must by the owner
 ### Where Response is unstable (owner, 2026-11-23, D54)
 
 A view check means something only where Response's own result is steady. Where Response's
-view moves more between neighbouring stages than the target allows, matching it at one stage
-is luck, and such a check is reported but not assessed.
+view spikes at a stage, departing from its neighbours and coming back, matching it at that
+stage is luck, and such a check is reported but not assessed. A step, where Response moves to
+a new state and stays there (cracking, for one), is behaviour to clone, and stays assessed
+(owner, 2026-11-23, D56).
 
 - **Which checks:** every detail view, in every tier, on every case, at each stage where views
   are compared. Not the checks on the curves (peak, rising branch, post-peak, shape).
-- **The test:** Response's views at the stages just before and after are captured as well. A
-  view at a stage is *unstable* when Response's own view there lies farther than `views_pct`
-  from the blend of its two neighbours' views, taken at that stage's place along the control
-  curve, with the same distance measure and printed-precision floor as the comparison. A
-  steady change between stages blends well and stays assessed; a spike or a jump does not.
+- **The test (a spike):** Response's views at the stages just before and after are captured
+  as well. A view at a stage is *unstable* when both of these hold, each with the same
+  distance measure and printed-precision floor as the comparison:
+  - its two neighbours agree with each other, within `views_pct`; and
+  - Response's own view at the stage lies farther than `views_pct` from the blend of its two
+    neighbours' views, taken at the stage's place along the control curve (D55).
+
+  A steady change blends well and stays assessed. A step fails the first condition, because
+  the neighbours on either side of it differ, and stays assessed. Only a spike is left out.
 - **Without both neighbours** (the first or last stage, or a capture missing them) a view is
   not tested and stays assessed.
 - **An unstable check** is shown on the results with Response's own departure beside r2c's

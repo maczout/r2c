@@ -9,11 +9,16 @@ from the peak too. Views are compared at the features of Response's control curv
 falls of load, the peak, the last stage: tools/compare.py, feature_stages), so each fixture
 must hold those stages. The fixtures were cut to the peak only.
 
+Since the owner's rule on unstable views (2026-11-23, D54; docs/acceptance.md, "Where
+Response is unstable") each fixture also holds Response's views at the stage just before and
+just after each compared stage, as neighbours (tools/trim.py says how, and which are
+needed). This tool adds them.
+
 ARCHIVE is the folder tools/capture.py wrote (ARCHIVE/NAME.r2x.txt, every stage). For each
 fixture this tool first checks that the capture, cut the way the fixture was, matches it
 byte for byte (tools/capture.py's check): a capture that does not is reported and that
 fixture left alone. It then cuts the capture again, keeping the stages the fixture had plus
-the feature stages, and writes the fixture. tools/capture.py's check reads the stages to keep
+the feature stages, and their neighbours, and writes the fixture. tools/capture.py's check reads the stages to keep
 from each fixture, so it carries on working with the new fixtures unchanged.
 
 Needs no Response, only the archive. --dry-run prints the stages each fixture would keep.
@@ -58,11 +63,13 @@ def main(argv=None) -> int:
         rec = record.read(cap)
         feats = compare.feature_stages(rec)
         keep = sorted(set(record.read(fx).stages()) | set(feats))
+        near = trim.near_needed(rec, keep)
         desc = ", ".join(f"{n} ({feats.get(n, 'kept')})" for n in keep)
+        desc += "; neighbours " + (", ".join(map(str, near)) or "none")
         if a.dry_run:
             print(f"{fx.name}: {desc}")
             continue
-        data = trim.trim(rec, keep)
+        data = trim.trim(rec, keep, near)
         fx.write_bytes(data)
         print(f"{fx.name}: {desc}; {len(data) / 1024:.0f} kB")
     return 1 if bad else 0

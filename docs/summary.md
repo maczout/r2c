@@ -5,27 +5,42 @@
 current at the end of every session (CLAUDE.md, "Ending a session"). Everything else in
 `docs/` is the developer's working record and backs this page; it does not replace it.
 
-Last updated: 2026-11-23, by the developer, at the end of the session on step A-2 (log
-2026-11-23-01).
+Last updated: 2026-11-23, by the developer, at the end of the session that carried out
+the owner's rule on unstable views (D54; log 2026-11-23-02).
 
-**What changed.** Step A-2, the four parts the owner set (D49, D50). (1) Response's
-handling of the shear strain profile is switched on (D49): the rising branch of
-M/V = 0.5 m is back inside, 11 checks came inside and 22 went outside as foreseen, no
-Must among them; the 22 are recorded as known deviations. (2) The depth lead was tested
-with two runs of Response, at M/V = 0.99 m and 1.01 m on the I-girder: **Response puts
-in no stage where the top cracks close at either, so the lead is dropped** (D51 is the
-developer's reading of the 0.99 m run, for the owner to confirm). D47, D48 and the early
-ends are recorded as one known deviation, "the shear profile iteration". (3) The set is
-widened by reinforcement: **five cases, not six to eight, because only five parked
-fixtures vary the reinforcement and can be run** (D52). All five met their Musts as they
-were. One Should was outside, transverse bond with prestrained stirrups; two rules read
-from the program brought it inside. **All five now meet the Musts and the Shoulds.**
-(4) On the five, the known deviations that recur are how a shear response ends, and
-nothing else.
+**What changed.** Only the measure; r2c calculates what it did. The rule of D54 is in
+use: at each compared stage Response's own view is set against the blend of its views at
+the stage before and the stage after, and where it departs by more than the 5 % target
+the check is shown with Response's departure beside r2c's difference and counted neither
+inside nor outside. For that, Response's views at the neighbouring stages of the 29 cases
+were added to the fixtures (4.5 to 9.2 MB).
 
-**No decisions wait for the owner.** D51 to D54 answered 2026-11-23 (owner, after the
-session). New rule (D54): a view check where Response itself is unstable is reported, not
-assessed. Next: carry out D54, then material models (step A-3).
+**What the rule does, on the 29 cases** (figures and the list of Musts in "The rule on
+unstable views" below):
+
+- **It leaves 318 of the 1,554 view checks unassessed, one in five.** 286 of them were
+  inside before; 32 were outside.
+- **Must: 64 checks unassessed, every one of them inside before** (r2c within 1.7 % of
+  Response at each). The seven Must checks that are outside stay outside: they are the
+  column under N alone at its last stage (the owner's override, C2), which has no stage
+  after it and so is not tested.
+- **Should: 27 misses are no longer counted,** on five cases; three more cases meet the
+  Should (24 of 29, from 21). Could: five misses no longer counted (26 of 29, from 23).
+  These include known deviations: the column with shear at its peak (D47) and the stage
+  of V alone compared across cracking (D32) are now unassessed, not misses.
+- **Why so many:** views are compared at the features of the curve (cracking, a fall of
+  load, the peak), and those are the places where Response's views change most from one
+  stage to the next. Put to the owner as D56.
+
+**Found on the way: Response does not repeat itself on the I-girder with shear.** All 29
+cases were captured again from Response to check the new fixtures. 28 came back byte
+for byte. The I-girder with shear came back with 25 stages in three runs of four and
+with the fixture's 15 in one. The 15 are all there in the 25, identical; ten more stages
+sit on the rising branch between two of them. Nothing that is compared changes (D57).
+
+**No decisions wait for the owner.** D55 to D57 answered 2026-11-23 (owner, after the
+session): the rule is narrowed to spikes (D56), a measure change before step A-3; new cases
+are captured three times (D57). Then material models (step A-3, D53).
 
 ## Aim
 
@@ -107,11 +122,107 @@ of the shear strain profile (D49). "Now" is the run of record of step A-2
 | Shape | 21 | 21 | 26 of 29 | Must (a shear case's ending left out: D25). Two misses are known deviations (D32, D36); the third is the I-girder with shear (the shear profile iteration, D50) |
 | Views of the stress state, without shear | 12 of 13 | 12 of 13 | 14 of 15 | Must. The miss is the column under N alone after its peak (the owner's override, C2) |
 | Post-peak, without shear | 12 of 13 | 12 of 13 | 14 of 15 | Should. The miss is the column under N alone (C2) |
-| Views related to shear, and stress-state views with shear | 14 of 24 (2 of the 11 with shear) | 16 of 24 (4 of 11) | 21 of 29 (7 of the 14 with shear) | Should, not met |
-| Views related to cracking | 20 | 18 | 23 of 29 | Could |
+| Views related to shear, and stress-state views with shear | 14 of 24 (2 of the 11 with shear) | 16 of 24 (4 of 11) | 21 of 29 (7 of the 14 with shear); **24 of 29 (10 of 14) with the rule of D54** | Should, not met |
+| Views related to cracking | 20 | 18 | 23 of 29; **26 of 29 with the rule of D54** | Could |
 
 The 24 cases are held by the no-regression bound: between "before" and "now" no check
 on them changed side.
+
+### The rule on unstable views (D54), before and after
+
+Carried out 2026-11-23 as a change to the measure (log 2026-11-23-02). "Before" and
+"after" are the same run of r2c on the 29 cases, counted without and with the rule; r2c's
+differences from Response are the same in both, number for number (measured: the run of
+record against step A-2's). The generated figures are in `docs/verification-results.md`
+("View checks by tier", "Detail views where Response is unstable"); the results page
+shows the same.
+
+**Checks, tier by tier** (measured, `python tools/unstable.py VERIFY_OUT`). A check is one
+view at one compared stage of one case; the last stage of a shear case is left out (D40).
+
+| Tier | Checks | Before: inside | Before: outside | After: inside | After: outside | After: unassessed |
+|---|---:|---:|---:|---:|---:|---:|
+| Must | 376 | 369 | 7 | 305 | 7 | 64 |
+| Should | 808 | 764 | 44 | 598 | 17 | 193 |
+| Could | 370 | 361 | 9 | 305 | 4 | 61 |
+
+Of the 1,554 checks, 1,216 were tested. The other 338 have no stage on both sides (the
+last stage of a case without shear, and the case with no load) or, twice, a view whose
+lines could not be blended (the shrinkage and thermal strain at the peak of the two −M
+cases, where r2c's difference is nothing); they stay assessed, as the rule says. Where the unassessed checks are:
+155 at cracking, 104 at a peak, 59 at a fall of load.
+
+**Cases, tier by tier** (measured, `python tools/targets.py VERIFY_OUT --counts`, and
+with `--before-d54`).
+
+| Tier | Before: cases inside | After: cases inside | Cases that changed |
+|---|---:|---:|---|
+| Must (views of the stress state, without shear) | 14 of 15 | 14 of 15 | None. The miss is the column under N alone (C2) |
+| Should | 21 of 29 | 24 of 29 | Column with shear (its peak, D47), I-girder with shear (transverse bond at its peak, D46), N + M + V increasing together (transverse bond at cracking) |
+| Could | 23 of 29 | 26 of 29 | Column with shear, tension (D36), V alone (D32) |
+
+Peak, rising branch, shape and post-peak are not touched by the rule and stand as in the
+table above.
+
+**The misses that are no longer counted** (32 checks; r2c's difference and Response's
+departure for each are in the generated report): the column with shear at its peak, 9
+Should and 2 Could; M/V = 0.5 m at its fall of load, 4 Should, and at its peak, 3; V
+alone at its fall of load, 9 Should and 2 Could; the I-girder with shear, transverse
+bond at its peak; N + M + V increasing together, transverse bond at cracking; tension,
+the diagonal crack spacing at cracking. They are still listed in `docs/status.md` as
+known deviations, now marked as unassessed.
+
+**Every Must check left unassessed** (64, on 12 of the 15 cases without shear; for the
+owner's review, as the rule asks). Each entry: Response's departure from the blend of
+its neighbouring stages, in % of the chart's largest value, then in brackets r2c's
+difference from Response at that stage. Measured,
+`python tools/unstable.py VERIFY_OUT --list --tier must`.
+
+| Case | Response's stage | View: Response's departure % (r2c's difference %) |
+|---|---|---|
+| `column-n4000-m` | 28 (cracking) | principal tensile stress 5.0 (0.4) |
+| `column-n4000-m` | 45 (peak) | principal tensile stress 20.3 (0.8); long reinf stress at crack 5.2 (0.0) |
+| `igirder-m` | 32 (cracking) | principal tensile stress 37.7 (0.1) |
+| `igirder-m` | 63 (peak) | principal tensile stress 30.1 (0.1); longitudinal concrete stress 6.0 (0.0); principal compressive stress 6.0 (0.0) |
+| `newbeam-bardep-m` | 14 (cracking) | principal tensile stress 16.1 (1.2) |
+| `newbeam-bardep-m` | 49 (peak) | principal tensile stress 34.7 (0.1); longitudinal concrete stress 5.1 (0.0); principal compressive stress 5.1 (0.0) |
+| `newbeam-bartherm-m` | 17 (cracking) | principal tensile stress 36.4 (0.0) |
+| `newbeam-bartherm-m` | 44 (peak) | principal tensile stress 28.9 (0.2); longitudinal concrete stress 10.4 (0.0); principal compressive stress 10.4 (0.0); long reinforcement stress 6.3 (0.0) |
+| `newbeam-m` | 16 (cracking) | principal tensile stress 15.2 (0.0); longitudinal concrete stress 9.8 (0.0) |
+| `newbeam-m` | 56 (peak) | principal tensile stress 35.5 (0.1); longitudinal concrete stress 7.7 (0.0); principal compressive stress 7.7 (0.0) |
+| `newbeam-n2000-m` | 16 (cracking) | principal tensile stress 12.1 (1.0) |
+| `newbeam-n2000-m` | 37 (peak) | principal tensile stress 6.3 (0.1) |
+| `newbeam-negm` | 13 (fall) | longitudinal concrete stress 10.0 (0.0); principal tensile stress 9.1 (0.2); principal tensile strain 6.4 (0.0); longitudinal strain 5.6 (0.0) |
+| `newbeam-negm` | 14 (cracking) | long reinf stress at crack 27.4 (0.0); longitudinal concrete stress 9.0 (0.0); principal tensile stress 8.9 (0.2); principal tensile strain 6.2 (0.0); longitudinal strain 5.5 (0.0) |
+| `newbeam-nm` | 22 (peak) | long reinf stress at crack 46.9 (0.0); principal tensile stress 12.8 (1.7) |
+| `newbeam-ntension-m` | 16 (fall) | longitudinal concrete stress 10.6 (0.0); principal tensile stress 7.9 (0.0) |
+| `newbeam-ntension-m` | 17 (cracking) | long reinf stress at crack 25.3 (0.0); longitudinal concrete stress 21.6 (0.0); principal tensile stress 16.7 (0.1) |
+| `newbeam-ntension-m` | 71 (peak) | principal tensile stress 43.0 (0.2); longitudinal concrete stress 31.0 (0.0); principal compressive stress 31.0 (0.0); long reinforcement stress 9.0 (0.0) |
+| `newbeam-tension` | 13 (fall) | principal tensile strain 44.6 (0.0); longitudinal strain 29.6 (0.4); principal tensile stress 24.0 (0.5); longitudinal concrete stress 24.0 (0.5) |
+| `newbeam-tension` | 25 (peak) | longitudinal concrete stress 10.1 (0.2); principal tensile stress 10.0 (0.2) |
+| `tbeam-m` | 12 (cracking) | long reinf stress at crack 20.0 (0.0); longitudinal concrete stress 16.7 (0.3); principal tensile stress 16.3 (0.3) |
+| `tbeam-m` | 61 (peak) | longitudinal concrete stress 32.2 (0.0); principal compressive stress 32.2 (0.0); principal tensile stress 30.0 (0.2) |
+| `tbeam-negm` | 19 (fall) | principal tensile strain 22.2 (0.0); principal tensile stress 17.1 (0.2); longitudinal strain 16.7 (0.0); longitudinal concrete stress 13.2 (0.2) |
+| `tbeam-negm` | 20 (cracking) | principal tensile stress 32.0 (0.1); longitudinal concrete stress 20.8 (0.0); long reinf stress at crack 13.0 (0.0); principal tensile strain 8.4 (0.0); longitudinal strain 7.2 (0.0) |
+
+By view: the principal tensile stress 24, the longitudinal concrete stress 16, the steel
+stress at a crack 6, the principal compressive stress 6, the principal tensile strain 5,
+the longitudinal strain 5, the steel stress 2. Not on the list: the column under N alone
+(its cracking stage and peak are steady; its last stage is not tested), N in compression
+on Newbeam, and the case with no load.
+
+**The readings** (D55). The rule's wording leaves three choices. What each moves
+(measured, `python tools/unstable.py VERIFY_OUT --readings`):
+
+| Choice | Reading in use | Other reading | What the other reading moves |
+|---|---|---|---|
+| The stage's place between its neighbours "along the control curve" | By distance along the curve, load and control value scaled as the curves are measured | By control value alone | 58 checks change (33 more unassessed, 25 assessed again); Must unassessed 79 |
+| | | By load alone | 48 change (41 more, 7 again); Must unassessed 79 |
+| | | Half way | 78 change (46 more, 32 again); Must unassessed 83 |
+| A line that one neighbour draws and the other does not (the shear on the crack, 10 views) | Blended with nothing, so it comes in by degrees | Left out of the blend, so the stage's own line counts at full size | No check changes |
+| How two views are blended when Response has re-layered the section between stages (most views) | By depth: at each depth where either has a point, the two values there | None measured: point by point is not possible when the points differ | — |
+
+With every reading the seven Must misses stay and no Must miss becomes unassessed.
 
 ### Step A-2, part by part
 
@@ -305,7 +416,10 @@ owner) · *open* (no suggestion yet).
 
 | # | Question | Status | Answer |
 |---|---|---|---|
-| D54 | Matching the shear views needs a very tight clone, and some of Response's own views jump between neighbouring stages (the bond chart at the end of prestrained stirrups: 0.1 to 38 MPa from stage to stage, step A-2). Matching such a view at one stage is luck; the stage-by-stage measure makes it worse near cracking, the peak and the ending (D13, D25, D40, D42, D49) | decided, owner 2026-11-23 | **A view check where Response itself is unstable is reported, not assessed.** Unstable: Response's view at the stage lies farther than the views target from the blend of its neighbouring stages' views. Checks in steady stretches stay strict; the curves are not affected; every Must left unassessed is listed for the owner. The rule is in `docs/acceptance.md`, "Where Response is unstable". Carried out by the developer as a measure change before step A-3: views captured at the neighbouring stages, the test in the measure, the report showing Response's departure beside r2c's |
+| D54 | Matching the shear views needs a very tight clone, and some of Response's own views jump between neighbouring stages (the bond chart at the end of prestrained stirrups: 0.1 to 38 MPa from stage to stage, step A-2). Matching such a view at one stage is luck; the stage-by-stage measure makes it worse near cracking, the peak and the ending (D13, D25, D40, D42, D49) | decided, owner 2026-11-23 | **A view check where Response itself is unstable is reported, not assessed.** Unstable: Response's view at the stage lies farther than the views target from the blend of its neighbouring stages' views. Checks in steady stretches stay strict; the curves are not affected; every Must left unassessed is listed for the owner. The rule is in `docs/acceptance.md`, "Where Response is unstable". Carried out by the developer as a measure change before step A-3: views captured at the neighbouring stages, the test in the measure, the report showing Response's departure beside r2c's. **Done 2026-11-23** (log 2026-11-23-02): "The rule on unstable views" above; D55 and D56 came out of it |
+| D55 | **Three readings of the rule's wording, for the owner to confirm.** (a) "At that stage's place along the control curve": the developer took the place by distance along the curve (load scaled by Response's peak, control value by its largest value, as the curves are measured), because it works on every branch, at a peak and across a fall of load, where load alone or control value alone turn back. (b) Response layers the section afresh at each stage, so the points of a view differ between neighbours: the blend is taken depth by depth. (c) A line that one neighbour draws and the other does not is blended with nothing. What each moves is in the table of readings above: (a) 48 to 78 of 1,554 checks with the other readings, none of them a Must miss; (c) nothing; (b) has no other reading that can be measured | decided, owner 2026-11-23 (readings confirmed) | **Confirm all three:** place by distance along the curve; blend depth by depth; a line one neighbour draws blended with nothing |
+| D57 | **Response gives two different responses for the I-girder with shear (M/V = 1 m), run to run.** Same input, same loads, same program: 15 stages (the fixture, captured 2026-11-21, and one run of four on 2026-11-23) or 25 stages (three runs of four). The 25 hold the 15 with every view identical, and ten more stages between a shear of 366 and 463 kN, where the curve is the same straight rise. Peak, rising branch, post-peak, shape and every compared view of r2c come out the same against either. The other 28 cases repeated exactly. It is not the stage of D48 (that one is at 34 kN). Why Response does this was not looked into | decided, owner 2026-11-23 | **Keep the 15-stage fixture and note the case as not repeatable. From now on each new case is captured three times when the set is widened,** and any that does not repeat is noted before it joins; the direct evidence of Response's instability. Start with the cases of step A-3 |
+| D56 | **The rule reaches further than its example: is that what was meant?** Views are compared at cracking, falls of load and the peak, which is where Response's views change most between stages; a steady stretch is not compared at all. So the rule leaves one check in five unassessed (318 of 1,554), nine in ten of them checks r2c was inside on. All 64 unassessed Musts were inside, r2c within 1.7 % of Response. It also takes 32 misses out of the count, among them known deviations (by case and stage: D47, and part of D32, D46 and D49). No Must miss is hidden by it. Whether a stage where Response jumps is one where a match "is luck" is a structural judgement and the owner's: r2c matches most of these jumps closely, which may not be luck | decided, owner 2026-11-23 | **No: the rule reached too far. Narrow it to spikes.** A check is unassessed only where Response's two neighbouring views agree with each other (within the views target) and its view at the stage departs from their blend by more than the target. A step, such as cracking, stays assessed: r2c follows most of them closely, which is behaviour to clone, not luck, and leaving them out would hide a regression at the stages that matter most. Wording in `docs/acceptance.md`. Carried out as a measure change before step A-3 (the neighbour captures are already in the fixtures). (The developer had suggested keeping the rule as written for step A-3.) |
 
 ### The source rule (2026-11-22, after A2)
 
@@ -391,5 +505,15 @@ H and I (views are now covered by D2).
 - **Still standing on the parked cases:** eleven I-girder cases with shear outside on peak,
   rising branch or shape; the two cases in US units at M/V = 1 ft outside on rising
   branch and shape; the T-beam at M/V = 2 m on its peak (+6.7 %).
+- **Response is not repeatable on at least one case** (the I-girder with shear, D57):
+  its number of stages differs from run to run. Each fixture is one capture. The 28
+  other cases repeated exactly on 2026-11-23; the 56 parked cases were not captured
+  again, and 16 of them are I-girders with shear.
+- **Less is assessed at the features of the curve since D54.** One view check in five is
+  now reported and not counted, most of them checks r2c meets (D56). A change to the
+  kernel that spoils one of them will not show in the tier counts; it will show in the
+  regression tests, which the rule does not touch, and in the report's list of unstable
+  checks, which prints r2c's difference beside Response's departure and marks one that
+  would be outside.
 - **Speed.** Not worked on. The 29 cases take about two minutes on the owner's machine
   with all of them running at once (measured).

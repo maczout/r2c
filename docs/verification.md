@@ -35,6 +35,53 @@ SCOPE_INPUTS --out OUT` (the parked set needs RESPONSE_FOLDER among the inputs a
 `python tools/report.py OUT`; compare any two records with
 `python tools/compare.py REF SUBJECT --views`.
 
+**Since 2026-11-23 a view check where Response itself is unstable is reported and not
+assessed** (owner, D54): see "The rule on unstable views" below. Sections written before
+that date count such checks as inside or outside.
+
+## The rule on unstable views (D54), a change to the measure (2026-11-23)
+
+No change to what r2c calculates: the run of record
+(`docs/verification-results.md`) has the same differences from Response as step A-2's,
+number for number (measured: the two runs' results set side by side, the new fields
+left out). What changed is which view checks are assessed (owner, 2026-11-23, D54;
+`docs/acceptance.md`, "Where Response is unstable").
+
+**What the generated file now shows.** "View checks by tier": one check is one view at
+one compared stage of one case; for each tier the checks inside, outside and unstable
+in Response, and what they were before the rule. "Detail views where Response is
+unstable": each such check with Response's departure from the blend of its neighbouring
+stages, then r2c's difference from Response, and "(outside)" where r2c's difference
+would be a miss. A case's assessment says how many of its checks are unstable. The
+"worst case per view" table and each case's worst view leave those checks out.
+
+**What it means.**
+
+- *Most of what the rule sets aside is agreement, not disagreement.* 286 of the 318
+  unstable checks were inside. Response's principal tensile stress at the peak of
+  Newbeam under M departs 35.5 % from the blend of its neighbours and r2c is 0.1 % from
+  Response there: Response's view moves a great deal from stage to stage at a peak, and
+  r2c moves with it. Whether such a match is luck is the owner's to judge (D56).
+- *Where it is disagreement,* the 32 misses set aside are on six cases, and in most of
+  them r2c's difference is about the size of Response's own departure (the column with
+  shear at its peak: transverse bond 28.5 % against 32.1 %, stirrup stress 14.0 %
+  against 14.0 %). Those are the cases the rule was written for. Two are not like
+  that: transverse bond at the peak of the I-girder with shear (r2c 49.8 %, Response's
+  departure 9.9 %) and at cracking of "N + M + V increasing together" (71.5 % against
+  14.0 %); and the eleven views of V alone at Response's fall of load are up to 100 % off
+  because the stage is compared across cracking (D32), with departures of 5.7 to 50 %.
+  The rule asks only whether Response is unstable, not by how much r2c is off, so all of
+  these are unassessed alike.
+- *The features of the curve are where Response is unstable.* Of the checks tested, 155
+  of the unstable ones are at cracking, 104 at a peak and 59 at a fall of load; those
+  are the only stages compared, apart from the last, which has no stage after it and is
+  not tested.
+- *The readings* of the rule's wording move 48 to 78 checks of 1,554 at most
+  (`docs/summary.md`, D55).
+
+Reproduce: `python tools/unstable.py VERIFY_OUT [--list] [--readings]`;
+`python tools/targets.py VERIFY_OUT --counts [--before-d54]`.
+
 ## Step A-2: the shear profile handling on; the depth lead; reinforcement (2026-11-23)
 
 The run of record of step A-2 (`docs/verification-results.md`, 29 cases; all measured,

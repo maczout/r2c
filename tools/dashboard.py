@@ -6,8 +6,9 @@
 
 Answers, at a glance, for the owner's review: which sections and loadings the test set covers
 (and what it leaves out), how far r2c's peak and rising branch are from Response's in every
-case, how the detail views at the features of the curve compare, and what the control curves look like
-overlaid.
+case, how the detail views at the features of the curve compare, where Response itself is
+unstable there (owner, 2026-11-23, D54: those checks are shown with Response's own departure
+beside r2c's difference, and not assessed), and what the control curves look like overlaid.
 
 RESULTS is a folder written by tools/verify.py (results.json and run.json) or the combined
 JSON tools/report.py writes (default: docs/verification-results.json). r2c's curves come from
@@ -206,8 +207,15 @@ def build(run: dict, results: dict, acc: dict, curves_dir: Path | None, ref_dir:
             case["views_gap_pct"] = abs(sx - rx) / abs(rx) * 100 if rx else 0.0
         # the views that are assessed, and (D40) the last stage of a shear case on its own
         feat = {s["ref_stage"]: s["feature"] for s in r.get("views_stages", [])}
+        # D54: the checks where Response itself is unstable, reported and not assessed
+        case["unstable"] = [
+            {"view": u["view"], "stage": u["ref_stage"], "feature": u["feature"],
+             "tier": report.TIERS[u["tier"]], "dep": round(u["departure_pct"], 3),
+             "pct": None if u["pct"] is None else round(u["pct"], 3),
+             "outside": u["plain"] == "outside"}
+            for u in report.unstable_checks(r, acc)]
         for key, endings in (("views", False), ("views_end", True)):
-            for v in report.view_rows(r, endings):
+            for v in report.view_rows(r, endings, report.views_limit(acc)):
                 if v.get("missing"):
                     case.setdefault(key, []).append({"view": v["view"], "missing": True})
                 else:
@@ -243,8 +251,12 @@ def build(run: dict, results: dict, acc: dict, curves_dir: Path | None, ref_dir:
                     if o.get("run") and case["run"] and o["run"] != case["run"] and not same:
                         case["curve"]["other_run"] = o["run"]
         cases.append(case)
+    ran = {n: r for n, r in results.items() if "control" in r}
     return {"run": run, "cases": cases, "gaps": gaps, "stale": stale(run),
-            "acceptance": {g: t for g, t in acc.items() if t}}
+            "acceptance": {g: t for g, t in acc.items() if t},
+            "views_pct": report.views_limit(acc),
+            "tiers": [dict(n, tier=report.TIERS[t])
+                      for t, n in report.tier_counts(ran, acc).items() if n["checks"]]}
 
 
 # ---------------------------------------------------------------- page
@@ -427,9 +439,10 @@ const bins = [[1,"<1"],[2,"1–2"],[5,"2–5"],[10,"5–10"],[25,"10–25"],[100
 const binOf = p => bins.findIndex(b => p < b[0]);
 const cs = 18, lw = 112, th = 150;
 H += `<h2>Detail views at the features of the curve</h2>
-<p class="sub">Largest difference in each chart, as % of that chart's largest value, over the stages compared: cracking, falls of load, the peak and the last stage of Response's curve, each against r2c's stage at the same place (within the target in load and control value together, and not across a fall of load), or, where there is none, r2c's stage at the same feature of its curve (the tooltip names the stage). For a case with shear the last stage is not assessed and is drawn on its own below. Hatched rows: at the peak, r2c's nearest stage is more than 5 % away in control value, so the two are different states.</p>
+<p class="sub">Largest difference in each chart, as % of that chart's largest value, over the stages compared: cracking, falls of load, the peak and the last stage of Response's curve, each against r2c's stage at the same place (within the target in load and control value together, and not across a fall of load), or, where there is none, r2c's stage at the same feature of its curve (the tooltip names the stage). For a case with shear the last stage is not assessed and is drawn on its own below. A ring marks a view where Response itself is unstable at one of the stages: that check is left out of the cell's colour and listed in the next section. Hatched rows: at the peak, r2c's nearest stage is more than 5 % away in control value, so the two are different states.</p>
 <div class="legend">${bins.map((b,i)=>`<span><span class="sw" style="background:var(--s${i+1})"></span>${b[1]} %</span>`).join("")}
-<span><span class="sw" style="background:var(--surface);border:1px solid var(--border)"></span>chart all zero</span></div>`;
+<span><span class="sw" style="background:var(--surface);border:1px solid var(--border)"></span>chart all zero</span>
+<span><svg width="12" height="12" style="vertical-align:-2px;margin-right:4px"><circle cx="6" cy="6" r="3.5" fill="none" stroke="var(--ink)" stroke-width="1.5"/></svg>Response unstable at a stage: not assessed there</span></div>`;
 function heat(rows, key, hatch) {
  let hm = `<svg width="${lw + views.length*cs + 4}" height="${th + rows.length*cs + 4}" role="img" aria-label="heatmap of detail-view differences">
 <defs><pattern id="hatch" width="5" height="5" patternTransform="rotate(45)" patternUnits="userSpaceOnUse"><line x1="0" y1="0" x2="0" y2="5" stroke="var(--surface)" stroke-width="2"/></pattern></defs>`;
@@ -440,19 +453,49 @@ function heat(rows, key, hatch) {
   const far = hatch && (c.views_gap_pct ?? 0) > 5;
   views.forEach((v, j) => {
    const x = lw + j*cs, r = c[key].find(w => w.view === v);
-   if (!r) return;
+   const un = key === "views" ? (c.unstable || []).filter(u => u.view === v) : [];
+   if (!r && !un.length) return;
+   const unTip = un.map(u => `\nResponse unstable at its stage ${u.stage}${u.feature?" ("+u.feature+")":""}: departs ${f(u.dep,1)} % from the blend of its neighbours; r2c differs ${u.pct==null?"(missing)":f(u.pct,1)+" %"}; not assessed`).join("");
+   const ring = un.length ? `<circle cx="${x+cs/2}" cy="${y+cs/2}" r="3.5" fill="none" stroke="var(--surface)" stroke-width="3.5" pointer-events="none"/><circle cx="${x+cs/2}" cy="${y+cs/2}" r="3.5" fill="none" stroke="var(--ink)" stroke-width="1.5" pointer-events="none"/>` : "";
+   if (!r) { hm += `<rect x="${x+1}" y="${y+1}" width="${cs-2}" height="${cs-2}" rx="2" fill="var(--surface)" stroke="var(--border)" data-tip="${esc(`${c.name} · ${v}\nno stage assessed${unTip}`)}"/>${ring}`; return; }
    let fill, tip;
    if (r.missing) { fill = "var(--surface)"; tip = `${c.name} · ${v}\nmissing in r2c`; }
    else if (r.ref_max === 0) { fill = "var(--surface)"; tip = `${c.name} · ${v}\nchart all zero in Response`; }
    else { fill = `var(--s${binOf(r.pct)+1})`; tip = `${c.name} · ${v}\n${f(r.pct,1)} % (${f(r.diff,3)} of ${f(r.ref_max,3)})${r.stage!=null?`\nworst at Response's stage ${r.stage}${r.feature?" ("+r.feature+")":""}`:""}${far?`\nstages differ by ${f(c.views_gap_pct,0)} % in control value`:""}`; }
-   hm += `<rect x="${x+1}" y="${y+1}" width="${cs-2}" height="${cs-2}" rx="2" fill="${fill}" stroke="${fill==="var(--surface)"?"var(--border)":"none"}" data-tip="${esc(tip)}"/>`;
+   hm += `<rect x="${x+1}" y="${y+1}" width="${cs-2}" height="${cs-2}" rx="2" fill="${fill}" stroke="${fill==="var(--surface)"?"var(--border)":"none"}" data-tip="${esc(tip + unTip)}"/>`;
    if (r.missing) hm += `<text x="${x+cs/2}" y="${y+11}" text-anchor="middle">×</text>`;
    if (far && !r.missing) hm += `<rect x="${x+1}" y="${y+1}" width="${cs-2}" height="${cs-2}" fill="url(#hatch)" opacity="0.6" pointer-events="none"/>`;
+   hm += ring;
   });
  });
  return `<div class="scroll">${hm}</svg></div>`;
 }
 H += heat(cases, "views", true);
+
+// ---------- where Response is unstable (D54)
+const unst = cases.flatMap(c => (c.unstable || []).map(u => ({...u, name: c.name})));
+if ((D.tiers || []).length) {
+ const lim = D.views_pct;
+ H += `<h2>Where Response itself is unstable</h2>
+<p class="sub">A view check means something only where Response's own result is steady. At each compared stage, Response's view is set against the blend of its views at the stage before and the stage after, taken at the stage's place along the control curve and measured as r2c is measured against Response. Where it departs by more than the target (${f(lim,0)} %), the check is shown here with Response's own departure beside r2c's difference, and counts neither inside nor outside. A check is one view at one stage of one case; the first and last stage of a curve have no two neighbours and are not tested.</p>
+<div class="scroll"><table><tr><th>Tier</th><th>Checks</th><th>Inside</th><th>Outside</th><th>Unstable in Response, not assessed</th><th>Before the rule: inside</th><th>outside</th></tr>
+${D.tiers.map(t => `<tr><td>${t.tier}</td><td class="num">${t.checks}</td><td class="num">${t.inside}</td><td class="num">${t.outside}</td><td class="num">${t.unstable}</td><td class="num">${t.plain_inside}</td><td class="num">${t.plain_outside}</td></tr>`).join("")}</table></div>`;
+ const pair = u => {
+  let s = `<svg width="${CW}" height="18" role="img" aria-label="Response departs ${f(u.dep,1)} %, r2c differs ${u.pct==null?"missing":f(u.pct,1)+" %"}">`;
+  for (const t of [0.1,1,10]) s += `<line x1="${cl(t)}" x2="${cl(t)}" y1="1" y2="17" stroke="var(--grid)"/>`;
+  s += `<rect x="4" y="2" width="${Math.max(2, cl(u.dep)-4)}" height="6" rx="2" fill="var(--ref)"/>`;
+  if (u.pct != null) s += `<rect x="4" y="10" width="${Math.max(2, cl(u.pct)-4)}" height="6" rx="2" fill="var(--sub)"/>`;
+  if (lim != null) s += `<line x1="${cl(lim)}" x2="${cl(lim)}" y1="0" y2="18" stroke="var(--tol)" stroke-width="1.5"/>`;
+  return s + `</svg>`; };
+ const list = tier => { const a = unst.filter(u => u.tier === tier); if (!a.length) return "";
+  a.sort((p, q) => p.name.localeCompare(q.name) || p.stage - q.stage || q.dep - p.dep);
+  return `<details${tier === "Must" ? " open" : ""}><summary>${tier}: ${a.length} check${a.length === 1 ? "" : "s"} not assessed${tier === "Must" ? " (for the owner's review)" : ""}</summary>
+<div class="scroll"><table><tr><th class="sticky">Case</th><th>Response's stage</th><th>View</th><th>Response's departure %</th><th>r2c's difference %</th><th></th><th></th></tr>
+<tr><td class="sticky"></td><td colspan="4"></td><td>${ax2}</td><td></td></tr>
+${a.map(u => `<tr><td class="sticky">${esc(u.name)}</td><td>${u.stage}${u.feature ? " (" + esc(u.feature) + ")" : ""}</td><td>${esc(u.view.replaceAll("_"," "))}</td><td class="num">${f(u.dep,1)}</td><td class="num">${u.pct == null ? "missing" : f(u.pct,1)}</td><td>${pair(u)}</td><td>${u.outside ? `<span style="color:var(--ink-2)">would be outside</span>` : ""}</td></tr>`).join("")}</table></div></details>`; };
+ H += `<div class="legend"><span><span class="sw" style="background:var(--ref)"></span>Response's departure from the blend of its neighbours</span><span><span class="sw" style="background:var(--sub)"></span>r2c's difference from Response</span><span><span class="ln" style="border-color:var(--tol)"></span>target</span></div>`;
+ H += unst.length ? ["Must","Should","Could"].map(list).join("") : `<p class="note">No check is unstable in this run.</p>`;
+}
 const enders = cases.filter(c => (c.views_end || []).length);
 if (enders.length) H += `<h2>Detail views at the last stage of the shear cases</h2>
 <p class="sub">Reported, not assessed: how a shear response ends is not chased in this phase, so the two programs are often in different states at the last stage.</p>` + heat(enders, "views_end", false);

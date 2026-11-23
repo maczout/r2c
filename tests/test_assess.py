@@ -70,3 +70,52 @@ def test_shear_views_leave_out_the_last_stage():
 def test_a_last_stage_that_is_the_peak_is_assessed():
     r = staged(True, [("cracking", {"b": 1.0}), ("peak", {"b": 9.0})])
     assert report.assess(r, ACC)["views_should"][2] is False
+
+
+# -- where Response is unstable (owner, 2026-11-23, D54) -----------------------------------------
+
+def unstable_case(shear=False):
+    """Two stages. View a at stage 0: r2c 9 % off where Response itself departs 20 % from
+    the blend of its neighbours. Everything else steady or not tested."""
+    r = staged(shear, [("cracking", {"a": 9.0, "b": 1.0}), ("peak", {"a": 1.0, "c": 9.0}),
+                       ("ends falling", {})])
+    rows = {(i, v["view"]): v for i, st in enumerate(r["views_stages"]) for v in st["views"]}
+    rows[0, "a"].update(departure=20.0, departure_pct=20.0)
+    rows[0, "b"].update(departure=2.0, departure_pct=2.0)       # steady: stays assessed
+    return r, rows
+
+
+def test_an_unstable_check_counts_neither_inside_nor_outside():
+    r, _rows = unstable_case()
+    chk = report.assess(r, ACC)
+    assert chk["views"] == (1.0, 5.0, True)                 # a's 9 % at stage 0 is left out
+    assert report.assess(r, ACC, rule=False)["views"][2] is False
+    states = {(c["view"], c["ref_stage"]): (c["state"], c["plain"])
+              for c in report.stage_checks(r, ACC)}
+    assert states["a", 0] == ("unstable", "outside")
+    assert states["b", 0] == ("inside", "inside")
+    n = report.tier_counts({"x": r}, ACC)["views"]
+    assert (n["checks"], n["inside"], n["outside"], n["unstable"]) == (2, 1, 0, 1)
+    assert (n["plain_inside"], n["plain_outside"]) == (1, 1)
+
+
+def test_a_check_that_is_not_tested_stays_assessed():
+    r, _rows = unstable_case()
+    # c at stage 1 has no departure (no neighbours): 9 % is outside, as before
+    assert report.assess(r, ACC)["views_could"][2] is False
+
+
+def test_a_departure_within_the_printed_precision_is_not_unstable():
+    r, rows = unstable_case()
+    rows[0, "a"].update(departure=0.01, departure_pct=20.0, floor=0.02)
+    assert report.assess(r, ACC)["views"][2] is False
+    # and one at the target is not beyond it
+    rows[0, "a"].update(departure=5.0, departure_pct=5.0, floor=0.0)
+    assert report.assess(r, ACC)["views"][2] is False
+
+
+def test_the_report_shows_response_departure_beside_r2c_difference():
+    r, _rows = unstable_case()
+    text = "\n".join(report.unstable_sections({"x": r}, ACC))
+    assert "| Must | x | 0 (cracking) | a: 20.0 / 9.0 (outside) |" in text
+    assert "| Must | 2 | 1 | 0 | 1 | 1 | 1 |" in text

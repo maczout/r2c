@@ -7,7 +7,10 @@ fixtures. A check is a case's peak, rising branch, post-peak branch or shape, or
 view at one feature stage of Response's curve; inside and outside are decided as
 tools/report.py decides them (docs/acceptance.md, the printed-precision floor included).
 The views at the last stage of a shear case are not assessed (D40): those that changed
-side are listed on their own and do not count as gone outside or come inside.
+side are listed on their own and do not count as gone outside or come inside. Nor is a view
+check where Response itself is unstable (D54, tools/report.py): it is named as such, counts
+on neither side in either run, and a check that is unstable in one run only (the fixtures
+or the rule changed between them) is listed on its own.
 
     python tools/changes.py VERIFY_BEFORE VERIFY_AFTER [--view principal_tensile_stress]
 
@@ -30,6 +33,7 @@ import report  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
 NOT_ASSESSED = ", not assessed"
+UNSTABLE = "unstable in Response"
 
 
 def checks(res: dict, acc: dict) -> dict:
@@ -54,6 +58,10 @@ def checks(res: dict, acc: dict) -> dict:
                 out[name] = (False, "missing")
                 continue
             d = 0.0 if v["max_diff"] <= v.get("floor", 0.0) else v["max_diff_pct"]
+            if report.is_unstable(v, lim) and not name.endswith(NOT_ASSESSED):
+                # D54: reported, not assessed
+                out[name] = (None, f"{d:.1f} ({UNSTABLE}, departure {v['departure_pct']:.1f})")
+                continue
             out[name] = (d <= lim, f"{d:.1f}")
     return out
 
@@ -72,7 +80,7 @@ def main(argv=None) -> int:
     a = ap.parse_args(argv)
     acc = report.read_acceptance(Path(a.acceptance))
     before, after = load(Path(a.before)), load(Path(a.after))
-    worse, better, still, ends = [], [], [], []
+    worse, better, still, ends, unst = [], [], [], [], []
     nb, na = Counter(), Counter()
     for case in sorted(set(before) & set(after)):
         if "control" not in before[case] or "control" not in after[case]:
@@ -86,7 +94,9 @@ def main(argv=None) -> int:
             nb[view] += ob is False
             na[view] += oa is False
             line = f"  {case}: {k}: {tb} -> {ta}"
-            if k.endswith(NOT_ASSESSED):
+            if (UNSTABLE in tb) != (UNSTABLE in ta):
+                unst.append(line)
+            elif k.endswith(NOT_ASSESSED):
                 if (ob is False) != (oa is False):
                     ends.append(line)
             elif ob is not False and oa is False:
@@ -101,6 +111,8 @@ def main(argv=None) -> int:
     print(f"went outside target ({len(worse)}):", *worse, sep="\n")
     print(f"came inside target ({len(better)}):", *better, sep="\n")
     print(f"last stage of a shear case, not assessed, changed side ({len(ends)}):", *ends,
+          sep="\n")
+    print(f"unstable in Response in one run only, not assessed there ({len(unst)}):", *unst,
           sep="\n")
     if a.view:
         print(f"{a.view} still outside ({len(still)}):", *still, sep="\n")
