@@ -15,7 +15,9 @@ them, the limit is views_pct of docs/acceptance.md, and a difference within the 
 precision counts as none, as in tools/report.py. --shear lists only cases with shear;
 --tier only views of those tiers of docs/acceptance.md. The last stage of a shear case is
 listed as "not assessed" and left out of the total (owner, 2026-11-22, D40); --no-endings
-leaves the last stage out of the listing altogether, for cases without shear too.
+leaves the last stage out of the listing altogether, for cases without shear too. A view
+where Response itself is unstable at the stage (owner, 2026-11-23, D54) is listed with
+Response's departure and left out of the total, as tools/report.py leaves it unassessed.
 """
 
 from __future__ import annotations
@@ -65,16 +67,20 @@ def main(argv=None) -> int:
                 continue
             # D40: the last stage of a shear case is reported, not assessed
             aside = ending and has_shear(res)
-            out = [(v["view"], v["max_diff_pct"]) for v in vs["views"]
+            out = [(v["view"], v["max_diff_pct"],
+                    v["departure_pct"] if report.is_unstable(v, limit) else None)
+                   for v in vs["views"]
                    if not v.get("missing") and v["max_diff"] > v.get("floor", 0.0)
                    and v["max_diff_pct"] > limit
                    and (not a.tier or tier.get(v["view"]) in a.tier)]
-            total += 0 if aside else len(out)
+            total += 0 if aside else sum(1 for o in out if o[2] is None)
             print(f"  {vs['feature']}{' (not assessed)' if aside else ''}: stage {vs['ref_stage']} at ({vs['ref_x']:g}, "
                   f"{vs['ref_y']:g}), r2c's {vs['sub_stage']} at ({vs['sub_x']:g}, "
                   f"{vs['sub_y']:g})" + ("" if out else ": all inside"))
-            for view, pct in out:
-                print(f"      {view} ({tier.get(view, '-')}): {pct:.1f} %")
+            for view, pct, dep in out:
+                print(f"      {view} ({tier.get(view, '-')}): {pct:.1f} %"
+                      + ("" if dep is None else
+                         f" (not assessed: Response unstable, departure {dep:.1f} %)"))
     print(f"{total} views outside at the stages assessed")
     return 0
 

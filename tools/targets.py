@@ -17,6 +17,9 @@ outside on one of the three, or failed.
 checks (peak, rising branch, shape, post-peak, and the views tier by tier) the number of cases not outside target
 and the names of those outside. It is the progress table of docs/summary.md. A case on which
 a check cannot be made (no curve after the peak, no load at all) counts as inside on it.
+A view check where Response itself is unstable takes no part (owner, 2026-11-23, D54;
+tools/report.py); --before-d54 counts as the measure did before that rule, to set the two
+side by side. tools/unstable.py counts the view checks one by one.
 """
 
 from __future__ import annotations
@@ -57,13 +60,13 @@ def row(name: str, res: dict, acc: dict) -> tuple[bool, str]:
     return ok, f"{name}: {flag}: " + "; ".join(parts)
 
 
-def counts(names, results: dict, acc: dict) -> int:
+def counts(names, results: dict, acc: dict, rule: bool = True) -> int:
     """Per check: how many of the cases are not outside target, and which are outside."""
     failed = [n for n in names if "control" not in results[n]]
     for n in failed:
         print(f"{n}: r2c: {results[n].get('failed') or results[n].get('skipped')}")
     ran = [n for n in names if n not in failed]
-    checks = {n: report.assess(results[n], acc) for n in ran}
+    checks = {n: report.assess(results[n], acc, rule) for n in ran}
     for k in ("peak", "curve", "shape", "post_peak", "views", "views_should", "views_could"):
         if not any(k in checks[n] for n in ran):
             continue
@@ -85,6 +88,8 @@ def main(argv=None) -> int:
     ap.add_argument("--new", action="store_true", help="only the cases of increment S")
     ap.add_argument("--outside", action="store_true", help="only cases outside, or failed")
     ap.add_argument("--counts", action="store_true", help="cases inside, check by check")
+    ap.add_argument("--before-d54", action="store_true",
+                    help="with --counts: no view check left unassessed for instability")
     a = ap.parse_args(argv)
     results = json.loads((Path(a.verify_out) / "results.json").read_text())
     acc = report.read_acceptance(ROOT / "docs" / "acceptance.md")
@@ -96,7 +101,7 @@ def main(argv=None) -> int:
         new = {c["name"] for c in scope_cases.CASES}
         names = [n for n in names if n in new]
     if a.counts:
-        return counts(names, results, acc)
+        return counts(names, results, acc, not a.before_d54)
     inside = 0
     for n in names:
         ok, text = row(n, results[n], acc)

@@ -51,14 +51,84 @@ def is_ending(stage: dict) -> bool:
     return stage.get("feature", "").startswith("ends")
 
 
-def view_rows(res: dict, endings: bool = False) -> list[dict]:
+def is_unstable(row: dict, limit) -> bool:
+    """Is Response itself unstable at this view check (owner, 2026-11-23, D54;
+    docs/acceptance.md, "Where Response is unstable")? It is when Response's own view at the
+    stage lies farther than the views target (limit, views_pct) from the blend of its two
+    neighbours' views (tools/compare.py, departure), a departure within the printed
+    precision counting as none, as for the comparison. A row without a departure was not
+    tested (first or last stage, or a fixture without the neighbours) and stays assessed;
+    so does every row where no target is set."""
+    if limit is None or row.get("missing") or "departure" not in row:
+        return False
+    return row["departure"] > row.get("floor", 0.0) and row["departure_pct"] > limit
+
+
+def views_limit(acc: dict):
+    return acc.get("views", {}).get("views_pct")
+
+
+def tier_of(view: str, g: str, vacc: dict) -> str:
+    """The tier a view is counted in on a case of group g (docs/acceptance.md, view tiers):
+    "views" (Must), "views_should", "views_could", or "" for a view in none or exempt."""
+    if view in vacc.get("views_exempt", []):
+        return ""
+    if "must" not in vacc:
+        return "views"
+    if view in vacc.get("must", []):
+        return "views" if g == "flexure" else "views_should"
+    if view in vacc.get("should", []):
+        return "views_should"
+    return "views_could" if view in vacc.get("could", []) else ""
+
+
+def stage_checks(res: dict, acc: dict) -> list[dict]:
+    """Every view check of a case that the tiers cover: one view at one compared stage,
+    leaving out the last stage of a shear case (D40). Each: view, tier, ref_stage, feature,
+    pct (r2c's difference, a difference within the printed precision as 0), state
+    ("inside", "outside" or "unstable") and plain, the state it would have were no check
+    left unassessed (the measure before D54). No target set: no checks."""
+    vacc = acc.get("views", {})
+    lim = views_limit(acc)
+    if lim is None:
+        return []
+    g = group(res["ref"])
+    out = []
+    for st in res.get("views_stages", []):
+        if g == "shear" and is_ending(st):
+            continue
+        for row in st["views"]:
+            tier = tier_of(row["view"], g, vacc)
+            if not tier:
+                continue
+            if row.get("missing"):
+                pct, plain = None, "outside"
+            else:
+                pct = 0.0 if row["max_diff"] <= row.get("floor", 0.0) else row["max_diff_pct"]
+                plain = "inside" if pct <= lim else "outside"
+            out.append({"view": row["view"], "tier": tier, "ref_stage": st["ref_stage"],
+                        "feature": st.get("feature", ""), "pct": pct, "plain": plain,
+                        "state": "unstable" if is_unstable(row, lim) else plain,
+                        "departure_pct": row.get("departure_pct")})
+    return out
+
+
+def unstable_checks(res: dict, acc: dict) -> list[dict]:
+    """The view checks of a case left unassessed because Response is unstable there."""
+    return [c for c in stage_checks(res, acc) if c["state"] == "unstable"]
+
+
+def view_rows(res: dict, endings: bool = False, limit=None) -> list[dict]:
     """Each view's worst row over the compared stages of a case, as tools/compare.py's
     "views" but split as the owner decided (2026-11-22, D40, the counterpart of D25): for a
     shear case the last stage is left out of the view checks, since how a shear response
     ends is a Won't, and is reported separately. endings=False gives the rows that are
     assessed (a case without shear: every stage; with shear: all but the last);
     endings=True the rows of the last stage of a shear case, which are not assessed (none
-    for a case without shear). A result without the stages listed is taken whole."""
+    for a case without shear). A result without the stages listed is taken whole.
+
+    With limit (the views target), the rows where Response itself is unstable are left out
+    as well (D54, is_unstable): they are reported on their own (unstable_checks)."""
     shear = group(res["ref"]) == "shear"
     if "views_stages" not in res:
         return [] if endings else list(res.get("views", []))
@@ -67,6 +137,8 @@ def view_rows(res: dict, endings: bool = False) -> list[dict]:
         if (shear and is_ending(st)) != endings:
             continue
         for row in st["views"]:
+            if not endings and is_unstable(row, limit):
+                continue
             w = worst.get(row["view"])
             if (w is None or row.get("missing")
                     or (not w.get("missing") and row["max_diff_pct"] > w["max_diff_pct"])):
@@ -74,8 +146,10 @@ def view_rows(res: dict, endings: bool = False) -> list[dict]:
     return list(worst.values())
 
 
-def assess(res: dict, acc: dict) -> dict:
-    """{check: (value, limit, ok)} for each tolerance that is set; ok is None if unset."""
+def assess(res: dict, acc: dict, rule: bool = True) -> dict:
+    """{check: (value, limit, ok)} for each tolerance that is set; ok is None if unset.
+    A view check where Response itself is unstable takes no part (D54); rule=False gives
+    the assessment as it was before that rule, for setting the two side by side."""
     g = group(res["ref"])
     lim = acc.get(g, {})
     out = {}
@@ -112,7 +186,7 @@ def assess(res: dict, acc: dict) -> dict:
     def worst(names=None):
         # a view within the printed-precision floor counts as no difference
         vals = [0.0 if v["max_diff"] <= v.get("floor", 0.0) else v["max_diff_pct"]
-                for v in view_rows(res)
+                for v in view_rows(res, limit=vl if rule else None)
                 if not v.get("missing") and v["view"] not in exempt
                 and (names is None or v["view"] in names)]
         if vals:
@@ -157,6 +231,79 @@ def verdict(checks: dict) -> str:
 
 NAMES = {"curve": "rising", "post_peak": "post-peak", "views": "views (Must)",
          "views_should": "views (Should)", "views_could": "views (Could)"}
+TIERS = {"views": "Must", "views_should": "Should", "views_could": "Could"}
+
+
+def tier_counts(results: dict, acc: dict) -> dict:
+    """{tier: {"checks", "inside", "outside", "unstable", "plain_inside", "plain_outside"}}
+    over the cases: the view checks (stage_checks) by tier and state, and by the state they
+    would have were none left unassessed (the measure before D54)."""
+    out = {t: dict.fromkeys(("checks", "inside", "outside", "unstable", "plain_inside",
+                             "plain_outside"), 0) for t in TIERS}
+    for r in results.values():
+        if "control" not in r:
+            continue
+        for c in stage_checks(r, acc):
+            n = out[c["tier"]]
+            n["checks"] += 1
+            n[c["state"]] += 1
+            n["plain_" + c["plain"]] += 1
+    return out
+
+
+def unstable_sections(ran: dict, acc: dict) -> list[str]:
+    """The report's sections on D54: the view checks by tier, and each unstable check with
+    Response's own departure beside r2c's difference."""
+    lim = views_limit(acc)
+    if lim is None:
+        return []
+    counts = tier_counts(ran, acc)
+    if not any(n["checks"] for n in counts.values()):
+        return []
+    out = ["## View checks by tier", "",
+           "A check is one detail view at one compared stage of one case (the last stage of a "
+           "shear case left out). Where Response's own view at the stage lies more than "
+           f"{lim:g} % from the blend of its two neighbouring stages' views, Response is "
+           "unstable there and the check is reported, not assessed: it counts neither inside "
+           "nor outside (owner, 2026-11-23, D54). The last two columns are the same checks "
+           "with none left unassessed, as they were measured before that rule.", "",
+           "| Tier | Checks | Inside | Outside | Unstable in Response, not assessed | "
+           "Before the rule: inside | Before the rule: outside |",
+           "|---|---:|---:|---:|---:|---:|---:|"]
+    for t, title in TIERS.items():
+        n = counts[t]
+        if n["checks"]:
+            out.append(f"| {title} | {n['checks']} | {n['inside']} | {n['outside']} | "
+                       f"{n['unstable']} | {n['plain_inside']} | {n['plain_outside']} |")
+    out.append("")
+    rows = []
+    for name in sorted(ran):
+        by: dict[tuple, list] = {}
+        for c in unstable_checks(ran[name], acc):
+            by.setdefault((c["tier"], c["ref_stage"], c["feature"]), []).append(c)
+        for (tier, stage, feat), cs in sorted(by.items(),
+                                              key=lambda kv: (list(TIERS).index(kv[0][0]),
+                                                              kv[0][1])):
+            cells = "; ".join(
+                f"{c['view']}: {c['departure_pct']:.1f} / "
+                + ("missing" if c["pct"] is None else
+                   f"{c['pct']:.1f}" + (" (outside)" if c["plain"] == "outside" else ""))
+                for c in sorted(cs, key=lambda c: -c["departure_pct"]))
+            rows.append((list(TIERS).index(tier),
+                         f"| {TIERS[tier]} | {name} | {stage} ({feat or 'stage'}) | {cells} |"))
+    out += ["## Detail views where Response is unstable", ""]
+    if not rows:
+        return out + ["None.", ""]
+    out += ["Reported, not assessed (owner, 2026-11-23, D54). For each check: Response's own "
+            "departure from the blend of its neighbouring stages' views, then r2c's "
+            "difference from Response at that stage, both as % of the chart's largest value; "
+            "\"(outside)\" marks a difference that would be outside target were the check "
+            "assessed.", "",
+            "| Tier | Case | Response's stage | View: Response's departure % / r2c's "
+            "difference % |", "|---|---|---|---|"]
+    out += [r for _k, r in sorted(rows, key=lambda r: r[0])]
+    out.append("")
+    return out
 
 
 def label(ref: dict) -> str:
@@ -184,6 +331,11 @@ def shape_cell(c, g="flexure") -> str:
     if g == "shear" and _no_ending(c["shape_ref"]) == _no_ending(c["shape_sub"]):
         return f"same but the ending (not assessed): {diff}"
     return f"different: {diff}"
+
+
+def unstable_note(res: dict, acc: dict) -> str:
+    n = len(unstable_checks(res, acc))
+    return f"; {n} view check{'s' if n != 1 else ''} unstable in Response, not assessed" if n else ""
 
 
 def render(results: dict, run: dict, acc: dict, acc_path: str) -> str:
@@ -220,7 +372,7 @@ def render(results: dict, run: dict, acc: dict, acc_path: str) -> str:
             c = r["control"][-1]
             chk = assess(r, acc)
             worst = ""
-            vv = [v for v in view_rows(r) if not v.get("missing")]
+            vv = [v for v in view_rows(r, limit=views_limit(acc)) if not v.get("missing")]
             if vv:
                 w = max(vv, key=lambda v: v["max_diff_pct"])
                 worst = f"{w['max_diff_pct']:.1f} ({w['view']})"
@@ -240,13 +392,14 @@ def render(results: dict, run: dict, acc: dict, acc_path: str) -> str:
                 f"{c['ref_peak_load']:.1f} | {c['sub_peak_load']:.1f} | "
                 f"{cell(chk.get('peak'))} | {cell(chk.get('curve'), signed=False)} | "
                 f"{cell(chk.get('post_peak'), signed=False)} | {shape_cell(c, g)} | {worst} | "
-                f"{verdict(chk)} | {r.get('seconds', '')} |")
+                f"{verdict(chk)}{unstable_note(r, acc)} | {r.get('seconds', '')} |")
         out.append("")
     if skipped:
         out += ["## Not run", ""]
         for n in sorted(skipped):
             out.append(f"- {n}: {skipped[n].get('skipped') or skipped[n].get('failed')}")
         out.append("")
+    out += unstable_sections(ran, acc)
     # the detail views, worst case per view
     for endings, title, lead in (
             (False, "## Detail views at the features of the curve, worst case per view", ""),
@@ -255,7 +408,7 @@ def render(results: dict, run: dict, acc: dict, acc_path: str) -> str:
              "Won't, so the last stage of a shear case is left out of the view checks above.")):
         rows = {}
         for n, r in ran.items():
-            for v in view_rows(r, endings):
+            for v in view_rows(r, endings, views_limit(acc)):
                 if v.get("missing"):
                     continue
                 k = v["view"]
@@ -281,7 +434,14 @@ def render(results: dict, run: dict, acc: dict, acc_path: str) -> str:
             "where there is none, r2c's stage at the same feature of its curve), the largest "
             "distance of Response's points from r2c's curve, relative to the chart's largest "
             "value. For a case with shear the last stage is not assessed and is listed on "
-            "its own (a last stage that is also the peak is the peak, and is assessed). Shape: the curve's features in order (cracking, falls of load before the "
+            "its own (a last stage that is also the peak is the peak, and is assessed). "
+            "Unstable: Response's views at the stage before and the stage after each compared "
+            "stage are blended, line by line and depth by depth, in proportion to where the "
+            "stage lies between them along the control curve (load scaled by Response's peak, "
+            "control value by its largest value); Response's own view at the stage is measured "
+            "against that blend as r2c's is measured against Response's, and where it is "
+            "farther than the views target (and more than the printed precision) the check is "
+            "reported and not assessed. A stage without both neighbours is not tested. Shape: the curve's features in order (cracking, falls of load before the "
             "peak, the peak, how the response ends), read alike from both curves; it matches "
             "when they are the same. Stage counts are not compared.", ""]
     return "\n".join(out)

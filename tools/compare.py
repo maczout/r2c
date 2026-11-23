@@ -23,7 +23,11 @@ What is compared:
   subject's stage nearest the reference's in load and control value together, between the
   same features of the curves when both have them (D13, _segment_stage); for each
   chart the largest distance of the reference's points from the subject's curve, as a percentage of the chart's largest value (depth scaled by the section
-  depth).
+  depth);
+* with --views, where the reference holds the views of the stages just before and after a
+  detail stage: how far the reference's own view at that stage lies from the blend of its
+  two neighbours' views, by the same measure (owner, 2026-11-23, D54; docs/acceptance.md,
+  "Where Response is unstable"; see departure).
 
 No pass or fail is decided here: the numbers are for an engineer to judge.
 """
@@ -350,7 +354,181 @@ def feature_stages(rec, key=None) -> dict[int, str]:
     return out
 
 
-def compare_views(ref, sub, ref_stage, sub_stage):
+def lines_distance(la, lb):
+    """The distance measure of the detail views: how far the lines la of a chart lie from
+    the lines lb of another, line by line in the order they are drawn. (worst, scale): the
+    largest distance of la's points from lb's curve, in the chart's units, and the chart's
+    largest value in la. Values are scaled by that largest value and depth by the chart's
+    span of depth; a line of la with no line in lb counts at its full size."""
+    worst = 0.0
+    scale = 0.0
+    span = 0.0
+    for a in la:
+        if len(a):
+            scale = max(scale, float(np.max(np.abs(a[:, 0]))))
+            span = max(span, float(np.ptp(a[:, 1])))
+    for i, a in enumerate(la):
+        if len(a) == 0 or scale <= 1e-9:
+            continue
+        if i >= len(lb) or len(lb[i]) == 0:
+            worst = max(worst, float(np.max(np.abs(a[:, 0]))))
+            continue
+        dmax, _ = curve_distance(a, lb[i], scale, max(span, 1e-9))
+        worst = max(worst, dmax * scale)
+    return worst, scale
+
+
+# -- where the reference is unstable (owner, 2026-11-23, D54) -----------------------------------
+#
+# docs/acceptance.md, "Where Response is unstable": a view at a stage is unstable when
+# Response's own view there lies farther than the views target from the blend of its two
+# neighbours' views, taken at that stage's place along the control curve, with the same
+# distance measure and printed-precision floor as the comparison. Here the departure is
+# measured; tools/report.py sets it against the target.
+#
+# The rule leaves three choices open. Each is the developer's reading, for the owner to
+# confirm (docs/summary.md, D55); tools/unstable.py says how much each one moves.
+PLACE = "curve"    # the stage's place between its neighbours: see place
+LINES = "zero"     # a line one neighbour does not have: see blend_lines
+
+
+def place(a, rs, xs, ys, how=PLACE):
+    """Where stage rs lies between the stage before and the stage after on the control curve
+    a: 0 at the one before, 1 at the one after. None without both neighbours.
+
+    "curve" (the reading in use): by distance along the curve, load scaled by ys and control
+    value by xs as the curves are measured, so it holds on any branch, at a peak and across a
+    fall of load. The other readings, for tools/unstable.py: "control" by control value
+    alone, "load" by load alone (both fail where that value turns back, and are then taken
+    as "middle"), "middle" half way."""
+    if rs < 1 or rs + 1 >= len(a):
+        return None
+    p0, p1, p2 = (np.array([a[i, 0] / xs, a[i, 1] / ys]) for i in (rs - 1, rs, rs + 1))
+    if how == "curve":
+        d0, d1 = float(np.hypot(*(p1 - p0))), float(np.hypot(*(p2 - p1)))
+        return d0 / (d0 + d1) if d0 + d1 > 1e-12 else 0.5
+    if how in ("control", "load"):
+        k = 0 if how == "control" else 1
+        if abs(p2[k] - p0[k]) > 1e-12:
+            t = float((p1[k] - p0[k]) / (p2[k] - p0[k]))
+            if 0.0 <= t <= 1.0:
+                return t
+    return 0.5
+
+
+def _by_depth(line):
+    """A line as (u, x) with u = -depth not decreasing along it, or None if its depth turns
+    back (the steel charts, drawn as boxes)."""
+    if len(line) < 2:
+        return -line[:, 1], line[:, 0]
+    d = np.diff(line[:, 1])
+    if np.all(d <= 1e-9):
+        return -line[:, 1], line[:, 0]
+    if np.all(d >= -1e-9):
+        return -line[::-1, 1], line[::-1, 0]
+    return None
+
+
+def _sides(u, x, q):
+    """The value of a line at each depth q, on the side it is approached from and on the
+    side it is left: they differ where the line steps (two points at one depth). Beyond its
+    ends a line keeps its end value."""
+    lo = np.searchsorted(u, q, "left")
+    hi = np.searchsorted(u, q, "right")
+    before, after = np.empty(len(q)), np.empty(len(q))
+    for j, (i0, i1, v) in enumerate(zip(lo, hi, q)):
+        if i0 < i1:                       # a point of the line, or several at this depth
+            before[j], after[j] = x[i0], x[i1 - 1]
+        elif i0 == 0:
+            before[j] = after[j] = x[0]
+        elif i0 == len(u):
+            before[j] = after[j] = x[-1]
+        else:
+            f = (v - u[i0 - 1]) / (u[i0] - u[i0 - 1])
+            before[j] = after[j] = x[i0 - 1] + f * (x[i0] - x[i0 - 1])
+    return before, after
+
+
+def blend_line(p, q, t):
+    """The line a fraction t of the way from line p to line q, or None if it cannot be
+    formed. Lines with the same points in depth are blended point by point. Response layers
+    the section afresh at each stage, so most lines are not; those are blended by depth:
+    at every depth where either has a point, the two values there, a step in either kept as
+    a step. That needs depth to run one way along both lines."""
+    if len(p) == len(q) and len(p) and np.allclose(p[:, 1], q[:, 1], rtol=0.0, atol=1e-6):
+        return np.column_stack([(1.0 - t) * p[:, 0] + t * q[:, 0], p[:, 1]])
+    dp, dq = _by_depth(p), _by_depth(q)
+    if dp is None or dq is None:
+        return None
+    u = np.union1d(dp[0], dq[0])
+    pb, pa = _sides(*dp, u)
+    qb, qa = _sides(*dq, u)
+    out = []
+    for j, v in enumerate(u):
+        out.append(((1.0 - t) * pb[j] + t * qb[j], -v))
+        if pa[j] != pb[j] or qa[j] != qb[j]:
+            out.append(((1.0 - t) * pa[j] + t * qa[j], -v))
+    return np.array(out, dtype=float).reshape(-1, 2)
+
+
+def blend_lines(lp, lq, t, lines=LINES):
+    """The chart a fraction t of the way from the chart with lines lp to the one with lines
+    lq, line by line in the order they are drawn, or None if a line cannot be blended.
+
+    A line that only one of the two has (Response draws some lines only once there is
+    something to show, such as the shear on the crack): with "zero", the reading in use, it
+    is blended with nothing, a line of zeros, so it comes in or goes out by degrees. With
+    "both", the other reading (tools/unstable.py), the blend has only the lines both have,
+    and a line of the stage's with none in the blend counts at its full size."""
+    out = []
+    for i in range(max(len(lp), len(lq))):
+        p = lp[i] if i < len(lp) else np.zeros((0, 2))
+        q = lq[i] if i < len(lq) else np.zeros((0, 2))
+        if len(p) == 0 and len(q) == 0:
+            out.append(np.zeros((0, 2)))
+        elif len(p) == 0 or len(q) == 0:
+            if lines == "both":
+                out.append(np.zeros((0, 2)))
+            else:
+                w, one = (1.0 - t, p) if len(q) == 0 else (t, q)
+                out.append(np.column_stack([w * one[:, 0], one[:, 1]]))
+        else:
+            b = blend_line(p, q, t)
+            if b is None:
+                return None
+            out.append(b)
+    return out
+
+
+def view_body(rec, stage, key):
+    """A detail view of a stage of a record, whether the record holds the stage as one to
+    compare (stage/N/VIEW) or as a neighbour (neighbour/N/VIEW, tools/trim.py). None if it
+    holds neither."""
+    body = rec.sections.get(record.stage_section(stage, key))
+    return body if body is not None else rec.sections.get(f"neighbour/{stage}/{key}")
+
+
+def departure(ref, stage, key, t, lines=LINES):
+    """How far the reference's own view at a stage lies from the blend of its views at the
+    stage before and the stage after, t of the way from the one to the other: the largest
+    distance of its points from the blend, in the chart's units, by the measure of the
+    comparison (lines_distance). None where it cannot be tested: a neighbour's view is not
+    in the record, or a line cannot be blended."""
+    before, after = view_body(ref, stage - 1, key), view_body(ref, stage + 1, key)
+    if t is None or before is None or after is None:
+        return None
+    blend = blend_lines(parse_chart(before)[3], parse_chart(after)[3], t, lines)
+    if blend is None:
+        return None
+    return lines_distance(parse_chart(ref.stage(stage, key))[3], blend)[0]
+
+
+def compare_views(ref, sub, ref_stage, sub_stage, t=None):
+    """Every detail view of the reference's stage against the subject's. With t, the place
+    of the reference's stage between its neighbours (place), each row also carries the
+    reference's own departure from the blend of its neighbours' views there, where it can
+    be tested (departure): "departure" in the chart's units, "departure_pct" relative to the
+    chart's largest value, as "max_diff" and "max_diff_pct" are."""
     rows = []
     prefix = f"stage/{ref_stage}/"
     for name in ref.sections:
@@ -364,26 +542,16 @@ def compare_views(ref, sub, ref_stage, sub_stage):
             continue
         la = parse_chart(ref.stage(ref_stage, key))[3]
         lb = parse_chart(sb)[3]
-        worst = 0.0
-        scale = 0.0
-        span = 0.0
-        for a in la:
-            if len(a):
-                scale = max(scale, float(np.max(np.abs(a[:, 0]))))
-                span = max(span, float(np.ptp(a[:, 1])))
-        for i, a in enumerate(la):
-            if len(a) == 0 or scale <= 1e-9:
-                continue
-            if i >= len(lb) or len(lb[i]) == 0:
-                worst = max(worst, float(np.max(np.abs(a[:, 0]))))
-                continue
-            dmax, _ = curve_distance(a, lb[i], scale, max(span, 1e-9))
-            worst = max(worst, dmax * scale)
+        worst, scale = lines_distance(la, lb)
         rx, ry = resolution(ref.stage(ref_stage, key))
         rows.append({"view": key, "ref_max": scale, "max_diff": worst,
                      "floor": FLOOR_DIGITS * rx,
                      "max_diff_pct": float(100.0 * worst / scale) if scale > 1e-9 else 0.0,
                      "lines": [len(la), len(lb)]})
+        dep = departure(ref, ref_stage, key, t)
+        if dep is not None:
+            rows[-1]["departure"] = dep
+            rows[-1]["departure_pct"] = float(100.0 * dep / scale) if scale > 1e-9 else 0.0
     return rows
 
 
@@ -418,7 +586,11 @@ def compare(ref, sub, views=False):
             at = {"ref_stage": rs, "sub_stage": ss, "matched_by": how,
                   "feature": feats.get(rs, ""),
                   "ref_x": x, "ref_y": y, "sub_x": float(b[ss, 0]), "sub_y": float(b[ss, 1])}
-            rows = compare_views(ref, sub, rs, ss)
+            # D54: the reference's own steadiness at this stage, where it has both neighbours
+            t = place(a, rs, xs or 1.0, pk or 1.0)
+            if t is not None:
+                at["place"] = t
+            rows = compare_views(ref, sub, rs, ss, t)
             at["views"] = rows
             out["views_stages"].append(at)
             if rs == rp:
