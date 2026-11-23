@@ -5,9 +5,11 @@ sections, other materials and reinforcement, units, material factors, More Detai
 and Response's sample inputs. They are kept and not run by default; they come back in
 phase B.
 
-The phase A set is the 17 fixtures directly in `tests/oracle`: Newbeam with only its loads
-varied. A tool given `tests/oracle` reads that set alone, because the tools read one folder
-and not the folders under it.
+The development set is the fixtures directly in `tests/oracle` (`docs/summary.md`, "The
+development set"): Newbeam with only its loads varied (17), the Quick Define sections (7,
+step A-1) and the reinforcement varied (5, step A-2: moved from here on 2026-11-23). A tool
+given `tests/oracle` reads that set alone, because the tools read one folder and not the
+folders under it.
 
 To run the parked set on request:
 
