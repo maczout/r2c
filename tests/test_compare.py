@@ -84,3 +84,33 @@ def test_matching_falls_back_to_nearest_when_the_features_differ():
     sub = np.array([[0, 0], [1, 50], [2, 60], [3, 100]], dtype=float)  # no cracking
     ss = compare._segment_stage(_Rec(4), None, 1, ref, sub, 1.0, 50.0, 3.0, 100.0)
     assert ss == 1
+
+
+# D42 (owner, 2026-11-22): a stage at the same place is compared before the feature's stage.
+def test_matching_takes_the_stage_at_the_same_place_before_the_feature():
+    # two curves that agree, with "cracking" read at stage 3 of one and stage 2 of the other
+    ref = np.array([[0, 0], [1, 40], [2, 70], [3, 80], [4, 90], [5, 100]], dtype=float)
+    sub = np.array([[0, 0], [1, 40], [2, 55], [3, 80], [4, 90], [5, 100]], dtype=float)
+    assert dict(compare.shape(ref, 100.0, 5.0))["cracking"] == 3
+    assert dict(compare.shape(sub, 100.0, 5.0))["cracking"] == 2
+    assert compare._segment_stage(_Rec(6), None, 3, ref, sub, 3.0, 80.0, 5.0, 100.0) == 2
+    assert compare.match_stage(_Rec(6), None, 3, ref, sub, 5.0, 100.0, 0.05) == (3, "same place")
+
+
+def test_same_place_does_not_match_across_a_fall():
+    # a shallow fall of load at stage 3 in both; the subject's stage before its fall (2) is
+    # the nearest to the reference's stage after the fall (3), and within the target
+    ref = np.array([[0, 0], [1, 50], [2, 60], [2.02, 57], [3, 80], [4, 100]], dtype=float)
+    sub = np.array([[0, 0], [1, 50], [2.02, 58], [2.3, 55], [3, 80], [4, 100]], dtype=float)
+    d = np.hypot((sub[:, 0] - 2.02) / 4.0, (sub[:, 1] - 57.0) / 100.0)
+    assert int(np.argmin(d)) == 2 and d[2] < 0.05
+    assert compare.match_stage(_Rec(6), None, 3, ref, sub, 4.0, 100.0, 0.05)[0] == 3
+
+
+def test_far_stages_are_matched_by_feature():
+    ref = np.array([[0, 0], [1, 40], [2, 80], [3, 90], [4, 100], [5, 82], [6, 105],
+                    [7, 110]], dtype=float)
+    sub = np.array([[0, 0], [1, 40], [2, 81], [3, 90], [4, 99], [5, 70], [6, 104],
+                    [7, 110]], dtype=float)
+    assert compare.match_stage(_Rec(8), None, 5, ref, sub, 7.0, 110.0, 0.05) == (5, "feature")
+

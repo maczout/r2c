@@ -4,12 +4,14 @@
     python tools/matching.py REFERENCE.r2x.txt SUBJECT.r2x.txt [--tier must should could]
 
 Answers the question a case raises when its curves agree and its views do not. At each
-feature stage of the reference's curve the views are compared twice: with the subject's
-stage tools/compare.py matches to it (between the same features of the two curves, D13),
-and with the subject's stage nearest it in load and control value alone. Where the two
+feature stage of the reference's curve the views are compared with the subject's stage
+matched by the features of the two curves (D13) and with the subject's stage nearest it in
+load and control value alone, and the line marked "compared" is the one tools/compare.py
+uses: since D42 (owner, 2026-11-22) the stage at the same place where there is one within
+the target, not across a fall of load, and the feature's stage otherwise. Where the two
 differ, the feature was read at different stages of two curves that may otherwise be the
 same (the threshold on stiffness that reads "cracking", or which of two points of a plateau
-is the largest), and the views are compared in different states.
+is the largest), and the views would be compared in different states.
 
 Nothing is assessed here and no measure is changed: the differences are tools/compare.py's
 own (compare_views), the limit is views_pct of docs/acceptance.md.
@@ -62,7 +64,9 @@ def main(argv=None) -> int:
         x, y = float(ca[rs, 0]), float(ca[rs, 1])
         by_feature = cmp._segment_stage(sub, key, rs, ca, cb, x, y, xs, pk)
         nearest = cmp._nearest_stage(sub, key, x, y, xs, pk)
-        print(f"{feats.get(rs, 'stage')}: reference stage {rs} at ({x:g}, {y:g})")
+        used, how = cmp.match_stage(sub, key, rs, ca, cb, xs, pk, cmp.same_place_limit(ref))
+        print(f"{feats.get(rs, 'stage')}: reference stage {rs} at ({x:g}, {y:g}); "
+              f"compared with subject stage {used} ({how})")
         for how, ss in (("matched by feature", by_feature), ("nearest in state", nearest)):
             out = outside(ref, sub, rs, ss, limit, tier, a.tier)
             worst = max(out, key=lambda o: o[1]) if out else None

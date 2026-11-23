@@ -13,7 +13,7 @@ analysis; anything else on the driver), to see what a rule that is written and o
 
 Columns: stages kept so far; the control variable and its target (rad/km or mm/m); the step
 multiplier; what came of it; the load factor; the profile error in Response's measure (%);
-passes; the state code; whether the state is cracked; then the curvature, the centroid's
+passes; the state code; whether the state is cracked, as the stage control tests it; then the curvature, the centroid's
 strain and the mean shear strain of the state.
 """
 
@@ -59,7 +59,7 @@ def main() -> int:
         err = "" if t["perr"] is None else f"{100 * t['perr']:7.2f}"
         tail = ""
         if st is not None:
-            crk = "y" if bool(st.detail.out.cracked.any()) else "n"
+            crk = "y" if drv._cracked(st) else "n"
             tail = (f"{crk:>3} {st.phi * 1e6:8.4f} {st.e0 * 1e3:8.4f} "
                     f"{getattr(st, 'gam_avg', st.gam) * 1e3:8.4f}")
         print(f"{t['n']:4d} {t['mode']:>3} {t['target'] * k:9.4f} {t['mult']:6.3f} {what:<9} "

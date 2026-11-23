@@ -386,8 +386,8 @@ class Analysis:
         ex = self.strain(e0, phi, zf) - sec.shrinkage(zf)
         m = sec.tab(sec.t_m, zf)
         ft = np.interp(zf, sec.tz, self.t_ft)
-        smx = sec.tab(sec.t_smx, zf)
-        smt = sec.tab(sec.t_smt, zf)
+        smx = sec.smx_at(zf)
+        smt = sec.smt_at(zf)
         cx = f1cx(zf)
         g = gam * np.interp(self.profile_z(z).ravel(), self.shape_z, self.shape) \
             if gam != 0.0 else np.zeros_like(zf)

@@ -281,6 +281,58 @@ def _segment_stage(sub, key, rs, a, b, x, y, xs, ys):
     return nearest(cand or have)
 
 
+def same_place_limit(ref) -> float:
+    """How near two stages must be to count as "at the same place" (D42): the target on the
+    curves of docs/acceptance.md (curve_pct of the case's group), as a fraction. 0.05 where
+    the file sets none."""
+    import report
+    try:
+        acc = report.read_acceptance(Path(__file__).resolve().parents[1] / "docs" / "acceptance.md")
+        pct = acc.get(report.group(ref.header), {}).get("curve_pct")
+    except (OSError, SystemExit, KeyError, ValueError):
+        pct = None
+    return 0.05 if pct is None else pct / 100.0
+
+
+def _same_place_stage(sub, rs, a, b, x, y, xs, ys, limit):
+    """D42 (owner, 2026-11-22): the subject's stage at the same place as the reference's
+    stage rs: the nearest in load and control value together (load scaled by ys, control
+    value by xs, as the curves are measured), if it is within the target (limit, a
+    fraction). None if there is none.
+
+    D13's purpose is kept: no matching across a fall of load. Where the two curves have the
+    same number of falls before the peak, only the subject's stages that have as many falls
+    behind them as rs has are looked at, so r2c's stage before a fall is never taken for
+    Response's stage after it, however near. A stage at a fall (the first one below) counts
+    as after it."""
+    fa = [i for f, i in shape(a, ys, xs) if f == "fall"]
+    fb = [i for f, i in shape(b, ys, xs) if f == "fall"]
+    have = [n for n in sub.stages() if n < len(b)]
+    if len(fa) == len(fb):
+        behind = sum(1 for i in fa if i <= rs)
+        have = [n for n in have if sum(1 for i in fb if i <= n) == behind]
+    if not have:
+        return None
+
+    def dist(n):
+        return float(np.hypot((b[n, 0] - x) / xs, (b[n, 1] - y) / ys))
+
+    n = min(have, key=dist)
+    return n if dist(n) <= limit else None
+
+
+def match_stage(sub, key, rs, a, b, xs, ys, limit):
+    """The subject's stage whose views are compared with those of the reference's stage rs,
+    and how it was found: (stage, "same place" or "feature"). Where the two curves have a
+    stage at the same place, those are compared (D42); the stage matched by the features of
+    the curves (D13) only where they do not. a, b: the two curves of control chart key."""
+    x, y = float(a[rs, 0]), float(a[rs, 1])
+    n = _same_place_stage(sub, rs, a, b, x, y, xs, ys, limit)
+    if n is not None:
+        return n, "same place"
+    return _segment_stage(sub, key, rs, a, b, x, y, xs, ys), "feature"
+
+
 def feature_stages(rec, key=None) -> dict[int, str]:
     """The stages at the features of a record's control curve (the bottom chart unless key is
     given), with the peak stage from its header: {stage: feature}. The stages whose detail
@@ -353,16 +405,18 @@ def compare(ref, sub, views=False):
         feats = feature_stages(ref, key)
         rp = int(ref.header.get("peak-stage", "0"))
         b = _curve(sub, key)
+        limit = same_place_limit(ref)
         worst: dict[str, dict] = {}
         out["views_stages"] = []
         for rs in ref.stages():
             if rs >= len(a):
                 continue
             x, y = float(a[rs, 0]), float(a[rs, 1])
-            ss = _segment_stage(sub, key, rs, a, b, x, y, xs or 1.0, pk or 1.0)
+            ss, how = match_stage(sub, key, rs, a, b, xs or 1.0, pk or 1.0, limit)
             if ss is None:
                 continue
-            at = {"ref_stage": rs, "sub_stage": ss, "feature": feats.get(rs, ""),
+            at = {"ref_stage": rs, "sub_stage": ss, "matched_by": how,
+                  "feature": feats.get(rs, ""),
                   "ref_x": x, "ref_y": y, "sub_x": float(b[ss, 0]), "sub_y": float(b[ss, 1])}
             rows = compare_views(ref, sub, rs, ss)
             at["views"] = rows
