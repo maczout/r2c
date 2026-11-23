@@ -66,6 +66,10 @@ developer's. Items that need a structural judgement are marked **(structural)**.
   for Response's sample inputs, `R2C_SCOPE_DIR` for the inputs of the scope cases). Eleven
   parked fixtures need something removed: five have no test, and the six on Response's
   sample inputs that hold several sections have a test that they are refused (D23).
+  The parked tests were run at the end of step A-2 for the first time since increment
+  A4: one fails, Newbeam in US units at M/V = 1 ft, whose peak is 1.41 and 1.57 % under
+  Response's on its two charts against a regression limit of 1.3 % (1.31 and 1.47 % at
+  the end of step A-1; the limit was left as it is).
 - Docs: `kernel.md` (each rule and its source), `verification.md` (what the results mean),
   `verification-results.md` (generated), `acceptance.md` (the owner's development targets),
   `scope.md` (every input an r2x solve can take, whether the manual documents it, and

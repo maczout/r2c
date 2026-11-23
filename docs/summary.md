@@ -376,6 +376,10 @@ H and I (views are now covered by D2).
   check to weigh it by. It is noted in `docs/status.md`.
 - **One inferred detail in the new layering:** which side the middle node of the thin layer
   belongs to (the wider one) is taken from Response's charts on one section, not read.
+- **One parked regression test fails:** Newbeam in US units at M/V = 1 ft, peak 1.4 to
+  1.6 % under Response's against a guard of 1.3 %. It has been over the guard since
+  step A-1 (the parked tests were not run in between) and moved 0.1 % further since.
+  The guard was left as it is; the case is inside the 5 % target on its peak.
 - **Still standing on the parked cases:** eleven I-girder cases with shear outside on peak,
   rising branch or shape; the two cases in US units at M/V = 1 ft outside on rising
   branch and shape; the T-beam at M/V = 2 m on its peak (+6.7 %).
