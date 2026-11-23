@@ -292,7 +292,9 @@ across a step to four times the width (measured, I-girder, M/V = 2 m). In r2c:
   step reads the profile on the layer's own side;
 * a node's stirrup ratio ρv = Av/(b·s) is taken with the width of the node's own layer.
 
-Both are r2c's own way of keeping the two sides apart, not rules read from Response. The
+Both are r2c's own way of keeping the two sides apart, not rules read from Response. Since
+2026-11-22 they apply only to a step of 10 mm or less: at a larger one Response's thin layer
+is there ("Layers", "Across a step"), with a point of the profile at each of its faces. The
 tables over the depth (crack spacing, bond, steel ratio at a crack) are still interpolated
 across a step from their 100 stations.
 
@@ -317,9 +319,27 @@ int(8·d/(h + 0.1 mm) + 0.99) − 1 equal layers, at least one (d its depth, h t
 seven for a section with one stretch. (The thesis says eight.) Then, bar layer by bar layer,
 the layer that holds the bar gets a boundary at the bar's upper edge and one at its lower
 edge (the bar's height ± half its diameter, held inside that layer), unless that would
-leave a layer thinner than h/2048 or the edge is within 0.2 mm of a boundary. Response also
-puts a layer 0.1 mm thick across a step in width; r2c does not, and keeps the two sides of a
-step apart in its own way ("At a step in width").
+leave a layer thinner than h/2048 or the edge is within 0.2 mm of a boundary.
+
+*Across a step* [B `00434eb0`], since 2026-11-22 (step A-1). Where one stretch of the
+outline ends and the next begins with a width more than 10 mm different, or with another
+concrete, the boundary between them is replaced by two: 0.05 mm above the step and 0.05 mm
+below it. So a layer 0.1 mm thick lies across the step, its top node on the upper stretch,
+its bottom node on the lower one and its middle node on the step itself; the other
+boundaries of the two stretches stay where they were. The layer is too thin to be split.
+The middle node has the width, and the shear strain, of the wider side [O: Response's
+Shear Stress and Shear Strain charts on the I-girder at both of its steps, 4.0 and 3.0
+times less at the middle node than at the web's node, the ratios of the widths; one
+section]. r2c: `Analysis.thin`, `_initial_bounds`, `layer_nodes`, `profile_z`
+(`solver.own_thin_layer`). Before, r2c had one boundary on the step and kept the two sides
+apart in its own way ("At a step in width"), which stays for a step of 10 mm or less.
+Measured: r2c's nodes at the two steps of the I-girder are Response's (333.16, 333.11,
+333.06 and −316.84, −316.89, −316.94 mm); the T-beam under −M, steel stress at a crack at
+the last stage, 100 to 0.0 % (the concrete's moment over the cracked halves of layers
+changes with the layer at the step); transverse bond in Response's own states on the
+I-girder with shear, 99.8 to 0.0 % at the stage before the peak (the jump of the stirrup
+stress at the web's edge is spread over the thin layer, not over half a web layer).
+Not checked: a change of concrete at one width (no case).
 
 *Splitting* [B `004a9d90`, `004a9be0`]. Each time the section's forces are wanted, the layers
 start from the base layers. The middle of each half of a layer is worked out and compared
