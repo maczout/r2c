@@ -21,9 +21,10 @@ def test_transverse_spacing_inside_and_outside_the_stirrups():
     assert inside < mid < 5.0 * sec.h
 
 
-def test_longitudinal_table_of_response_is_off_and_never_over_the_depth():
-    assert Section.response_smx is False
+def test_longitudinal_spacing_is_never_over_the_depth_and_has_a_point_at_each_layer():
     sec = Section(inputs.default_section())
+    heights = set(np.round(sec.p_smx[0], 9))
+    assert all(round(l.z, 9) in heights for l in sec.layers)
     z = np.linspace(sec.zbot, sec.ztop, 50)
     assert float(np.max(sec.smx_at(z))) <= sec.h + 1e-9
 
