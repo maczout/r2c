@@ -33,6 +33,50 @@ input folder; the parked set needs `--inputs RESPONSE_FOLDER R2X/tests/reference
 `python tools/report.py OUT`; compare any two records with
 `python tools/compare.py REF SUBJECT --views`.
 
+## Step A-1: other shapes (2026-11-22)
+
+The run of record of step A-1 (`docs/verification-results.md`, 24 cases), against the run
+of the same 24 cases made when the seven Quick Define cases came into the set, on the
+kernel of A4 (`python tools/changes.py`; all measured, one machine). Both are assessed with
+the last stage of a shear case left out of the view checks (D40). The rules are in
+`docs/kernel.md`.
+
+| Change | Came inside | Went outside |
+|---|---|---|
+| Response's layer 0.1 mm thick across a step in width | T-beam under −M: steel stress at a crack at the last stage, 100 to 0.0 % | none |
+| Steel stress at a crack: the step of its solve; the plastic strain of a bar that has unloaded | I-girder under M: steel stress at a crack at cracking, 5.2 to 0.0 %, and at the last stage, 47.6 to 0.0 % | none |
+| The try after a refused stage goes half a step further (with the layer across a step) | I-girder with shear, at the peak: longitudinal strain 5.7 to 0.0 %, principal tensile strain 5.7 to 2.3 %, shear strain 5.8 to 2.4 %, transverse strain 5.6 to 2.3 %, transverse bond 98.9 to 2.5 % | none |
+
+In all 8 checks came inside and none went outside. No check on a Newbeam case changed
+side, and no Newbeam case's peak, rising branch or post-peak figure moved by more than
+0.05 points. By case: Must views 9 to 11 of 13; nothing else changed in the counts. The
+I-girder with shear's peak went from −1.65 to +0.05 % and its stages from 49 to 25
+(Response: 15).
+
+**The transverse bond on the I-girder** is worth a note, because the chart's values there
+are not physical: at the web's edge the stirrup stress falls from yield to nothing across
+the step, and the chart shows the bond that jump would need, 20 MPa at the top of the web
+and 3249 MPa at the bottom at Response's peak. With one boundary on the step r2c spread the
+jump over half a web layer; with Response's thin layer it has Response's figures (in
+Response's own state at the stage before the peak, 99.8 to 0.0 %).
+
+**What the seven new cases still miss** (`python tools/viewmisses.py VERIFY_OUT --only …`,
+`python tools/matching.py`, `python tools/diagnose.py states RECORD --views`):
+
+- *Shape, the I-girder with shear* (a Must): one fall of load in r2c's curve where the
+  girder's top cracks close, which Response's curve does not have (`docs/status.md`;
+  D43).
+- *The column under N alone after its peak*: the owner's override (C2).
+- *The column with shear, views at cracking*: the stage compared is not the same state
+  (D42). *At the peak*: a flat top, the largest loads two stages apart.
+- *Shear on the crack* in Response's own states: 6.4 to 6.7 % on the column, 8.5 % at one
+  node on the I-girder. It follows the crack spacing, which r2c does not have right on
+  these shapes (`docs/status.md`, "Crack spacing on the other shapes"; D45).
+- *Crack spacing and what follows it* (Could): on six of the seven.
+
+**The parked cases** were run once after it; what moved is in `docs/status.md` and in the
+Risks of `docs/summary.md`.
+
 ## A4 (2026-11-22)
 
 The run of record of increment A4 (`docs/verification-results.md`), against that of A3

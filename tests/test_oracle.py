@@ -61,6 +61,8 @@ DEFINE = {
 }
 DEFINE_SLOW = {
     "column-mv": (0.8, 3.0),
+    # at the baseline of step A-1 (2026-11-22)
+    "igirder-mv": (0.2, 0.3),
 }
 PARKED_DEFINE_SLOW = {
     # 4.3 % on the moment-curvature chart: Response's load falls and recovers at a curvature
