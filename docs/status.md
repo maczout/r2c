@@ -180,6 +180,22 @@ peak states r2c's forces agree within 1 to 3 % on every one.
    fails to converge is not always the same. 23 of the 50 shear responses now end as
    Response's does (14 before; `python tools/ends.py VERIFY_OUT`).
 
+**Known deviations that came with the longitudinal crack spacing table** (owner,
+2026-11-22, D46: the table is switched on and these are accepted). Measured on the 24
+cases, the run of record of step A-1b against the "before" run of step A-1c
+(`python tools/changes.py`): 43 checks came inside and seven went outside.
+
+1. *The rising branch of M/V = 0.5 m, 2.7 to 9.9 %* (a Must). The point the measure counts
+   is r2c's last stage, after its own peak: it falls back to a point nearest to Response's
+   fall of load before its peak. It belongs to how the shear response ends (a Won't, D1).
+   Response's own rising points stay within 2.7 % of r2c's curve.
+2. *Transverse bond at the peak of the I-girder with shear, 2.5 to 49.8 %*, which takes
+   that case's Should views outside, and *of M/V = 2 m, 3.7 to 22.5 %*: a spike at the end
+   of the stirrups in a stage r2c has not converged.
+3. *M/V = 0.5 m by a point:* longitudinal strain at its fall of load (2.4 to 5.2 %) and
+   shear on the crack at its peak (4.7 to 5.7 %).
+4. *The post-peak of V alone, 3.7 to 6.9 %.*
+
 **Known deviation, the column under axial load alone after its peak (C2). Not cloned**
 (owner, 2026-11-22, D12: it looks wrong in Response; r2c's uniform post-peak stands). A
 parked case. Response leaves the uniform state (a curved state with no moment, the load falling by a quarter in
