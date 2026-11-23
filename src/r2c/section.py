@@ -227,38 +227,7 @@ class Section:
     def _tables(self):
         self.tz = np.linspace(self.zbot, self.ztop, NTAB)
         bw = np.maximum(self.width(self.tz), 1e-6)
-        # longitudinal crack spacing: 2c + 0.1 db / rho (CEB), c the diagonal distance to the
-        # nearest bar, rho the steel within 7.5 db above and below the bar
-        if self.layers:
-            best = np.full(NTAB, np.inf)
-            for l in self.layers:
-                up = min(l.z + 7.5 * l.db, self.ztop)
-                dn = max(l.z - 7.5 * l.db, self.zbot)
-                ac = max(self.area_between(dn, up), 1e-6)
-                steel = sum(o.area for o in self.layers if dn - 1e-9 <= o.z <= up + 1e-9)
-                rho = steel / ac
-                bz = float(self.width(np.array([l.z]))[0])
-                dx = bz / (2.0 * l.num)
-                c = np.sqrt((self.tz - l.z) ** 2 + dx * dx)
-                best = np.minimum(best, 2.0 * c + 0.1 * l.db / rho)
-            sx = best
-        else:
-            sx = np.full(NTAB, 5.0 * self.h)
-        if self.smx_user > 0:
-            sx = np.full(NTAB, self.smx_user)
-        self.t_smx = np.minimum(sx, self.h)
-        self.t_smx_raw = sx
-        # transverse crack spacing: the same relation for the stirrups
-        st = np.full(NTAB, 5.0 * self.h)
-        for s in self.stirrups:
-            inside = (self.tz >= s.bot - 1e-9) & (self.tz <= s.top + 1e-9)
-            rho = s.area / (bw * s.space)
-            c = np.sqrt((s.space / 2.0) ** 2 + np.maximum(bw / 2.0 - 50.0, 0.0) ** 2)
-            val = 2.0 * c + 0.1 * s.db / rho
-            st = np.where(inside, np.minimum(st, val), st)
-        if self.smt_user > 0:
-            st = np.full(NTAB, self.smt_user)
-        self.t_smt = st
+        self._spacing_tables()
         # tension stiffening coefficient M (Bentz 1999): 3.6 / T, T the bonded bar perimeter
         # per area of concrete, a tent around each layer reaching zero one crack spacing away
         tl = np.zeros(NTAB)
@@ -267,7 +236,7 @@ class Section:
             dn = max(l.z - 7.5 * l.db, self.zbot)
             ac = max(self.area_between(dn, up), 1e-6)
             perim = l.db * math.pi * l.num / ac
-            sbar = float(np.interp(l.z, self.tz, self.t_smx))
+            sbar = float(self.smx_at(l.z))
             kk = perim * 2.5 / (sbar + 1e-4)
             tent = np.minimum((l.z + sbar - self.tz) * kk, (self.tz - (l.z - sbar)) * kk)
             tl += np.maximum(tent, 0.0)
@@ -302,6 +271,175 @@ class Section:
                 fac = np.where(v > 0, np.sqrt(np.maximum(v, 0.0)), 1.0)
             rh += np.where(inside, s.area / (bw * s.space) * fac, 0.0)
         self.t_rhocrit = np.maximum(bot + (self.tz - self.tz[0]) / self.h * (top - bot), rh)
+
+    # -- crack spacing over the depth [B 0043f570, 0043faf0, 0043e8d0, 00440100, 0043f0d0] -----
+    def _bar_terms(self) -> list[float]:
+        """The second term of each layer's crack spacing, 0.1 db / rho, as Response-2000
+        takes it: the bar diameter is the mean over the layers weighted by their areas, a
+        layer counting in full at the layer's own height and less with distance, to nothing
+        at 15 of its own diameters; rho is that weighted area over the concrete within 7.5
+        of the mean diameter above and below the layer. 0.1 mm for a layer outside the
+        section."""
+        out = []
+        for l in self.layers:
+            if not self.zbot <= l.z <= self.ztop:
+                out.append(0.1)
+                continue
+            steel = dsum = 0.0
+            for o in self.layers:
+                w = (15.0 - min(abs(o.z - l.z) / o.db, 15.0)) / 15.0 * o.area
+                steel += w
+                dsum += o.db * w
+            db = dsum / steel
+            conc = self.area_between(max(l.z - 7.5 * db, self.zbot), min(l.z + 7.5 * db, self.ztop))
+            out.append(0.1 * db * conc / steel)
+        return out
+
+    def _aggregate_floor(self, z: float) -> float:
+        """No crack spacing is under the aggregate size, taken between 2 and 25 mm."""
+        return min(25.0, max(self.law_at(z).agg, 2.0))
+
+    def _long_spacing(self, z: float, terms: list[float]) -> float:
+        """The longitudinal crack spacing at a height: from the nearest layer above and the
+        nearest below, twice the diagonal distance to its bars (the height apart, and half
+        the spacing of the bars across the width, with the bars of layers that overlap it in
+        height counted in) plus the layer's term; the lesser of the two, no more than five
+        times the depth, which is also the value where there is no layer."""
+        z = min(max(z, self.zbot), self.ztop)
+        best = math.inf
+        near = [math.inf, math.inf]
+        for i, l in enumerate(self.layers):
+            bars = l.num + sum(o.num for o in self.layers if o is not l and
+                               (abs(o.z - l.z) < l.db or abs(o.z - l.z) < o.db))
+            d = abs(l.z - z)
+            for k, (side, inside) in enumerate(((l.z >= z, l.z < self.ztop),
+                                                (l.z <= z, l.z > self.zbot))):
+                if side and inside and d < near[k]:
+                    near[k] = d
+                    # the width on the side of the layer that faces the height
+                    width = self.width_side(l.z, k == 1)
+                    val = math.hypot(2.0 * d, width / bars) + terms[i] if width > 0 else math.inf
+                    if k == 0:
+                        above = val
+                    else:
+                        below = val
+        if near[0] < math.inf:
+            best = min(best, above)
+        if near[1] < math.inf:
+            best = min(best, below)
+        return max(min(best, 5.0 * self.h), self._aggregate_floor(z))
+
+    def _trans_spacing(self, z: float, upper: bool) -> float:
+        """The transverse crack spacing at a height (on a step in width: on its upper or
+        lower side): the diagonal of the stirrup spacing and the width less 100 mm, plus
+        0.1 db / rho of the stirrups that reach the height; a hoop's steel counts by the
+        cosine of where the height lies on its circle. Five times the depth where no
+        stirrup reaches."""
+        big = 5.0 * self.h
+        b = self.width_side(z, upper)
+        if not (b > 0 and z > self.zbot and self.stirrups):
+            return big
+        n = len(self.stirrups)
+        rho = db = space = 0.0
+        for st in self.stirrups:
+            if not (st.bot <= z <= st.top and st.space > 0):
+                continue
+            r = st.area / st.space / b
+            if st.pattern == 4:
+                x = (z - 0.5 * (st.top + st.bot)) / (0.5 * (st.top - st.bot) + 0.1)
+                r *= math.cos(math.asin(max(-1.0, min(1.0, x))))
+            rho += r
+            db += st.db / n
+            space += st.space / n
+        if rho <= 0.0:
+            return big
+        return max(math.hypot(b - 100.0, space) + 0.1 * db / rho, self._aggregate_floor(z))
+
+    # Response's longitudinal crack spacing table: written and off (docs/kernel.md, "Crack
+    # spacing over the depth"; docs/summary.md, D46)
+    response_smx = False
+
+    def _long_spacing_before(self):
+        """r2c's longitudinal crack spacing before Response's table was read, at 100 evenly
+        spaced heights: least over the layers of 2 c + 0.1 db / rho, c the diagonal distance
+        to the nearest bar, rho the steel within 7.5 db of the layer over the concrete
+        there. In use while Response's table is off."""
+        if not self.layers:
+            return np.full(NTAB, 5.0 * self.h)
+        best = np.full(NTAB, np.inf)
+        for l in self.layers:
+            up = min(l.z + 7.5 * l.db, self.ztop)
+            dn = max(l.z - 7.5 * l.db, self.zbot)
+            ac = max(self.area_between(dn, up), 1e-6)
+            steel = sum(o.area for o in self.layers if dn - 1e-9 <= o.z <= up + 1e-9)
+            dx = float(self.width(np.array([l.z]))[0]) / (2.0 * l.num)
+            c = np.sqrt((self.tz - l.z) ** 2 + dx * dx)
+            best = np.minimum(best, 2.0 * c + 0.1 * l.db / (steel / ac))
+        return best
+
+    def _spacing_tables(self):
+        """Both crack spacings as tables of points over the depth, read linearly between
+        them, as Response-2000 builds them (docs/kernel.md, "Crack spacing over the depth").
+        Longitudinal: at every layer and every corner of the outline, and at 0.1, 0.25,
+        0.5, 0.75 and 0.9 of the way from each of those heights to the next. Transverse: at
+        the top and bottom of every part of the outline (the two sides of a step in width
+        0.1 mm apart) and one stirrup diameter above and below each end of a stirrup."""
+        if self.smx_user > 0:
+            pts = [(self.zbot, self.smx_user), (self.ztop, self.smx_user)]
+        elif not self.response_smx:
+            pts = list(zip(self.tz, self._long_spacing_before()))
+        else:
+            terms = self._bar_terms()
+            keys = sorted({l.z for l in self.layers} | {self.segs[0][0]}
+                          | {sg[1] for sg in self.segs}, reverse=True)
+            pts = []
+            for hi, lo in zip(keys[:-1], keys[1:]):
+                for f in (0.0, 0.1, 0.25, 0.5, 0.75, 0.9):
+                    z = hi + f * (lo - hi)
+                    pts.append((z, self._long_spacing(z, terms)))
+            pts.append((self.zbot, self._long_spacing(self.zbot, terms)))
+        self.p_smx = self._points(pts)
+        if self.smt_user > 0:
+            pts = [(self.zbot, self.smt_user), (self.ztop, self.smt_user)]
+        else:
+            pts = []
+            last = len(self.segs) - 1
+            for k, (zt, zb, wt, wb, _law) in enumerate(self.segs):
+                if k == 0:
+                    pts.append((zt, self._trans_spacing(zt, False)))
+                elif wt != self.segs[k - 1][3]:
+                    # a step: its lower side, just under the step where the section widens
+                    z = zt - 0.1 if self.segs[k - 1][3] <= wt else zt
+                    pts.append((z, self._trans_spacing(z, False)))
+                for st in self.stirrups:
+                    if zb < st.top < zt:
+                        for z in (min(st.top + st.db, zt), min(st.top - st.db, zt)):
+                            pts.append((z, self._trans_spacing(z, True)))
+                    if zb < st.bot < zt:
+                        for z in (max(st.bot + st.db, zb), max(st.bot - st.db, zb)):
+                            pts.append((z, self._trans_spacing(z, True)))
+                z = zb
+                if k < last:
+                    nxt = self.segs[k + 1][2]
+                    if abs(wb - nxt) > 10.0 and wb > nxt:
+                        z = zb + 0.1      # the upper side, just over a step to a narrower part
+                pts.append((z, self._trans_spacing(z, True)))
+        self.p_smt = self._points(pts)
+
+    @staticmethod
+    def _points(pts):
+        """Points (height, value) as arrays for reading, from the bottom up; points at one
+        height keep the order they were made in from the top down."""
+        pts = sorted(enumerate(pts), key=lambda p: (p[1][0], -p[0]))
+        return (np.array([p[1][0] for p in pts]), np.array([p[1][1] for p in pts]))
+
+    def smx_at(self, z):
+        """Longitudinal crack spacing at heights z: never more than the depth."""
+        return np.minimum(np.interp(z, *self.p_smx), self.h)
+
+    def smt_at(self, z):
+        """Transverse crack spacing at heights z."""
+        return np.interp(z, *self.p_smt)
 
     def tab(self, table: np.ndarray, z):
         return np.interp(z, self.tz, table)

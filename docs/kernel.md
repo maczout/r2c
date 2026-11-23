@@ -165,150 +165,89 @@ still take (longitudinal reserve f1cx, transverse reserve f1cy) and by shear on 
 with Bentz's lower bound 0.25·ft/(0.31 + 24w/(a + 16)). Crack width w = (ε1 − εcr)·sθ,
 sθ = 1/(|sin θ|/smx + |cos θ|/smy).
 
-Tables over the depth (100 stations) [B]:
+Tables over the depth [B]:
 
-* longitudinal crack spacing: least over the layers of 2·c + 0.1·db/ρ, c the diagonal distance
-  to the nearest bar, ρ the steel within 7.5 db over the concrete in that band; never more than
-  the depth;
-* transverse crack spacing: 2·c + 0.1·db/ρv inside the stirrups' depth, five times the section
-  depth outside;
-* the bond parameter M: from the bars' perimeters within 7.5 db, falling to nothing one crack
-  spacing away; M = 3.6·b·s/(π·db·legs) for stirrups; the lesser governs;
-* the steel ratio for the strain concentration of stirrups at a crack.
+* longitudinal and transverse crack spacing: "Crack spacing over the depth", below;
+* the bond parameter M (100 stations): from the bars' perimeters within 7.5 db, falling to
+  nothing one crack spacing away; M = 3.6·b·s/(π·db·legs) for stirrups; the lesser governs;
+* the steel ratio for the strain concentration of stirrups at a crack (100 stations).
 
-### Cracking under compression [B `0046a960`]
+### Crack spacing over the depth [B `0043f570`, `0043faf0`, `0043e8d0`, `00440100`, `0043f0d0`], read 2026-11-22
 
-Response's crack-strain routine, called by the node [`0046aaa0`, `004a7b60`], scales the
-cracking strain and the cracking stress of a node by
+Response makes each spacing as a table of points over the depth and reads it linearly
+between them (`004b6a30`); `0043fa20` makes both when the section is set up. A spacing
+the user gives is used as it is, at every height.
 
-    k = 1.05 − f2/f2max, held between 0.05 and 1,
+**Longitudinal** (written, off: see the end of this section).
 
-f2 the principal compressive stress and f2max its softened strength at that node; k = 0.05
-once the principal compressive strain (net of shrinkage) is past the strain at peak stress.
-Then (a) the node counts as cracked when ε1 exceeds k·εcr, and the crack width and the floor
-after cracking are measured from k·εcr; (b) f1 is held to k times the cracking stress; (c)
-the line on the Principal Tensile Stress chart is k times the cracking stress where the node
-is uncracked. The rule is on in every analysis r2c covers (a flag, `00569f58`, clears it for
-one code-based analysis type only) and skipped for a concrete type named "steel".
+*A layer's term* [`0043f570`], the 0.1·db/ρ of the CEB expression. Every layer counts
+with a weight that is its area at the layer's own height and falls linearly with
+distance to nothing at 15 of its own diameters. db is the mean diameter by those
+weights; ρ is the weighted area over the concrete between 7.5·db above and below the
+layer, within the section. A layer outside the section has a term of 0.1 mm.
 
-**r2c applies all of it since 2026-11-22** (owner, D14; before, only the drawn line (c)).
-The thesis does not describe the rule: its node cracks at the cracking strength [T 3-2-2];
-this is one of the details where the program is followed. Measured on the phase A set
-(`tools/changes.py`, the run before against the run after): nothing moves without shear,
-where there is no principal tension across compression. With shear the rising branch at
-M/V = 0.5 m comes inside (6.1 to 2.7 %), and 35 view checks with it, 24 of them at two stages
-that are now like states (the peak under N₀ then V, the fall at cracking under V alone);
-three Should views go outside by a point (shear on crack 4.9 to 5.5 %, average angle 3.7 to
-5.1 %) or at one stage (transverse bond under N₀ then M + V at the last stage). The stage
-that flipped in the trial of 2026-11-21 does not flip with the stage matching of D13.
+*The spacing at a height* [`0043faf0`]: for the nearest layer at or above and the nearest
+at or below (not one on the top or bottom face),
 
-## Flexural cracking strength [B]
+    s = √((2·d)² + (b/n)²) + the layer's term,
 
-With an automatic ft, each face gets a cracking strength fr = min(0.15·fc′,
-2.5·(1 + 1.75·fc′/D)), D twice the depth of the tension zone at cracking under the loads being
-applied (found by iteration on the transformed section), falling linearly from the face to
-nothing at D/2 and never below ft.
+d the distance in height, b the width at the layer on the side that faces the height, n
+the layer's bars and those of every other layer within one bar diameter of it in height.
+The lesser of the two, no more than five times the depth (which is also the value where
+there is no layer) and no less than the aggregate size held between 2 and 25 mm.
 
-## Flexural crack check [T 4-5; details B]
+*The points* [`0043e8d0`]: every layer and every corner of the outline, and 0.1, 0.25,
+0.5, 0.75 and 0.9 of the way from each of those heights to the next one down. The node
+takes the table's value, never more than the depth [O: Newbeam's chart stands at 600 mm
+where the expression gives 680].
 
-Per tension zone, the moment the bars can still add about the neutral axis at a crack,
-Σ As·(cap − fs)·lever, limits the average concrete tension over the zone, by a profile of up to
-three parts (uniform; 0.6·ft at the face; 3·ft at the neutral axis).
+**Transverse** (in use since 2026-11-22).
 
-The capacity at a crack is the bare-bar stress at a concentrated strain
-k·ε + prestrain + (εsh − fy/E), k = max(1, 0.014/ρ) (0.625 of that for strands), never less
-than yield; ρ is all the steel on the layer's side of the centroid over 0.8·Ag [B]. Steel
-that has yielded on average and whose concentrated strain passes the end of its curve
-ruptures at the crack and is removed.
+*The spacing at a height* [`00440100`], on one side of the height where the width steps:
 
-*After unloading* [B `004ae520`, `004aea40`], since 2026-11-22 (second session of the
-day). The stress at the concentrated strain is taken by the same steel routine as the
-average stress, with the bar's plastic strain from the stages before: the curve, or the
-elastic line through the plastic strain where that is lower. r2c took the curve alone,
-which is the same until a bar unloads.
+    s = √((b − 100 mm)² + sv²) + 0.1·db/ρv,
 
-*When it is removed* [B `004aaf70`, `004ae520`, `0041e310`, `00434c80`]. A bar's stress in
-a state is the lesser of its average stress and its capacity at a crack, and nothing at all
-when the capacity says it has ruptured: the bar is gone in the state where it ruptures, not
-from the stage after. An accepted stage marks its ruptured bars as gone for the stages that
-follow; a stage that is set aside marks nothing (the marks are put back from the stage
-before). Until 2026-11-22 r2c removed the bar only from the next stage on, so the stage
-where it ruptured still carried it [O: −M, the stage after the peak, 84 kNm where Response
-has 17].
+over the stirrup types that reach the height: ρv the sum of Av/(sv·b), db and sv each
+type's value over the number of types. A hoop's Av/(sv·b) is multiplied by the cosine of
+the angle whose sine is the height above the hoop's middle over its half height (plus
+0.1 mm). Five times the depth where no stirrup reaches, at the bottom face and where
+there is no width; no less than the aggregate size held between 2 and 25 mm.
 
-A tension zone that no bar crosses is limited to zero: its capacity moment is zero and so
-is its limit, which leaves the node at its floor after cracking [B `00441d80`, `00440400`;
-O: N + M at cracking, 51.5 to 0.3 %]. The thesis has it the other way ("if there are no
-bars crossing the crack face, the concrete stress is not reduced", T 4-5, restriction 3);
-r2c followed the thesis until 2026-11-22 and follows the program since (D30, D34).
+*The points* [`0043f0d0`], for each part of the outline from the top down: its top (the
+first part), or where the width steps from the part above, the lower side of the step,
+0.1 mm under it if the section widens there; one stirrup diameter above and below the
+top end and the bottom end of each stirrup that ends inside the part, held inside the
+part; its bottom, or 0.1 mm over it where the part below is narrower by more than 10 mm.
 
-*Between the zones* [B `00441d80`, `004b5470`, `00440400`], since 2026-11-22 (increment
-A4). The limit over the depth is a table: each tension zone's values at its face and at its
-axis, and between the two axes (an axis is the face itself where that face is not in
-tension) three times the tensile strength of the concrete at each axis, linear between.
-r2c had no limit there, so a node that cracks diagonally above the flexural tension zone
-was not held by the longitudinal steel's limit. Measured on "N + M + V together" at the
-stage of diagonal cracking, in Response's own state: the limit line 0.30 MPa off before,
-0.025 after. Read and not checked against output: a section all in tension (the table
-runs from one face value to the other), and special concretes.
+**Checked against Response's charts** (measured, `python tools/spacing.py`): the two
+tables give Response's Longitudinal and Transverse Crack Spacing charts within 0.001 mm at
+every node on the circular column, the T-beam and the I-girder, but for one node of the
+transverse chart at a step of the I-girder (1.4 mm in 1369). Before, r2c's tables were
+21 and 11 % off on the column and 6 to 8 % on the T-beam: its longitudinal spacing took
+the bars of the layer alone and all the steel within 7.5 db unweighted, on 100 stations;
+its transverse spacing had no factor for a hoop and a jump, not a ramp, at a stirrup's
+end.
 
-### Steel stress at a crack [T 4-5; B `00442e50`, `00442cd0`, `00440c70`, `004409d0`, `00441d80`]
+**Not read in full:** both routines branch on a setting of the section (the field at
+`0x338`; the branch that fits the charts is the one for the value 1) and, in the other
+branch, on a number each layer carries (at `0x97`: there a layer's weight is divided by
+it, and a layer with 100 or more does not count). What the setting is was not found; no
+phase A case takes the other branch as far as the charts show.
 
-"The moment caused by the combined principal tension and shear on the crack is computed
-about the crack face. An increase in curvature is then calculated about the crack front to
-induce the same moment" [T 4-5, last part]. The particulars are the program's, read
-2026-11-22 for the two cases where r2c showed no stress at a crack and Response did:
-
-* *About which point.* The neutral axis of the deeper of the two tension zones of the crack
-  check (where the strain, net of shrinkage, changes sign), not the crack front. A section
-  all in tension has no such axis: Response takes one 1000 m below the section, which makes
-  the extra strain the same for every bar, and counts the concrete only when the tension
-  grows upwards.
-* *The concrete's moment.* Over the halves of layers that are cracked at both ends, on the
-  tension side of that axis: (f1 less the floor after cracking, not below zero, plus
-  vci/tan θ) times the width times the distance from the axis. The floor here is
-  max(ft, the node's cracking strength)/(1 + 250·w).
-* *The bars.* Every bar whose strain (without prestrain, net of shrinkage) is tensile takes
-  part, cracked concrete around it or not. The extra curvature Δφ₁ that uses up the reserve
-  of the first bar to reach its capacity at a crack (reserve/E over its distance from the
-  axis; 1 /m at most) is found, and the moment the bars below yield add at it, elastically.
-  If that is at least the concrete's moment, the extra curvature is Δφ₁ in the proportion
-  of the two moments. If not, and the concrete's moment is within the capacity moment of
-  the crack check (0.1 % and 2 N m over), it is solved for with the bars' own curves, each
-  held to its capacity at a crack. Otherwise there is no value.
-* *The solve* [B `00442cd0`, `00440c70`, `004409d0`, `004aaf70`]. The extra curvature is
-  raised in steps of 0.001/h per metre (h the section's depth in metres; 5·10⁻⁷ /m with
-  the axis 1000 m away), 50 at most, until the bars' moment reaches the concrete's, then
-  halved ten times inside the last step. If 50 steps do not reach it, the curvature that
-  takes one bar to 1.01 times its rupture strain is tried for each bar and the one with
-  the largest moment is kept: ten halvings between zero and that, or no extra curvature
-  if that moment is still short. A bar's stress at the extra strain is the steel routine's
-  with the bar's plastic strain (a bar that has unloaded climbs its elastic line, a bar
-  yielded in compression stays at its yield), and no more than its capacity at a crack at
-  that strain.
-* *What is shown.* A bar in compression shows nothing. A bar in tension shows its stress at
-  the extra strain, the lesser of its curve and its capacity at a crack, if the strain at
-  its depth with the extra strain reaches the cracking strain there; nothing if it does not.
-
-Before 2026-11-22 r2c took the moment of f1 itself about the crack front, by the bars inside
-the cracked depth alone [r2c's reading of the thesis]: a bar above the crack front showed
-nothing (N + M at the peak: Response 46 MPa), and under tension the two layers were
-treated as two zones (top bar 210 MPa where Response has 37). Measured on the phase A set:
-both come to 0.0 %, and the same view comes inside at five stages of four shear cases
-(`docs/verification.md`, "A2, part 3").
-
-Two corrections of r2c's reading, 2026-11-22 (second session), found on an I-girder with
-strands, each measured in Response's own strain state
-(`tools/diagnose.py states … --views`, records of every stage):
-
-* The step of the solve was a thousand times too small (a slip of units: 0.001/h is per
-  metre with h in metres), so 50 steps never reached the moment and the coarse fallback
-  answered, or nothing. I-girder at cracking, lower strand: 1593.5 MPa (no increase)
-  before, 1673.8 after, Response 1675.3. The fallback took the strain at peak stress
-  where Response takes the rupture strain.
-* The bars' stresses at the extra strain were on the loading curve whatever the history.
-  I-girder after the load has fallen: 1801 / +463 / 1791 MPa before, 839.8 / −400.0 /
-  785.9 after, Response 839.8 / −400.0 / 785.9.
+**The longitudinal table is off** (`Section.response_smx`; D46 in `docs/summary.md`).
+With it on, measured on the 24 cases (2026-11-22, `tools/changes.py`): the 17 checks of
+longitudinal crack spacing that are outside all come inside, 55 checks in all, the
+Could views go from 15 to 20 of 24 cases, the last-stage point of "constant N +200 kN,
+then M" (D35) comes inside (6.2 to 1.4 %), and in Response's own states the column with
+shear then agrees on every view but transverse bond (shear on the crack 6.4 to 1.5 % at
+the peak). Six go outside, one of them a Must: **the rising branch of M/V = 0.5 m, 3.7
+to 9.9 %**. That is r2c's last stage, after its own peak, which now falls back to a
+point that is nearest to Response's fall of load before the peak and so is measured with
+the rising branch; Response's own rising points are 2.7 % from r2c's curve (3.7 before).
+The others: transverse bond at the peak of the I-girder with shear and of M/V = 2 m (a
+spike at the end of the stirrups, in r2c's own stage; in Response's own state the
+I-girder's is 0.00 % off), two views of M/V = 0.5 m by a point, and the post-peak of V
+alone. The no-regression bound keeps it off.
 
 ### At a step in width [O]
 
@@ -324,8 +263,9 @@ across a step to four times the width (measured, I-girder, M/V = 2 m). In r2c:
 Both are r2c's own way of keeping the two sides apart, not rules read from Response. Since
 2026-11-22 they apply only to a step of 10 mm or less: at a larger one Response's thin layer
 is there ("Layers", "Across a step"), with a point of the profile at each of its faces. The
-tables over the depth (crack spacing, bond, steel ratio at a crack) are still interpolated
-across a step from their 100 stations.
+transverse crack spacing has a point on each side of a step since 2026-11-22 ("Crack
+spacing over the depth"); the bond parameter and the steel ratio at a crack are still
+interpolated across a step from their 100 stations.
 
 ### Hoops [T 7-6]
 
