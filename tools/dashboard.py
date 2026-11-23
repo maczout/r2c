@@ -427,7 +427,7 @@ const bins = [[1,"<1"],[2,"1–2"],[5,"2–5"],[10,"5–10"],[25,"10–25"],[100
 const binOf = p => bins.findIndex(b => p < b[0]);
 const cs = 18, lw = 112, th = 150;
 H += `<h2>Detail views at the features of the curve</h2>
-<p class="sub">Largest difference in each chart, as % of that chart's largest value, over the stages compared: cracking, falls of load, the peak and the last stage of Response's curve, each against r2c's stage nearest it in load and control value (the tooltip names the stage). For a case with shear the last stage is not assessed and is drawn on its own below. Hatched rows: at the peak, r2c's nearest stage is more than 5 % away in control value, so the two are different states.</p>
+<p class="sub">Largest difference in each chart, as % of that chart's largest value, over the stages compared: cracking, falls of load, the peak and the last stage of Response's curve, each against r2c's stage at the same place (within the target in load and control value together, and not across a fall of load), or, where there is none, r2c's stage at the same feature of its curve (the tooltip names the stage). For a case with shear the last stage is not assessed and is drawn on its own below. Hatched rows: at the peak, r2c's nearest stage is more than 5 % away in control value, so the two are different states.</p>
 <div class="legend">${bins.map((b,i)=>`<span><span class="sw" style="background:var(--s${i+1})"></span>${b[1]} %</span>`).join("")}
 <span><span class="sw" style="background:var(--surface);border:1px solid var(--border)"></span>chart all zero</span></div>`;
 function heat(rows, key, hatch) {

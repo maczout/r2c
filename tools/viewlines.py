@@ -37,8 +37,8 @@ def matched_stage(ref, sub, ref_stage: int) -> int:
     c = cmp._curve(ref, key)
     pk = float(np.max(np.abs(c[:, 1]))) or 1.0
     xs = float(np.max(np.abs(c[:, 0]))) or 1.0
-    return cmp._segment_stage(sub, key, ref_stage, c, cmp._curve(sub, key), c[ref_stage, 0],
-                              c[ref_stage, 1], xs, pk)
+    return cmp.match_stage(sub, key, ref_stage, c, cmp._curve(sub, key), xs, pk,
+                           cmp.same_place_limit(ref))[0]
 
 
 def main(argv=None) -> int:
