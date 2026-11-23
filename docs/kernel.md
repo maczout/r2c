@@ -720,6 +720,83 @@ and the last step is more than 2 % of the travel of the control variable from th
 fifth of the way to it (four fifths, for a stage that has un-cracked); this repeats on the
 shrinking interval, and then the stage set aside is taken up again.
 
+*"Cracked", for an event* [`004181d0`, `004ff4e0`]: the cracking strain here is the node's
+own before it is lowered for the compression across the node ("Cracking under
+compression": `004ff4e0` is the first lines of `0046a960`, the cracking stress of the node
+over Ec and no less than the concrete's own cracking strain, without the factor k). So a
+node that has cracked under compression, below that strain, is cracked in the node and
+does not yet make the stage a cracked one. In r2c since 2026-11-22 (step A-1b); before, a
+stage counted as cracked as soon as any node had. [O, measured: under V with a constant
+compression Response closes in between the shear strains 0.178 and 0.197 mm/m, with
+stages at 0.182 and 0.185; r2c closed in between 0.163 and 0.179 with seven stages
+Response does not have, and now has its stage at 0.183. `python tools/stagematch.py`: r2c's
+stages up to the peak 30 to 24, Response's 25.]
+
+**A stage put in between** [`00415e30`, `00416730`, `00418af0`], in r2c since 2026-11-22
+(step A-1b):
+
+* its first estimate is the three global strains of whichever is nearer in the control
+  variable, the stage before or the stage set aside, with the control variable at its
+  target (`00416730`; for a stage that is not put in between, the strains of the stage
+  before: the extrapolation written there multiplies by a difference that is zero);
+* the shear strain profile it starts from is that of the stage set aside where that
+  stage has un-cracked, and of the stage before for every other event (`00415e30`);
+* if it is refused or not solved it is dropped. The stage set aside is then taken up as
+  it was found and is marked: the event is closed in on no further (a field of the stage
+  that every new stage has set and only this clears). The step multiplier and the count
+  of tries are left as they were (`00418af0`);
+* a stage set aside and taken up again is not solved again.
+
+[O, measured: on the I-girder at M/V = 2 m (parked cases) Response's stages around the
+closing of the top cracks are at curvatures of −0.539, −0.533, −0.532 and −0.530 rad/km
+with moments of 49.6, 51.8, 32.6 and 34.5 kNm; r2c's are now 49.5, 51.8, 32.5 and 34.4 at
+the same places. Before, r2c had 49.5 at −0.539, 51.1 at −0.532 and no stage at −0.533:
+its stage at −0.532 started from the cracked stage before and stayed cracked.]
+
+**Open: the same girder at M/V = 1 m (D43).** There Response has no stage at −0.539 or
+−0.533: it goes from −0.571 (cracked) to −0.530 (un-cracked), and later from −0.251 to
+−0.171, where the web cracks, with nothing in between. By the rules above it must have
+put a stage in between at both places and dropped it, which needs that stage to be
+refused or not solved. r2c solves both (the cracked state at −0.539 in five passes; the
+un-cracked one at −0.235 in one) and keeps them, so its curve has the fall of load
+Response's has not. What was ruled out, each by reading and by trying it: the closing-in
+test (`00419ff0`: 2 % of the travel, as written above); the mark on the stage (set by
+`00433c50` on every new stage, copied by `004330a0`, cleared only in `00418af0`); the
+global solve (`004276a0`, below: r2c's writing of it finds both states in two to four
+steps, at M/V = 1 m and 2 m alike); the state code (0 for r2c's two states); the refusal of a stage
+that has not converged (its load is under the largest so far). Not read: what the forces
+routine `004a9d90` does differently between its iteration mode and its final mode beyond
+the steel stress at a crack (`004440d0` against `00442e50`), and the 3 × 3 solve
+`004688b0` and its 2 × 2 fall-back `00467f20`, whose failure is what makes the profile
+update `0041e840` report a stage as not solved (through `0041fe20`).
+
+### The global solve with shear [B `004276a0`, `004267c0`], read 2026-11-22: written, off
+
+Response's solve of the three global strains of a stage, the same routine as the general
+solve without shear ("The stage solve without shear"). The load factor is read off the
+load that goes with the control variable (N for the axial strain, M for the curvature, V
+for the shear strain; the first control variable's where that load is not increased). The
+other two loads' unbalance is the right-hand side, the stiffness is the section's 3 × 3
+(`00427cd0`, the one of the shear flow calculation) with the control variable's own
+diagonal term multiplied by 10⁹, so that it stays where it is, and a strain is left out of
+the step where its diagonal stiffness is under a ten-thousandth of the control's
+(`004267c0`). Whole steps (half steps with the relaxation flag), no search along the step,
+and no account of the load factor changing with the strains. It stops when the squared
+unbalance over (h + 0.1 mm)² is under 10⁻⁶·(N² + V² + M²/h²) + 1 + (1000·A)², after at
+least one step. It fails after 50 steps, when the system cannot be solved, or when a step
+is larger than 0.5 in all. With shear it returns found or not found only: the third
+status (−2) that the stage control tests for is returned without shear alone.
+
+r2c has it as `Shear.own_solve`, off: what runs is r2c's own solve (Newton's method on the
+true residual with a search along the step, then a bracketing search). Measured with it on
+(2026-11-22, the eleven shear cases, `tools/changes.py` against the run before): 8 checks
+come inside (the post-peak of "constant V, then M", 5.9 to 1.8 %; views at the peak of
+M/V = 0.5 m and of the I-girder) and 13 go outside (12 views of V alone at its fall of
+load, up to 100 %; transverse bond at the I-girder's peak, 2.5 to 93.5 %), and r2c has
+fewer of Response's stages at M/V = 2 m (`tools/stagematch.py`: 59 to 47 of 87). It does
+not change what happens on the I-girder at M/V = 1 m. Not used.
+
+
 **Accepting a stage.** A stage is worked on in passes: solve the global strains for the
 loads at the control value with the shear strain profile as it is; update the profile from
 the calculated shear stress; measure the profile error. The error is the standard deviation,

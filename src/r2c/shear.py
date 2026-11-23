@@ -248,14 +248,14 @@ class Shear(Flexure):
         return dict(z=z, b=b, out=out, ex=ex, g=g, ey=ey, es=es, fs=fs, j=jj.reshape(shp),
                     k=kk.reshape(shp), m=mm.reshape(shp), n=nn.reshape(shp), zone=(zlo, zhi))
 
-    def shear_flow(self, e0, phi, gam, v_total):
-        """The shear stress profile longitudinal equilibrium requires: (z nodes from the top
-        down, stress from the state, stress calculated, tangent shear stiffness, state)."""
-        an, sec = self.an, self.sec
-        t = self.tangent(e0, phi, gam)
+    def _stiffness(self, t, s):
+        """The section's 3 x 3 tangent stiffness from the nodes' condensed stiffnesses t
+        (rows N, M, V; columns the strain at the axis, the curvature, the shear strain
+        parameter), with s the shear strain profile at the nodes [B 00427cd0], and the bars
+        as (height, stiffness less the concrete displaced, lever arm, diameter, layer)."""
+        sec = self.sec
         z, b = t["z"], t["b"]
         y = z - sec.zaxial
-        s = np.interp(an.profile_z(z), an.shape_z, an.shape)
         dz = (z[:, 0] - z[:, 2])[:, None]
         w = np.array([1.0, 4.0, 1.0]) / 6.0
 
@@ -282,6 +282,22 @@ class Shear(Flexure):
             jm[1, 0] -= ea * yb
             jm[1, 1] += ea * yb * yb
             bars.append((l.z, ea, yb, l.db, i))
+        return jm, bars
+
+    def shear_flow(self, e0, phi, gam, v_total):
+        """The shear stress profile longitudinal equilibrium requires: (z nodes from the top
+        down, stress from the state, stress calculated, tangent shear stiffness, state)."""
+        an, sec = self.an, self.sec
+        t = self.tangent(e0, phi, gam)
+        z, b = t["z"], t["b"]
+        y = z - sec.zaxial
+        s = np.interp(an.profile_z(z), an.shape_z, an.shape)
+        dz = (z[:, 0] - z[:, 2])[:, None]
+        w = np.array([1.0, 4.0, 1.0]) / 6.0
+
+        def integ(f):
+            return float(np.sum((f @ w) * dz[:, 0]))
+        jm, bars = self._stiffness(t, s)
         rhs = np.array([0.0, v_total, 0.0])
         try:
             if abs(jm[2, 2]) < 1e-9:
@@ -455,6 +471,93 @@ class Shear(Flexure):
         self.unbalance = best[0]
         return best[1], best[2], best[0] < 2e-5
 
+    def _general(self, c, x0):
+        """Response-2000's solve of the global strains at control value c [B 004276a0, its
+        step 004267c0]: the load factor is read off the load that goes with the control
+        variable, and the other strains are stepped by the section's own stiffness on what
+        the other two loads are out of balance by, whole steps and no search along them. It
+        stops once the unbalanced loads are inside its tolerance (at least one step is
+        taken), and gives up after 50 steps, when the stiffness cannot be solved or when a
+        step is larger than 0.5 in all (strains, and curvature per metre). The layers are
+        split anew at each evaluation. Returns (x, info, found) as _newton does."""
+        an, sec = self.an, self.sec
+        ci = {"e0": 0, "phi": 1, "gam": 2}[self.mode]
+        if self.mode == "phi":
+            e = np.array([x0[0], c, x0[1]], dtype=float)
+        elif self.mode == "e0":
+            e = np.array([c, x0[0], x0[1]], dtype=float)
+        else:
+            e = np.array([x0[0], x0[1], c], dtype=float)
+        inc = np.array([an.dn, an.dm, an.dv])
+        con = np.array([an.n0, an.m0, an.v0])
+        kl = ci
+        if abs(inc[ci]) < 1e-3:
+            kl = {"e0": 0, "phi": 1, "gam": 2}[self.mode0 if inc[
+                {"e0": 0, "phi": 1, "gam": 2}[self.mode0]] != 0.0 else
+                next(k for k, d in zip(("e0", "phi", "gam"), inc) if d != 0.0)]
+        hm = sec.h / 1e3
+        hh = (hm + 1e-4) ** 2
+        floor = 1.0 + (1000.0 * sec.area / 1e6) ** 2
+        si = np.array([1.0, 1e-3, 1.0])            # N, N mm, N to N, N m, N
+        share = self.step_share
+        count = 0
+        found = False
+
+        def state():
+            an.refine(e[0], e[1], e[2])
+            self.evals += 1
+            f = np.array(an.forces(e[0], e[1], e[2]))
+            lam = (f[kl] - con[kl]) / inc[kl]
+            return f, lam, (con + lam * inc - f)
+
+        while True:
+            f, lam, rhs = state()
+            if not np.all(np.isfinite(f)):
+                break
+            err = float(np.sum((rhs * si) ** 2)) / hh
+            tol = (f[0] ** 2 + f[2] ** 2 + (f[1] / 1e3) ** 2 / hh) * 1e-6 + floor
+            if err < tol and count:
+                found = True
+                break
+            t = self.tangent(e[0], e[1], e[2])
+            k, _bars = self._stiffness(t, np.interp(an.profile_z(t["z"]), an.shape_z, an.shape))
+            # which strains have a stiffness to step on, against that of the control
+            d = np.abs(np.array([k[0, 0], k[1, 1] / 1e6 / (hm * hm), k[2, 2]]))
+            ref = d[ci] / 1e4
+            on = d > ref
+            on &= (d >= 1.0) | (np.arange(3) == ci)
+            on[ci] = on[ci] or not on.any()
+            k[ci, ci] *= 1e9                        # the control variable stays where it is
+            step = np.zeros(3)
+            idx = np.flatnonzero(on)
+            try:
+                step[idx] = np.linalg.solve(k[np.ix_(idx, idx)], rhs[idx])
+            except np.linalg.LinAlgError:
+                break
+            if not np.all(np.isfinite(step)) or \
+                    abs(step[0]) + abs(step[1] * 1e3) + abs(step[2]) > 0.5:
+                break
+            e += share * step
+            count += 1
+            if count > 50:
+                break
+            if not tol < err:
+                found = True
+                break
+        if found and count:
+            f, lam, rhs = state()
+        self.unbalance = float(np.max(np.abs(rhs * si))) if np.all(np.isfinite(rhs)) else math.inf
+        info = (float(e[0]), float(e[1]), float(e[2]), float(lam), float(f[0]), float(f[1]),
+                float(f[2]))
+        x = {"phi": [e[0], e[2]], "e0": [e[1], e[2]], "gam": [e[0], e[1]]}[self.mode]
+        return np.array(x), info, found
+
+    trace = None             # tools/trace.py: a list to which each try is added
+    # Response's own solve of the global strains [B 004276a0]: written and off
+    # (docs/kernel.md, "The global solve with shear")
+    own_solve = False
+    step_share = 1.0         # the share of a step of that solve that is taken
+
     def _nested(self, c, x0):
         """Fallback for the Newton iteration: the two unknowns one inside the other, each by
         the bracketing search of the flexural solution."""
@@ -483,7 +586,7 @@ class Shear(Flexure):
 
     def solve(self, c, prev: Stage | None) -> Stage:
         """The state at control value c: curvature, or the shear strain when there is no
-        moment increment."""
+        moment increment. prev: the stage whose strains are the first estimate."""
         an = self.an
         keep = an.profile()
         try:
@@ -517,8 +620,13 @@ class Shear(Flexure):
         used = saved_shape
         while passes < self.passes:
             x0 = np.array(x, dtype=float)
-            x, info, ok = self._newton(c, x0)
             soft = False
+            if self.own_solve:
+                x, info, ok = self._general(c, x0)
+                if not ok:
+                    break
+            else:
+                x, info, ok = self._newton(c, x0)
             if not ok:
                 near = (x, info, self.unbalance)
                 x, info, ok = self._nested(c, x0)
@@ -532,7 +640,7 @@ class Shear(Flexure):
                         break
                     ok = soft = True
             e0, phi, gam, lam, n, m, v = info
-            if refines < 3 and an.refine(e0, phi, gam):
+            if not self.own_solve and refines < 3 and an.refine(e0, phi, gam):
                 refines += 1
                 continue
             z, vstate, tau, t, _d = self.shear_flow(e0, phi, gam, v)
@@ -699,11 +807,20 @@ class Shear(Flexure):
             return 3 if bool(np.all(o.e2 <= -e0s)) else 0
         return 2
 
+    def _cracked(self, st: Stage) -> bool:
+        """Is the stage cracked, for the events between stages? Response's test [B 004181d0,
+        004ff4e0] is the principal tensile strain above the cracking strain at any node,
+        with the cracking strain as it is before the node lowers it for the compression
+        across it [B 0046a960]: a node that has cracked under compression, below that
+        strain, does not make the stage a cracked one."""
+        o = st.detail.out
+        return bool(np.any(o.e1 > o.ecr))
+
     def _event(self, a: Stage, b: Stage) -> int:
         """What sets stage b apart from the one before [B 00415e30]: 1 newly cracked, 2
         cracked before and not now, 3 newly crushing, 5 a crack slipping, 4 a change in what
         has ruptured; 0 nothing."""
-        ca, cb = bool(a.detail.out.cracked.any()), bool(b.detail.out.cracked.any())
+        ca, cb = self._cracked(a), self._cracked(b)
         if cb and not ca:
             return 1
         if ca and not cb:
@@ -772,6 +889,44 @@ class Shear(Flexure):
         mult = 1.0
         target = st0.control + d0 / 6.0
         pending: list[Stage] = []       # stages set aside while an event is closed in on
+        start: Stage | None = None      # the stage a stage put in between starts from
+
+        def next_target():
+            """The next stage [B 00415e30]: close in on an event, take up a stage set
+            aside, or step on."""
+            nonlocal target, peak, start
+            start = None
+            while True:
+                a, b = self.stages[-2], self.stages[-1]
+                ev = self._event(a, b)
+                travel = abs(self.control_of(b) - self.control_of(self.stages[0]))
+                gap = self.control_of(b) - self.control_of(a)
+                share = {1: 0.02, 2: 0.02, 3: 0.005, 4: 0.01, 5: 0.02}.get(ev, 0.0)
+                if ev and abs(gap) >= 1e-10 and abs(gap) > share * travel \
+                        and len(pending) < 60 and not getattr(b, "closed", False):
+                    pending.append(self.stages.pop())
+                    self._uncommit()
+                    target = self.control_of(a) + (0.8 if ev == 2 else 0.2) * gap
+                    # the first estimate: the strains of whichever of the two is nearer in
+                    # the control variable [B 00416730]; the profile of the stage set aside
+                    # where that one has un-cracked, else of the stage before [B 00415e30]
+                    if abs(self.control_of(b) - target) < abs(self.control_of(a) - target):
+                        start = b
+                    src = b if ev == 2 else a
+                    if getattr(src, "profile", None) is not None:
+                        an.set_profile(src.profile)
+                    return
+                if pending:
+                    nxt = pending.pop()
+                    self.accept(nxt)
+                    if getattr(nxt, "profile", None) is not None:
+                        an.set_profile(nxt.profile)
+                    peak = max(peak, nxt.lam)
+                    target = nxt.control
+                    continue
+                target += d0 * mult
+                return
+
         peak = 0.0
         retries = 0
         solves = 0
@@ -784,7 +939,7 @@ class Shear(Flexure):
                 d0 = math.copysign(abs(target) / 10.0, d0)
             solves += 1
             try:
-                st = self.solve(target, prev)
+                st = self.solve(target, start or prev)
                 st.parent = prev        # the stage it follows, for its envelope (export)
                 ok = True
                 if st.lam < 0.0 and len(self.stages) > 1:
@@ -804,13 +959,22 @@ class Shear(Flexure):
                     ok = False
                 if code == 3 and st.lam > peak:
                     ok = False
-            if getattr(self, "trace", None) is not None:
+            if self.trace is not None:
                 self.trace.append(dict(
                     n=len(self.stages), mode=self.mode, target=target, mult=mult, kept=ok,
                     solved=st is not None, code=code, peak=peak,
                     lam=None if st is None else st.lam, perr=None if st is None else st.perr,
                     passes=None if st is None else st.passes, stage=st))
             if not ok:
+                if pending:
+                    # a stage put in between that is refused or not solved is dropped; the
+                    # stage set aside is taken up as it was found and the event is closed
+                    # in on no further; the step is as it was [B 00418af0]
+                    pending[-1].closed = True
+                    if self.trace is not None:
+                        self.trace[-1]["what"] = "dropped"
+                    next_target()
+                    continue
                 retries += 1
                 # back to the state of the stage before [B 004190a0]
                 if getattr(prev, "profile", None) is not None:
@@ -869,32 +1033,7 @@ class Shear(Flexure):
             if abs(st.lam) < 0.01 * abs(prev.lam) and len(self.stages) > 2:
                 self.stages.pop()       # the load has run out: not a load stage
                 break
-            # the next stage [B 00415e30]: close in on an event, take up a stage set aside,
-            # or step on
-            while True:
-                a, b = self.stages[-2], self.stages[-1]
-                ev = self._event(a, b)
-                travel = abs(self.control_of(b) - self.control_of(self.stages[0]))
-                gap = self.control_of(b) - self.control_of(a)
-                share = {1: 0.02, 2: 0.02, 3: 0.005, 4: 0.01, 5: 0.02}.get(ev, 0.0)
-                if ev and abs(gap) >= 1e-10 and abs(gap) > share * travel \
-                        and len(pending) < 60:
-                    pending.append(self.stages.pop())
-                    self._uncommit()
-                    if getattr(a, "profile", None) is not None:
-                        an.set_profile(a.profile)
-                    target = self.control_of(a) + (0.8 if ev == 2 else 0.2) * gap
-                    break
-                if pending:
-                    nxt = pending.pop()
-                    self.accept(nxt)
-                    if getattr(nxt, "profile", None) is not None:
-                        an.set_profile(nxt.profile)
-                    peak = max(peak, nxt.lam)
-                    target = nxt.control
-                    continue
-                target += d0 * mult
-                break
+            next_target()
         return self.stages[:max_stages]
 
     def _uncommit(self):
