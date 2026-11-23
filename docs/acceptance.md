@@ -36,8 +36,10 @@ What this means for the work:
 
 ## Phase A exit criteria (owner, 2026-11-22)
 
-Development (phase A) is on Newbeam alone, varied in its loads; the other cases are parked
-until phase B (validate and refine). Phase A is done when, on that set:
+Development (phase A) is on a development set that widens step by step (owner, 2026-11-22,
+D41): Newbeam varied in its loads, then one variable at a time (shape first). Cases not yet
+in the set are parked. A case joins the set when it meets these criteria or its misses are
+accepted by the owner as known deviations; phase A is done when, on the whole set:
 
 - **Must:** peak, rising branch and shape inside target on every case; the detail views of
   the stress state under moment and axial load inside target.

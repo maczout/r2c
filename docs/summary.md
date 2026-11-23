@@ -18,8 +18,9 @@ the last stage, where a shear response ends differently, which is a Won't. A fif
 (how the stirrups remember yielding) is written and switched off, because it moves a Must
 outside; the sixth (an angle drawn as 180°) was not taken over.
 
-**Three decisions wait for the owner: D38, D39, D40.** D40 is the one that decides whether
-the shear views can be met at all in phase A.
+**No decisions wait for the owner.** D38 to D41 answered 2026-11-22 (owner, after the
+session). **Phase A now widens step by step** (D41): the development set grows from Newbeam,
+first by the seven Quick Define cases (other shapes).
 
 ## Aim
 
@@ -34,12 +35,12 @@ binary differ, the binary is followed without asking, apart from the owner's ove
 
 | Phase | What | State |
 |---|---|---|
-| **A. Develop the kernel** | Newbeam only, varied in its loads (the 17 cases below). Other sections, reinforcement, material models and units are parked. | **Now.** Increment A4 is done as far as its bounds allow (2026-11-22). Peak and rising branch are met on all 17 cases; shape on 15 and the Must views on 7 of 8, each miss a known deviation by the owner's decision (D32, D35, D36). The Should on shear views is not met: D38 to D40 |
-| **B. Validate and refine** | The parked cases come back; the test set and targets are reviewed; r2c is held to them. | Not started. Starts when Phase A meets its exit criteria (D1, D2). |
+| **A. Develop the kernel** | On a development set that widens step by step (D41): Newbeam varied in its loads (the 17 cases below), then one variable at a time — shape (step A-1, the seven Quick Define cases), then reinforcement, material models, units and material factors. What is not yet in the set stays parked. | **Now.** Increment A4 is done as far as its bounds allow (2026-11-22). Peak and rising branch are met on all 17 cases; shape on 15 and the Must views on 7 of 8, each miss a known deviation by the owner's decision (D32, D35, D36). The Should on shear views is not met: D38 to D40 |
+| **B. Validate and refine** | The parked cases come back; the test set and targets are reviewed; r2c is held to them. | Not started. Starts when the development set has widened to cover the scope and meets the exit criteria (D1, D2). Then the test set and targets are reviewed with the owner. |
 
-### The phase A set
+### The development set
 
-Newbeam as Response defines it, in SI units, with no material factors; only the loads
+**Newbeam (17 cases).** Newbeam as Response defines it, in SI units, with no material factors; only the loads
 differ. Confirmed against the fixtures on 2026-11-22: 17 cases.
 
 | Without shear (8) | With shear (9) |
@@ -54,7 +55,13 @@ differ. Confirmed against the fixtures on 2026-11-22: 17 cases.
 | no load | constant M (−50 kNm), then M + V |
 | | constant V (50 kN), then M |
 
-Parked until phase B, kept and not run by default (68 cases): other sections (T-beam,
+**Step A-1, shape (7 cases, owner 2026-11-22, D41):** the Quick Define sections already among
+the fixtures — T-beam under M and −M (`tbeam-m`, `tbeam-negm`); column under N, N₀ + M and
+M + V (`column-nonly`, `column-n4000-m`, `column-mv`); I-girder under M and M + V
+(`igirder-m`, `igirder-mv`). The column under N alone carries the owner's override after its
+peak (C2, D12).
+
+Parked, kept and not run by default (68 cases before step A-1): other sections (T-beam,
 column, I-girder), other materials and reinforcement, units, material factors, More Detail,
 no input, and Response's sample inputs. They sit in a folder of their own and can be run on
 request. Eleven of them need something that has been removed, and r2c refuses them: five
@@ -159,7 +166,7 @@ owner) · *open* (no suggestion yet).
 | D13 | Stage matching: a 0.5 % change in r2c's load can switch the matched stage and flip 11 view checks | decided, owner 2026-11-22 (suggestion approved) | Fix the measure before any work on views. **Done 2026-11-22:** a stage is matched between the same features of the two curves. Without shear only the no-load case's first stage was re-matched, and no check changed; with shear ten stages, mostly after the peak, are now matched to like states (one had been matched to r2c's stage 1) |
 | D14 | F1: Response's cracking-under-compression rule inside the node | decided, owner 2026-11-22 (suggestion approved) | Yes, after D13. **Done 2026-11-22** (A2 part 2) |
 | D15 | The generated results JSON is committed on every run (~80,000 lines) | decided, owner 2026-11-22 (suggestion approved) | Build it in CI instead of storing it |
-| D16 | The test set has grown to 85 cases | decided, owner 2026-11-22 | Develop on Newbeam; the rest is parked until Phase B |
+| D16 | The test set has grown to 85 cases | decided, owner 2026-11-22 | Develop on Newbeam; the rest is parked until Phase B. Amended by D41: the set widens step by step within phase A |
 | D19 | Parked fixtures: delete, or keep and not run by default? | decided, owner 2026-11-22 (suggestion approved) | Keep them, not run by default |
 | D25 | The shape check still counts how a shear response ends, against D1a. Two cases (M/V = 0.5 m and 2 m) are outside on shape for that reason alone | decided, owner 2026-11-22 (reading confirmed) | Change the measure so that shape leaves out the ending for shear cases. **Done 2026-11-22:** shape 13 → 15 of 17 |
 | D27 | Which of the 21 detail views are Must, Should or Could | decided, owner 2026-11-22 | Must: the stress-state views on cases without shear, including steel stress at a crack and the principal tensile strain and stress (the owner's choice). Should: shear views, and stress-state views on shear cases. Could: cracking views. Lists in `docs/acceptance.md` |
@@ -188,10 +195,10 @@ owner) · *open* (no suggestion yet).
 
 | # | Question | Status | Answer |
 |---|---|---|---|
-| D38 | Shear on crack: a line that one program draws and the other does not. Response draws the limit of the shear on a crack only once the largest value on the chart passes 0.001 MPa, and on the negative side only when the negative values are over a fiftieth of the positive. r2c now follows that rule. At two stages the values are so small (0.0015 against 0.0002 MPa; a ratio of exactly a fiftieth at the printed precision) that the two programs fall on either side of the rule, and the measure counts a line that is missing as a difference of 100 % | suggested | **Accept as known deviations** (two stages: M/V = 2 m at cracking, "M constant, then M + V" at its first fall). The rule is the program's (D34). Other options: have the measure leave out a line that only one program draws when the values that decide it are within the printed precision (a change to the measure, with the owner); or go back to drawing both limit lines always, which is not what the program does |
-| D39 | How the stirrups remember yielding (A4 part 2c). Response keeps the stirrups' plastic strain at each stage's own points over the depth; r2c keeps it on a fixed grid about 6 mm apart, which is too coarse next to a crack front. With Response's rule switched on, the peak of "N constant, then M + V" comes inside (shear stress 15.5 to 1.3 %) and so do four checks on M/V = 0.5 m, but the rising branch of M/V = 0.5 m, a Must, goes outside (3.7 to 7.6 %): that case has a fall of load and a recovery on the way up, and where r2c takes the fall moves. The no-regression bound says it stays off | suggested | **Leave it off for phase A** and take it up with the recovery after a fall of load on M/V = 0.5 m (the case was at 6.1 % before A2 and is sensitive to everything). Other options: switch it on as the program's method (D34) and accept the rising branch of M/V = 0.5 m as a known deviation (it was one before A2); or a third approach, named: put r2c in Response's states stage by stage through that fall of load to find which of the two programs' stages differs first |
-| D40 | Views at the last stage of a shear response. How a shear response ends is a Won't (D1), and the shape check leaves the ending out for shear cases (D25). The views are still compared at the last stage, where the two programs are in different states (often Response's last stage is one it has not converged). Eight of the nine shear cases are outside on their views there, two of them for that alone; so the Should on shear views cannot be met in phase A as it is measured | suggested | **Leave the last stage out of the view checks for shear cases** (a change to the measure, for the owner; the counterpart of D25), and report the last-stage views separately as before. With that, 2 of the 9 shear cases would be inside on their views today (measured: `tools/viewmisses.py --no-endings`). Other options: keep the measure and accept that the shear views stay a Should not met in phase A; or lift the Won't on shear endings (a larger piece of work) |
-| D41 | What comes next. After A4 every Must miss is a known deviation by the owner's decision, and the Should without shear is met | suggested | **Decide D40 first**, since it says what is left of phase A. Then either an increment A5 on what the shear views still miss away from the endings (the stirrups' memory with the fall of load on M/V = 0.5 m, D39; the calculated shear stress after a fall of load), or call phase A done on its Musts and start phase B, where the parked cases come back (Risks) |
+| D38 | Shear on crack: a line that one program draws and the other does not. Response draws the limit of the shear on a crack only once the largest value on the chart passes 0.001 MPa, and on the negative side only when the negative values are over a fiftieth of the positive. r2c now follows that rule. At two stages the values are so small (0.0015 against 0.0002 MPa; a ratio of exactly a fiftieth at the printed precision) that the two programs fall on either side of the rule, and the measure counts a line that is missing as a difference of 100 % | decided, owner 2026-11-22 (suggestion approved) | **Accept as known deviations** (two stages: M/V = 2 m at cracking, "M constant, then M + V" at its first fall) |
+| D39 | How the stirrups remember yielding (A4 part 2c). Response keeps the stirrups' plastic strain at each stage's own points over the depth; r2c keeps it on a fixed grid about 6 mm apart, which is too coarse next to a crack front. With Response's rule switched on, the peak of "N constant, then M + V" comes inside (shear stress 15.5 to 1.3 %) and so do four checks on M/V = 0.5 m, but the rising branch of M/V = 0.5 m, a Must, goes outside (3.7 to 7.6 %): that case has a fall of load and a recovery on the way up, and where r2c takes the fall moves. The no-regression bound says it stays off | decided, owner 2026-11-22 (suggestion approved) | **Leave it off for now**; see whether the same miss appears on the other shapes before taking it up again |
+| D40 | Views at the last stage of a shear response. How a shear response ends is a Won't (D1), and the shape check leaves the ending out for shear cases (D25). The views are still compared at the last stage, where the two programs are in different states (often Response's last stage is one it has not converged). Eight of the nine shear cases are outside on their views there, two of them for that alone; so the Should on shear views cannot be met in phase A as it is measured | decided, owner 2026-11-22 (suggestion approved) | **Leave the last stage out of the view checks for shear cases** (a change to the measure, the counterpart of D25), and report the last-stage views separately |
+| D41 | What comes next. After A4 every Must miss is a known deviation by the owner's decision, and the Should without shear is met | decided, owner 2026-11-22 | **Neither more Newbeam nor phase B yet: widen the development set step by step**, one variable at a time, so the kernel is not fitted to Newbeam. Step A-1 is shape: the seven Quick Define cases. Each new case meets the same tiers (or its misses become known deviations by the owner's decision); the cases already in the set are held by the no-regression bound. Phase B becomes the review of the test set and targets at the end. Known deviations are watched as the set grows: one that recurs on other shapes is likely Response's solver; one that does not was a Newbeam quirk. (The developer had suggested calling phase A done on its Musts and starting phase B.) |
 
 ### The source rule (2026-11-22, after A2)
 
