@@ -235,19 +235,20 @@ it, and a layer with 100 or more does not count). What the setting is was not fo
 phase A case takes the other branch as far as the charts show.
 
 **The longitudinal table is off** (`Section.response_smx`; D46 in `docs/summary.md`).
-With it on, measured on the 24 cases (2026-11-22, `tools/changes.py`): the 17 checks of
-longitudinal crack spacing that are outside all come inside, 55 checks in all, the
-Could views go from 15 to 20 of 24 cases, the last-stage point of "constant N +200 kN,
-then M" (D35) comes inside (6.2 to 1.4 %), and in Response's own states the column with
-shear then agrees on every view but transverse bond (shear on the crack 6.4 to 1.5 % at
-the peak). Six go outside, one of them a Must: **the rising branch of M/V = 0.5 m, 3.7
-to 9.9 %**. That is r2c's last stage, after its own peak, which now falls back to a
-point that is nearest to Response's fall of load before the peak and so is measured with
-the rising branch; Response's own rising points are 2.7 % from r2c's curve (3.7 before).
-The others: transverse bond at the peak of the I-girder with shear and of M/V = 2 m (a
-spike at the end of the stirrups, in r2c's own stage; in Response's own state the
-I-girder's is 0.00 % off), two views of M/V = 0.5 m by a point, and the post-peak of V
-alone. The no-regression bound keeps it off.
+With it on, measured on the 24 cases against the run of record (2026-11-22,
+`tools/changes.py`): 43 checks come inside, among them every check of longitudinal crack
+spacing; the Could views go from 15 to 20 of 24 cases; the last-stage point of "constant
+N +200 kN, then M" (D35) comes inside (6.2 to 1.4 %); and in Response's own states the
+column with shear then agrees on every view but transverse bond (shear on the crack 6.4
+to 1.5 % at the peak). Seven go outside, one of them a Must: **the rising branch of
+M/V = 0.5 m, 2.7 to 9.9 %**. That is r2c's last stage, after its own peak, which now falls
+back to a point that is nearest to Response's fall of load before the peak and so is
+measured with the rising branch; Response's own rising points stay within 2.7 % of r2c's
+curve. The others: transverse bond at the peak of the I-girder with shear (2.5 to 49.8 %,
+and that case's Should views with it) and of M/V = 2 m (3.7 to 22.5 %), a spike at the end
+of the stirrups in a stage of r2c's own that has not converged (in Response's own state
+the I-girder's is 0.00 % off); two views of M/V = 0.5 m by a point; the post-peak of V
+alone (3.7 to 6.9 %). The no-regression bound keeps it off.
 
 ### At a step in width [O]
 

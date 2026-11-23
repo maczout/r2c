@@ -33,6 +33,64 @@ input folder; the parked set needs `--inputs RESPONSE_FOLDER R2X/tests/reference
 `python tools/report.py OUT`; compare any two records with
 `python tools/compare.py REF SUBJECT --views`.
 
+## Step A-1b: the measure, the stage control, crack spacing (2026-11-22)
+
+The run of record of step A-1b (`docs/verification-results.md`, 24 cases) against the run
+recorded as "before": the same 24 cases on the kernel of step A-1, measured with the
+stage matching of D42 (`python tools/changes.py`; all measured, one machine). The rules
+are in `docs/kernel.md`.
+
+**The measure first (D42, owner).** Views are now compared at r2c's stage at the same
+place as Response's feature stage, where there is one within the target and not across a
+fall of load; at the stage of the same feature otherwise. On the kernel of step A-1 that
+alone moved 44 assessed checks inside and 4 outside (the run of record of A-1 against
+"before"): the column with shear at cracking (no longer compared four stages apart: every
+Must and Should view inside, the worst 3.7 %) and at its peak (seven views), M/V = 2 m at its peak
+(12 views), M/V = 0.5 m at its fall (7); outside, four views at the peak of M/V = 0.5 m
+(principal tensile stress 3.6 to 11.6 %, stirrup stress 3.5 to 11.4 %, two by a point),
+as foreseen in D42. By case the Could views went from 14 to 15 of 24; nothing else changed
+in the counts. Six stages are still matched by feature, all of them last stages of shear
+cases, which are not assessed.
+
+| Change to the kernel | Came inside | Went outside |
+|---|---|---|
+| "Cracked" for an event tested before the lowering by compression; a stage put in between starts from the nearer neighbour and is dropped when refused | none | none |
+| Response's transverse crack spacing table | 14: transverse crack spacing at every stage of the three column cases and the two T-beam cases (11.0 and 5.7 to 0.0 %); shear on the crack at the peak of the I-girder with shear, 7.3 to 1.0 %, which brings that case's Should views inside | shear stress at the peak of the column with shear, 2.9 to 7.7 % |
+
+By case: views Should 14 to 15 of 24 (3 of the 11 with shear); nothing else changed in the
+counts, and no figure of peak, rising branch or post-peak moved to the other side.
+
+**What the stage control rules changed is where r2c's stages are**, which the checks do
+not see (`python tools/stagematch.py tests/oracle BEFORE AFTER`). Under V with a constant
+compression r2c had seven stages closing in on the first node to crack under compression,
+which Response does not have; they are gone (stages up to the peak 30 to 24, Response's
+25). On the I-girder with shear r2c has two stages more (26 up to its peak, Response 13).
+
+**The I-girder with shear's shape (D43) is as it was.** Response puts no stage where the
+top cracks close at M/V = 1 m, and it does on every case of the same girder at M/V = 2 m
+(the parked ones), where r2c now has its three stages to within 0.1 kNm. Why the two
+ratios differ was not found (`docs/kernel.md`, "Open: the same girder at M/V = 1 m").
+
+**The two new shear cases on their views** (`python tools/viewmisses.py VERIFY_OUT --only
+column-mv igirder-mv`; `python tools/diagnose.py states RECORD --views`):
+
+- *The I-girder with shear:* every assessed view inside (the worst 2.5 %). In Response's
+  own state at the peak shear stress, shear on the crack, stirrup stress and transverse
+  bond are within 0.4 %.
+- *The column with shear:* at cracking every Must and Should view is inside; three
+  cracking views are 21 % off, which is the longitudinal crack spacing (D46). At the peak
+  ten Must and Should views are 7.7 to 14 % off, at the same curvature and a load 0.2 %
+  apart: the state differs on a flat top. In Response's own state at that stage every
+  Must and Should view agrees within 2.0 % but shear on the crack (6.4 %; 1.5 % with the longitudinal
+  table on) and transverse bond (12.5 %, not explained; the bond rule was not checked on
+  a hoop).
+
+**The longitudinal crack spacing table is written and off** (D46): what it moves is in
+`docs/kernel.md`, "Crack spacing over the depth".
+
+**The parked cases** were run once after it; what moved is in the Risks of
+`docs/summary.md`.
+
 ## Step A-1: other shapes (2026-11-22)
 
 The run of record of step A-1 (`docs/verification-results.md`, 24 cases), against the run
