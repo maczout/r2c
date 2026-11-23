@@ -57,8 +57,8 @@ developer's. Items that need a structural judgement are marked **(structural)**.
   inputs, which are r2x's `tests/reference/define`, `R2C_SCOPE_DIR` for the inputs of the
   scope cases). Eleven parked fixtures need something removed: five have no test, and the
   six on Response's sample inputs that hold several sections have a test that they are
-  refused (D23). One parked test fails since A2: `newbeam-cmod0-m`, peak 0.09 % against a
-  regression limit of 0.05 % (measured 2026-11-22; left alone, parked cases are not in A2).
+  refused (D23). The one parked test that failed after A2, `newbeam-cmod0-m`, passes again since A4
+  (measured 2026-11-22; the other parked tests were not run).
 - Docs: `kernel.md` (each rule and its source), `verification.md` (what the results mean),
   `verification-results.md` (generated), `acceptance.md` (the owner's development targets),
   `scope.md` (every input an r2x solve can take, whether the manual documents it, and

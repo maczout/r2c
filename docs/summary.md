@@ -254,8 +254,8 @@ H and I (views are now covered by D2).
   - Not looked into: parked. The stirrups over part of the depth is the first thing to
     look at when that case comes back.
 - **Still standing on the parked cases:** I-girder cases with shear outside on peak, rising
-  branch or shape (one far: Kaufmann-Marti softening, peak −8 %), and one parked
-  regression test that failed by a hair after A2 (linear concrete; not run again in A4).
+  branch or shape (one far: Kaufmann-Marti softening, peak −8 %). The one parked
+  regression test that failed by a hair after A2 (linear concrete) passes again.
 - **Speed.** Building the layers again for each state costs time: the 17 cases together
   take about a third longer (345 to 470 s of computing, measured on one machine). Speed was
   not in A2.

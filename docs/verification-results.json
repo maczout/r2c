@@ -1,9 +1,9 @@
 {
  "run": {
   "r2c_version": "0.1.0",
-  "commit": "b056b8a863126590f1684d165425a838fa1234b1",
+  "commit": "9580a68f316790b90c9d067e737bda251fff36a4",
   "dirty": false,
-  "started": "2026-11-22T16:52:06-07:00",
+  "started": "2026-11-22T16:59:33-07:00",
   "host": "Makertyre",
   "machine": "Linux x86_64, 32 cores",
   "python": "3.12.3",
@@ -1086,8 +1086,8 @@
      "ref_stage": 59
     }
    ],
-   "seconds": 2.3,
-   "run": "b056b8a86312",
+   "seconds": 2.1,
+   "run": "9580a68f3167",
    "sub_curve": [
     [
      -0.0,
@@ -2639,8 +2639,8 @@
      "ref_stage": 55
     }
    ],
-   "seconds": 73.6,
-   "run": "b056b8a86312",
+   "seconds": 72.2,
+   "run": "9580a68f3167",
    "sub_curve": [
     [
      -0.0,
@@ -3910,8 +3910,8 @@
      "ref_stage": 14
     }
    ],
-   "seconds": 46.9,
-   "run": "b056b8a86312",
+   "seconds": 41.6,
+   "run": "9580a68f3167",
    "sub_curve": [
     [
      -0.999,
@@ -5173,8 +5173,8 @@
      "ref_stage": 87
     }
    ],
-   "seconds": 123.3,
-   "run": "b056b8a86312",
+   "seconds": 123.5,
+   "run": "9580a68f3167",
    "sub_curve": [
     [
      -0.0,
@@ -6508,8 +6508,8 @@
      "ref_stage": 42
     }
    ],
-   "seconds": 42.9,
-   "run": "b056b8a86312",
+   "seconds": 39.3,
+   "run": "9580a68f3167",
    "sub_curve": [
     [
      -0.0,
@@ -7740,7 +7740,7 @@
     }
    ],
    "seconds": 1.0,
-   "run": "b056b8a86312",
+   "run": "9580a68f3167",
    "sub_curve": [
     [
      0.174,
@@ -8738,8 +8738,8 @@
      "ref_stage": 38
     }
    ],
-   "seconds": 23.4,
-   "run": "b056b8a86312",
+   "seconds": 23.2,
+   "run": "9580a68f3167",
    "sub_curve": [
     [
      -0.117,
@@ -10207,8 +10207,8 @@
      "ref_stage": 13
     }
    ],
-   "seconds": 2.6,
-   "run": "b056b8a86312",
+   "seconds": 1.9,
+   "run": "9580a68f3167",
    "sub_curve": [
     [
      -0.0,
@@ -11485,7 +11485,7 @@
     }
    ],
    "seconds": 1.0,
-   "run": "b056b8a86312",
+   "run": "9580a68f3167",
    "sub_curve": [
     [
      -0.0,
@@ -12421,8 +12421,8 @@
      "ref_stage": 41
     }
    ],
-   "seconds": 48.3,
-   "run": "b056b8a86312",
+   "seconds": 46.5,
+   "run": "9580a68f3167",
    "sub_curve": [
     [
      -0.0,
@@ -13644,8 +13644,8 @@
      "ref_stage": 44
     }
    ],
-   "seconds": 38.4,
-   "run": "b056b8a86312",
+   "seconds": 38.2,
+   "run": "9580a68f3167",
    "sub_curve": [
     [
      0.042,
@@ -14856,7 +14856,7 @@
     }
    ],
    "seconds": 0.5,
-   "run": "b056b8a86312",
+   "run": "9580a68f3167",
    "sub_curve": [
     [
      0.0,
@@ -16305,7 +16305,7 @@
     }
    ],
    "seconds": 2.5,
-   "run": "b056b8a86312",
+   "run": "9580a68f3167",
    "sub_curve": [
     [
      -0.017,
@@ -17860,7 +17860,7 @@
     }
    ],
    "seconds": 1.1,
-   "run": "b056b8a86312",
+   "run": "9580a68f3167",
    "sub_curve": [
     [
      0.0,
@@ -19034,8 +19034,8 @@
      "ref_stage": 69
     }
    ],
-   "seconds": 42.3,
-   "run": "b056b8a86312",
+   "seconds": 44.1,
+   "run": "9580a68f3167",
    "sub_curve": [
     [
      -0.0,
@@ -20353,8 +20353,8 @@
      "ref_stage": 51
     }
    ],
-   "seconds": 43.7,
-   "run": "b056b8a86312",
+   "seconds": 46.6,
+   "run": "9580a68f3167",
    "sub_curve": [
     [
      0.0,
@@ -21097,7 +21097,7 @@
     }
    ],
    "seconds": 0.0,
-   "run": "b056b8a86312",
+   "run": "9580a68f3167",
    "sub_curve": [
     [
      -0.0,
