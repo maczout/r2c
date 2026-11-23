@@ -809,7 +809,7 @@ class Shear(Flexure):
                     n=len(self.stages), mode=self.mode, target=target, mult=mult, kept=ok,
                     solved=st is not None, code=code, peak=peak,
                     lam=None if st is None else st.lam, perr=None if st is None else st.perr,
-                    passes=None if st is None else st.passes))
+                    passes=None if st is None else st.passes, stage=st))
             if not ok:
                 retries += 1
                 # back to the state of the stage before [B 004190a0]
@@ -846,7 +846,9 @@ class Shear(Flexure):
                     target = last_c + 0.5 * gap
                     mult *= 0.5
                 elif mult == 1.0:
-                    target -= 0.5 * d0
+                    # the first refusal of a whole step: half a step further on, not back
+                    # (the multiplier's 1.5 is the step tried) [B 0041a870]
+                    target += 0.5 * d0
                     mult = 1.5
                 else:
                     mult *= 0.5

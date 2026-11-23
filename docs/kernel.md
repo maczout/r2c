@@ -737,8 +737,15 @@ shear is negligible). After each pass:
 * a stage whose state code is not zero (below) is refused while the multiplier is 0.5 or
   more, and one with code 3 is refused while its load is above the largest so far.
 
-**A stage refused, or not solved.** The stage is reset to the one before and tried again
-closer: the first time at half a base step back with the multiplier marked; after that the
+**A stage refused, or not solved.** The stage is reset to the one before and tried again.
+The first time a whole step is refused the target goes half a base step *further* and the
+multiplier is marked 1.5, which is the step then being tried; after that the multiplier is
+halved each time and the target comes back by the multiplier times the base step, so the
+tries are at 1, 1.5, 0.75, 0.375 … of a step [`0041a870`, case 1]. Until 2026-11-22 r2c
+went half a step back at the first refusal (a sign read the wrong way), so its tries were
+at 1, 0.5, −0.25 … [O: on the I-girder with shear Response's stage after the curvature of
+−0.091 rad/km is at −0.031, three quarters of a step on, its peak; r2c now puts its stage
+there, 656.2 kN against 655.9, where it had gone back and climbed to 645 in 23 stages]. The
 multiplier is halved each time (and doubled again after a stage accepted at the first try
 while it is under 0.25). When the multiplier is under 0.2 (0.05 if the control is the axial
 strain) and the other control variable is not the present one, the control variable is
