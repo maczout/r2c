@@ -766,7 +766,7 @@ class Analysis:
             # past what the bars take elastically: solved, if it is within the capacity
             # moment of the crack check (2 N m over)
             if mom < 1.001 * mcap + 2000.0:
-                step = 1e-6 / sec.h if abs(zref) <= 20.0 * sec.h else 5e-10
+                step = 1e-3 / sec.h if abs(zref) <= 20.0 * sec.h else 5e-10
                 hi = step
                 for _ in range(50):
                     hi += step
@@ -775,7 +775,7 @@ class Analysis:
                 else:
                     best = 0.0
                     for i, l, e, arm in bars:
-                        x = ((l.steel.eu - l.prestrain) * 1.01 - e) / (arm + 0.1)
+                        x = ((l.steel.rupture - l.prestrain) * 1.01 - e) / (arm + 0.1)
                         if resist(x) > best:
                             best, hi = resist(x), x
                     if best < mom:
