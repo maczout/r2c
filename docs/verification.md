@@ -35,11 +35,65 @@ SCOPE_INPUTS --out OUT` (the parked set needs RESPONSE_FOLDER among the inputs a
 `python tools/report.py OUT`; compare any two records with
 `python tools/compare.py REF SUBJECT --views`.
 
-**Since 2026-11-23 a view check where Response itself is unstable is reported and not
-assessed** (owner, D54): see "The rule on unstable views" below. Sections written before
-that date count such checks as inside or outside.
+**Since 2026-11-23 a view check where Response's own view spikes is reported and not
+assessed** (owner, D54, narrowed by D56): see "The spike test" below. It applies to four
+checks of the 29 cases, so the sections written before that date, which count every
+check as inside or outside, read almost as they would today.
 
-## The rule on unstable views (D54), a change to the measure (2026-11-23)
+## The spike test (D56), a change to the measure (2026-11-23)
+
+No change to what r2c calculates: the run of record (`docs/verification-results.md`) has
+the same differences from Response as the run before it, number for number (measured:
+the two runs' results set side by side, the new field and the run's identity left out).
+What changed is which view checks are left unassessed (owner, 2026-11-23, D56;
+`docs/acceptance.md`, "Where Response is unstable"): only those where Response's views
+at the two neighbouring stages agree within the views target and its view at the stage
+departs from their blend by more than the target.
+
+**What the generated file now shows.** "View checks by tier": for each tier the checks
+inside, outside and unstable under the spike test, then the same checks with no rule,
+and under the rule as first written. "Detail views where Response is unstable": each
+unstable check with three numbers, Response's departure from the blend of its
+neighbours, how far the neighbours are apart, and r2c's difference from Response.
+
+**What it means.**
+
+- *The spike test catches almost nothing.* Four checks of 1,554, against 318 under the
+  rule as first written: principal tensile stress at cracking of the column under
+  N₀ then M (departure 5.0 %, neighbours 4.1 % apart) and at the peak of Newbeam under
+  −2000 kN then M (6.3 %, 3.8 %); shear on the crack at the peak of "V constant, then M"
+  (8.9 %, 1.4 %); longitudinal bond at the peak of M/V = 1 m (7.3 %, 3.7 %). r2c is
+  within 0.4 % of Response at each. All four are near both thresholds; none is a jump
+  of the size the rule was written for.
+- *Why so few.* Views are compared at cracking, falls of load and the peak. What
+  Response's views do there is move to a new state (the 314 other checks of the first
+  rule: neighbours more than 5 % apart). Response returning to where it was after one
+  stage is rare at those stages.
+- *No case's tier result changes* against no rule: Must 14 of 15, Should 21 of 29, Could
+  23 of 29. The 32 misses that the first rule set aside are counted again.
+- *The bond chart along the prestrained stirrups is not caught.* At its peak (stage 28)
+  the chart's largest value is 9.5, 20.9 and 32.7 MPa at stages 27 to 29: departure
+  18.0 %, neighbours 71 % apart, so a step by the test. At cracking (stage 9): 0.003,
+  0.005 and 18.6 MPa, neighbours 100 % apart. Over the whole response
+  (`tools/unstable.py --trace` on the full capture) the first rule would leave 19 of
+  the 41 testable stages unassessed and the spike test one (stage 12: 18.6, 0.13,
+  18.6 MPa). The chart moves between levels and seldom comes straight back. Put to the
+  owner as D59 (`docs/summary.md`).
+- *The one-way measure and a drop to nothing.* Stage 19 of the same chart (37.2, 1.4,
+  37.3 MPa) has a departure of 4.9 %: the stage's own points, all small, lie near the
+  foot of the blend, and the blend's peak has no point of the stage to be far from. The
+  comparison measures r2c against Response the same one-way (Response's points from
+  r2c's curve); nothing was changed.
+- *The readings* move at most 3 checks (`docs/summary.md`, D55 and D58).
+
+Reproduce: `python tools/unstable.py VERIFY_OUT [--list] [--readings]`;
+`python tools/unstable.py --trace CAPTURE VIEW`;
+`python tools/targets.py VERIFY_OUT --counts [--before-d54 | --d54-first]`.
+
+The section below describes the rule as first written; its counts are the "as first
+written" columns of today's tables.
+
+## The rule on unstable views as first written (D54), a change to the measure (2026-11-23)
 
 No change to what r2c calculates: the run of record
 (`docs/verification-results.md`) has the same differences from Response as step A-2's,
