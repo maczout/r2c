@@ -1,5 +1,6 @@
-"""Response's own handling of the shear strain profile, written and off (docs/kernel.md,
-"The shear strain profile between passes")."""
+"""Response's own handling of the shear strain profile (docs/kernel.md, "The shear strain
+profile between passes"): in use since step A-2 (D49). Its tests on every pass and its
+solve of the global strains are written and off."""
 
 import numpy as np
 
@@ -13,7 +14,6 @@ def _driver():
 
 
 def test_the_switches_are_off():
-    assert Shear.own_profile is False
     assert Shear.own_solve is False
     assert Shear.pass_code is False
 

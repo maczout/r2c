@@ -165,6 +165,45 @@ still take (longitudinal reserve f1cx, transverse reserve f1cy) and by shear on 
 with Bentz's lower bound 0.25·ft/(0.31 + 24w/(a + 16)). Crack width w = (ε1 − εcr)·sθ,
 sθ = 1/(|sin θ|/smx + |cos θ|/smy).
 
+### A node with next to no shear strain [B `004a8b20`, `004a7b60`], read 2026-11-23 (step A-2)
+
+With shear, before Response solves a node's transverse strain (`004a8b20`) it tests the
+node: if the size of its shear strain is under two millionths of the difference of its
+longitudinal and transverse strains (each less its shrinkage or thermal strain), plus
+10⁻¹⁰, and the node has no shrinkage or thermal strain (the sum of the sizes of its four
+strain offsets under 10⁻⁶), and a value read from a table over the depth that the analysis
+keeps is under 1 in size, the node goes through a second routine (`004a7b60`) in place of
+the transverse solve. That routine takes the node as uniaxial: the transverse strain is the
+node's transverse offset (nothing, with no shrinkage), the principal directions are the
+member's, the concrete's stress and cracking are found from the longitudinal strain alone,
+and **the stirrups are left out: the node's stirrup stress, its stirrup stress at a crack
+and its stirrup ratio are set to nothing.**
+
+For stirrups with no prestrain this cannot be seen: their stress at such a node is next
+to nothing anyway. With prestrained stirrups it can: the Stirrup Stress chart shows
+nothing at such a node and the prestress at its neighbours. Under no load every node is
+such a node; near a face, where a node that carries no shear has a profile value of a few
+millionths (the update adds 10⁻⁶ in each pass, "The shear strain profile between
+passes"), a node falls on one side of the test or the other from stage to stage. Measured
+on Response's capture of Newbeam with a prestrain of 1 mm/m on the stirrups at M/V = 1 m:
+at stage 0 all 19 nodes within the stirrups show no stress; from stage 13 to 28 three to
+ten of the nodes 0.4 mm apart at the bottom end of the stirrups do, a different set at
+each stage, and Response's own Transverse Average Bond chart at that end goes with it
+(0.13, 18.6, 37.2, 1.4, 37.3 MPa … at successive stages).
+
+r2c (`Analysis.lone_nodes`, in `Analysis.detail`): the test is made on the state a stage
+reports, with r2c's solved transverse strain in it, and at such a node the transverse
+strain, the stirrup stress and the stirrup stress at a crack are reported as nothing and
+the node counts as one with no stirrups for the bond chart (below). **Not taken over:**
+the forces are not evaluated differently at such a node (the stirrups carry no part of
+the axial load or the moment, and the transverse strain r2c solves there is the 0.012
+mm/m of the prestress at most) [O: with the rule in the reported state alone no check on
+the 29 cases moves but the two it was written for]; the table over the depth in the test
+was taken to hold nothing in every case here (inferred: no input of the manual was found
+to fill it); the offsets were taken to be the shrinkage and thermal strains (inferred
+from how the routine uses them). Which nodes near a face fall under the test at a given
+stage is not Response's node for node: it hangs on a profile value of millionths.
+
 Tables over the depth [B]:
 
 * longitudinal and transverse crack spacing: "Crack spacing over the depth", below;
@@ -379,6 +418,20 @@ stirrup stress. Measured: from Response's own stirrup stress chart the rule give
 chart within 0.01 MPa at 469 of 470 stages of the nine phase A captures. Not checked with
 more than one stirrup type or with stirrups over part of the depth (one parked case moved
 far: `docs/status.md`).
+
+*"Stirrups at a node", corrected 2026-11-23 (step A-2)* [`004a80e0`, `004a7b60`]. The
+test is on the node's own stirrup ratio, which the stirrup routine sums over the stirrups
+whose depth holds the node, and which is nothing at a node with next to no shear strain
+("A node with next to no shear strain"). r2c had read the ratio from its table over the
+depth, which gives a little just beyond the stirrups' end; a prestress that stops at the
+end was then taken for a change of stress along the stirrup (18.6 MPa of bond at the top
+end of the prestrained stirrups, where Response's chart has nothing). Measured with
+`python tools/bond.py CAPTURE`, which applies the rule to a capture's own Stirrup Stress
+chart: on Response's capture of the prestrained stirrups the chart at the peak was 355 %
+off before the correction and is within 0.4 % at every stage after it; on five Newbeam
+captures with shear, on the column with shear and on the column with interlocking hoops
+it is within 0.8 % at every stage whose chart reaches 0.01 MPa (the rule had not been
+checked on a hoop before), but for M/V = 0.5 m, 17.9 % at one stage.
 
 *Average Angle: one rule not taken over* [`004a9d90`, its end]. After the angles are found,
 Response turns some of them by 180°, by a test on the mean angle of the nodes made first

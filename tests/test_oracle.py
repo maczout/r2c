@@ -1,9 +1,11 @@
 """r2c against records captured from Response-2000 with r2x (tests/oracle).
 
 The development set (docs/summary.md, D16 and D41: Newbeam with only its loads varied, and
-since step A-1 the seven cases on the Quick Define sections) is in tests/oracle and is what
-runs by default. The Quick Define inputs are r2x's: without R2C_DEFINE_DIR those tests are
-skipped. Every other case is parked (D19): its fixture is in tests/oracle/parked and its test
+since step A-1 the seven cases on the Quick Define sections, since step A-2 five cases whose
+variable is the reinforcement) is in tests/oracle and is what runs by default. The Quick
+Define inputs are r2x's: without R2C_DEFINE_DIR those tests are skipped; the inputs of the
+five of step A-2 are variants of r2x's (tools/variants.py): without R2C_SCOPE_DIR those tests
+are skipped. Every other case is parked (D19): its fixture is in tests/oracle/parked and its test
 is marked "parked", run on request with `pytest -m parked` (`-m "parked and not slow"` to
 leave out the parked shear cases).
 
@@ -78,12 +80,22 @@ SCOPE = {
     "newbeam-axialloc-nm": (0.05, 0.1),
     "newbeam-shrink-m": (0.1, 0.8),
     "newbeam-thermgrad-m": (0.05, 0.3),
-    "newbeam-bartherm-m": (0.05, 0.1),
     "newbeam-usfile-si-m": (0.05, 0.1),
     "newbeam-negelev-m": (0.05, 0.1),
-    "newbeam-bardep-m": (0.05, 0.1),
     "newbeam-csafile-m": (0.05, 0.1),
     "newbeam-csafile-none-m": (0.05, 0.1),
+}
+# Step A-2 of the development set (owner, 2026-11-23, D50): the reinforcement varied on
+# shapes already in the set. Inputs as for SCOPE
+REINF = {
+    "newbeam-bardep-m": (0.05, 0.1),
+    "newbeam-bartherm-m": (0.05, 0.1),
+}
+# at the "before" run of step A-2 (2026-11-23)
+REINF_SLOW = {
+    "newbeam-nostirrups-mv": (0.1, 0.5),
+    "newbeam-stirrupdep-mv": (0.1, 0.3),
+    "column-interlock-mv": (0.4, 1.0),
 }
 # Phase A, with shear
 SLOW = {
@@ -187,11 +199,26 @@ def test_parked_quick_define_shear(case, parked_dir, define_dirs):
 @pytest.mark.parked
 @pytest.mark.parametrize("case", sorted(SCOPE))
 def test_scope_cases(case, parked_dir, scope_dirs):
-    ref = record.read(parked_dir / f"{case}.r2x.txt")
+    _scope(case, parked_dir, scope_dirs, SCOPE[case])
+
+
+def _scope(case, folder, scope_dirs, limits):
+    ref = record.read(folder / f"{case}.r2x.txt")
     path = verify.find_input(ref.header["input-name"], ref.header["input-sha256"], scope_dirs)
     if path is None:
         pytest.skip(f"{ref.header['input-name']} is not under R2C_SCOPE_DIR")
-    _check(ref, _solve(ref, path), *SCOPE[case])
+    _check(ref, _solve(ref, path), *limits)
+
+
+@pytest.mark.parametrize("case", sorted(REINF))
+def test_reinforcement(case, oracle_dir, scope_dirs):
+    _scope(case, oracle_dir, scope_dirs, REINF[case])
+
+
+@pytest.mark.slow
+@pytest.mark.parametrize("case", sorted(REINF_SLOW))
+def test_reinforcement_shear(case, oracle_dir, scope_dirs):
+    _scope(case, oracle_dir, scope_dirs, REINF_SLOW[case])
 
 
 def test_same_charts_as_the_oracle(oracle_dir):

@@ -51,6 +51,7 @@ class Detail:
     es: np.ndarray           # strain of each layer (with prestrain)
     f1cx: np.ndarray
     vcalc: np.ndarray | None = None     # shear stress from the longitudinal stiffness method
+    lone: np.ndarray | None = None      # nodes with next to no shear strain (lone_nodes)
 
 
 @dataclass
@@ -687,10 +688,28 @@ class Analysis:
             extra = np.maximum(o2.f1 - fl, 0.0) - o2.vci * o2.tan
             on = has & (o2.w > 0)
             fsycr[on] = extra[on] / rho_t[on] + fsy[on]
+        lone = self.lone_nodes(zz, ex[sel], ey, g[sel])
+        if lone.any():
+            ey = np.where(lone, 0.0, ey)
+            fsy[lone] = 0.0
+            fsycr[lone] = 0.0
         return Detail(z=zz, b=b.ravel()[sel], ex=ex[sel], ey=ey, gxy=g[sel],
                       out=o2, smx=smx[sel], smt=smt[sel], fsy=fsy,
                       fsycr=fsycr, rhov=rhov, fs=fs, fscr=fscr, es=es,
-                      f1cx=f1cx(zz))
+                      f1cx=f1cx(zz), lone=lone)
+
+    def lone_nodes(self, z, ex, ey, g):
+        """The nodes Response-2000 takes through its node routine for no shear strain
+        [B 004a8b20, 004a7b60]: with shear, a node whose shear strain is under two
+        millionths of the difference of its longitudinal and transverse strains, plus
+        1e-10, where the concrete has no shrinkage or thermal strain. Such a node has no
+        transverse strain and no stirrups: their stress and their ratio are nothing there.
+        Applied to the state a stage reports; the forces are not evaluated differently
+        (docs/kernel.md, "A node with next to no shear strain")."""
+        if not self.shear:
+            return np.zeros(len(z), dtype=bool)
+        lone = np.abs(g) < 2e-6 * np.abs(ex - ey) + 1e-10
+        return lone & (np.abs(self.sec.shrinkage(z)) < 1e-6)
 
     def steel_at_crack(self, e0, phi, es, fs, z, out, b, f1cx):
         """Stress of each longitudinal layer at a crack (thesis 4-5, last part; the details

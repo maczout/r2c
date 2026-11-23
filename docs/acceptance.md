@@ -146,9 +146,25 @@ views on shear cases. *Could:* the views related to cracking (`could`), on every
 tier is assessed against `views_pct` and counted separately. The longitudinal steel stress at
 a crack and the principal tensile strain and stress are in the Must by the owner's choice.
 
-### Not yet measured
+### Where Response is unstable (owner, 2026-11-23, D54)
 
-- **Detail views away from the peak.** Today views are compared at the peak only.
+A view check means something only where Response's own result is steady. Where Response's
+view moves more between neighbouring stages than the target allows, matching it at one stage
+is luck, and such a check is reported but not assessed.
+
+- **Which checks:** every detail view, in every tier, on every case, at each stage where views
+  are compared. Not the checks on the curves (peak, rising branch, post-peak, shape).
+- **The test:** Response's views at the stages just before and after are captured as well. A
+  view at a stage is *unstable* when Response's own view there lies farther than `views_pct`
+  from the blend of its two neighbours' views, taken at that stage's place along the control
+  curve, with the same distance measure and printed-precision floor as the comparison. A
+  steady change between stages blends well and stays assessed; a spike or a jump does not.
+- **Without both neighbours** (the first or last stage, or a capture missing them) a view is
+  not tested and stays assessed.
+- **An unstable check** is shown on the results with Response's own departure beside r2c's
+  difference, and counts neither inside nor outside its tier.
+- **Owner's review:** every Must check that the test leaves unassessed is listed in the
+  summary for the owner. A check is never left unassessed by any other route.
 
 ## How this relates to the tests
 

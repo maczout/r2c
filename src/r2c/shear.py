@@ -328,64 +328,9 @@ class Shear(Flexure):
         tau[-1, 2] = 0.0
         return z, t["out"].v.reshape(z.shape), tau, t, (de0, dphi, dgam)
 
-    def update_shape(self, z, vstate, tau, t, relax=1.0):
-        """A new shear strain profile from the calculated stresses: secant stiffness where the
-        node carries shear, tangent stiffness where it does not yet. Returns the largest
-        mismatch between the calculated and the state's shear stress, relative to the peak."""
-        an, sec = self.an, self.sec
-        g = t["g"].reshape(z.shape)
-        nn = t["n"]
-        with np.errstate(divide="ignore", invalid="ignore"):
-            sec_g = np.where(np.abs(g) > 1e-12, vstate / g, 0.0)
-        gc = sec.conc0.Ec / 2.0
-        use_sec = (sec_g > 1e-4 * gc) & (np.abs(vstate) > 1e-6)
-        stiff = np.where(use_sec, sec_g, np.maximum(nn, 1e-4 * gc))
-        # Response's update [B 0041e840]: where the node carries shear, its shear strain
-        # times the mean of one and (calculated stress / the state's stress), that factor
-        # held within ten either way. Where it carries none yet (r2c's own): the calculated
-        # stress over the tangent stiffness, no more than twice the largest strain so far.
-        sgn = 1.0 if float(np.sum(vstate)) >= 0 else -1.0
-        gold = g * sgn
-        with np.errstate(divide="ignore", invalid="ignore"):
-            ratio = np.where(use_sec, 0.5 * (tau / np.where(use_sec, vstate, 1.0) + 1.0), 1.0)
-        ratio = np.clip(ratio, -10.0, 10.0)
-        gfree = np.minimum(np.maximum(tau / stiff * sgn, 0.0),
-                           2.0 * max(float(np.max(gold)), 1e-12))
-        gnew = np.where(use_sec, np.maximum(ratio * gold, 0.0), gfree) * sgn
-        gnew[0, 0] = 0.0
-        gnew[-1, 2] = 0.0
-        # how far the calculated stresses are from those of the state: the shear force that
-        # the difference amounts to, relative to the shear force itself
-        dzl = z[:, 0] - z[:, 2]
-        wts = np.array([1.0, 4.0, 1.0]) / 6.0
-        bb = t["b"]
-        tot = float(np.sum((np.abs(vstate) * bb) @ wts * dzl))
-        dif = float(np.sum((np.abs(tau - vstate) * bb) @ wts * dzl))
-        err = dif / tot if tot > 1e-9 else 0.0
-        # onto the profile's own grid, bottom up
-        zf = an.profile_z(z).ravel()[::-1]
-        gf = gnew.ravel()[::-1]
-        zz, ii = np.unique(zf, return_index=True)
-        # the profile is kept at the nodes' own heights as well as on its base grid: the
-        # shear strain changes sharply at a crack front, where the nodes are closest
-        grid = np.unique(np.concatenate([an.shape_z0, zz]))
-        prof = np.interp(grid, zz, gf[ii])
-        bw = sec.width(grid)
-        mean = np.trapezoid(prof * bw, grid) / np.trapezoid(bw, grid)
-        if not np.isfinite(mean) or abs(mean) < 1e-15:
-            return err, None
-        new = prof / mean
-        old = np.interp(grid, an.shape_z, an.shape)
-        an.shape_z, an.shape = grid, (1.0 - relax) * old + relax * new
-        return err, mean
-
-    # Response's own handling of the shear strain profile [B 0041e840, 00418af0, 0041c060]:
-    # written, off until verified (docs/kernel.md, "The shear strain profile between passes")
-    own_profile = False
-
     def update_profile(self, z, vstate, tau, t, gam, relax=1.0):
         """The shear strain profile for the next pass, as Response-2000 updates it
-        [B 0041e840]. At every node: the profile's value times the mean of one and
+        [B 0041e840; in use since step A-2, owner 2026-11-23, D49]. At every node: the profile's value times the mean of one and
         (calculated stress over the state's stress), that factor within ten either way and
         the value within a hundred; unchanged where the node carries no shear or the
         section has no shear strain yet. Nothing at the two faces. Then divided by its mean
@@ -708,14 +653,10 @@ class Shear(Flexure):
                 continue
             z, vstate, tau, t, _d = self.shear_flow(e0, phi, gam, v)
             used = an.profile()
-            if self.own_profile:
-                mean = None
-                self.update_profile(z, vstate, tau, t, gam, relax=self.relax(passes))
-            else:
-                _own, mean = self.update_shape(z, vstate, tau, t, relax=self.relax(passes))
+            self.update_profile(z, vstate, tau, t, gam, relax=self.relax(passes))
             err = self.profile_error(z, vstate, tau, v)
             passes += 1
-            if self.own_profile and err > 10.0 and passes > 3:
+            if err > 10.0 and passes > 3:
                 # far off after three passes: the profile of the uncracked section again
                 # [B 00418af0, 004357d0]
                 an.shape_z = an.shape_z0.copy()
@@ -743,17 +684,14 @@ class Shear(Flexure):
                 continue
             if err < self.profile_tol:
                 break
-            if mean is not None and self.mode != "gam" and abs(gam) < 1e-12:
-                x = [x[0], mean]
         if ok and soft:
             err = max(err, self.profile_tol)
         if not ok or info is None:
             an.set_profile(saved_shape)
             raise SolveError(f"no equilibrium at control value {c:g}")
         left = an.profile()
-        if err >= self.profile_tol or self.own_profile:
-            # the state is the last pass's, with the profile it was solved on
-            an.set_profile(used)
+        # the state is the last pass's, with the profile it was solved on
+        an.set_profile(used)
         e0, phi, gam, lam, n, m, v = info
         if not all(math.isfinite(q) for q in info) or abs(gam) > 0.2 or abs(e0) > 0.2:
             an.set_profile(saved_shape)
@@ -783,11 +721,10 @@ class Shear(Flexure):
         st.codes = codes
         st.failed = failed
         st.profile = an.profile()        # the profile the stage leaves for the next one
-        if self.own_profile:
-            # the stage keeps the profile of its own state, which is what is put back when
-            # a later stage fails or is put in between [B 0041c060]; the next stage starts
-            # from the last update, converged or not [B 00418af0]
-            an.set_profile(left)
+        # the stage keeps the profile of its own state, which is what is put back when
+        # a later stage fails or is put in between [B 0041c060]; the next stage starts
+        # from the last update, converged or not [B 00418af0]
+        an.set_profile(left)
         return st
 
     def more_detail(self, stages, peak, limit):
