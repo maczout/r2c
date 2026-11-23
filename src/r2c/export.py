@@ -115,10 +115,11 @@ def bond_table(sec, d):
     for each half layer the change of the average stirrup stress between its two nodes over
     their distance, times the stirrups' area over their perimeter (taken at the layer's
     bottom node), put at the top of the half layer; nothing where the layer's top or middle
-    node has no stirrups. Returns (z descending, value)."""
+    node has no stirrups. A node has stirrups when it is within their depth [B 004a80e0]
+    and is not one with next to no shear strain [B 004a7b60]. Returns (z descending,
+    value)."""
     z = np.asarray(d.z, dtype=float)
     fs = np.asarray(d.fsy, dtype=float)
-    rho = np.asarray(d.rhov, dtype=float)
 
     def k_at(zz):
         num = den = 0.0
@@ -128,13 +129,17 @@ def bond_table(sec, d):
                 den += math.pi * s.db * s.legs
         return num / den if den > 0 else 0.0
 
+    lone = getattr(d, "lone", None)
+    has = np.array([k_at(zz) > 0 for zz in z])
+    if lone is not None:
+        has &= ~np.asarray(lone, dtype=bool)
     zt, vt = [], []
     n = (len(z) - 1) // 2
     last = 0.0
     for i in range(n):
         t, m, b = 2 * i, 2 * i + 1, 2 * i + 2
         k = k_at(z[b])
-        on = rho[t] > 0 and rho[m] > 0
+        on = has[t] and has[m]
         up = abs(fs[t] - fs[m]) * k / (z[t] - z[m]) if on and z[t] > z[m] else 0.0
         dn = abs(fs[m] - fs[b]) * k / (z[m] - z[b]) if on and z[m] > z[b] else 0.0
         zt += [z[t], z[m]]
@@ -142,8 +147,28 @@ def bond_table(sec, d):
         last = dn
     if n:
         zt.append(z[2 * n])
-        vt.append(last if rho[2 * n] > 0 else 0.0)
+        vt.append(last if has[2 * n] else 0.0)
     return np.array(zt), np.array(vt)
+
+
+def bond_chart(sec, d):
+    """The Transverse Average Bond chart [B 0047fcd0]: the table of bond over the depth,
+    averaged over a window at each of 41 evenly spaced heights. Returns (z from the top
+    down, value in MPa)."""
+    zz = np.linspace(sec.ztop, sec.zbot, 41)
+    vals = np.zeros(41)
+    if sec.stirrups and len(d.z) >= 3:
+        zt, vt = bond_table(sec, d)
+        zt, vt = zt[::-1], vt[::-1]
+        for j, zq in enumerate(zz):
+            half = 0.5 * bond_window(sec, zq)
+            lo_, hi_ = max(zq - half, sec.zbot), min(zq + half, sec.ztop)
+            if hi_ - lo_ <= 0:
+                continue
+            inner = zt[(zt > lo_) & (zt < hi_)]
+            zs = np.concatenate([[lo_], inner, [hi_]])
+            vals[j] = np.trapezoid(np.interp(zs, zt, vt), zs) / (hi_ - lo_)
+    return zz, vals
 
 
 def bond_window(sec, z):
@@ -281,20 +306,9 @@ class Views:
             elif key == "transverse_average_bond":
                 # the table of bond over the depth, averaged over a window at each of 41
                 # heights [B 0047fcd0]
-                zz = np.linspace(sec.ztop, sec.zbot, 41)
+                zz, vals = bond_chart(sec, d)
                 yy = (zz - sec.zaxial) / u.length
-                vals = np.zeros(41)
-                if sec.stirrups and len(d.z) >= 3:
-                    zt, vt = bond_table(sec, d)
-                    zt, vt = zt[::-1], vt[::-1]
-                    for j, zq in enumerate(zz):
-                        half = 0.5 * bond_window(sec, zq)
-                        lo_, hi_ = max(zq - half, sec.zbot), min(zq + half, sec.ztop)
-                        if hi_ - lo_ <= 0:
-                            continue
-                        inner = zt[(zt > lo_) & (zt < hi_)]
-                        zs = np.concatenate([[lo_], inner, [hi_]])
-                        vals[j] = np.trapezoid(np.interp(zs, zt, vt), zs) / (hi_ - lo_) / cs
+                vals = vals / cs
                 made[key] = chart("Transverse Average Bond", f"Bond stress ({u.l_conc})", depth,
                                   [(0, list(zip(vals, yy)))], 4)
             elif key == "shrinkage_thermal_strain":

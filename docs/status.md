@@ -520,7 +520,7 @@ repository).
 | `004ad9c0`, `004ac960` | concrete stress, tangent |
 | `004ac190`, `004af050`, `004aefa0` | concrete set-up, ε0, ft |
 | `0046aaa0`, `0046a960` | MCFT node; crack strain, with its lowering by compression |
-| `004a7b60` | a second node routine that calls the crack strain; not read |
+| `004a7b60` | the node routine for a node with next to no shear strain (uniaxial, no stirrups); the test for it is at the head of `004a8b20` |
 | `00569f58` | flag for the lowering by compression; set in `004992b0`, `004b2580` |
 | `004aea40`, `004ae630` | steel stress, tangent |
 | `004ab4e0` | derived steel properties (rupture strain, tendon yield) |
