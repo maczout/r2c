@@ -26,8 +26,9 @@ What is compared:
   depth);
 * with --views, where the reference holds the views of the stages just before and after a
   detail stage: how far the reference's own view at that stage lies from the blend of its
-  two neighbours' views, by the same measure (owner, 2026-11-23, D54; docs/acceptance.md,
-  "Where Response is unstable"; see departure).
+  two neighbours' views, and how far the two neighbours' views lie from each other, by the
+  same measure (owner, 2026-11-23, D54 and D56; docs/acceptance.md, "Where Response is
+  unstable"; see departure and apart).
 
 No pass or fail is decided here: the numbers are for an engineer to judge.
 """
@@ -354,19 +355,23 @@ def feature_stages(rec, key=None) -> dict[int, str]:
     return out
 
 
-def lines_distance(la, lb):
+def lines_distance(la, lb, scale=None):
     """The distance measure of the detail views: how far the lines la of a chart lie from
     the lines lb of another, line by line in the order they are drawn. (worst, scale): the
     largest distance of la's points from lb's curve, in the chart's units, and the chart's
     largest value in la. Values are scaled by that largest value and depth by the chart's
-    span of depth; a line of la with no line in lb counts at its full size."""
+    span of depth; a line of la with no line in lb counts at its full size.
+
+    With scale given, values are scaled by it and not by la's own largest value: two charts
+    measured on the scale of a third (apart)."""
     worst = 0.0
-    scale = 0.0
+    own = 0.0
     span = 0.0
     for a in la:
         if len(a):
-            scale = max(scale, float(np.max(np.abs(a[:, 0]))))
+            own = max(own, float(np.max(np.abs(a[:, 0]))))
             span = max(span, float(np.ptp(a[:, 1])))
+    scale = own if scale is None else scale
     for i, a in enumerate(la):
         if len(a) == 0 or scale <= 1e-9:
             continue
@@ -378,18 +383,21 @@ def lines_distance(la, lb):
     return worst, scale
 
 
-# -- where the reference is unstable (owner, 2026-11-23, D54) -----------------------------------
+# -- where the reference is unstable (owner, 2026-11-23, D54, narrowed to spikes by D56) --------
 #
-# docs/acceptance.md, "Where Response is unstable": a view at a stage is unstable when
-# Response's own view there lies farther than the views target from the blend of its two
-# neighbours' views, taken at that stage's place along the control curve, with the same
-# distance measure and printed-precision floor as the comparison. Here the departure is
-# measured; tools/report.py sets it against the target.
+# docs/acceptance.md, "Where Response is unstable": a view at a stage is unstable when its
+# two neighbours agree with each other within the views target AND Response's own view at
+# the stage lies farther than the views target from the blend of its two neighbours' views,
+# taken at that stage's place along the control curve, each with the same distance measure
+# and printed-precision floor as the comparison. Here the two distances are measured
+# (departure, apart); tools/report.py sets them against the target.
 #
-# The rule leaves three choices open. Each is the developer's reading, for the owner to
-# confirm (docs/summary.md, D55); tools/unstable.py says how much each one moves.
+# The choices the wording leaves open. PLACE and LINES are the owner's (D55, readings
+# confirmed 2026-11-23). APART is the developer's reading of "agree with each other", for
+# the owner to confirm (docs/summary.md, D58); tools/unstable.py says how much each moves.
 PLACE = "curve"    # the stage's place between its neighbours: see place
 LINES = "zero"     # a line one neighbour does not have: see blend_lines
+APART = "own"      # the chart the neighbours' difference is a percentage of: see apart
 
 
 def place(a, rs, xs, ys, how=PLACE):
@@ -523,12 +531,45 @@ def departure(ref, stage, key, t, lines=LINES):
     return lines_distance(parse_chart(ref.stage(stage, key))[3], blend)[0]
 
 
+def apart(ref, stage, key, how=APART):
+    """How far the reference's views at the stage before and the stage after lie from each
+    other, as a percentage, by the measure of the comparison (lines_distance) taken both
+    ways, since neither neighbour is the reference: the larger of the two. A distance within
+    the printed precision counts as none, as for the comparison. None where a neighbour's
+    view is not in the record.
+
+    The comparison's percentage is of the reference chart's largest value, and here there
+    are three charts. "own" (the reading in use): each neighbour as the reference in turn,
+    on its own largest value, as any two records are compared. "stage" (the other reading,
+    tools/unstable.py): both on the scale of the chart at the stage itself, the one the
+    departure is a percentage of; a chart with nothing in it at the stage is then taken on
+    the larger neighbour's scale."""
+    before, after = view_body(ref, stage - 1, key), view_body(ref, stage + 1, key)
+    if before is None or after is None:
+        return None
+    lp, lq = parse_chart(before)[3], parse_chart(after)[3]
+    scale = None
+    if how == "stage":
+        mine = parse_chart(ref.stage(stage, key))[3]
+        scale = max((float(np.max(np.abs(a[:, 0]))) for a in mine if len(a)), default=0.0)
+        if scale <= 1e-9:
+            scale = max((float(np.max(np.abs(a[:, 0]))) for a in lp + lq if len(a)),
+                        default=0.0)
+    worst = 0.0
+    for la, lb, body in ((lp, lq, before), (lq, lp, after)):
+        d, s = lines_distance(la, lb, scale)
+        if d > FLOOR_DIGITS * resolution(body)[0] and s > 1e-9:
+            worst = max(worst, 100.0 * d / s)
+    return float(worst)
+
+
 def compare_views(ref, sub, ref_stage, sub_stage, t=None):
     """Every detail view of the reference's stage against the subject's. With t, the place
     of the reference's stage between its neighbours (place), each row also carries the
     reference's own departure from the blend of its neighbours' views there, where it can
     be tested (departure): "departure" in the chart's units, "departure_pct" relative to the
-    chart's largest value, as "max_diff" and "max_diff_pct" are."""
+    chart's largest value, as "max_diff" and "max_diff_pct" are; and "apart_pct", how far
+    the two neighbours' views lie from each other (apart)."""
     rows = []
     prefix = f"stage/{ref_stage}/"
     for name in ref.sections:
@@ -552,6 +593,7 @@ def compare_views(ref, sub, ref_stage, sub_stage, t=None):
         if dep is not None:
             rows[-1]["departure"] = dep
             rows[-1]["departure_pct"] = float(100.0 * dep / scale) if scale > 1e-9 else 0.0
+            rows[-1]["apart_pct"] = apart(ref, ref_stage, key)
     return rows
 
 

@@ -187,4 +187,20 @@ def test_views_carry_the_references_departure():
     row = compare.compare_views(ref, ref, 1, 1, 0.5)[0]
     assert row["max_diff"] == pytest.approx(0.0)
     assert row["departure"] == pytest.approx(2.0) and row["departure_pct"] == pytest.approx(50.0)
+    assert row["apart_pct"] == pytest.approx(100.0 * 2.0 / 3.0)     # 1 and 3: a step
     assert "departure" not in compare.compare_views(ref, ref, 1, 1)[0]
+
+
+def test_neighbours_apart_is_measured_both_ways_and_floored():
+    # owner, 2026-11-23 (D56): a spike has neighbours that agree; a step does not
+    assert compare.apart(_record([3.0, 9.0, 3.0]), 1, "v") == pytest.approx(0.0)
+    # 2 and 4 at the top: the end of the larger line lies 2 from the smaller, 50 % of its
+    # own largest value (the smaller line's end is nearer the larger line than that)
+    assert compare.apart(_record([2.0, 9.0, 4.0]), 1, "v") == pytest.approx(50.0)
+    # the other reading: both on the scale of the chart at the stage (2 of 9)
+    assert compare.apart(_record([2.0, 9.0, 4.0]), 1, "v", "stage") == \
+        pytest.approx(100.0 * 2.0 / 9.0)
+    # within two units of the last printed digit the neighbours do not differ
+    assert compare.apart(_record([3.0, 9.0, 3.002]), 1, "v") == 0.0
+    assert compare.apart(_record([3.0, 9.0, 3.01]), 1, "v") > 0.0
+    assert compare.apart(_record([3.0, 9.0, 3.0], near=None), 1, "v") is None
