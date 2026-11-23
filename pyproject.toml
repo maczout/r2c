@@ -25,7 +25,7 @@ packages = ["src/r2c"]
 [tool.pytest.ini_options]
 markers = [
     "slow: shear cases that take a minute or more (run with -m slow)",
-    "parked: cases outside phase A, parked until phase B (run with -m parked)",
+    "parked: cases not yet in the development set (run with -m parked)",
 ]
 addopts = "-m 'not slow and not parked'"
 testpaths = ["tests"]
