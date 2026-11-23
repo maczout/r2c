@@ -221,6 +221,12 @@ than yield; ρ is all the steel on the layer's side of the centroid over 0.8·Ag
 that has yielded on average and whose concentrated strain passes the end of its curve
 ruptures at the crack and is removed.
 
+*After unloading* [B `004ae520`, `004aea40`], since 2026-11-22 (second session of the
+day). The stress at the concentrated strain is taken by the same steel routine as the
+average stress, with the bar's plastic strain from the stages before: the curve, or the
+elastic line through the plastic strain where that is lower. r2c took the curve alone,
+which is the same until a bar unloads.
+
 *When it is removed* [B `004aaf70`, `004ae520`, `0041e310`, `00434c80`]. A bar's stress in
 a state is the lesser of its average stress and its capacity at a crack, and nothing at all
 when the capacity says it has ruptured: the bar is gone in the state where it ruptures, not
@@ -261,7 +267,8 @@ induce the same moment" [T 4-5, last part]. The particulars are the program's, r
 * *The concrete's moment.* Over the halves of layers that are cracked at both ends, on the
   tension side of that axis: (f1 less the floor after cracking, not below zero, plus
   vci/tan θ) times the width times the distance from the axis. The floor here is
-  max(ft, the node's cracking strength)/(1 + 250·w).
+  max(ft, the node's cracking strength)/(1 + 250·w). Each layer is summed with its own
+  widths: at a step in width the layer below the step has the width below it.
 * *The bars.* Every bar whose strain (without prestrain, net of shrinkage) is tensile takes
   part, cracked concrete around it or not. The extra curvature Δφ₁ that uses up the reserve
   of the first bar to reach its capacity at a crack (reserve/E over its distance from the
@@ -270,6 +277,16 @@ induce the same moment" [T 4-5, last part]. The particulars are the program's, r
   of the two moments. If not, and the concrete's moment is within the capacity moment of
   the crack check (0.1 % and 2 N m over), it is solved for with the bars' own curves, each
   held to its capacity at a crack. Otherwise there is no value.
+* *The solve* [B `00442cd0`, `00440c70`, `004409d0`, `004aaf70`]. The extra curvature is
+  raised in steps of 0.001/h per metre (h the section's depth in metres; 5·10⁻⁷ /m with
+  the axis 1000 m away), 50 at most, until the bars' moment reaches the concrete's, then
+  halved ten times inside the last step. If 50 steps do not reach it, the curvature that
+  takes one bar to 1.01 times its rupture strain is tried for each bar and the one with
+  the largest moment is kept: ten halvings between zero and that, or no extra curvature
+  if that moment is still short. A bar's stress at the extra strain is the steel routine's
+  with the bar's plastic strain (a bar that has unloaded climbs its elastic line, a bar
+  yielded in compression stays at its yield), and no more than its capacity at a crack at
+  that strain.
 * *What is shown.* A bar in compression shows nothing. A bar in tension shows its stress at
   the extra strain, the lesser of its curve and its capacity at a crack, if the strain at
   its depth with the extra strain reaches the cracking strain there; nothing if it does not.
@@ -280,6 +297,24 @@ nothing (N + M at the peak: Response 46 MPa), and under tension the two layers w
 treated as two zones (top bar 210 MPa where Response has 37). Measured on the phase A set:
 both come to 0.0 %, and the same view comes inside at five stages of four shear cases
 (`docs/verification.md`, "A2, part 3").
+
+Three corrections of r2c's reading, 2026-11-22 (second session), found on an I-girder with
+strands and a T-beam under negative moment, each measured in Response's own strain state
+(`tools/diagnose.py states … --views`, records of every stage):
+
+* The step of the solve was a thousand times too small (a slip of units: 0.001/h is per
+  metre with h in metres), so 50 steps never reached the moment and the coarse fallback
+  answered, or nothing. I-girder at cracking, lower strand: 1593.5 MPa (no increase)
+  before, 1673.8 after, Response 1675.3. The fallback took the strain at peak stress
+  where Response takes the rupture strain.
+* The bars' stresses at the extra strain were on the loading curve whatever the history.
+  I-girder after the load has fallen: 1801 / +463 / 1791 MPa before, 839.8 / −400.0 /
+  785.9 after, Response 839.8 / −400.0 / 785.9.
+* The concrete's moment was summed over the list of distinct nodes, which at a step in
+  width has one node with the upper width: the half layer under a flange was counted as
+  widening to the flange, the moment came out above the capacity moment and there was no
+  value. T-beam, −M, after the top bars have ruptured: no value before, 448.9 MPa after,
+  Response 448.9; the bar in compression shows 0 as in Response.
 
 ### At a step in width [O]
 
