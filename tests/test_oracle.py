@@ -1,9 +1,11 @@
 """r2c against records captured from Response-2000 with r2x (tests/oracle).
 
-The phase A set (Newbeam with only its loads varied; docs/summary.md, D16) is in tests/oracle
-and is what runs by default. Every other case is parked until phase B (D19): its fixture is in
-tests/oracle/parked and its test is marked "parked", run on request with `pytest -m parked`
-(`-m "parked and not slow"` to leave out the parked shear cases).
+The development set (docs/summary.md, D16 and D41: Newbeam with only its loads varied, and
+since step A-1 the seven cases on the Quick Define sections) is in tests/oracle and is what
+runs by default. The Quick Define inputs are r2x's: without R2C_DEFINE_DIR those tests are
+skipped. Every other case is parked (D19): its fixture is in tests/oracle/parked and its test
+is marked "parked", run on request with `pytest -m parked` (`-m "parked and not slow"` to
+leave out the parked shear cases).
 
 These are regression tests. The limits are a little above the differences found when the cases
 were last compared (docs/verification.md); they say "no worse than it was", not "close enough
@@ -47,8 +49,9 @@ BUILT_IN = {
 # horizontal ties besides: refused since 2026-11-22 (D23). Their fixtures are kept (D19).
 REFUSED_SAMPLES = ("marshall-m", "marshall-nonly", "marshall-asis", "cm4-asis", "liping-asis",
                    "se100-asis")
-# Quick Define sections (T-beam, circular column, I-girder with strands): their inputs are
-# r2x's, found by SHA-256 under R2C_DEFINE_DIR
+# Step A-1 of the development set (owner, 2026-11-22, D41): the Quick Define sections
+# (T-beam, circular column, I-girder with strands). Their inputs are r2x's, found by SHA-256
+# under R2C_DEFINE_DIR
 DEFINE = {
     "tbeam-m": (0.1, 0.1),
     "tbeam-negm": (0.05, 1.2),
@@ -58,6 +61,10 @@ DEFINE = {
 }
 DEFINE_SLOW = {
     "column-mv": (0.8, 3.0),
+    # at the baseline of step A-1 (2026-11-22)
+    "igirder-mv": (0.2, 0.3),
+}
+PARKED_DEFINE_SLOW = {
     # 4.3 % on the moment-curvature chart: Response's load falls and recovers at a curvature
     # of 0.4 rad/km, r2c's rises through it
     "igirder-m2v": (0.9, 5.0),
@@ -159,17 +166,22 @@ def _define(case, oracle_dir, define_dirs, limits):
     _check(ref, _solve(ref, path), *limits)
 
 
-@pytest.mark.parked
 @pytest.mark.parametrize("case", sorted(DEFINE))
-def test_quick_define_sections(case, parked_dir, define_dirs):
-    _define(case, parked_dir, define_dirs, DEFINE[case])
+def test_quick_define_sections(case, oracle_dir, define_dirs):
+    _define(case, oracle_dir, define_dirs, DEFINE[case])
+
+
+@pytest.mark.slow
+@pytest.mark.parametrize("case", sorted(DEFINE_SLOW))
+def test_quick_define_shear(case, oracle_dir, define_dirs):
+    _define(case, oracle_dir, define_dirs, DEFINE_SLOW[case])
 
 
 @pytest.mark.parked
 @pytest.mark.slow
-@pytest.mark.parametrize("case", sorted(DEFINE_SLOW))
-def test_quick_define_shear(case, parked_dir, define_dirs):
-    _define(case, parked_dir, define_dirs, DEFINE_SLOW[case])
+@pytest.mark.parametrize("case", sorted(PARKED_DEFINE_SLOW))
+def test_parked_quick_define_shear(case, parked_dir, define_dirs):
+    _define(case, parked_dir, define_dirs, PARKED_DEFINE_SLOW[case])
 
 
 @pytest.mark.parked

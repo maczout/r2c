@@ -221,6 +221,12 @@ than yield; ρ is all the steel on the layer's side of the centroid over 0.8·Ag
 that has yielded on average and whose concentrated strain passes the end of its curve
 ruptures at the crack and is removed.
 
+*After unloading* [B `004ae520`, `004aea40`], since 2026-11-22 (second session of the
+day). The stress at the concentrated strain is taken by the same steel routine as the
+average stress, with the bar's plastic strain from the stages before: the curve, or the
+elastic line through the plastic strain where that is lower. r2c took the curve alone,
+which is the same until a bar unloads.
+
 *When it is removed* [B `004aaf70`, `004ae520`, `0041e310`, `00434c80`]. A bar's stress in
 a state is the lesser of its average stress and its capacity at a crack, and nothing at all
 when the capacity says it has ruptured: the bar is gone in the state where it ruptures, not
@@ -270,6 +276,16 @@ induce the same moment" [T 4-5, last part]. The particulars are the program's, r
   of the two moments. If not, and the concrete's moment is within the capacity moment of
   the crack check (0.1 % and 2 N m over), it is solved for with the bars' own curves, each
   held to its capacity at a crack. Otherwise there is no value.
+* *The solve* [B `00442cd0`, `00440c70`, `004409d0`, `004aaf70`]. The extra curvature is
+  raised in steps of 0.001/h per metre (h the section's depth in metres; 5·10⁻⁷ /m with
+  the axis 1000 m away), 50 at most, until the bars' moment reaches the concrete's, then
+  halved ten times inside the last step. If 50 steps do not reach it, the curvature that
+  takes one bar to 1.01 times its rupture strain is tried for each bar and the one with
+  the largest moment is kept: ten halvings between zero and that, or no extra curvature
+  if that moment is still short. A bar's stress at the extra strain is the steel routine's
+  with the bar's plastic strain (a bar that has unloaded climbs its elastic line, a bar
+  yielded in compression stays at its yield), and no more than its capacity at a crack at
+  that strain.
 * *What is shown.* A bar in compression shows nothing. A bar in tension shows its stress at
   the extra strain, the lesser of its curve and its capacity at a crack, if the strain at
   its depth with the extra strain reaches the cracking strain there; nothing if it does not.
@@ -280,6 +296,19 @@ nothing (N + M at the peak: Response 46 MPa), and under tension the two layers w
 treated as two zones (top bar 210 MPa where Response has 37). Measured on the phase A set:
 both come to 0.0 %, and the same view comes inside at five stages of four shear cases
 (`docs/verification.md`, "A2, part 3").
+
+Two corrections of r2c's reading, 2026-11-22 (second session), found on an I-girder with
+strands, each measured in Response's own strain state
+(`tools/diagnose.py states … --views`, records of every stage):
+
+* The step of the solve was a thousand times too small (a slip of units: 0.001/h is per
+  metre with h in metres), so 50 steps never reached the moment and the coarse fallback
+  answered, or nothing. I-girder at cracking, lower strand: 1593.5 MPa (no increase)
+  before, 1673.8 after, Response 1675.3. The fallback took the strain at peak stress
+  where Response takes the rupture strain.
+* The bars' stresses at the extra strain were on the loading curve whatever the history.
+  I-girder after the load has fallen: 1801 / +463 / 1791 MPa before, 839.8 / −400.0 /
+  785.9 after, Response 839.8 / −400.0 / 785.9.
 
 ### At a step in width [O]
 
@@ -292,7 +321,9 @@ across a step to four times the width (measured, I-girder, M/V = 2 m). In r2c:
   step reads the profile on the layer's own side;
 * a node's stirrup ratio ρv = Av/(b·s) is taken with the width of the node's own layer.
 
-Both are r2c's own way of keeping the two sides apart, not rules read from Response. The
+Both are r2c's own way of keeping the two sides apart, not rules read from Response. Since
+2026-11-22 they apply only to a step of 10 mm or less: at a larger one Response's thin layer
+is there ("Layers", "Across a step"), with a point of the profile at each of its faces. The
 tables over the depth (crack spacing, bond, steel ratio at a crack) are still interpolated
 across a step from their 100 stations.
 
@@ -317,9 +348,27 @@ int(8·d/(h + 0.1 mm) + 0.99) − 1 equal layers, at least one (d its depth, h t
 seven for a section with one stretch. (The thesis says eight.) Then, bar layer by bar layer,
 the layer that holds the bar gets a boundary at the bar's upper edge and one at its lower
 edge (the bar's height ± half its diameter, held inside that layer), unless that would
-leave a layer thinner than h/2048 or the edge is within 0.2 mm of a boundary. Response also
-puts a layer 0.1 mm thick across a step in width; r2c does not, and keeps the two sides of a
-step apart in its own way ("At a step in width").
+leave a layer thinner than h/2048 or the edge is within 0.2 mm of a boundary.
+
+*Across a step* [B `00434eb0`], since 2026-11-22 (step A-1). Where one stretch of the
+outline ends and the next begins with a width more than 10 mm different, or with another
+concrete, the boundary between them is replaced by two: 0.05 mm above the step and 0.05 mm
+below it. So a layer 0.1 mm thick lies across the step, its top node on the upper stretch,
+its bottom node on the lower one and its middle node on the step itself; the other
+boundaries of the two stretches stay where they were. The layer is too thin to be split.
+The middle node has the width, and the shear strain, of the wider side [O: Response's
+Shear Stress and Shear Strain charts on the I-girder at both of its steps, 4.0 and 3.0
+times less at the middle node than at the web's node, the ratios of the widths; one
+section]. r2c: `Analysis.thin`, `_initial_bounds`, `layer_nodes`, `profile_z`
+(`solver.own_thin_layer`). Before, r2c had one boundary on the step and kept the two sides
+apart in its own way ("At a step in width"), which stays for a step of 10 mm or less.
+Measured: r2c's nodes at the two steps of the I-girder are Response's (333.16, 333.11,
+333.06 and −316.84, −316.89, −316.94 mm); the T-beam under −M, steel stress at a crack at
+the last stage, 100 to 0.0 % (the concrete's moment over the cracked halves of layers
+changes with the layer at the step); transverse bond in Response's own states on the
+I-girder with shear, 99.8 to 0.0 % at the stage before the peak (the jump of the stirrup
+stress at the web's edge is spread over the thin layer, not over half a web layer).
+Not checked: a change of concrete at one width (no case).
 
 *Splitting* [B `004a9d90`, `004a9be0`]. Each time the section's forces are wanted, the layers
 start from the base layers. The middle of each half of a layer is worked out and compared
@@ -688,8 +737,15 @@ shear is negligible). After each pass:
 * a stage whose state code is not zero (below) is refused while the multiplier is 0.5 or
   more, and one with code 3 is refused while its load is above the largest so far.
 
-**A stage refused, or not solved.** The stage is reset to the one before and tried again
-closer: the first time at half a base step back with the multiplier marked; after that the
+**A stage refused, or not solved.** The stage is reset to the one before and tried again.
+The first time a whole step is refused the target goes half a base step *further* and the
+multiplier is marked 1.5, which is the step then being tried; after that the multiplier is
+halved each time and the target comes back by the multiplier times the base step, so the
+tries are at 1, 1.5, 0.75, 0.375 … of a step [`0041a870`, case 1]. Until 2026-11-22 r2c
+went half a step back at the first refusal (a sign read the wrong way), so its tries were
+at 1, 0.5, −0.25 … [O: on the I-girder with shear Response's stage after the curvature of
+−0.091 rad/km is at −0.031, three quarters of a step on, its peak; r2c now puts its stage
+there, 656.2 kN against 655.9, where it had gone back and climbed to 645 in 23 stages]. The
 multiplier is halved each time (and doubled again after a stage accepted at the first try
 while it is under 0.25). When the multiplier is under 0.2 (0.05 if the control is the axial
 strain) and the other control variable is not the present one, the control variable is

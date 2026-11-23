@@ -24,6 +24,8 @@ FAR = 1e6            # stands for a neutral axis outside the section (whole sect
 
 
 STEP = 1e-6          # mm: how far from a step in width the shear strain profile is read
+THIN = 0.05          # mm: half the layer Response-2000 puts across a step [B 00434eb0]
+THIN_WIDTH = 10.0    # mm: the change of width from which it does [B 00434eb0]
 
 
 class SolveError(RuntimeError):
@@ -66,6 +68,10 @@ class Stage:
     cmode: str | None = None      # the control variable the stage was found in
 
 
+# Response's layer 0.1 mm thick across a step in width (docs/kernel.md, "Layers")
+own_thin_layer = True
+
+
 class Analysis:
     def __init__(self, sec: Section, const=(0.0, 0.0, 0.0), incr=(0.0, 1.0, 0.0)):
         self.sec = sec
@@ -73,14 +79,25 @@ class Analysis:
         self.dn, self.dm, self.dv = incr
         self.shear = (self.dv != 0.0) or (self.v0 != 0.0)
         self.t_ft = sec.cracking_table(self.n0, self.m0, self.dn, self.dm)
+        # the steps in width, and those Response-2000 puts a thin layer across (docs/kernel.md,
+        # "Layers"): a change of width of more than 10 mm, or a change of concrete
+        jump = {z: abs(sec.width_side(z, True) - sec.width_side(z, False))
+                for z in sec.breaks()[1:-1]}
+        self.steps = np.array([z for z, d in jump.items() if d > 1e-6])
+        self.thin = np.array([z for z, d in jump.items()
+                              if own_thin_layer and (d > THIN_WIDTH or sec.law_at(z + STEP)
+                                                     is not sec.law_at(z - STEP))])
+        # which side of a thin layer its middle node belongs to: the wider one [O]
+        self.thin_side = {float(z): (THIN if sec.width_side(z, True) >= sec.width_side(z, False)
+                                     else -THIN) for z in self.thin}
         self.bounds = self._initial_bounds()
         # the shear strain profile's grid: the tables' heights, and a point just above and
-        # just below every step in width, where the shear strain jumps
-        self.steps = np.array([z for z in sec.breaks()[1:-1]
-                               if abs(sec.width_side(z, True) - sec.width_side(z, False))
-                               > 1e-6])
-        self.shape_z = np.array(sorted(set(sec.tz.tolist())
-                                       | {z + d for z in self.steps for d in (-STEP, STEP)}))
+        # just below every step in width, where the shear strain jumps (the two faces of the
+        # thin layer, where there is one)
+        self.shape_z = np.array(sorted(
+            set(sec.tz.tolist())
+            | {z + d * (THIN if float(z) in self.thin_side else STEP)
+               for z in self.steps for d in (-1.0, 1.0)}))
         self.shape_z0 = self.shape_z.copy()      # the profile's base grid
         self.shape = self._elastic_shape()
         self.max_layers = 220
@@ -106,7 +123,11 @@ class Analysis:
             nl = max(n - 1, 1)
             bd.extend(z1 - (z1 - z2) * i / nl for i in range(nl))
         bd.append(sec.zbot)
-        bd = sorted(set(round(z, 9) for z in bd) | set(sec.breaks()), reverse=True)
+        bd = set(round(z, 9) for z in bd) | set(sec.breaks())
+        # across a step, a layer 0.1 mm thick in place of the boundary [B 00434eb0]
+        for zs in self.thin:
+            bd = {z for z in bd if abs(z - zs) > 1e-6} | {zs + THIN, zs - THIN}
+        bd = sorted(bd, reverse=True)
         sliver = h / 2048.0
         near = 0.2          # mm
         for l in sec.layers:
@@ -162,6 +183,11 @@ class Analysis:
             return z
         zp = z.copy()
         for zs in self.steps:
+            side = self.thin_side.get(float(zs))
+            if side is not None:
+                # the middle node of the thin layer across the step: on the wider side
+                zp[np.abs(z[:, 1] - zs) < 1e-9, 1] = zs + side
+                continue
             zp[np.abs(z[:, 0] - zs) < 1e-9, 0] = zs - STEP
             zp[np.abs(z[:, 2] - zs) < 1e-9, 2] = zs + STEP
         return zp
@@ -177,6 +203,8 @@ class Analysis:
         b[:, 1] = sec.width(zm)
         b[:, 0] = [sec.width_side(v, upper=False) for v in zt]
         b[:, 2] = [sec.width_side(v, upper=True) for v in zb]
+        for zs, side in self.thin_side.items():
+            b[np.abs(zm - zs) < 1e-9, 1] = sec.width_side(zs, upper=side > 0)
         return z, b
 
     # -- strain state ---------------------------------------------------------------------------
@@ -195,17 +223,10 @@ class Analysis:
             if self.dead[i]:
                 fs[i] = float("nan")
                 continue
-            env = float(l.steel.raw(e))
-            if not math.isnan(env):
-                # a bar that has yielded unloads along its elastic stiffness
-                lin = (e - self.ep[i]) * l.steel.E
-                if env > 0:
-                    if env - lin > 1e-6:
-                        env = lin
-                    env = max(env, -l.steel.fy)
-                elif env < 0:
-                    env = min(max(lin, env), l.steel.fy)
-            cap = float(l.steel.crack_capacity(e - l.prestrain, l.prestrain, l.rho, l.strand))
+            # a bar that has yielded unloads along its elastic stiffness
+            env = float(l.steel.unloaded(e, self.ep[i]))
+            cap = float(l.steel.crack_capacity(e - l.prestrain, l.prestrain, l.rho, l.strand,
+                                               self.ep[i]))
             f = env * l.steel.phi
             fs[i] = float("nan") if math.isnan(cap) or math.isnan(f) else min(f, cap)
         return es, fs
@@ -276,12 +297,13 @@ class Analysis:
         else:
             z4 = zbot
         mtop = mbot = 0.0
-        for l, e, f in zip(sec.layers, es, fs):
+        for l, e, f, ep in zip(sec.layers, es, fs, self.ep):
             if not (l.z > z3 or l.z < z4):
                 continue
             if math.isnan(f):
                 continue
-            cap = float(l.steel.crack_capacity(e - l.prestrain, l.prestrain, l.rho, l.strand))
+            cap = float(l.steel.crack_capacity(e - l.prestrain, l.prestrain, l.rho, l.strand,
+                                               ep))
             df = 0.0 if math.isnan(cap) else max(cap - f, 0.0)
             near = min(min(abs(l.z - z4), abs(l.z - z3)) / (l.db + 0.1), 1.0)
             if l.z > z3:
@@ -707,7 +729,7 @@ class Analysis:
             bars.append((i, l, e, arm))
             if math.isnan(fs[i]):
                 continue
-            cap = float(l.steel.crack_capacity(e, l.prestrain, l.rho, l.strand))
+            cap = float(l.steel.crack_capacity(e, l.prestrain, l.rho, l.strand, self.ep[i]))
             room = 0.0 if math.isnan(cap) else max(cap - fs[i], 0.0)
             if arm > 0:
                 dmin = min(dmin, room / (l.steel.E * l.steel.phi) / arm)
@@ -719,8 +741,9 @@ class Analysis:
             """The bar's stress with an extra strain at the crack; nan when it ruptures."""
             if math.isnan(fs[i]):
                 return float("nan")
-            s = float(l.steel.stress(es[i] + extra))
-            cap = float(l.steel.crack_capacity(e + extra, l.prestrain, l.rho, l.strand))
+            s = float(l.steel.unloaded(es[i] + extra, self.ep[i])) * l.steel.phi
+            cap = float(l.steel.crack_capacity(e + extra, l.prestrain, l.rho, l.strand,
+                                               self.ep[i]))
             if math.isnan(cap):
                 return float("nan")
             return cap if math.isnan(s) else min(s, cap)
@@ -738,7 +761,7 @@ class Analysis:
             # past what the bars take elastically: solved, if it is within the capacity
             # moment of the crack check (2 N m over)
             if mom < 1.001 * mcap + 2000.0:
-                step = 1e-6 / sec.h if abs(zref) <= 20.0 * sec.h else 5e-10
+                step = 1e-3 / sec.h if abs(zref) <= 20.0 * sec.h else 5e-10
                 hi = step
                 for _ in range(50):
                     hi += step
@@ -747,7 +770,7 @@ class Analysis:
                 else:
                     best = 0.0
                     for i, l, e, arm in bars:
-                        x = ((l.steel.eu - l.prestrain) * 1.01 - e) / (arm + 0.1)
+                        x = ((l.steel.rupture - l.prestrain) * 1.01 - e) / (arm + 0.1)
                         if resist(x) > best:
                             best, hi = resist(x), x
                     if best < mom:

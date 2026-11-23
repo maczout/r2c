@@ -43,3 +43,30 @@ def test_without_tiers_all_views_are_one_check():
     acc = {"flexure": {}, "views": {"views_pct": 5.0, "views_exempt": []}}
     chk = report.assess(res(False, {"a": 1.0, "c": 9.0}), acc)
     assert chk["views"][2] is False and "views_could" not in chk
+
+
+def staged(shear, stages):
+    """A result with its views stage by stage: stages is [(feature, {view: pct})]."""
+    r = res(shear, {})
+    r["views_stages"] = [
+        {"ref_stage": i, "feature": f,
+         "views": [{"view": v, "max_diff": p, "max_diff_pct": p, "floor": 0.0}
+                   for v, p in views.items()]}
+        for i, (f, views) in enumerate(stages)]
+    return r
+
+
+def test_shear_views_leave_out_the_last_stage():
+    # owner, 2026-11-22 (D40): the counterpart of D25 for the views
+    stages = [("peak", {"b": 1.0}), ("ends falling", {"b": 9.0})]
+    assert report.assess(staged(True, stages), ACC)["views_should"][2] is True
+    assert [v["max_diff_pct"] for v in report.view_rows(staged(True, stages), True)] == [9.0]
+    # without shear the last stage is assessed, and nothing is set aside
+    flex = staged(False, stages)
+    assert report.assess(flex, ACC)["views_should"][2] is False
+    assert report.view_rows(flex, True) == []
+
+
+def test_a_last_stage_that_is_the_peak_is_assessed():
+    r = staged(True, [("cracking", {"b": 1.0}), ("peak", {"b": 9.0})])
+    assert report.assess(r, ACC)["views_should"][2] is False

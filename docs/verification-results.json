@@ -1,17 +1,22 @@
 {
  "run": {
   "r2c_version": "0.1.0",
-  "commit": "9580a68f316790b90c9d067e737bda251fff36a4",
+  "commit": "0c050361e94c9a73face6b7bdd8f2db563d4d1d9",
   "dirty": false,
-  "started": "2026-11-22T16:59:33-07:00",
+  "started": "2026-11-22T19:40:50-07:00",
   "host": "Makertyre",
   "machine": "Linux x86_64, 32 cores",
   "python": "3.12.3",
   "numpy": "2.5.5",
-  "jobs": 17,
+  "jobs": 24,
   "inputs_dir": true,
   "reference_dir": "tests/oracle",
   "cases": [
+   "column-mv",
+   "column-n4000-m",
+   "column-nonly",
+   "igirder-m",
+   "igirder-mv",
    "newbeam-m",
    "newbeam-m05v",
    "newbeam-m0neg-mv",
@@ -28,10 +33,5925 @@
    "newbeam-tension",
    "newbeam-v0-m",
    "newbeam-vonly",
-   "newbeam-zero"
+   "newbeam-zero",
+   "tbeam-m",
+   "tbeam-negm"
   ]
  },
  "results": {
+  "column-mv": {
+   "ref": {
+    "input-name": "column.r2t",
+    "units": "si",
+    "factors": "1.00,1.00,1.00",
+    "initial": "0.00,0.00,0.00",
+    "increment": "0.00,1.00,1.00",
+    "more-detail": "0",
+    "stage-count": "41",
+    "peak-stage": "36"
+   },
+   "sub": {
+    "stage-count": "40",
+    "peak-stage": "34"
+   },
+   "control": [
+    {
+     "chart": "shear_gxy",
+     "ref_peak_load": 417.921,
+     "sub_peak_load": 417.856,
+     "ref_peak_x": 4.608,
+     "sub_peak_x": 2.442,
+     "peak_diff_pct": -0.015553178710808437,
+     "curve_max_diff_pct": 0.5774855340411643,
+     "curve_mean_diff_pct": 0.1172552523597035,
+     "shape_ref": [
+      "cracking",
+      "peak",
+      "ends falling"
+     ],
+     "shape_sub": [
+      "cracking",
+      "peak",
+      "ends standing still"
+     ],
+     "shape_same": false,
+     "floor_pct": 0.03244472988846211,
+     "rising_pct": 0.5680797233445429,
+     "post_peak_pct": 13.829098011101626
+    },
+    {
+     "chart": "moment_phi",
+     "ref_peak_load": 417.812,
+     "sub_peak_load": 417.856,
+     "ref_peak_x": 5.732,
+     "sub_peak_x": 5.382,
+     "peak_diff_pct": 0.010531052243588676,
+     "curve_max_diff_pct": 0.3339087143024072,
+     "curve_mean_diff_pct": 0.06553658595988696,
+     "shape_ref": [
+      "cracking",
+      "peak",
+      "ends falling"
+     ],
+     "shape_sub": [
+      "cracking",
+      "peak",
+      "ends standing still"
+     ],
+     "shape_same": false,
+     "floor_pct": 0.03489511871156456,
+     "rising_pct": 0.3915636697844782,
+     "post_peak_pct": 9.528887880188783
+    }
+   ],
+   "missing_control": [],
+   "views_stages": [
+    {
+     "ref_stage": 15,
+     "sub_stage": 11,
+     "feature": "cracking",
+     "ref_x": 0.822,
+     "ref_y": 120.847,
+     "sub_x": 0.316,
+     "sub_y": 71.025,
+     "views": [
+      {
+       "view": "longitudinal_strain",
+       "ref_max": 0.2828,
+       "max_diff": 0.1878,
+       "floor": 0.0002,
+       "max_diff_pct": 66.40735502121642,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "transverse_strain",
+       "ref_max": 0.005,
+       "max_diff": 0.005,
+       "floor": 0.002,
+       "max_diff_pct": 100.0,
+       "lines": [
+        4,
+        4
+       ]
+      },
+      {
+       "view": "shear_strain",
+       "ref_max": 0.073,
+       "max_diff": 0.05319062046677614,
+       "floor": 0.0002,
+       "max_diff_pct": 72.863863653118,
+       "lines": [
+        5,
+        5
+       ]
+      },
+      {
+       "view": "shear_stress",
+       "ref_max": 0.7043,
+       "max_diff": 0.3488613297426305,
+       "floor": 0.0002,
+       "max_diff_pct": 49.53305831927168,
+       "lines": [
+        3,
+        3
+       ]
+      },
+      {
+       "view": "principal_compressive_stress",
+       "ref_max": 50.0,
+       "max_diff": 3.531,
+       "floor": 0.002,
+       "max_diff_pct": 7.062,
+       "lines": [
+        3,
+        3
+       ]
+      },
+      {
+       "view": "shear_on_crack",
+       "ref_max": 4.1039,
+       "max_diff": 4.1039,
+       "floor": 0.0002,
+       "max_diff_pct": 100.0,
+       "lines": [
+        3,
+        1
+       ]
+      },
+      {
+       "view": "principal_tensile_stress",
+       "ref_max": 2.862,
+       "max_diff": 0.7622338425183537,
+       "floor": 0.0002,
+       "max_diff_pct": 26.63290854361823,
+       "lines": [
+        3,
+        3
+       ]
+      },
+      {
+       "view": "principal_tensile_strain",
+       "ref_max": 0.283,
+       "max_diff": 0.18799999999999997,
+       "floor": 0.002,
+       "max_diff_pct": 66.43109540636043,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "crack_widths",
+       "ref_max": 0.0924,
+       "max_diff": 0.09209999999999999,
+       "floor": 0.0002,
+       "max_diff_pct": 99.67532467532467,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "average_angle",
+       "ref_max": 90.025,
+       "max_diff": 10.974148087595896,
+       "floor": 0.002,
+       "max_diff_pct": 12.190111732958508,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "long_crack_spacing",
+       "ref_max": 489.96,
+       "max_diff": 102.97200000000001,
+       "floor": 0.002,
+       "max_diff_pct": 21.016409502816558,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "transverse_crack_spacing",
+       "ref_max": 3000.0,
+       "max_diff": 328.65118601880897,
+       "floor": 0.002,
+       "max_diff_pct": 10.955039533960298,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "diagonal_spacing",
+       "ref_max": 489.96,
+       "max_diff": 179.32888111799852,
+       "floor": 0.002,
+       "max_diff_pct": 36.60071865417555,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "long_reinforcement_stress",
+       "ref_max": 45.657,
+       "max_diff": 30.836999999999996,
+       "floor": 0.002,
+       "max_diff_pct": 67.54057428214732,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "long_reinf_stress_at_crack",
+       "ref_max": 93.745,
+       "max_diff": 78.925,
+       "floor": 0.002,
+       "max_diff_pct": 84.19115686169928,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "long_average_bond",
+       "ref_max": 0.6,
+       "max_diff": 0.45499999999999996,
+       "floor": 0.002,
+       "max_diff_pct": 75.83333333333333,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "stirrup_stress",
+       "ref_max": 0.551,
+       "max_diff": 0.551,
+       "floor": 0.002,
+       "max_diff_pct": 100.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "stirrup_stress_at_crack",
+       "ref_max": 400.0,
+       "max_diff": 400.0,
+       "floor": 0.002,
+       "max_diff_pct": 100.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "transverse_average_bond",
+       "ref_max": 0.0273,
+       "max_diff": 0.0273,
+       "floor": 0.0002,
+       "max_diff_pct": 100.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "shrinkage_thermal_strain",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        3,
+        3
+       ]
+      },
+      {
+       "view": "longitudinal_concrete_stress",
+       "ref_max": 6.396,
+       "max_diff": 3.5309999999999997,
+       "floor": 0.002,
+       "max_diff_pct": 55.20637898686679,
+       "lines": [
+        1,
+        1
+       ]
+      }
+     ]
+    },
+    {
+     "ref_stage": 36,
+     "sub_stage": 34,
+     "feature": "peak",
+     "ref_x": 5.732,
+     "ref_y": 417.812,
+     "sub_x": 5.382,
+     "sub_y": 417.856,
+     "views": [
+      {
+       "view": "longitudinal_strain",
+       "ref_max": 2.513,
+       "max_diff": 0.2456999999999998,
+       "floor": 0.0002,
+       "max_diff_pct": 9.777158774373252,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "transverse_strain",
+       "ref_max": 17.277,
+       "max_diff": 4.308683707322591,
+       "floor": 0.002,
+       "max_diff_pct": 24.938841855198188,
+       "lines": [
+        4,
+        4
+       ]
+      },
+      {
+       "view": "shear_strain",
+       "ref_max": 10.8408,
+       "max_diff": 2.1916666963957097,
+       "floor": 0.0002,
+       "max_diff_pct": 20.21683544014934,
+       "lines": [
+        5,
+        5
+       ]
+      },
+      {
+       "view": "shear_stress",
+       "ref_max": 2.2008,
+       "max_diff": 0.25644613482981915,
+       "floor": 0.0002,
+       "max_diff_pct": 11.652405253990327,
+       "lines": [
+        3,
+        3
+       ]
+      },
+      {
+       "view": "principal_compressive_stress",
+       "ref_max": 50.0,
+       "max_diff": 10.376897998077267,
+       "floor": 0.002,
+       "max_diff_pct": 20.75379599615453,
+       "lines": [
+        3,
+        3
+       ]
+      },
+      {
+       "view": "shear_on_crack",
+       "ref_max": 4.0382,
+       "max_diff": 0.5691024371216347,
+       "floor": 0.0002,
+       "max_diff_pct": 14.092973035551351,
+       "lines": [
+        3,
+        3
+       ]
+      },
+      {
+       "view": "principal_tensile_stress",
+       "ref_max": 2.1,
+       "max_diff": 0.42625813122898604,
+       "floor": 0.0002,
+       "max_diff_pct": 20.298006248999336,
+       "lines": [
+        3,
+        3
+       ]
+      },
+      {
+       "view": "principal_tensile_strain",
+       "ref_max": 18.585,
+       "max_diff": 4.491306861674434,
+       "floor": 0.002,
+       "max_diff_pct": 24.166300035913014,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "crack_widths",
+       "ref_max": 15.3081,
+       "max_diff": 4.29787527333713,
+       "floor": 0.0002,
+       "max_diff_pct": 28.075824389291487,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "average_angle",
+       "ref_max": 90.025,
+       "max_diff": 16.089054343292602,
+       "floor": 0.002,
+       "max_diff_pct": 17.87176266958356,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "long_crack_spacing",
+       "ref_max": 489.96,
+       "max_diff": 102.97200000000001,
+       "floor": 0.002,
+       "max_diff_pct": 21.016409502816558,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "transverse_crack_spacing",
+       "ref_max": 3000.0,
+       "max_diff": 337.23662496976795,
+       "floor": 0.002,
+       "max_diff_pct": 11.241220832325599,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "diagonal_spacing",
+       "ref_max": 831.671,
+       "max_diff": 186.5476562376304,
+       "floor": 0.002,
+       "max_diff_pct": 22.430463036180218,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "long_reinforcement_stress",
+       "ref_max": 400.0,
+       "max_diff": 36.29500000000001,
+       "floor": 0.002,
+       "max_diff_pct": 9.073750000000002,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "long_reinf_stress_at_crack",
+       "ref_max": 400.0,
+       "max_diff": 45.99900000000004,
+       "floor": 0.002,
+       "max_diff_pct": 11.499750000000011,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "long_average_bond",
+       "ref_max": 2.608,
+       "max_diff": 0.37190080000000003,
+       "floor": 0.002,
+       "max_diff_pct": 14.26,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "stirrup_stress",
+       "ref_max": 441.373,
+       "max_diff": 85.895268839457,
+       "floor": 0.002,
+       "max_diff_pct": 19.460925076852686,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "stirrup_stress_at_crack",
+       "ref_max": 459.663,
+       "max_diff": 59.79276125390635,
+       "floor": 0.002,
+       "max_diff_pct": 13.00795610129733,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "transverse_average_bond",
+       "ref_max": 36.2057,
+       "max_diff": 26.099192792901185,
+       "floor": 0.0002,
+       "max_diff_pct": 72.08586712285963,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "shrinkage_thermal_strain",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        3,
+        3
+       ]
+      },
+      {
+       "view": "longitudinal_concrete_stress",
+       "ref_max": 27.768,
+       "max_diff": 5.357896965853668,
+       "floor": 0.002,
+       "max_diff_pct": 19.2952209948634,
+       "lines": [
+        1,
+        1
+       ]
+      }
+     ]
+    },
+    {
+     "ref_stage": 40,
+     "sub_stage": 35,
+     "feature": "ends falling",
+     "ref_x": 1.798,
+     "ref_y": 138.524,
+     "sub_x": 5.665,
+     "sub_y": 413.905,
+     "views": [
+      {
+       "view": "longitudinal_strain",
+       "ref_max": 0.7637,
+       "max_diff": 0.22357953916666667,
+       "floor": 0.0002,
+       "max_diff_pct": 29.27583333333333,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "transverse_strain",
+       "ref_max": 368.035,
+       "max_diff": 355.98583854558234,
+       "floor": 0.002,
+       "max_diff_pct": 96.72608272191025,
+       "lines": [
+        4,
+        4
+       ]
+      },
+      {
+       "view": "shear_strain",
+       "ref_max": 12.4858,
+       "max_diff": 3.867958777936122,
+       "floor": 0.0002,
+       "max_diff_pct": 30.978862210960628,
+       "lines": [
+        5,
+        5
+       ]
+      },
+      {
+       "view": "shear_stress",
+       "ref_max": 2.7177,
+       "max_diff": 1.1418073937724238,
+       "floor": 0.0002,
+       "max_diff_pct": 42.0137393300373,
+       "lines": [
+        3,
+        3
+       ]
+      },
+      {
+       "view": "principal_compressive_stress",
+       "ref_max": 50.0,
+       "max_diff": 14.814076926140594,
+       "floor": 0.002,
+       "max_diff_pct": 29.628153852281187,
+       "lines": [
+        3,
+        3
+       ]
+      },
+      {
+       "view": "shear_on_crack",
+       "ref_max": 4.0897,
+       "max_diff": 1.185519923403564,
+       "floor": 0.0002,
+       "max_diff_pct": 28.987943453152166,
+       "lines": [
+        3,
+        3
+       ]
+      },
+      {
+       "view": "principal_tensile_stress",
+       "ref_max": 2.862,
+       "max_diff": 1.136281216562278,
+       "floor": 0.0002,
+       "max_diff_pct": 39.702348587081694,
+       "lines": [
+        3,
+        3
+       ]
+      },
+      {
+       "view": "principal_tensile_strain",
+       "ref_max": 368.141,
+       "max_diff": 354.8773573403747,
+       "floor": 0.002,
+       "max_diff_pct": 96.39712972485398,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "crack_widths",
+       "ref_max": 550.7517,
+       "max_diff": 542.3439230990105,
+       "floor": 0.0002,
+       "max_diff_pct": 98.47339973694324,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "average_angle",
+       "ref_max": 90.087,
+       "max_diff": 16.68571629666359,
+       "floor": 0.002,
+       "max_diff_pct": 18.521780386363833,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "long_crack_spacing",
+       "ref_max": 489.96,
+       "max_diff": 102.97200000000001,
+       "floor": 0.002,
+       "max_diff_pct": 21.016409502816558,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "transverse_crack_spacing",
+       "ref_max": 3000.0,
+       "max_diff": 337.23662496976795,
+       "floor": 0.002,
+       "max_diff_pct": 11.241220832325599,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "diagonal_spacing",
+       "ref_max": 1499.071,
+       "max_diff": 723.0328710607531,
+       "floor": 0.002,
+       "max_diff_pct": 48.232063128481116,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "long_reinforcement_stress",
+       "ref_max": 117.658,
+       "max_diff": 2.6125324126269334e-14,
+       "floor": 0.002,
+       "max_diff_pct": 2.2204460492503128e-14,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "long_reinf_stress_at_crack",
+       "ref_max": 156.036,
+       "max_diff": 3.4646951974082185e-14,
+       "floor": 0.002,
+       "max_diff_pct": 2.220446049250313e-14,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "long_average_bond",
+       "ref_max": 0.782,
+       "max_diff": 0.04082039999999998,
+       "floor": 0.002,
+       "max_diff_pct": 5.219999999999996,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "stirrup_stress",
+       "ref_max": 3.1415626e+25,
+       "max_diff": 3.1415626e+25,
+       "floor": 0.002,
+       "max_diff_pct": 100.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "stirrup_stress_at_crack",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "transverse_average_bond",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.0002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "shrinkage_thermal_strain",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        3,
+        3
+       ]
+      },
+      {
+       "view": "longitudinal_concrete_stress",
+       "ref_max": 9.569,
+       "max_diff": 1.8873417800149743,
+       "floor": 0.002,
+       "max_diff_pct": 19.723500679433318,
+       "lines": [
+        1,
+        1
+       ]
+      }
+     ]
+    }
+   ],
+   "views_at": {
+    "ref_stage": 36,
+    "sub_stage": 34,
+    "ref_x": 5.732,
+    "sub_x": 5.382
+   },
+   "views": [
+    {
+     "view": "longitudinal_strain",
+     "ref_max": 0.2828,
+     "max_diff": 0.1878,
+     "floor": 0.0002,
+     "max_diff_pct": 66.40735502121642,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 15
+    },
+    {
+     "view": "transverse_strain",
+     "ref_max": 0.005,
+     "max_diff": 0.005,
+     "floor": 0.002,
+     "max_diff_pct": 100.0,
+     "lines": [
+      4,
+      4
+     ],
+     "ref_stage": 15
+    },
+    {
+     "view": "shear_strain",
+     "ref_max": 0.073,
+     "max_diff": 0.05319062046677614,
+     "floor": 0.0002,
+     "max_diff_pct": 72.863863653118,
+     "lines": [
+      5,
+      5
+     ],
+     "ref_stage": 15
+    },
+    {
+     "view": "shear_stress",
+     "ref_max": 0.7043,
+     "max_diff": 0.3488613297426305,
+     "floor": 0.0002,
+     "max_diff_pct": 49.53305831927168,
+     "lines": [
+      3,
+      3
+     ],
+     "ref_stage": 15
+    },
+    {
+     "view": "principal_compressive_stress",
+     "ref_max": 50.0,
+     "max_diff": 14.814076926140594,
+     "floor": 0.002,
+     "max_diff_pct": 29.628153852281187,
+     "lines": [
+      3,
+      3
+     ],
+     "ref_stage": 40
+    },
+    {
+     "view": "shear_on_crack",
+     "ref_max": 4.1039,
+     "max_diff": 4.1039,
+     "floor": 0.0002,
+     "max_diff_pct": 100.0,
+     "lines": [
+      3,
+      1
+     ],
+     "ref_stage": 15
+    },
+    {
+     "view": "principal_tensile_stress",
+     "ref_max": 2.862,
+     "max_diff": 1.136281216562278,
+     "floor": 0.0002,
+     "max_diff_pct": 39.702348587081694,
+     "lines": [
+      3,
+      3
+     ],
+     "ref_stage": 40
+    },
+    {
+     "view": "principal_tensile_strain",
+     "ref_max": 368.141,
+     "max_diff": 354.8773573403747,
+     "floor": 0.002,
+     "max_diff_pct": 96.39712972485398,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 40
+    },
+    {
+     "view": "crack_widths",
+     "ref_max": 0.0924,
+     "max_diff": 0.09209999999999999,
+     "floor": 0.0002,
+     "max_diff_pct": 99.67532467532467,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 15
+    },
+    {
+     "view": "average_angle",
+     "ref_max": 90.087,
+     "max_diff": 16.68571629666359,
+     "floor": 0.002,
+     "max_diff_pct": 18.521780386363833,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 40
+    },
+    {
+     "view": "long_crack_spacing",
+     "ref_max": 489.96,
+     "max_diff": 102.97200000000001,
+     "floor": 0.002,
+     "max_diff_pct": 21.016409502816558,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 15
+    },
+    {
+     "view": "transverse_crack_spacing",
+     "ref_max": 3000.0,
+     "max_diff": 337.23662496976795,
+     "floor": 0.002,
+     "max_diff_pct": 11.241220832325599,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 36
+    },
+    {
+     "view": "diagonal_spacing",
+     "ref_max": 1499.071,
+     "max_diff": 723.0328710607531,
+     "floor": 0.002,
+     "max_diff_pct": 48.232063128481116,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 40
+    },
+    {
+     "view": "long_reinforcement_stress",
+     "ref_max": 45.657,
+     "max_diff": 30.836999999999996,
+     "floor": 0.002,
+     "max_diff_pct": 67.54057428214732,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 15
+    },
+    {
+     "view": "long_reinf_stress_at_crack",
+     "ref_max": 93.745,
+     "max_diff": 78.925,
+     "floor": 0.002,
+     "max_diff_pct": 84.19115686169928,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 15
+    },
+    {
+     "view": "long_average_bond",
+     "ref_max": 0.6,
+     "max_diff": 0.45499999999999996,
+     "floor": 0.002,
+     "max_diff_pct": 75.83333333333333,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 15
+    },
+    {
+     "view": "stirrup_stress",
+     "ref_max": 0.551,
+     "max_diff": 0.551,
+     "floor": 0.002,
+     "max_diff_pct": 100.0,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 15
+    },
+    {
+     "view": "stirrup_stress_at_crack",
+     "ref_max": 400.0,
+     "max_diff": 400.0,
+     "floor": 0.002,
+     "max_diff_pct": 100.0,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 15
+    },
+    {
+     "view": "transverse_average_bond",
+     "ref_max": 0.0273,
+     "max_diff": 0.0273,
+     "floor": 0.0002,
+     "max_diff_pct": 100.0,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 15
+    },
+    {
+     "view": "shrinkage_thermal_strain",
+     "ref_max": 0.0,
+     "max_diff": 0.0,
+     "floor": 0.002,
+     "max_diff_pct": 0.0,
+     "lines": [
+      3,
+      3
+     ],
+     "ref_stage": 15
+    },
+    {
+     "view": "longitudinal_concrete_stress",
+     "ref_max": 6.396,
+     "max_diff": 3.5309999999999997,
+     "floor": 0.002,
+     "max_diff_pct": 55.20637898686679,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 15
+    }
+   ],
+   "seconds": 60.0,
+   "run": "0c050361e94c",
+   "sub_curve": [
+    [
+     -0.0,
+     -0.0
+    ],
+    [
+     0.022,
+     5.062
+    ],
+    [
+     0.156,
+     35.437
+    ],
+    [
+     0.289,
+     65.812
+    ],
+    [
+     0.294,
+     67.027
+    ],
+    [
+     0.298,
+     67.999
+    ],
+    [
+     0.302,
+     68.776
+    ],
+    [
+     0.305,
+     69.398
+    ],
+    [
+     0.307,
+     69.896
+    ],
+    [
+     0.309,
+     70.294
+    ],
+    [
+     0.31,
+     70.612
+    ],
+    [
+     0.316,
+     71.025
+    ],
+    [
+     0.422,
+     82.249
+    ],
+    [
+     0.556,
+     96.753
+    ],
+    [
+     0.689,
+     109.281
+    ],
+    [
+     0.822,
+     120.744
+    ],
+    [
+     0.956,
+     131.585
+    ],
+    [
+     1.089,
+     142.027
+    ],
+    [
+     1.222,
+     152.361
+    ],
+    [
+     1.356,
+     162.503
+    ],
+    [
+     1.491,
+     172.615
+    ],
+    [
+     1.64,
+     183.583
+    ],
+    [
+     1.804,
+     195.56
+    ],
+    [
+     1.985,
+     208.649
+    ],
+    [
+     2.183,
+     222.773
+    ],
+    [
+     2.401,
+     238.215
+    ],
+    [
+     2.642,
+     255.015
+    ],
+    [
+     2.906,
+     273.296
+    ],
+    [
+     3.196,
+     293.184
+    ],
+    [
+     3.516,
+     314.746
+    ],
+    [
+     3.868,
+     338.295
+    ],
+    [
+     4.254,
+     364.012
+    ],
+    [
+     4.68,
+     392.243
+    ],
+    [
+     5.148,
+     407.409
+    ],
+    [
+     5.382,
+     417.856
+    ],
+    [
+     5.665,
+     413.905
+    ],
+    [
+     5.732,
+     417.043
+    ],
+    [
+     5.695,
+     414.076
+    ],
+    [
+     5.696,
+     415.682
+    ],
+    [
+     5.675,
+     416.32
+    ]
+   ]
+  },
+  "column-n4000-m": {
+   "ref": {
+    "input-name": "column.r2t",
+    "units": "si",
+    "factors": "1.00,1.00,1.00",
+    "initial": "-4000.00,0.00,0.00",
+    "increment": "0.00,1.00,0.00",
+    "more-detail": "0",
+    "stage-count": "55",
+    "peak-stage": "45"
+   },
+   "sub": {
+    "stage-count": "58",
+    "peak-stage": "48"
+   },
+   "control": [
+    {
+     "chart": "moment_ex",
+     "ref_peak_load": 1130.068,
+     "sub_peak_load": 1129.933,
+     "ref_peak_x": 0.024,
+     "sub_peak_x": 0.024,
+     "peak_diff_pct": -0.011946183769471475,
+     "curve_max_diff_pct": 0.24752475247524774,
+     "curve_mean_diff_pct": 0.02846737257240752,
+     "shape_ref": [
+      "cracking",
+      "peak",
+      "ends falling"
+     ],
+     "shape_sub": [
+      "cracking",
+      "peak",
+      "ends falling"
+     ],
+     "shape_same": true,
+     "floor_pct": 0.10152299690080681,
+     "rising_pct": 0.05210792684416648,
+     "post_peak_pct": 0.052107926844162225
+    },
+    {
+     "chart": "moment_phi",
+     "ref_peak_load": 1130.068,
+     "sub_peak_load": 1129.933,
+     "ref_peak_x": 10.363,
+     "sub_peak_x": 10.363,
+     "peak_diff_pct": -0.011946183769471475,
+     "curve_max_diff_pct": 0.014907183281502543,
+     "curve_mean_diff_pct": 0.004671051407227819,
+     "shape_ref": [
+      "cracking",
+      "peak",
+      "ends falling"
+     ],
+     "shape_sub": [
+      "cracking",
+      "peak",
+      "ends falling"
+     ],
+     "shape_same": true,
+     "floor_pct": 0.008186558848160564,
+     "rising_pct": 0.012180851910499143,
+     "post_peak_pct": 0.01176920326918518
+    }
+   ],
+   "missing_control": [],
+   "views_stages": [
+    {
+     "ref_stage": 28,
+     "sub_stage": 28,
+     "feature": "cracking",
+     "ref_x": 5.85,
+     "ref_y": 888.536,
+     "sub_x": 5.85,
+     "sub_y": 888.437,
+     "views": [
+      {
+       "view": "longitudinal_strain",
+       "ref_max": 1.9701,
+       "max_diff": 0.00010000000000004241,
+       "floor": 0.0002,
+       "max_diff_pct": 0.00507588447287155,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "transverse_strain",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        4,
+        4
+       ]
+      },
+      {
+       "view": "shear_strain",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.0002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        5,
+        5
+       ]
+      },
+      {
+       "view": "shear_stress",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.0002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "principal_compressive_stress",
+       "ref_max": 50.0,
+       "max_diff": 0.001903640195017287,
+       "floor": 0.002,
+       "max_diff_pct": 0.003807280390034574,
+       "lines": [
+        3,
+        3
+       ]
+      },
+      {
+       "view": "shear_on_crack",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.0002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "principal_tensile_stress",
+       "ref_max": 3.9834,
+       "max_diff": 0.015958938453776855,
+       "floor": 0.0002,
+       "max_diff_pct": 0.400636101164253,
+       "lines": [
+        3,
+        3
+       ]
+      },
+      {
+       "view": "principal_tensile_strain",
+       "ref_max": 1.54,
+       "max_diff": 0.0004004364725619638,
+       "floor": 0.002,
+       "max_diff_pct": 0.026002368348179466,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "crack_widths",
+       "ref_max": 0.6901,
+       "max_diff": 0.145,
+       "floor": 0.0002,
+       "max_diff_pct": 21.01144761628749,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "average_angle",
+       "ref_max": 90.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "long_crack_spacing",
+       "ref_max": 489.96,
+       "max_diff": 102.97200000000001,
+       "floor": 0.002,
+       "max_diff_pct": 21.016409502816558,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "transverse_crack_spacing",
+       "ref_max": 3000.0,
+       "max_diff": 328.65118601880897,
+       "floor": 0.002,
+       "max_diff_pct": 10.955039533960298,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "diagonal_spacing",
+       "ref_max": 489.96,
+       "max_diff": 102.97200000000001,
+       "floor": 0.002,
+       "max_diff_pct": 21.016409502816558,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "long_reinforcement_stress",
+       "ref_max": 316.514,
+       "max_diff": 0.02500000000003576,
+       "floor": 0.002,
+       "max_diff_pct": 0.007898544772122484,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "long_reinf_stress_at_crack",
+       "ref_max": 272.771,
+       "max_diff": 0.11299999999998986,
+       "floor": 0.002,
+       "max_diff_pct": 0.041426691253831915,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "long_average_bond",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "stirrup_stress",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "stirrup_stress_at_crack",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "transverse_average_bond",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.0002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "shrinkage_thermal_strain",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        3,
+        3
+       ]
+      },
+      {
+       "view": "longitudinal_concrete_stress",
+       "ref_max": 48.923,
+       "max_diff": 0.01897188387399963,
+       "floor": 0.002,
+       "max_diff_pct": 0.038779068891931466,
+       "lines": [
+        1,
+        1
+       ]
+      }
+     ]
+    },
+    {
+     "ref_stage": 45,
+     "sub_stage": 48,
+     "feature": "peak",
+     "ref_x": 10.363,
+     "ref_y": 1130.068,
+     "sub_x": 10.363,
+     "sub_y": 1129.933,
+     "views": [
+      {
+       "view": "longitudinal_strain",
+       "ref_max": 3.1329,
+       "max_diff": 0.000500000000000353,
+       "floor": 0.0002,
+       "max_diff_pct": 0.015959653994712664,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "transverse_strain",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        4,
+        4
+       ]
+      },
+      {
+       "view": "shear_strain",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.0002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        5,
+        5
+       ]
+      },
+      {
+       "view": "shear_stress",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.0002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "principal_compressive_stress",
+       "ref_max": 50.0,
+       "max_diff": 0.012999999999996348,
+       "floor": 0.002,
+       "max_diff_pct": 0.025999999999992696,
+       "lines": [
+        3,
+        3
+       ]
+      },
+      {
+       "view": "shear_on_crack",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.0002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "principal_tensile_stress",
+       "ref_max": 2.1,
+       "max_diff": 0.01760455271784054,
+       "floor": 0.0002,
+       "max_diff_pct": 0.8383120341828828,
+       "lines": [
+        3,
+        3
+       ]
+      },
+      {
+       "view": "principal_tensile_strain",
+       "ref_max": 3.133,
+       "max_diff": 0.0004664891721761385,
+       "floor": 0.002,
+       "max_diff_pct": 0.014889536296716839,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "crack_widths",
+       "ref_max": 1.4708,
+       "max_diff": 0.3090000000000002,
+       "floor": 0.0002,
+       "max_diff_pct": 21.008974707642114,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "average_angle",
+       "ref_max": 90.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "long_crack_spacing",
+       "ref_max": 489.96,
+       "max_diff": 102.97200000000001,
+       "floor": 0.002,
+       "max_diff_pct": 21.016409502816558,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "transverse_crack_spacing",
+       "ref_max": 3000.0,
+       "max_diff": 328.65118601880897,
+       "floor": 0.002,
+       "max_diff_pct": 10.955039533960298,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "diagonal_spacing",
+       "ref_max": 489.96,
+       "max_diff": 102.97200000000001,
+       "floor": 0.002,
+       "max_diff_pct": 21.016409502816558,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "long_reinforcement_stress",
+       "ref_max": 400.0,
+       "max_diff": 0.09500000000000064,
+       "floor": 0.002,
+       "max_diff_pct": 0.02375000000000016,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "long_reinf_stress_at_crack",
+       "ref_max": 400.0,
+       "max_diff": 0.558000000000014,
+       "floor": 0.002,
+       "max_diff_pct": 0.1395000000000035,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "long_average_bond",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "stirrup_stress",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "stirrup_stress_at_crack",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "transverse_average_bond",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.0002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "shrinkage_thermal_strain",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        3,
+        3
+       ]
+      },
+      {
+       "view": "longitudinal_concrete_stress",
+       "ref_max": 50.0,
+       "max_diff": 0.02398401745091143,
+       "floor": 0.002,
+       "max_diff_pct": 0.04796803490182286,
+       "lines": [
+        1,
+        1
+       ]
+      }
+     ]
+    },
+    {
+     "ref_stage": 54,
+     "sub_stage": 57,
+     "feature": "ends falling",
+     "ref_x": 24.436,
+     "ref_y": 505.892,
+     "sub_x": 24.436,
+     "sub_y": 506.025,
+     "views": [
+      {
+       "view": "longitudinal_strain",
+       "ref_max": 9.3002,
+       "max_diff": 0.000700000000000139,
+       "floor": 0.0002,
+       "max_diff_pct": 0.007526719855488473,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "transverse_strain",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        4,
+        4
+       ]
+      },
+      {
+       "view": "shear_strain",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.0002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        5,
+        5
+       ]
+      },
+      {
+       "view": "shear_stress",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.0002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "principal_compressive_stress",
+       "ref_max": 50.0,
+       "max_diff": 0.0030983893113763266,
+       "floor": 0.002,
+       "max_diff_pct": 0.006196778622752653,
+       "lines": [
+        3,
+        3
+       ]
+      },
+      {
+       "view": "shear_on_crack",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.0002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "principal_tensile_stress",
+       "ref_max": 2.1,
+       "max_diff": 0.006127817900711802,
+       "floor": 0.0002,
+       "max_diff_pct": 0.2918008524148477,
+       "lines": [
+        3,
+        3
+       ]
+      },
+      {
+       "view": "principal_tensile_strain",
+       "ref_max": 5.361,
+       "max_diff": 0.0008616274452133762,
+       "floor": 0.002,
+       "max_diff_pct": 0.016072140369583588,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "crack_widths",
+       "ref_max": 2.5625,
+       "max_diff": 0.5383,
+       "floor": 0.0002,
+       "max_diff_pct": 21.006829268292684,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "average_angle",
+       "ref_max": 90.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "long_crack_spacing",
+       "ref_max": 489.96,
+       "max_diff": 102.97200000000001,
+       "floor": 0.002,
+       "max_diff_pct": 21.016409502816558,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "transverse_crack_spacing",
+       "ref_max": 3000.0,
+       "max_diff": 328.65118601880897,
+       "floor": 0.002,
+       "max_diff_pct": 10.955039533960298,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "diagonal_spacing",
+       "ref_max": 489.96,
+       "max_diff": 102.97200000000001,
+       "floor": 0.002,
+       "max_diff_pct": 21.016409502816558,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "long_reinforcement_stress",
+       "ref_max": 402.92,
+       "max_diff": 0.14100000000002205,
+       "floor": 0.002,
+       "max_diff_pct": 0.034994539859034564,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "long_reinf_stress_at_crack",
+       "ref_max": 400.0,
+       "max_diff": 2.220446049250313e-14,
+       "floor": 0.002,
+       "max_diff_pct": 5.551115123125783e-15,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "long_average_bond",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "stirrup_stress",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "stirrup_stress_at_crack",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "transverse_average_bond",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.0002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "shrinkage_thermal_strain",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        3,
+        3
+       ]
+      },
+      {
+       "view": "longitudinal_concrete_stress",
+       "ref_max": 49.978,
+       "max_diff": 0.019583530087380504,
+       "floor": 0.002,
+       "max_diff_pct": 0.03918430126731862,
+       "lines": [
+        1,
+        1
+       ]
+      }
+     ]
+    }
+   ],
+   "views_at": {
+    "ref_stage": 45,
+    "sub_stage": 48,
+    "ref_x": 10.363,
+    "sub_x": 10.363
+   },
+   "views": [
+    {
+     "view": "longitudinal_strain",
+     "ref_max": 3.1329,
+     "max_diff": 0.000500000000000353,
+     "floor": 0.0002,
+     "max_diff_pct": 0.015959653994712664,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 45
+    },
+    {
+     "view": "transverse_strain",
+     "ref_max": 0.0,
+     "max_diff": 0.0,
+     "floor": 0.002,
+     "max_diff_pct": 0.0,
+     "lines": [
+      4,
+      4
+     ],
+     "ref_stage": 28
+    },
+    {
+     "view": "shear_strain",
+     "ref_max": 0.0,
+     "max_diff": 0.0,
+     "floor": 0.0002,
+     "max_diff_pct": 0.0,
+     "lines": [
+      5,
+      5
+     ],
+     "ref_stage": 28
+    },
+    {
+     "view": "shear_stress",
+     "ref_max": 0.0,
+     "max_diff": 0.0,
+     "floor": 0.0002,
+     "max_diff_pct": 0.0,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 28
+    },
+    {
+     "view": "principal_compressive_stress",
+     "ref_max": 50.0,
+     "max_diff": 0.012999999999996348,
+     "floor": 0.002,
+     "max_diff_pct": 0.025999999999992696,
+     "lines": [
+      3,
+      3
+     ],
+     "ref_stage": 45
+    },
+    {
+     "view": "shear_on_crack",
+     "ref_max": 0.0,
+     "max_diff": 0.0,
+     "floor": 0.0002,
+     "max_diff_pct": 0.0,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 28
+    },
+    {
+     "view": "principal_tensile_stress",
+     "ref_max": 2.1,
+     "max_diff": 0.01760455271784054,
+     "floor": 0.0002,
+     "max_diff_pct": 0.8383120341828828,
+     "lines": [
+      3,
+      3
+     ],
+     "ref_stage": 45
+    },
+    {
+     "view": "principal_tensile_strain",
+     "ref_max": 1.54,
+     "max_diff": 0.0004004364725619638,
+     "floor": 0.002,
+     "max_diff_pct": 0.026002368348179466,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 28
+    },
+    {
+     "view": "crack_widths",
+     "ref_max": 0.6901,
+     "max_diff": 0.145,
+     "floor": 0.0002,
+     "max_diff_pct": 21.01144761628749,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 28
+    },
+    {
+     "view": "average_angle",
+     "ref_max": 90.0,
+     "max_diff": 0.0,
+     "floor": 0.002,
+     "max_diff_pct": 0.0,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 28
+    },
+    {
+     "view": "long_crack_spacing",
+     "ref_max": 489.96,
+     "max_diff": 102.97200000000001,
+     "floor": 0.002,
+     "max_diff_pct": 21.016409502816558,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 28
+    },
+    {
+     "view": "transverse_crack_spacing",
+     "ref_max": 3000.0,
+     "max_diff": 328.65118601880897,
+     "floor": 0.002,
+     "max_diff_pct": 10.955039533960298,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 28
+    },
+    {
+     "view": "diagonal_spacing",
+     "ref_max": 489.96,
+     "max_diff": 102.97200000000001,
+     "floor": 0.002,
+     "max_diff_pct": 21.016409502816558,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 28
+    },
+    {
+     "view": "long_reinforcement_stress",
+     "ref_max": 402.92,
+     "max_diff": 0.14100000000002205,
+     "floor": 0.002,
+     "max_diff_pct": 0.034994539859034564,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 54
+    },
+    {
+     "view": "long_reinf_stress_at_crack",
+     "ref_max": 400.0,
+     "max_diff": 0.558000000000014,
+     "floor": 0.002,
+     "max_diff_pct": 0.1395000000000035,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 45
+    },
+    {
+     "view": "long_average_bond",
+     "ref_max": 0.0,
+     "max_diff": 0.0,
+     "floor": 0.002,
+     "max_diff_pct": 0.0,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 28
+    },
+    {
+     "view": "stirrup_stress",
+     "ref_max": 0.0,
+     "max_diff": 0.0,
+     "floor": 0.002,
+     "max_diff_pct": 0.0,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 28
+    },
+    {
+     "view": "stirrup_stress_at_crack",
+     "ref_max": 0.0,
+     "max_diff": 0.0,
+     "floor": 0.002,
+     "max_diff_pct": 0.0,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 28
+    },
+    {
+     "view": "transverse_average_bond",
+     "ref_max": 0.0,
+     "max_diff": 0.0,
+     "floor": 0.0002,
+     "max_diff_pct": 0.0,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 28
+    },
+    {
+     "view": "shrinkage_thermal_strain",
+     "ref_max": 0.0,
+     "max_diff": 0.0,
+     "floor": 0.002,
+     "max_diff_pct": 0.0,
+     "lines": [
+      3,
+      3
+     ],
+     "ref_stage": 28
+    },
+    {
+     "view": "longitudinal_concrete_stress",
+     "ref_max": 50.0,
+     "max_diff": 0.02398401745091143,
+     "floor": 0.002,
+     "max_diff_pct": 0.04796803490182286,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 45
+    }
+   ],
+   "seconds": 4.3,
+   "run": "0c050361e94c",
+   "sub_curve": [
+    [
+     -0.0,
+     0.0
+    ],
+    [
+     0.028,
+     6.314
+    ],
+    [
+     0.194,
+     44.195
+    ],
+    [
+     0.361,
+     82.069
+    ],
+    [
+     0.528,
+     119.928
+    ],
+    [
+     0.694,
+     157.766
+    ],
+    [
+     0.861,
+     195.575
+    ],
+    [
+     1.028,
+     233.349
+    ],
+    [
+     1.194,
+     271.079
+    ],
+    [
+     1.361,
+     308.752
+    ],
+    [
+     1.528,
+     346.368
+    ],
+    [
+     1.694,
+     383.914
+    ],
+    [
+     1.728,
+     391.539
+    ],
+    [
+     1.755,
+     397.63
+    ],
+    [
+     1.777,
+     402.506
+    ],
+    [
+     1.794,
+     405.487
+    ],
+    [
+     1.864,
+     418.222
+    ],
+    [
+     2.05,
+     453.508
+    ],
+    [
+     2.255,
+     489.144
+    ],
+    [
+     2.481,
+     525.431
+    ],
+    [
+     2.729,
+     562.049
+    ],
+    [
+     3.002,
+     599.1
+    ],
+    [
+     3.302,
+     636.743
+    ],
+    [
+     3.632,
+     675.279
+    ],
+    [
+     3.995,
+     714.922
+    ],
+    [
+     4.395,
+     756.003
+    ],
+    [
+     4.834,
+     798.515
+    ],
+    [
+     5.318,
+     842.621
+    ],
+    [
+     5.85,
+     888.437
+    ],
+    [
+     6.435,
+     936.003
+    ],
+    [
+     6.563,
+     946.103
+    ],
+    [
+     6.666,
+     954.09
+    ],
+    [
+     6.749,
+     960.425
+    ],
+    [
+     6.815,
+     965.455
+    ],
+    [
+     6.867,
+     969.459
+    ],
+    [
+     6.909,
+     972.645
+    ],
+    [
+     6.943,
+     975.186
+    ],
+    [
+     6.97,
+     977.211
+    ],
+    [
+     6.992,
+     978.83
+    ],
+    [
+     7.009,
+     980.123
+    ],
+    [
+     7.012,
+     980.389
+    ],
+    [
+     7.014,
+     980.602
+    ],
+    [
+     7.016,
+     980.772
+    ],
+    [
+     7.023,
+     981.452
+    ],
+    [
+     7.078,
+     985.269
+    ],
+    [
+     7.786,
+     1035.415
+    ],
+    [
+     8.564,
+     1082.92
+    ],
+    [
+     9.421,
+     1116.551
+    ],
+    [
+     10.363,
+     1129.933
+    ],
+    [
+     11.399,
+     1121.257
+    ],
+    [
+     12.539,
+     1099.606
+    ],
+    [
+     13.793,
+     1063.023
+    ],
+    [
+     15.173,
+     1013.098
+    ],
+    [
+     16.69,
+     943.816
+    ],
+    [
+     18.359,
+     839.088
+    ],
+    [
+     20.195,
+     722.67
+    ],
+    [
+     22.214,
+     607.96
+    ],
+    [
+     24.436,
+     506.025
+    ]
+   ]
+  },
+  "column-nonly": {
+   "ref": {
+    "input-name": "column.r2t",
+    "units": "si",
+    "factors": "1.00,1.00,1.00",
+    "initial": "0.00,0.00,0.00",
+    "increment": "-1.00,0.00,0.00",
+    "more-detail": "0",
+    "stage-count": "42",
+    "peak-stage": "19"
+   },
+   "sub": {
+    "stage-count": "38",
+    "peak-stage": "20"
+   },
+   "control": [
+    {
+     "chart": "axial_ex",
+     "ref_peak_load": -16916.229,
+     "sub_peak_load": -16916.322,
+     "ref_peak_x": -2.239,
+     "sub_peak_x": -2.241,
+     "peak_diff_pct": 0.0005497679181380005,
+     "curve_max_diff_pct": 0.0002153389811073409,
+     "curve_mean_diff_pct": 1.0766949055367045e-05,
+     "shape_ref": [
+      "cracking",
+      "peak",
+      "ends falling"
+     ],
+     "shape_sub": [
+      "cracking",
+      "peak",
+      "ends falling"
+     ],
+     "shape_same": true,
+     "floor_pct": 0.055975372085439186,
+     "rising_pct": 0.0009477195836518583,
+     "post_peak_pct": 160.94004793519304
+    }
+   ],
+   "missing_control": [],
+   "views_stages": [
+    {
+     "ref_stage": 18,
+     "sub_stage": 18,
+     "feature": "cracking",
+     "ref_x": -2.225,
+     "ref_y": -16914.772,
+     "sub_x": -2.225,
+     "sub_y": -16914.772,
+     "views": [
+      {
+       "view": "longitudinal_strain",
+       "ref_max": 2.2256,
+       "max_diff": 0.00020000000000022097,
+       "floor": 0.0002,
+       "max_diff_pct": 0.008986340762051626,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "transverse_strain",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        4,
+        4
+       ]
+      },
+      {
+       "view": "shear_strain",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.0002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        5,
+        5
+       ]
+      },
+      {
+       "view": "shear_stress",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.0002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "principal_compressive_stress",
+       "ref_max": 50.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        3,
+        3
+       ]
+      },
+      {
+       "view": "shear_on_crack",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.0002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "principal_tensile_stress",
+       "ref_max": 0.1053,
+       "max_diff": 0.00010000000000000224,
+       "floor": 0.0002,
+       "max_diff_pct": 0.09496676163343043,
+       "lines": [
+        3,
+        3
+       ]
+      },
+      {
+       "view": "principal_tensile_strain",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "crack_widths",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.0002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "average_angle",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "long_crack_spacing",
+       "ref_max": 489.96,
+       "max_diff": 102.97200000000001,
+       "floor": 0.002,
+       "max_diff_pct": 21.016409502816558,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "transverse_crack_spacing",
+       "ref_max": 3000.0,
+       "max_diff": 328.65118601880897,
+       "floor": 0.002,
+       "max_diff_pct": 10.955039533960298,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "diagonal_spacing",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "long_reinforcement_stress",
+       "ref_max": 400.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "long_reinf_stress_at_crack",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "long_average_bond",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "stirrup_stress",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "stirrup_stress_at_crack",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "transverse_average_bond",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.0002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "shrinkage_thermal_strain",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        3,
+        3
+       ]
+      },
+      {
+       "view": "longitudinal_concrete_stress",
+       "ref_max": 49.994,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      }
+     ]
+    },
+    {
+     "ref_stage": 19,
+     "sub_stage": 20,
+     "feature": "peak",
+     "ref_x": -2.239,
+     "ref_y": -16916.229,
+     "sub_x": -2.241,
+     "sub_y": -16916.322,
+     "views": [
+      {
+       "view": "longitudinal_strain",
+       "ref_max": 2.2401,
+       "max_diff": 0.0031999558695519396,
+       "floor": 0.0002,
+       "max_diff_pct": 0.14284879556948082,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "transverse_strain",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        4,
+        4
+       ]
+      },
+      {
+       "view": "shear_strain",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.0002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        5,
+        5
+       ]
+      },
+      {
+       "view": "shear_stress",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.0002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "principal_compressive_stress",
+       "ref_max": 50.0,
+       "max_diff": 0.000999999999995449,
+       "floor": 0.002,
+       "max_diff_pct": 0.001999999999990898,
+       "lines": [
+        3,
+        3
+       ]
+      },
+      {
+       "view": "shear_on_crack",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.0002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "principal_tensile_stress",
+       "ref_max": 0.105,
+       "max_diff": 0.0,
+       "floor": 0.0002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        3,
+        3
+       ]
+      },
+      {
+       "view": "principal_tensile_strain",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "crack_widths",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.0002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "average_angle",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "long_crack_spacing",
+       "ref_max": 489.96,
+       "max_diff": 102.97200000000001,
+       "floor": 0.002,
+       "max_diff_pct": 21.016409502816558,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "transverse_crack_spacing",
+       "ref_max": 3000.0,
+       "max_diff": 328.65118601880897,
+       "floor": 0.002,
+       "max_diff_pct": 10.955039533960298,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "diagonal_spacing",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "long_reinforcement_stress",
+       "ref_max": 400.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "long_reinf_stress_at_crack",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "long_average_bond",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "stirrup_stress",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "stirrup_stress_at_crack",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "transverse_average_bond",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.0002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "shrinkage_thermal_strain",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        3,
+        3
+       ]
+      },
+      {
+       "view": "longitudinal_concrete_stress",
+       "ref_max": 49.999,
+       "max_diff": 0.0009999999999967763,
+       "floor": 0.002,
+       "max_diff_pct": 0.002000040000793568,
+       "lines": [
+        1,
+        1
+       ]
+      }
+     ]
+    },
+    {
+     "ref_stage": 41,
+     "sub_stage": 28,
+     "feature": "ends falling",
+     "ref_x": -3.573,
+     "ref_y": -6178.039,
+     "sub_x": -3.942,
+     "sub_y": -6907.948,
+     "views": [
+      {
+       "view": "longitudinal_strain",
+       "ref_max": 9.0967,
+       "max_diff": 5.154300000000001,
+       "floor": 0.0002,
+       "max_diff_pct": 56.66120681126123,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "transverse_strain",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        4,
+        4
+       ]
+      },
+      {
+       "view": "shear_strain",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.0002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        5,
+        5
+       ]
+      },
+      {
+       "view": "shear_stress",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.0002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "principal_compressive_stress",
+       "ref_max": 50.0,
+       "max_diff": 36.912,
+       "floor": 0.002,
+       "max_diff_pct": 73.824,
+       "lines": [
+        3,
+        3
+       ]
+      },
+      {
+       "view": "shear_on_crack",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.0002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "principal_tensile_stress",
+       "ref_max": 2.1,
+       "max_diff": 1.9949999999999999,
+       "floor": 0.0002,
+       "max_diff_pct": 95.0,
+       "lines": [
+        3,
+        3
+       ]
+      },
+      {
+       "view": "principal_tensile_strain",
+       "ref_max": 1.951,
+       "max_diff": 1.951,
+       "floor": 0.002,
+       "max_diff_pct": 100.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "crack_widths",
+       "ref_max": 0.9221,
+       "max_diff": 0.9221,
+       "floor": 0.0002,
+       "max_diff_pct": 100.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "average_angle",
+       "ref_max": 90.0,
+       "max_diff": 90.0,
+       "floor": 0.002,
+       "max_diff_pct": 100.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "long_crack_spacing",
+       "ref_max": 489.96,
+       "max_diff": 102.97200000000001,
+       "floor": 0.002,
+       "max_diff_pct": 21.016409502816558,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "transverse_crack_spacing",
+       "ref_max": 3000.0,
+       "max_diff": 328.65118601880897,
+       "floor": 0.002,
+       "max_diff_pct": 10.955039533960298,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "diagonal_spacing",
+       "ref_max": 489.958,
+       "max_diff": 489.958,
+       "floor": 0.002,
+       "max_diff_pct": 100.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "long_reinforcement_stress",
+       "ref_max": 403.754,
+       "max_diff": 146.241,
+       "floor": 0.002,
+       "max_diff_pct": 36.22032227544495,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "long_reinf_stress_at_crack",
+       "ref_max": 200.756,
+       "max_diff": 200.756,
+       "floor": 0.002,
+       "max_diff_pct": 99.99999999999999,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "long_average_bond",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "stirrup_stress",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "stirrup_stress_at_crack",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "transverse_average_bond",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.0002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "shrinkage_thermal_strain",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        3,
+        3
+       ]
+      },
+      {
+       "view": "longitudinal_concrete_stress",
+       "ref_max": 49.998,
+       "max_diff": 36.912,
+       "floor": 0.002,
+       "max_diff_pct": 73.82695307812313,
+       "lines": [
+        1,
+        1
+       ]
+      }
+     ]
+    }
+   ],
+   "views_at": {
+    "ref_stage": 19,
+    "sub_stage": 20,
+    "ref_x": -2.239,
+    "sub_x": -2.241
+   },
+   "views": [
+    {
+     "view": "longitudinal_strain",
+     "ref_max": 9.0967,
+     "max_diff": 5.154300000000001,
+     "floor": 0.0002,
+     "max_diff_pct": 56.66120681126123,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 41
+    },
+    {
+     "view": "transverse_strain",
+     "ref_max": 0.0,
+     "max_diff": 0.0,
+     "floor": 0.002,
+     "max_diff_pct": 0.0,
+     "lines": [
+      4,
+      4
+     ],
+     "ref_stage": 18
+    },
+    {
+     "view": "shear_strain",
+     "ref_max": 0.0,
+     "max_diff": 0.0,
+     "floor": 0.0002,
+     "max_diff_pct": 0.0,
+     "lines": [
+      5,
+      5
+     ],
+     "ref_stage": 18
+    },
+    {
+     "view": "shear_stress",
+     "ref_max": 0.0,
+     "max_diff": 0.0,
+     "floor": 0.0002,
+     "max_diff_pct": 0.0,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 18
+    },
+    {
+     "view": "principal_compressive_stress",
+     "ref_max": 50.0,
+     "max_diff": 36.912,
+     "floor": 0.002,
+     "max_diff_pct": 73.824,
+     "lines": [
+      3,
+      3
+     ],
+     "ref_stage": 41
+    },
+    {
+     "view": "shear_on_crack",
+     "ref_max": 0.0,
+     "max_diff": 0.0,
+     "floor": 0.0002,
+     "max_diff_pct": 0.0,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 18
+    },
+    {
+     "view": "principal_tensile_stress",
+     "ref_max": 2.1,
+     "max_diff": 1.9949999999999999,
+     "floor": 0.0002,
+     "max_diff_pct": 95.0,
+     "lines": [
+      3,
+      3
+     ],
+     "ref_stage": 41
+    },
+    {
+     "view": "principal_tensile_strain",
+     "ref_max": 1.951,
+     "max_diff": 1.951,
+     "floor": 0.002,
+     "max_diff_pct": 100.0,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 41
+    },
+    {
+     "view": "crack_widths",
+     "ref_max": 0.9221,
+     "max_diff": 0.9221,
+     "floor": 0.0002,
+     "max_diff_pct": 100.0,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 41
+    },
+    {
+     "view": "average_angle",
+     "ref_max": 90.0,
+     "max_diff": 90.0,
+     "floor": 0.002,
+     "max_diff_pct": 100.0,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 41
+    },
+    {
+     "view": "long_crack_spacing",
+     "ref_max": 489.96,
+     "max_diff": 102.97200000000001,
+     "floor": 0.002,
+     "max_diff_pct": 21.016409502816558,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 18
+    },
+    {
+     "view": "transverse_crack_spacing",
+     "ref_max": 3000.0,
+     "max_diff": 328.65118601880897,
+     "floor": 0.002,
+     "max_diff_pct": 10.955039533960298,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 18
+    },
+    {
+     "view": "diagonal_spacing",
+     "ref_max": 489.958,
+     "max_diff": 489.958,
+     "floor": 0.002,
+     "max_diff_pct": 100.0,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 41
+    },
+    {
+     "view": "long_reinforcement_stress",
+     "ref_max": 403.754,
+     "max_diff": 146.241,
+     "floor": 0.002,
+     "max_diff_pct": 36.22032227544495,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 41
+    },
+    {
+     "view": "long_reinf_stress_at_crack",
+     "ref_max": 200.756,
+     "max_diff": 200.756,
+     "floor": 0.002,
+     "max_diff_pct": 99.99999999999999,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 41
+    },
+    {
+     "view": "long_average_bond",
+     "ref_max": 0.0,
+     "max_diff": 0.0,
+     "floor": 0.002,
+     "max_diff_pct": 0.0,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 18
+    },
+    {
+     "view": "stirrup_stress",
+     "ref_max": 0.0,
+     "max_diff": 0.0,
+     "floor": 0.002,
+     "max_diff_pct": 0.0,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 18
+    },
+    {
+     "view": "stirrup_stress_at_crack",
+     "ref_max": 0.0,
+     "max_diff": 0.0,
+     "floor": 0.002,
+     "max_diff_pct": 0.0,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 18
+    },
+    {
+     "view": "transverse_average_bond",
+     "ref_max": 0.0,
+     "max_diff": 0.0,
+     "floor": 0.0002,
+     "max_diff_pct": 0.0,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 18
+    },
+    {
+     "view": "shrinkage_thermal_strain",
+     "ref_max": 0.0,
+     "max_diff": 0.0,
+     "floor": 0.002,
+     "max_diff_pct": 0.0,
+     "lines": [
+      3,
+      3
+     ],
+     "ref_stage": 18
+    },
+    {
+     "view": "longitudinal_concrete_stress",
+     "ref_max": 49.998,
+     "max_diff": 36.912,
+     "floor": 0.002,
+     "max_diff_pct": 73.82695307812313,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 41
+    }
+   ],
+   "seconds": 0.7,
+   "run": "0c050361e94c",
+   "sub_curve": [
+    [
+     0.0,
+     0.0
+    ],
+    [
+     -0.019,
+     -185.634
+    ],
+    [
+     -0.131,
+     -1299.427
+    ],
+    [
+     -0.243,
+     -2413.061
+    ],
+    [
+     -0.356,
+     -3525.961
+    ],
+    [
+     -0.468,
+     -4636.874
+    ],
+    [
+     -0.58,
+     -5743.651
+    ],
+    [
+     -0.693,
+     -6843.06
+    ],
+    [
+     -0.805,
+     -7930.651
+    ],
+    [
+     -0.917,
+     -9000.665
+    ],
+    [
+     -1.03,
+     -10046.025
+    ],
+    [
+     -1.142,
+     -11058.415
+    ],
+    [
+     -1.256,
+     -12044.229
+    ],
+    [
+     -1.382,
+     -13065.433
+    ],
+    [
+     -1.52,
+     -14095.538
+    ],
+    [
+     -1.672,
+     -15094.608
+    ],
+    [
+     -1.839,
+     -16007.493
+    ],
+    [
+     -2.023,
+     -16726.593
+    ],
+    [
+     -2.225,
+     -16914.772
+    ],
+    [
+     -2.234,
+     -16915.869
+    ],
+    [
+     -2.241,
+     -16916.322
+    ],
+    [
+     -2.247,
+     -16914.7
+    ],
+    [
+     -2.27,
+     -16845.337
+    ],
+    [
+     -2.448,
+     -16070.136
+    ],
+    [
+     -2.693,
+     -14490.783
+    ],
+    [
+     -2.962,
+     -12462.284
+    ],
+    [
+     -3.258,
+     -10340.383
+    ],
+    [
+     -3.584,
+     -8436.047
+    ],
+    [
+     -3.942,
+     -6907.948
+    ],
+    [
+     -4.337,
+     -5773.251
+    ],
+    [
+     -4.77,
+     -4972.635
+    ],
+    [
+     -5.247,
+     -4425.732
+    ],
+    [
+     -5.772,
+     -4059.531
+    ],
+    [
+     -6.349,
+     -3817.282
+    ],
+    [
+     -6.984,
+     -3658.191
+    ],
+    [
+     -7.683,
+     -3578.739
+    ],
+    [
+     -8.451,
+     -3538.332
+    ],
+    [
+     -9.296,
+     -3524.07
+    ]
+   ]
+  },
+  "igirder-m": {
+   "ref": {
+    "input-name": "igirder.r2t",
+    "units": "si",
+    "factors": "1.00,1.00,1.00",
+    "initial": "0.00,0.00,0.00",
+    "increment": "0.00,1.00,0.00",
+    "more-detail": "0",
+    "stage-count": "66",
+    "peak-stage": "63"
+   },
+   "sub": {
+    "stage-count": "60",
+    "peak-stage": "57"
+   },
+   "control": [
+    {
+     "chart": "moment_ex",
+     "ref_peak_load": 2129.436,
+     "sub_peak_load": 2129.039,
+     "ref_peak_x": 11.947,
+     "sub_peak_x": 11.948,
+     "peak_diff_pct": -0.018643434223894705,
+     "curve_max_diff_pct": 0.1722361537710197,
+     "curve_mean_diff_pct": 0.02078609110842776,
+     "shape_ref": [
+      "cracking",
+      "peak",
+      "ends falling"
+     ],
+     "shape_sub": [
+      "cracking",
+      "peak",
+      "ends falling"
+     ],
+     "shape_same": true,
+     "floor_pct": 0.015435957577758045,
+     "rising_pct": 0.15882303061128553,
+     "post_peak_pct": 0.039444808620119204
+    },
+    {
+     "chart": "moment_phi",
+     "ref_peak_load": 2129.436,
+     "sub_peak_load": 2129.039,
+     "ref_peak_x": 31.275,
+     "sub_peak_x": 31.274,
+     "peak_diff_pct": -0.018643434223894705,
+     "curve_max_diff_pct": 0.2134435520152324,
+     "curve_mean_diff_pct": 0.023722818830076334,
+     "shape_ref": [
+      "cracking",
+      "peak",
+      "ends falling"
+     ],
+     "shape_sub": [
+      "cracking",
+      "peak",
+      "ends falling"
+     ],
+     "shape_same": true,
+     "floor_pct": 0.005285827753461531,
+     "rising_pct": 0.17665480833332212,
+     "post_peak_pct": 0.01841140600287475
+    }
+   ],
+   "missing_control": [],
+   "views_stages": [
+    {
+     "ref_stage": 32,
+     "sub_stage": 27,
+     "feature": "cracking",
+     "ref_x": 3.175,
+     "ref_y": 1838.856,
+     "sub_x": 3.175,
+     "sub_y": 1838.348,
+     "views": [
+      {
+       "view": "longitudinal_strain",
+       "ref_max": 2.2569,
+       "max_diff": 0.00029999999999990505,
+       "floor": 0.0002,
+       "max_diff_pct": 0.01329256945367119,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "transverse_strain",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        4,
+        4
+       ]
+      },
+      {
+       "view": "shear_strain",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.0002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        5,
+        5
+       ]
+      },
+      {
+       "view": "shear_stress",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.0002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "principal_compressive_stress",
+       "ref_max": 60.0,
+       "max_diff": 0.007999999999999119,
+       "floor": 0.002,
+       "max_diff_pct": 0.013333333333331865,
+       "lines": [
+        3,
+        3
+       ]
+      },
+      {
+       "view": "shear_on_crack",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.0002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "principal_tensile_stress",
+       "ref_max": 2.24,
+       "max_diff": 0.05111388560584426,
+       "floor": 0.0002,
+       "max_diff_pct": 2.281869893118047,
+       "lines": [
+        3,
+        3
+       ]
+      },
+      {
+       "view": "principal_tensile_strain",
+       "ref_max": 2.257,
+       "max_diff": 0.0005770600223959266,
+       "floor": 0.002,
+       "max_diff_pct": 0.025567568559854963,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "crack_widths",
+       "ref_max": 0.6319,
+       "max_diff": 0.03247534898064129,
+       "floor": 0.0002,
+       "max_diff_pct": 5.139317768735764,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "average_angle",
+       "ref_max": 90.0,
+       "max_diff": 0.045719994100657364,
+       "floor": 0.002,
+       "max_diff_pct": 0.05079999344517486,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "long_crack_spacing",
+       "ref_max": 966.172,
+       "max_diff": 47.195000000000036,
+       "floor": 0.002,
+       "max_diff_pct": 4.884741019197413,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "transverse_crack_spacing",
+       "ref_max": 5000.0,
+       "max_diff": 158.8518524726722,
+       "floor": 0.002,
+       "max_diff_pct": 3.177037049453444,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "diagonal_spacing",
+       "ref_max": 966.172,
+       "max_diff": 47.195000000000036,
+       "floor": 0.002,
+       "max_diff_pct": 4.884741019197413,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "long_reinforcement_stress",
+       "ref_max": 1593.487,
+       "max_diff": 0.05300000000000469,
+       "floor": 0.002,
+       "max_diff_pct": 0.0033260390577397043,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "long_reinf_stress_at_crack",
+       "ref_max": 1675.272,
+       "max_diff": 0.6470000000000673,
+       "floor": 0.002,
+       "max_diff_pct": 0.03862059414829755,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "long_average_bond",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "stirrup_stress",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "stirrup_stress_at_crack",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "transverse_average_bond",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.0002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "shrinkage_thermal_strain",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        3,
+        3
+       ]
+      },
+      {
+       "view": "longitudinal_concrete_stress",
+       "ref_max": 29.81,
+       "max_diff": 0.08823269978921279,
+       "floor": 0.002,
+       "max_diff_pct": 0.29598356185579605,
+       "lines": [
+        1,
+        1
+       ]
+      }
+     ]
+    },
+    {
+     "ref_stage": 63,
+     "sub_stage": 57,
+     "feature": "peak",
+     "ref_x": 31.275,
+     "ref_y": 2129.436,
+     "sub_x": 31.274,
+     "sub_y": 2129.039,
+     "views": [
+      {
+       "view": "longitudinal_strain",
+       "ref_max": 28.1129,
+       "max_diff": 0.0008999999999999743,
+       "floor": 0.0002,
+       "max_diff_pct": 0.00320137730365766,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "transverse_strain",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        4,
+        4
+       ]
+      },
+      {
+       "view": "shear_strain",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.0002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        5,
+        5
+       ]
+      },
+      {
+       "view": "shear_stress",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.0002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "principal_compressive_stress",
+       "ref_max": 60.0,
+       "max_diff": 0.038000000000002476,
+       "floor": 0.002,
+       "max_diff_pct": 0.06333333333333746,
+       "lines": [
+        3,
+        3
+       ]
+      },
+      {
+       "view": "shear_on_crack",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.0002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "principal_tensile_stress",
+       "ref_max": 2.24,
+       "max_diff": 0.03537748130688919,
+       "floor": 0.0002,
+       "max_diff_pct": 1.579351844057553,
+       "lines": [
+        3,
+        3
+       ]
+      },
+      {
+       "view": "principal_tensile_strain",
+       "ref_max": 28.113,
+       "max_diff": 0.0007919912743958828,
+       "floor": 0.002,
+       "max_diff_pct": 0.002817170968576398,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "crack_widths",
+       "ref_max": 10.9897,
+       "max_diff": 0.49320113382112185,
+       "floor": 0.0002,
+       "max_diff_pct": 4.48784892964432,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "average_angle",
+       "ref_max": 90.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "long_crack_spacing",
+       "ref_max": 959.489,
+       "max_diff": 39.68407072951927,
+       "floor": 0.002,
+       "max_diff_pct": 4.1359589041165945,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "transverse_crack_spacing",
+       "ref_max": 5000.0,
+       "max_diff": 158.8518524726722,
+       "floor": 0.002,
+       "max_diff_pct": 3.177037049453444,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "diagonal_spacing",
+       "ref_max": 959.489,
+       "max_diff": 39.68407072951927,
+       "floor": 0.002,
+       "max_diff_pct": 4.1359589041165945,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "long_reinforcement_stress",
+       "ref_max": 1816.592,
+       "max_diff": 0.17700000000003543,
+       "floor": 0.002,
+       "max_diff_pct": 0.00974351973365706,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "long_reinf_stress_at_crack",
+       "ref_max": 1816.592,
+       "max_diff": 0.001000000000128388,
+       "floor": 0.002,
+       "max_diff_pct": 5.5048134095514456e-05,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "long_average_bond",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "stirrup_stress",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "stirrup_stress_at_crack",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "transverse_average_bond",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.0002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "shrinkage_thermal_strain",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        3,
+        3
+       ]
+      },
+      {
+       "view": "longitudinal_concrete_stress",
+       "ref_max": 59.982,
+       "max_diff": 0.04297682821919947,
+       "floor": 0.002,
+       "max_diff_pct": 0.07164954189456749,
+       "lines": [
+        1,
+        1
+       ]
+      }
+     ]
+    },
+    {
+     "ref_stage": 65,
+     "sub_stage": 59,
+     "feature": "ends falling",
+     "ref_x": 37.843,
+     "ref_y": 516.985,
+     "sub_x": 37.841,
+     "sub_y": 517.159,
+     "views": [
+      {
+       "view": "longitudinal_strain",
+       "ref_max": 25.3794,
+       "max_diff": 0.005600000000001146,
+       "floor": 0.0002,
+       "max_diff_pct": 0.022065139443805393,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "transverse_strain",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        4,
+        4
+       ]
+      },
+      {
+       "view": "shear_strain",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.0002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        5,
+        5
+       ]
+      },
+      {
+       "view": "shear_stress",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.0002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "principal_compressive_stress",
+       "ref_max": 60.0,
+       "max_diff": 0.010429081479884314,
+       "floor": 0.002,
+       "max_diff_pct": 0.017381802466473858,
+       "lines": [
+        3,
+        3
+       ]
+      },
+      {
+       "view": "shear_on_crack",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.0002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "principal_tensile_stress",
+       "ref_max": 3.1929,
+       "max_diff": 0.03999140456028299,
+       "floor": 0.0002,
+       "max_diff_pct": 1.252510399958752,
+       "lines": [
+        3,
+        3
+       ]
+      },
+      {
+       "view": "principal_tensile_strain",
+       "ref_max": 25.379,
+       "max_diff": 0.0033379564119413205,
+       "floor": 0.002,
+       "max_diff_pct": 0.013152434737150085,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "crack_widths",
+       "ref_max": 7.0516,
+       "max_diff": 0.3704822218557611,
+       "floor": 0.0002,
+       "max_diff_pct": 5.253874607972107,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "average_angle",
+       "ref_max": 90.0,
+       "max_diff": 0.04571999410065986,
+       "floor": 0.002,
+       "max_diff_pct": 0.050799993445177626,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "long_crack_spacing",
+       "ref_max": 966.172,
+       "max_diff": 50.537000000000106,
+       "floor": 0.002,
+       "max_diff_pct": 5.230642163093125,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "transverse_crack_spacing",
+       "ref_max": 5000.0,
+       "max_diff": 82.81001322220285,
+       "floor": 0.002,
+       "max_diff_pct": 1.656200264444057,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "diagonal_spacing",
+       "ref_max": 962.308,
+       "max_diff": 50.53699999999995,
+       "floor": 0.002,
+       "max_diff_pct": 5.251645003470817,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "long_reinforcement_stress",
+       "ref_max": 717.111,
+       "max_diff": 0.02300000000000435,
+       "floor": 0.002,
+       "max_diff_pct": 0.003207313791031563,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "long_reinf_stress_at_crack",
+       "ref_max": 839.772,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "long_average_bond",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "stirrup_stress",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "stirrup_stress_at_crack",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "transverse_average_bond",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.0002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "shrinkage_thermal_strain",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        3,
+        3
+       ]
+      },
+      {
+       "view": "longitudinal_concrete_stress",
+       "ref_max": 59.989,
+       "max_diff": 0.047972499754869655,
+       "floor": 0.002,
+       "max_diff_pct": 0.07996882720977122,
+       "lines": [
+        1,
+        1
+       ]
+      }
+     ]
+    }
+   ],
+   "views_at": {
+    "ref_stage": 63,
+    "sub_stage": 57,
+    "ref_x": 31.275,
+    "sub_x": 31.274
+   },
+   "views": [
+    {
+     "view": "longitudinal_strain",
+     "ref_max": 25.3794,
+     "max_diff": 0.005600000000001146,
+     "floor": 0.0002,
+     "max_diff_pct": 0.022065139443805393,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 65
+    },
+    {
+     "view": "transverse_strain",
+     "ref_max": 0.0,
+     "max_diff": 0.0,
+     "floor": 0.002,
+     "max_diff_pct": 0.0,
+     "lines": [
+      4,
+      4
+     ],
+     "ref_stage": 32
+    },
+    {
+     "view": "shear_strain",
+     "ref_max": 0.0,
+     "max_diff": 0.0,
+     "floor": 0.0002,
+     "max_diff_pct": 0.0,
+     "lines": [
+      5,
+      5
+     ],
+     "ref_stage": 32
+    },
+    {
+     "view": "shear_stress",
+     "ref_max": 0.0,
+     "max_diff": 0.0,
+     "floor": 0.0002,
+     "max_diff_pct": 0.0,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 32
+    },
+    {
+     "view": "principal_compressive_stress",
+     "ref_max": 60.0,
+     "max_diff": 0.038000000000002476,
+     "floor": 0.002,
+     "max_diff_pct": 0.06333333333333746,
+     "lines": [
+      3,
+      3
+     ],
+     "ref_stage": 63
+    },
+    {
+     "view": "shear_on_crack",
+     "ref_max": 0.0,
+     "max_diff": 0.0,
+     "floor": 0.0002,
+     "max_diff_pct": 0.0,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 32
+    },
+    {
+     "view": "principal_tensile_stress",
+     "ref_max": 2.24,
+     "max_diff": 0.05111388560584426,
+     "floor": 0.0002,
+     "max_diff_pct": 2.281869893118047,
+     "lines": [
+      3,
+      3
+     ],
+     "ref_stage": 32
+    },
+    {
+     "view": "principal_tensile_strain",
+     "ref_max": 2.257,
+     "max_diff": 0.0005770600223959266,
+     "floor": 0.002,
+     "max_diff_pct": 0.025567568559854963,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 32
+    },
+    {
+     "view": "crack_widths",
+     "ref_max": 7.0516,
+     "max_diff": 0.3704822218557611,
+     "floor": 0.0002,
+     "max_diff_pct": 5.253874607972107,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 65
+    },
+    {
+     "view": "average_angle",
+     "ref_max": 90.0,
+     "max_diff": 0.04571999410065986,
+     "floor": 0.002,
+     "max_diff_pct": 0.050799993445177626,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 65
+    },
+    {
+     "view": "long_crack_spacing",
+     "ref_max": 966.172,
+     "max_diff": 50.537000000000106,
+     "floor": 0.002,
+     "max_diff_pct": 5.230642163093125,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 65
+    },
+    {
+     "view": "transverse_crack_spacing",
+     "ref_max": 5000.0,
+     "max_diff": 158.8518524726722,
+     "floor": 0.002,
+     "max_diff_pct": 3.177037049453444,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 32
+    },
+    {
+     "view": "diagonal_spacing",
+     "ref_max": 962.308,
+     "max_diff": 50.53699999999995,
+     "floor": 0.002,
+     "max_diff_pct": 5.251645003470817,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 65
+    },
+    {
+     "view": "long_reinforcement_stress",
+     "ref_max": 1816.592,
+     "max_diff": 0.17700000000003543,
+     "floor": 0.002,
+     "max_diff_pct": 0.00974351973365706,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 63
+    },
+    {
+     "view": "long_reinf_stress_at_crack",
+     "ref_max": 1675.272,
+     "max_diff": 0.6470000000000673,
+     "floor": 0.002,
+     "max_diff_pct": 0.03862059414829755,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 32
+    },
+    {
+     "view": "long_average_bond",
+     "ref_max": 0.0,
+     "max_diff": 0.0,
+     "floor": 0.002,
+     "max_diff_pct": 0.0,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 32
+    },
+    {
+     "view": "stirrup_stress",
+     "ref_max": 0.0,
+     "max_diff": 0.0,
+     "floor": 0.002,
+     "max_diff_pct": 0.0,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 32
+    },
+    {
+     "view": "stirrup_stress_at_crack",
+     "ref_max": 0.0,
+     "max_diff": 0.0,
+     "floor": 0.002,
+     "max_diff_pct": 0.0,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 32
+    },
+    {
+     "view": "transverse_average_bond",
+     "ref_max": 0.0,
+     "max_diff": 0.0,
+     "floor": 0.0002,
+     "max_diff_pct": 0.0,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 32
+    },
+    {
+     "view": "shrinkage_thermal_strain",
+     "ref_max": 0.0,
+     "max_diff": 0.0,
+     "floor": 0.002,
+     "max_diff_pct": 0.0,
+     "lines": [
+      3,
+      3
+     ],
+     "ref_stage": 32
+    },
+    {
+     "view": "longitudinal_concrete_stress",
+     "ref_max": 29.81,
+     "max_diff": 0.08823269978921279,
+     "floor": 0.002,
+     "max_diff_pct": 0.29598356185579605,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 32
+    }
+   ],
+   "seconds": 4.1,
+   "run": "0c050361e94c",
+   "sub_curve": [
+    [
+     -0.665,
+     0.0
+    ],
+    [
+     -0.631,
+     10.445
+    ],
+    [
+     -0.431,
+     152.162
+    ],
+    [
+     -0.231,
+     389.911
+    ],
+    [
+     -0.031,
+     627.619
+    ],
+    [
+     0.169,
+     865.266
+    ],
+    [
+     0.369,
+     1102.83
+    ],
+    [
+     0.409,
+     1150.331
+    ],
+    [
+     0.441,
+     1188.328
+    ],
+    [
+     0.466,
+     1218.723
+    ],
+    [
+     0.487,
+     1243.037
+    ],
+    [
+     0.503,
+     1262.486
+    ],
+    [
+     0.506,
+     1265.6
+    ],
+    [
+     0.508,
+     1268.091
+    ],
+    [
+     0.516,
+     1277.1
+    ],
+    [
+     0.569,
+     1309.578
+    ],
+    [
+     0.769,
+     1400.98
+    ],
+    [
+     0.969,
+     1461.803
+    ],
+    [
+     1.169,
+     1512.535
+    ],
+    [
+     1.369,
+     1557.645
+    ],
+    [
+     1.569,
+     1599.22
+    ],
+    [
+     1.769,
+     1638.273
+    ],
+    [
+     1.969,
+     1675.302
+    ],
+    [
+     2.169,
+     1710.64
+    ],
+    [
+     2.385,
+     1747.096
+    ],
+    [
+     2.624,
+     1785.069
+    ],
+    [
+     2.886,
+     1821.235
+    ],
+    [
+     3.175,
+     1838.348
+    ],
+    [
+     3.493,
+     1844.862
+    ],
+    [
+     3.842,
+     1848.859
+    ],
+    [
+     4.226,
+     1855.686
+    ],
+    [
+     4.649,
+     1869.701
+    ],
+    [
+     5.114,
+     1884.022
+    ],
+    [
+     5.625,
+     1896.843
+    ],
+    [
+     6.187,
+     1907.498
+    ],
+    [
+     6.806,
+     1918.088
+    ],
+    [
+     7.487,
+     1928.62
+    ],
+    [
+     8.235,
+     1939.299
+    ],
+    [
+     9.059,
+     1950.388
+    ],
+    [
+     9.965,
+     1962.015
+    ],
+    [
+     10.961,
+     1974.321
+    ],
+    [
+     12.057,
+     1987.83
+    ],
+    [
+     13.263,
+     2000.8
+    ],
+    [
+     14.589,
+     2014.727
+    ],
+    [
+     16.048,
+     2029.071
+    ],
+    [
+     17.653,
+     2042.661
+    ],
+    [
+     19.419,
+     2058.555
+    ],
+    [
+     21.36,
+     2074.171
+    ],
+    [
+     21.788,
+     2077.186
+    ],
+    [
+     22.129,
+     2079.67
+    ],
+    [
+     22.184,
+     2079.928
+    ],
+    [
+     22.228,
+     2080.456
+    ],
+    [
+     22.263,
+     2080.666
+    ],
+    [
+     22.403,
+     2081.685
+    ],
+    [
+     23.496,
+     2089.414
+    ],
+    [
+     25.846,
+     2104.577
+    ],
+    [
+     28.431,
+     2117.841
+    ],
+    [
+     31.274,
+     2129.039
+    ],
+    [
+     34.401,
+     2127.618
+    ],
+    [
+     37.841,
+     517.159
+    ]
+   ]
+  },
+  "igirder-mv": {
+   "ref": {
+    "input-name": "igirder.r2t",
+    "units": "si",
+    "factors": "1.00,1.00,1.00",
+    "initial": "0.00,0.00,0.00",
+    "increment": "0.00,1.00,1.00",
+    "more-detail": "0",
+    "stage-count": "15",
+    "peak-stage": "12"
+   },
+   "sub": {
+    "stage-count": "25",
+    "peak-stage": "23"
+   },
+   "control": [
+    {
+     "chart": "shear_gxy",
+     "ref_peak_load": 655.713,
+     "sub_peak_load": 656.249,
+     "ref_peak_x": 4.744,
+     "sub_peak_x": 4.806,
+     "peak_diff_pct": 0.08174307967053547,
+     "curve_max_diff_pct": 0.11349299776216404,
+     "curve_mean_diff_pct": 0.017104389512445247,
+     "shape_ref": [
+      "cracking",
+      "peak",
+      "ends falling"
+     ],
+     "shape_sub": [
+      "fall",
+      "cracking",
+      "peak",
+      "ends falling"
+     ],
+     "shape_same": false,
+     "floor_pct": 0.03859634222360617,
+     "rising_pct": 0.1339837845844622,
+     "post_peak_pct": 3.73352828242378
+    },
+    {
+     "chart": "moment_phi",
+     "ref_peak_load": 655.93,
+     "sub_peak_load": 656.249,
+     "ref_peak_x": -0.031,
+     "sub_peak_x": -0.031,
+     "peak_diff_pct": 0.04863323830287892,
+     "curve_max_diff_pct": 0.027044210890224938,
+     "curve_mean_diff_pct": 0.010137102413244206,
+     "shape_ref": [
+      "peak",
+      "ends falling"
+     ],
+     "shape_sub": [
+      "fall",
+      "peak",
+      "ends falling"
+     ],
+     "shape_same": false,
+     "floor_pct": 0.30075203426260616,
+     "rising_pct": 2.397795128682812,
+     "post_peak_pct": 4.085423770764878
+    }
+   ],
+   "missing_control": [],
+   "views_stages": [
+    {
+     "ref_stage": 12,
+     "sub_stage": 23,
+     "feature": "peak",
+     "ref_x": -0.031,
+     "ref_y": 655.93,
+     "sub_x": -0.031,
+     "sub_y": 656.249,
+     "views": [
+      {
+       "view": "longitudinal_strain",
+       "ref_max": 0.0277,
+       "max_diff": 0.00014706814230711104,
+       "floor": 0.0002,
+       "max_diff_pct": 0.5309319216863214,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "transverse_strain",
+       "ref_max": 10.566,
+       "max_diff": 0.24559011113405263,
+       "floor": 0.002,
+       "max_diff_pct": 2.3243432816018608,
+       "lines": [
+        4,
+        4
+       ]
+      },
+      {
+       "view": "shear_strain",
+       "ref_max": 7.7941,
+       "max_diff": 0.18834921606107347,
+       "floor": 0.0002,
+       "max_diff_pct": 2.4165614511113978,
+       "lines": [
+        5,
+        5
+       ]
+      },
+      {
+       "view": "shear_stress",
+       "ref_max": 5.3282,
+       "max_diff": 0.021431330990182306,
+       "floor": 0.0002,
+       "max_diff_pct": 0.4022245972407625,
+       "lines": [
+        3,
+        3
+       ]
+      },
+      {
+       "view": "principal_compressive_stress",
+       "ref_max": 60.0,
+       "max_diff": 0.4562397653067182,
+       "floor": 0.002,
+       "max_diff_pct": 0.7603996088445304,
+       "lines": [
+        3,
+        3
+       ]
+      },
+      {
+       "view": "shear_on_crack",
+       "ref_max": 0.9139,
+       "max_diff": 0.06680000000000005,
+       "floor": 0.0002,
+       "max_diff_pct": 7.309333625123104,
+       "lines": [
+        3,
+        3
+       ]
+      },
+      {
+       "view": "principal_tensile_stress",
+       "ref_max": 3.2109,
+       "max_diff": 0.012466301149164426,
+       "floor": 0.0002,
+       "max_diff_pct": 0.38824943626909675,
+       "lines": [
+        3,
+        3
+       ]
+      },
+      {
+       "view": "principal_tensile_strain",
+       "ref_max": 11.847,
+       "max_diff": 0.27726883586870865,
+       "floor": 0.002,
+       "max_diff_pct": 2.3404139095864664,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "crack_widths",
+       "ref_max": 7.3269,
+       "max_diff": 0.22824196762869692,
+       "floor": 0.0002,
+       "max_diff_pct": 3.115123280360001,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "average_angle",
+       "ref_max": 90.0,
+       "max_diff": 0.9115119268487645,
+       "floor": 0.002,
+       "max_diff_pct": 1.0127910298319605,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "long_crack_spacing",
+       "ref_max": 959.489,
+       "max_diff": 39.685212204046664,
+       "floor": 0.002,
+       "max_diff_pct": 4.136077871038299,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "transverse_crack_spacing",
+       "ref_max": 5000.0,
+       "max_diff": 113.17043256015445,
+       "floor": 0.002,
+       "max_diff_pct": 2.2634086512030893,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "diagonal_spacing",
+       "ref_max": 622.191,
+       "max_diff": 7.305169785419054,
+       "floor": 0.002,
+       "max_diff_pct": 1.1741040589495915,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "long_reinforcement_stress",
+       "ref_max": 1286.874,
+       "max_diff": 0.015999999999999192,
+       "floor": 0.002,
+       "max_diff_pct": 0.0012433229671280322,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "long_reinf_stress_at_crack",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "long_average_bond",
+       "ref_max": 0.174,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "stirrup_stress",
+       "ref_max": 415.044,
+       "max_diff": 1.3501503765427578,
+       "floor": 0.002,
+       "max_diff_pct": 0.32530295017944066,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "stirrup_stress_at_crack",
+       "ref_max": 514.809,
+       "max_diff": 1.8410522614744722,
+       "floor": 0.002,
+       "max_diff_pct": 0.35761850734436895,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "transverse_average_bond",
+       "ref_max": 3249.4082,
+       "max_diff": 80.72273614409008,
+       "floor": 0.0002,
+       "max_diff_pct": 2.4842288557064047,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "shrinkage_thermal_strain",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        3,
+        3
+       ]
+      },
+      {
+       "view": "longitudinal_concrete_stress",
+       "ref_max": 15.508,
+       "max_diff": 0.05404414251650748,
+       "floor": 0.002,
+       "max_diff_pct": 0.34849202035405913,
+       "lines": [
+        1,
+        1
+       ]
+      }
+     ]
+    },
+    {
+     "ref_stage": 14,
+     "sub_stage": 8,
+     "feature": "ends falling",
+     "ref_x": -0.476,
+     "ref_y": 140.633,
+     "sub_x": -0.491,
+     "sub_y": 80.834,
+     "views": [
+      {
+       "view": "longitudinal_strain",
+       "ref_max": 0.4704,
+       "max_diff": 0.05709999999999997,
+       "floor": 0.0002,
+       "max_diff_pct": 12.138605442176866,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "transverse_strain",
+       "ref_max": 463.732,
+       "max_diff": 463.732,
+       "floor": 0.002,
+       "max_diff_pct": 100.0,
+       "lines": [
+        4,
+        4
+       ]
+      },
+      {
+       "view": "shear_strain",
+       "ref_max": 11.8378,
+       "max_diff": 11.795,
+       "floor": 0.0002,
+       "max_diff_pct": 99.63844633293348,
+       "lines": [
+        5,
+        5
+       ]
+      },
+      {
+       "view": "shear_stress",
+       "ref_max": 1.6438,
+       "max_diff": 1.0017578627772281,
+       "floor": 0.0002,
+       "max_diff_pct": 60.941590386739755,
+       "lines": [
+        3,
+        3
+       ]
+      },
+      {
+       "view": "principal_compressive_stress",
+       "ref_max": 60.0,
+       "max_diff": 59.288,
+       "floor": 0.002,
+       "max_diff_pct": 98.81333333333332,
+       "lines": [
+        3,
+        3
+       ]
+      },
+      {
+       "view": "shear_on_crack",
+       "ref_max": 0.0351,
+       "max_diff": 0.0351,
+       "floor": 0.0002,
+       "max_diff_pct": 100.0,
+       "lines": [
+        3,
+        1
+       ]
+      },
+      {
+       "view": "principal_tensile_stress",
+       "ref_max": 3.2109,
+       "max_diff": 2.2395,
+       "floor": 0.0002,
+       "max_diff_pct": 69.7467999626273,
+       "lines": [
+        3,
+        3
+       ]
+      },
+      {
+       "view": "principal_tensile_strain",
+       "ref_max": 463.807,
+       "max_diff": 463.80399974484556,
+       "floor": 0.002,
+       "max_diff_pct": 99.99935312421881,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "crack_widths",
+       "ref_max": 340.7483,
+       "max_diff": 340.7483,
+       "floor": 0.0002,
+       "max_diff_pct": 99.99999999999999,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "average_angle",
+       "ref_max": 90.0,
+       "max_diff": 19.4089445767268,
+       "floor": 0.002,
+       "max_diff_pct": 21.56549397414089,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "long_crack_spacing",
+       "ref_max": 959.489,
+       "max_diff": 30.307515465802712,
+       "floor": 0.002,
+       "max_diff_pct": 3.158714218276886,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "transverse_crack_spacing",
+       "ref_max": 5000.0,
+       "max_diff": 141.67700769303428,
+       "floor": 0.002,
+       "max_diff_pct": 2.8335401538606857,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "diagonal_spacing",
+       "ref_max": 734.717,
+       "max_diff": 734.717,
+       "floor": 0.002,
+       "max_diff_pct": 100.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "long_reinforcement_stress",
+       "ref_max": 1207.986,
+       "max_diff": 11.604000000000017,
+       "floor": 0.002,
+       "max_diff_pct": 0.9606071593544971,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "long_reinf_stress_at_crack",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "long_average_bond",
+       "ref_max": 0.038,
+       "max_diff": 0.018000000000000002,
+       "floor": 0.002,
+       "max_diff_pct": 47.36842105263159,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "stirrup_stress",
+       "ref_max": 3.1415626e+25,
+       "max_diff": 3.1415626e+25,
+       "floor": 0.002,
+       "max_diff_pct": 100.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "stirrup_stress_at_crack",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "transverse_average_bond",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.0002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "shrinkage_thermal_strain",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        3,
+        3
+       ]
+      },
+      {
+       "view": "longitudinal_concrete_stress",
+       "ref_max": 15.339,
+       "max_diff": 6.179383414226377,
+       "floor": 0.002,
+       "max_diff_pct": 40.28543851767636,
+       "lines": [
+        1,
+        1
+       ]
+      }
+     ]
+    }
+   ],
+   "views_at": {
+    "ref_stage": 12,
+    "sub_stage": 23,
+    "ref_x": -0.031,
+    "sub_x": -0.031
+   },
+   "views": [
+    {
+     "view": "longitudinal_strain",
+     "ref_max": 0.4704,
+     "max_diff": 0.05709999999999997,
+     "floor": 0.0002,
+     "max_diff_pct": 12.138605442176866,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 14
+    },
+    {
+     "view": "transverse_strain",
+     "ref_max": 463.732,
+     "max_diff": 463.732,
+     "floor": 0.002,
+     "max_diff_pct": 100.0,
+     "lines": [
+      4,
+      4
+     ],
+     "ref_stage": 14
+    },
+    {
+     "view": "shear_strain",
+     "ref_max": 11.8378,
+     "max_diff": 11.795,
+     "floor": 0.0002,
+     "max_diff_pct": 99.63844633293348,
+     "lines": [
+      5,
+      5
+     ],
+     "ref_stage": 14
+    },
+    {
+     "view": "shear_stress",
+     "ref_max": 1.6438,
+     "max_diff": 1.0017578627772281,
+     "floor": 0.0002,
+     "max_diff_pct": 60.941590386739755,
+     "lines": [
+      3,
+      3
+     ],
+     "ref_stage": 14
+    },
+    {
+     "view": "principal_compressive_stress",
+     "ref_max": 60.0,
+     "max_diff": 59.288,
+     "floor": 0.002,
+     "max_diff_pct": 98.81333333333332,
+     "lines": [
+      3,
+      3
+     ],
+     "ref_stage": 14
+    },
+    {
+     "view": "shear_on_crack",
+     "ref_max": 0.0351,
+     "max_diff": 0.0351,
+     "floor": 0.0002,
+     "max_diff_pct": 100.0,
+     "lines": [
+      3,
+      1
+     ],
+     "ref_stage": 14
+    },
+    {
+     "view": "principal_tensile_stress",
+     "ref_max": 3.2109,
+     "max_diff": 2.2395,
+     "floor": 0.0002,
+     "max_diff_pct": 69.7467999626273,
+     "lines": [
+      3,
+      3
+     ],
+     "ref_stage": 14
+    },
+    {
+     "view": "principal_tensile_strain",
+     "ref_max": 463.807,
+     "max_diff": 463.80399974484556,
+     "floor": 0.002,
+     "max_diff_pct": 99.99935312421881,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 14
+    },
+    {
+     "view": "crack_widths",
+     "ref_max": 340.7483,
+     "max_diff": 340.7483,
+     "floor": 0.0002,
+     "max_diff_pct": 99.99999999999999,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 14
+    },
+    {
+     "view": "average_angle",
+     "ref_max": 90.0,
+     "max_diff": 19.4089445767268,
+     "floor": 0.002,
+     "max_diff_pct": 21.56549397414089,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 14
+    },
+    {
+     "view": "long_crack_spacing",
+     "ref_max": 959.489,
+     "max_diff": 39.685212204046664,
+     "floor": 0.002,
+     "max_diff_pct": 4.136077871038299,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 12
+    },
+    {
+     "view": "transverse_crack_spacing",
+     "ref_max": 5000.0,
+     "max_diff": 141.67700769303428,
+     "floor": 0.002,
+     "max_diff_pct": 2.8335401538606857,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 14
+    },
+    {
+     "view": "diagonal_spacing",
+     "ref_max": 734.717,
+     "max_diff": 734.717,
+     "floor": 0.002,
+     "max_diff_pct": 100.0,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 14
+    },
+    {
+     "view": "long_reinforcement_stress",
+     "ref_max": 1207.986,
+     "max_diff": 11.604000000000017,
+     "floor": 0.002,
+     "max_diff_pct": 0.9606071593544971,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 14
+    },
+    {
+     "view": "long_reinf_stress_at_crack",
+     "ref_max": 0.0,
+     "max_diff": 0.0,
+     "floor": 0.002,
+     "max_diff_pct": 0.0,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 12
+    },
+    {
+     "view": "long_average_bond",
+     "ref_max": 0.038,
+     "max_diff": 0.018000000000000002,
+     "floor": 0.002,
+     "max_diff_pct": 47.36842105263159,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 14
+    },
+    {
+     "view": "stirrup_stress",
+     "ref_max": 3.1415626e+25,
+     "max_diff": 3.1415626e+25,
+     "floor": 0.002,
+     "max_diff_pct": 100.0,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 14
+    },
+    {
+     "view": "stirrup_stress_at_crack",
+     "ref_max": 514.809,
+     "max_diff": 1.8410522614744722,
+     "floor": 0.002,
+     "max_diff_pct": 0.35761850734436895,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 12
+    },
+    {
+     "view": "transverse_average_bond",
+     "ref_max": 3249.4082,
+     "max_diff": 80.72273614409008,
+     "floor": 0.0002,
+     "max_diff_pct": 2.4842288557064047,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 12
+    },
+    {
+     "view": "shrinkage_thermal_strain",
+     "ref_max": 0.0,
+     "max_diff": 0.0,
+     "floor": 0.002,
+     "max_diff_pct": 0.0,
+     "lines": [
+      3,
+      3
+     ],
+     "ref_stage": 12
+    },
+    {
+     "view": "longitudinal_concrete_stress",
+     "ref_max": 15.339,
+     "max_diff": 6.179383414226377,
+     "floor": 0.002,
+     "max_diff_pct": 40.28543851767636,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 14
+    }
+   ],
+   "seconds": 24.2,
+   "run": "0c050361e94c",
+   "sub_curve": [
+    [
+     -0.665,
+     0.0
+    ],
+    [
+     -0.651,
+     4.057
+    ],
+    [
+     -0.571,
+     30.843
+    ],
+    [
+     -0.539,
+     49.543
+    ],
+    [
+     -0.532,
+     51.051
+    ],
+    [
+     -0.53,
+     34.423
+    ],
+    [
+     -0.52,
+     46.597
+    ],
+    [
+     -0.507,
+     61.813
+    ],
+    [
+     -0.491,
+     80.834
+    ],
+    [
+     -0.411,
+     175.938
+    ],
+    [
+     -0.331,
+     271.04
+    ],
+    [
+     -0.251,
+     366.137
+    ],
+    [
+     -0.235,
+     385.156
+    ],
+    [
+     -0.223,
+     400.371
+    ],
+    [
+     -0.212,
+     412.543
+    ],
+    [
+     -0.204,
+     422.28
+    ],
+    [
+     -0.198,
+     430.07
+    ],
+    [
+     -0.192,
+     436.302
+    ],
+    [
+     -0.188,
+     441.287
+    ],
+    [
+     -0.185,
+     445.276
+    ],
+    [
+     -0.182,
+     448.484
+    ],
+    [
+     -0.171,
+     462.472
+    ],
+    [
+     -0.091,
+     567.796
+    ],
+    [
+     -0.031,
+     656.249
+    ],
+    [
+     -0.047,
+     633.814
+    ]
+   ]
+  },
   "newbeam-m": {
    "ref": {
     "input-name": "input.r2t",
@@ -507,9 +6427,9 @@
       {
        "view": "long_reinf_stress_at_crack",
        "ref_max": 463.897,
-       "max_diff": 0.12599999999996295,
+       "max_diff": 5.1502913045453623e-14,
        "floor": 0.002,
-       "max_diff_pct": 0.0271612017322731,
+       "max_diff_pct": 1.1102230246251565e-14,
        "lines": [
         1,
         1
@@ -749,9 +6669,9 @@
       {
        "view": "long_reinf_stress_at_crack",
        "ref_max": 459.849,
-       "max_diff": 0.04199999999998203,
+       "max_diff": 0.0,
        "floor": 0.002,
-       "max_diff_pct": 0.009133432931240915,
+       "max_diff_pct": 0.0,
        "lines": [
         1,
         1
@@ -1086,8 +7006,8 @@
      "ref_stage": 59
     }
    ],
-   "seconds": 2.1,
-   "run": "9580a68f3167",
+   "seconds": 2.4,
+   "run": "0c050361e94c",
    "sub_curve": [
     [
      -0.0,
@@ -2639,8 +8559,8 @@
      "ref_stage": 55
     }
    ],
-   "seconds": 72.2,
-   "run": "9580a68f3167",
+   "seconds": 78.5,
+   "run": "0c050361e94c",
    "sub_curve": [
     [
      -0.0,
@@ -3910,8 +9830,8 @@
      "ref_stage": 14
     }
    ],
-   "seconds": 41.6,
-   "run": "9580a68f3167",
+   "seconds": 46.6,
+   "run": "0c050361e94c",
    "sub_curve": [
     [
      -0.999,
@@ -5173,8 +11093,8 @@
      "ref_stage": 87
     }
    ],
-   "seconds": 123.5,
-   "run": "9580a68f3167",
+   "seconds": 123.6,
+   "run": "0c050361e94c",
    "sub_curve": [
     [
      -0.0,
@@ -6508,8 +12428,8 @@
      "ref_stage": 42
     }
    ],
-   "seconds": 39.3,
-   "run": "9580a68f3167",
+   "seconds": 41.2,
+   "run": "0c050361e94c",
    "sub_curve": [
     [
      -0.0,
@@ -7739,8 +13659,8 @@
      "ref_stage": 16
     }
    ],
-   "seconds": 1.0,
-   "run": "9580a68f3167",
+   "seconds": 1.2,
+   "run": "0c050361e94c",
    "sub_curve": [
     [
      0.174,
@@ -8738,8 +14658,8 @@
      "ref_stage": 38
     }
    ],
-   "seconds": 23.2,
-   "run": "9580a68f3167",
+   "seconds": 26.9,
+   "run": "0c050361e94c",
    "sub_curve": [
     [
      -0.117,
@@ -10207,8 +16127,8 @@
      "ref_stage": 13
     }
    ],
-   "seconds": 1.9,
-   "run": "9580a68f3167",
+   "seconds": 2.9,
+   "run": "0c050361e94c",
    "sub_curve": [
     [
      -0.0,
@@ -11484,8 +17404,8 @@
      "ref_stage": 14
     }
    ],
-   "seconds": 1.0,
-   "run": "9580a68f3167",
+   "seconds": 1.2,
+   "run": "0c050361e94c",
    "sub_curve": [
     [
      -0.0,
@@ -11647,7 +17567,7 @@
      "shape_same": true,
      "floor_pct": 0.0431914588414718,
      "rising_pct": 0.19591531700351283,
-     "post_peak_pct": 4.674035987649522
+     "post_peak_pct": 3.7209418197383632
     },
     {
      "chart": "moment_phi",
@@ -12421,8 +18341,8 @@
      "ref_stage": 41
     }
    ],
-   "seconds": 46.5,
-   "run": "9580a68f3167",
+   "seconds": 45.4,
+   "run": "0c050361e94c",
    "sub_curve": [
     [
      -0.0,
@@ -12585,8 +18505,8 @@
      314.069
     ],
     [
-     4.71,
-     311.007
+     4.706,
+     310.646
     ]
    ]
   },
@@ -13644,8 +19564,8 @@
      "ref_stage": 44
     }
    ],
-   "seconds": 38.2,
-   "run": "9580a68f3167",
+   "seconds": 40.5,
+   "run": "0c050361e94c",
    "sub_curve": [
     [
      0.042,
@@ -14855,8 +20775,8 @@
      "ref_stage": 22
     }
    ],
-   "seconds": 0.5,
-   "run": "9580a68f3167",
+   "seconds": 0.7,
+   "run": "0c050361e94c",
    "sub_curve": [
     [
      0.0,
@@ -15725,9 +21645,9 @@
       {
        "view": "long_reinf_stress_at_crack",
        "ref_max": 497.618,
-       "max_diff": 0.005000000000006903,
+       "max_diff": 0.0,
        "floor": 0.002,
-       "max_diff_pct": 0.001004786804337243,
+       "max_diff_pct": 0.0,
        "lines": [
         1,
         1
@@ -15967,9 +21887,9 @@
       {
        "view": "long_reinf_stress_at_crack",
        "ref_max": 499.586,
-       "max_diff": 0.0,
+       "max_diff": 0.009000000000022611,
        "floor": 0.002,
-       "max_diff_pct": 0.0,
+       "max_diff_pct": 0.001801491635078367,
        "lines": [
         1,
         1
@@ -16304,8 +22224,8 @@
      "ref_stage": 72
     }
    ],
-   "seconds": 2.5,
-   "run": "9580a68f3167",
+   "seconds": 2.6,
+   "run": "0c050361e94c",
    "sub_curve": [
     [
      -0.017,
@@ -17859,8 +23779,8 @@
      "ref_stage": 12
     }
    ],
-   "seconds": 1.1,
-   "run": "9580a68f3167",
+   "seconds": 1.3,
+   "run": "0c050361e94c",
    "sub_curve": [
     [
      0.0,
@@ -18455,9 +24375,9 @@
       {
        "view": "long_reinf_stress_at_crack",
        "ref_max": 467.586,
-       "max_diff": 1.0382494863847569e-13,
+       "max_diff": 0.0,
        "floor": 0.002,
-       "max_diff_pct": 2.220446049250313e-14,
+       "max_diff_pct": 0.0,
        "lines": [
         1,
         1
@@ -18697,9 +24617,9 @@
       {
        "view": "long_reinf_stress_at_crack",
        "ref_max": 468.027,
-       "max_diff": 0.4250000000000011,
+       "max_diff": 0.5409999999999927,
        "floor": 0.002,
-       "max_diff_pct": 0.0908067269623336,
+       "max_diff_pct": 0.11559162185087457,
        "lines": [
         1,
         1
@@ -19034,8 +24954,8 @@
      "ref_stage": 69
     }
    ],
-   "seconds": 44.1,
-   "run": "9580a68f3167",
+   "seconds": 45.2,
+   "run": "0c050361e94c",
    "sub_curve": [
     [
      -0.0,
@@ -20353,8 +26273,8 @@
      "ref_stage": 51
     }
    ],
-   "seconds": 46.6,
-   "run": "9580a68f3167",
+   "seconds": 49.9,
+   "run": "0c050361e94c",
    "sub_curve": [
     [
      0.0,
@@ -21097,7 +27017,7 @@
     }
    ],
    "seconds": 0.0,
-   "run": "9580a68f3167",
+   "run": "0c050361e94c",
    "sub_curve": [
     [
      -0.0,
@@ -21106,6 +27026,2898 @@
     [
      -0.0,
      -0.0
+    ]
+   ]
+  },
+  "tbeam-m": {
+   "ref": {
+    "input-name": "tbeam.r2t",
+    "units": "si",
+    "factors": "1.00,1.00,1.00",
+    "initial": "0.00,0.00,0.00",
+    "increment": "0.00,1.00,0.00",
+    "more-detail": "0",
+    "stage-count": "64",
+    "peak-stage": "61"
+   },
+   "sub": {
+    "stage-count": "64",
+    "peak-stage": "61"
+   },
+   "control": [
+    {
+     "chart": "moment_ex",
+     "ref_peak_load": 2631.365,
+     "sub_peak_load": 2630.413,
+     "ref_peak_x": 17.065,
+     "sub_peak_x": 17.073,
+     "peak_diff_pct": -0.03617894134792288,
+     "curve_max_diff_pct": 0.041202773035402755,
+     "curve_mean_diff_pct": 0.007168637769501038,
+     "shape_ref": [
+      "cracking",
+      "peak",
+      "ends falling"
+     ],
+     "shape_sub": [
+      "cracking",
+      "peak",
+      "ends falling"
+     ],
+     "shape_same": true,
+     "floor_pct": 0.011538933762726444,
+     "rising_pct": 0.041194591580761775,
+     "post_peak_pct": 0.07555068956759925
+    },
+    {
+     "chart": "moment_phi",
+     "ref_peak_load": 2631.365,
+     "sub_peak_load": 2630.413,
+     "ref_peak_x": 47.618,
+     "sub_peak_x": 47.618,
+     "peak_diff_pct": -0.03617894134792288,
+     "curve_max_diff_pct": 0.03617894134791966,
+     "curve_mean_diff_pct": 0.006711478040032198,
+     "shape_ref": [
+      "cracking",
+      "peak",
+      "ends falling"
+     ],
+     "shape_sub": [
+      "cracking",
+      "peak",
+      "ends falling"
+     ],
+     "shape_same": true,
+     "floor_pct": 0.0034719695312555115,
+     "rising_pct": 0.03617894134791966,
+     "post_peak_pct": 0.07193984870970116
+    }
+   ],
+   "missing_control": [],
+   "views_stages": [
+    {
+     "ref_stage": 12,
+     "sub_stage": 12,
+     "feature": "cracking",
+     "ref_x": 0.194,
+     "ref_y": 319.621,
+     "sub_x": 0.194,
+     "sub_y": 319.34,
+     "views": [
+      {
+       "view": "longitudinal_strain",
+       "ref_max": 0.1487,
+       "max_diff": 0.00010000000000000333,
+       "floor": 0.0002,
+       "max_diff_pct": 0.06724949562878503,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "transverse_strain",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        4,
+        4
+       ]
+      },
+      {
+       "view": "shear_strain",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.0002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        5,
+        5
+       ]
+      },
+      {
+       "view": "shear_stress",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.0002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "principal_compressive_stress",
+       "ref_max": 40.0,
+       "max_diff": 0.001973936242177805,
+       "floor": 0.002,
+       "max_diff_pct": 0.0049348406054445125,
+       "lines": [
+        3,
+        3
+       ]
+      },
+      {
+       "view": "shear_on_crack",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.0002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "principal_tensile_stress",
+       "ref_max": 2.6483,
+       "max_diff": 0.008163552662353527,
+       "floor": 0.0002,
+       "max_diff_pct": 0.3082563403826427,
+       "lines": [
+        3,
+        3
+       ]
+      },
+      {
+       "view": "principal_tensile_strain",
+       "ref_max": 0.149,
+       "max_diff": 8.056971161925133e-05,
+       "floor": 0.002,
+       "max_diff_pct": 0.05407363195922908,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "crack_widths",
+       "ref_max": 0.0142,
+       "max_diff": 0.0006218889585256444,
+       "floor": 0.0002,
+       "max_diff_pct": 4.379499707927073,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "average_angle",
+       "ref_max": 90.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "long_crack_spacing",
+       "ref_max": 1016.436,
+       "max_diff": 69.53325008325406,
+       "floor": 0.002,
+       "max_diff_pct": 6.840888170357411,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "transverse_crack_spacing",
+       "ref_max": 6000.0,
+       "max_diff": 342.72706515060327,
+       "floor": 0.002,
+       "max_diff_pct": 5.712117752510055,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "diagonal_spacing",
+       "ref_max": 618.241,
+       "max_diff": 9.112784058928554,
+       "floor": 0.002,
+       "max_diff_pct": 1.4739857206054847,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "long_reinforcement_stress",
+       "ref_max": 26.587,
+       "max_diff": 0.008000000000001178,
+       "floor": 0.002,
+       "max_diff_pct": 0.030089893557005976,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "long_reinf_stress_at_crack",
+       "ref_max": 47.729,
+       "max_diff": 0.4510000000000008,
+       "floor": 0.002,
+       "max_diff_pct": 0.9449181839133458,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "long_average_bond",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "stirrup_stress",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "stirrup_stress_at_crack",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "transverse_average_bond",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.0002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "shrinkage_thermal_strain",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        3,
+        3
+       ]
+      },
+      {
+       "view": "longitudinal_concrete_stress",
+       "ref_max": 2.362,
+       "max_diff": 0.0070764515330993755,
+       "floor": 0.002,
+       "max_diff_pct": 0.29959574653257304,
+       "lines": [
+        1,
+        1
+       ]
+      }
+     ]
+    },
+    {
+     "ref_stage": 61,
+     "sub_stage": 61,
+     "feature": "peak",
+     "ref_x": 47.618,
+     "ref_y": 2631.365,
+     "sub_x": 47.618,
+     "sub_y": 2630.413,
+     "views": [
+      {
+       "view": "longitudinal_strain",
+       "ref_max": 51.588,
+       "max_diff": 0.007800000000000668,
+       "floor": 0.0002,
+       "max_diff_pct": 0.01511979530123414,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "transverse_strain",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        4,
+        4
+       ]
+      },
+      {
+       "view": "shear_strain",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.0002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        5,
+        5
+       ]
+      },
+      {
+       "view": "shear_stress",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.0002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "principal_compressive_stress",
+       "ref_max": 40.0,
+       "max_diff": 0.023999999999999577,
+       "floor": 0.002,
+       "max_diff_pct": 0.05999999999999894,
+       "lines": [
+        3,
+        3
+       ]
+      },
+      {
+       "view": "shear_on_crack",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.0002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "principal_tensile_stress",
+       "ref_max": 2.0533,
+       "max_diff": 0.0045988664721763805,
+       "floor": 0.0002,
+       "max_diff_pct": 0.22397440569699412,
+       "lines": [
+        3,
+        3
+       ]
+      },
+      {
+       "view": "principal_tensile_strain",
+       "ref_max": 51.588,
+       "max_diff": 0.007385554837726862,
+       "floor": 0.002,
+       "max_diff_pct": 0.01431642017082822,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "crack_widths",
+       "ref_max": 22.6186,
+       "max_diff": 1.0593825291033223,
+       "floor": 0.0002,
+       "max_diff_pct": 4.683678605675516,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "average_angle",
+       "ref_max": 90.0,
+       "max_diff": 1.2490009027033011e-15,
+       "floor": 0.002,
+       "max_diff_pct": 1.3877787807814457e-15,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "long_crack_spacing",
+       "ref_max": 1013.083,
+       "max_diff": 69.35103081975541,
+       "floor": 0.002,
+       "max_diff_pct": 6.8455428449352524,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "transverse_crack_spacing",
+       "ref_max": 6000.0,
+       "max_diff": 197.05715085505088,
+       "floor": 0.002,
+       "max_diff_pct": 3.2842858475841816,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "diagonal_spacing",
+       "ref_max": 1013.083,
+       "max_diff": 69.35103081975541,
+       "floor": 0.002,
+       "max_diff_pct": 6.8455428449352524,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "long_reinforcement_stress",
+       "ref_max": 603.933,
+       "max_diff": 1.562000000000028,
+       "floor": 0.002,
+       "max_diff_pct": 0.2586379614957335,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "long_reinf_stress_at_crack",
+       "ref_max": 616.166,
+       "max_diff": 0.03300000000004727,
+       "floor": 0.002,
+       "max_diff_pct": 0.005355699600440022,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "long_average_bond",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "stirrup_stress",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "stirrup_stress_at_crack",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "transverse_average_bond",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.0002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "shrinkage_thermal_strain",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        3,
+        3
+       ]
+      },
+      {
+       "view": "longitudinal_concrete_stress",
+       "ref_max": 39.986,
+       "max_diff": 0.023999999999999876,
+       "floor": 0.002,
+       "max_diff_pct": 0.06002100735257309,
+       "lines": [
+        1,
+        1
+       ]
+      }
+     ]
+    },
+    {
+     "ref_stage": 63,
+     "sub_stage": 63,
+     "feature": "ends falling",
+     "ref_x": 57.618,
+     "ref_y": 1695.998,
+     "sub_x": 57.618,
+     "sub_y": 1697.891,
+     "views": [
+      {
+       "view": "longitudinal_strain",
+       "ref_max": 54.933,
+       "max_diff": 0.004299999999997431,
+       "floor": 0.0002,
+       "max_diff_pct": 0.007827717401193146,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "transverse_strain",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        4,
+        4
+       ]
+      },
+      {
+       "view": "shear_strain",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.0002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        5,
+        5
+       ]
+      },
+      {
+       "view": "shear_stress",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.0002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "principal_compressive_stress",
+       "ref_max": 40.0,
+       "max_diff": 0.004712528463763447,
+       "floor": 0.002,
+       "max_diff_pct": 0.011781321159408617,
+       "lines": [
+        3,
+        3
+       ]
+      },
+      {
+       "view": "shear_on_crack",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.0002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "principal_tensile_stress",
+       "ref_max": 2.6227,
+       "max_diff": 0.01753459995169022,
+       "floor": 0.0002,
+       "max_diff_pct": 0.6685705552175324,
+       "lines": [
+        3,
+        3
+       ]
+      },
+      {
+       "view": "principal_tensile_strain",
+       "ref_max": 54.933,
+       "max_diff": 0.0032180945045799,
+       "floor": 0.002,
+       "max_diff_pct": 0.005858217291209109,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "crack_widths",
+       "ref_max": 21.0954,
+       "max_diff": 0.7684708024116331,
+       "floor": 0.0002,
+       "max_diff_pct": 3.642835890344023,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "average_angle",
+       "ref_max": 90.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "long_crack_spacing",
+       "ref_max": 1016.436,
+       "max_diff": 69.53325008325406,
+       "floor": 0.002,
+       "max_diff_pct": 6.840888170357411,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "transverse_crack_spacing",
+       "ref_max": 6000.0,
+       "max_diff": 41.229861100298955,
+       "floor": 0.002,
+       "max_diff_pct": 0.6871643516716494,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "diagonal_spacing",
+       "ref_max": 1016.436,
+       "max_diff": 69.53325008325406,
+       "floor": 0.002,
+       "max_diff_pct": 6.840888170357411,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "long_reinforcement_stress",
+       "ref_max": 463.55,
+       "max_diff": 0.020000000000018153,
+       "floor": 0.002,
+       "max_diff_pct": 0.004314529177007476,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "long_reinf_stress_at_crack",
+       "ref_max": 598.241,
+       "max_diff": 6.641809324747783e-14,
+       "floor": 0.002,
+       "max_diff_pct": 1.1102230246251565e-14,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "long_average_bond",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "stirrup_stress",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "stirrup_stress_at_crack",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "transverse_average_bond",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.0002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "shrinkage_thermal_strain",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        3,
+        3
+       ]
+      },
+      {
+       "view": "longitudinal_concrete_stress",
+       "ref_max": 39.997,
+       "max_diff": 0.01047957130506051,
+       "floor": 0.002,
+       "max_diff_pct": 0.026200893329650997,
+       "lines": [
+        1,
+        1
+       ]
+      }
+     ]
+    }
+   ],
+   "views_at": {
+    "ref_stage": 61,
+    "sub_stage": 61,
+    "ref_x": 47.618,
+    "sub_x": 47.618
+   },
+   "views": [
+    {
+     "view": "longitudinal_strain",
+     "ref_max": 0.1487,
+     "max_diff": 0.00010000000000000333,
+     "floor": 0.0002,
+     "max_diff_pct": 0.06724949562878503,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 12
+    },
+    {
+     "view": "transverse_strain",
+     "ref_max": 0.0,
+     "max_diff": 0.0,
+     "floor": 0.002,
+     "max_diff_pct": 0.0,
+     "lines": [
+      4,
+      4
+     ],
+     "ref_stage": 12
+    },
+    {
+     "view": "shear_strain",
+     "ref_max": 0.0,
+     "max_diff": 0.0,
+     "floor": 0.0002,
+     "max_diff_pct": 0.0,
+     "lines": [
+      5,
+      5
+     ],
+     "ref_stage": 12
+    },
+    {
+     "view": "shear_stress",
+     "ref_max": 0.0,
+     "max_diff": 0.0,
+     "floor": 0.0002,
+     "max_diff_pct": 0.0,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 12
+    },
+    {
+     "view": "principal_compressive_stress",
+     "ref_max": 40.0,
+     "max_diff": 0.023999999999999577,
+     "floor": 0.002,
+     "max_diff_pct": 0.05999999999999894,
+     "lines": [
+      3,
+      3
+     ],
+     "ref_stage": 61
+    },
+    {
+     "view": "shear_on_crack",
+     "ref_max": 0.0,
+     "max_diff": 0.0,
+     "floor": 0.0002,
+     "max_diff_pct": 0.0,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 12
+    },
+    {
+     "view": "principal_tensile_stress",
+     "ref_max": 2.6227,
+     "max_diff": 0.01753459995169022,
+     "floor": 0.0002,
+     "max_diff_pct": 0.6685705552175324,
+     "lines": [
+      3,
+      3
+     ],
+     "ref_stage": 63
+    },
+    {
+     "view": "principal_tensile_strain",
+     "ref_max": 0.149,
+     "max_diff": 8.056971161925133e-05,
+     "floor": 0.002,
+     "max_diff_pct": 0.05407363195922908,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 12
+    },
+    {
+     "view": "crack_widths",
+     "ref_max": 22.6186,
+     "max_diff": 1.0593825291033223,
+     "floor": 0.0002,
+     "max_diff_pct": 4.683678605675516,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 61
+    },
+    {
+     "view": "average_angle",
+     "ref_max": 90.0,
+     "max_diff": 1.2490009027033011e-15,
+     "floor": 0.002,
+     "max_diff_pct": 1.3877787807814457e-15,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 61
+    },
+    {
+     "view": "long_crack_spacing",
+     "ref_max": 1013.083,
+     "max_diff": 69.35103081975541,
+     "floor": 0.002,
+     "max_diff_pct": 6.8455428449352524,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 61
+    },
+    {
+     "view": "transverse_crack_spacing",
+     "ref_max": 6000.0,
+     "max_diff": 342.72706515060327,
+     "floor": 0.002,
+     "max_diff_pct": 5.712117752510055,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 12
+    },
+    {
+     "view": "diagonal_spacing",
+     "ref_max": 1013.083,
+     "max_diff": 69.35103081975541,
+     "floor": 0.002,
+     "max_diff_pct": 6.8455428449352524,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 61
+    },
+    {
+     "view": "long_reinforcement_stress",
+     "ref_max": 603.933,
+     "max_diff": 1.562000000000028,
+     "floor": 0.002,
+     "max_diff_pct": 0.2586379614957335,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 61
+    },
+    {
+     "view": "long_reinf_stress_at_crack",
+     "ref_max": 47.729,
+     "max_diff": 0.4510000000000008,
+     "floor": 0.002,
+     "max_diff_pct": 0.9449181839133458,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 12
+    },
+    {
+     "view": "long_average_bond",
+     "ref_max": 0.0,
+     "max_diff": 0.0,
+     "floor": 0.002,
+     "max_diff_pct": 0.0,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 12
+    },
+    {
+     "view": "stirrup_stress",
+     "ref_max": 0.0,
+     "max_diff": 0.0,
+     "floor": 0.002,
+     "max_diff_pct": 0.0,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 12
+    },
+    {
+     "view": "stirrup_stress_at_crack",
+     "ref_max": 0.0,
+     "max_diff": 0.0,
+     "floor": 0.002,
+     "max_diff_pct": 0.0,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 12
+    },
+    {
+     "view": "transverse_average_bond",
+     "ref_max": 0.0,
+     "max_diff": 0.0,
+     "floor": 0.0002,
+     "max_diff_pct": 0.0,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 12
+    },
+    {
+     "view": "shrinkage_thermal_strain",
+     "ref_max": 0.0,
+     "max_diff": 0.0,
+     "floor": 0.002,
+     "max_diff_pct": 0.0,
+     "lines": [
+      3,
+      3
+     ],
+     "ref_stage": 12
+    },
+    {
+     "view": "longitudinal_concrete_stress",
+     "ref_max": 2.362,
+     "max_diff": 0.0070764515330993755,
+     "floor": 0.002,
+     "max_diff_pct": 0.29959574653257304,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 12
+    }
+   ],
+   "seconds": 3.9,
+   "run": "0c050361e94c",
+   "sub_curve": [
+    [
+     -0.0,
+     -0.0
+    ],
+    [
+     0.028,
+     59.476
+    ],
+    [
+     0.061,
+     130.847
+    ],
+    [
+     0.088,
+     187.943
+    ],
+    [
+     0.109,
+     233.62
+    ],
+    [
+     0.126,
+     270.162
+    ],
+    [
+     0.129,
+     276.009
+    ],
+    [
+     0.131,
+     280.686
+    ],
+    [
+     0.133,
+     284.428
+    ],
+    [
+     0.134,
+     287.422
+    ],
+    [
+     0.135,
+     285.183
+    ],
+    [
+     0.14,
+     277.814
+    ],
+    [
+     0.194,
+     319.34
+    ],
+    [
+     0.361,
+     435.253
+    ],
+    [
+     0.528,
+     547.373
+    ],
+    [
+     0.694,
+     660.363
+    ],
+    [
+     0.861,
+     774.786
+    ],
+    [
+     1.028,
+     890.184
+    ],
+    [
+     1.194,
+     1006.346
+    ],
+    [
+     1.361,
+     1122.929
+    ],
+    [
+     1.528,
+     1240.457
+    ],
+    [
+     1.694,
+     1358.096
+    ],
+    [
+     1.864,
+     1478.02
+    ],
+    [
+     2.05,
+     1610.243
+    ],
+    [
+     2.255,
+     1755.929
+    ],
+    [
+     2.481,
+     1909.989
+    ],
+    [
+     2.729,
+     1933.032
+    ],
+    [
+     3.002,
+     1944.846
+    ],
+    [
+     3.302,
+     1957.397
+    ],
+    [
+     3.632,
+     1971.902
+    ],
+    [
+     3.995,
+     1986.742
+    ],
+    [
+     4.395,
+     2002.862
+    ],
+    [
+     4.834,
+     2020.067
+    ],
+    [
+     5.318,
+     2036.382
+    ],
+    [
+     5.85,
+     2049.524
+    ],
+    [
+     6.435,
+     2059.031
+    ],
+    [
+     7.078,
+     2068.622
+    ],
+    [
+     7.786,
+     2079.797
+    ],
+    [
+     8.565,
+     2098.212
+    ],
+    [
+     9.421,
+     2116.693
+    ],
+    [
+     10.363,
+     2136.077
+    ],
+    [
+     11.399,
+     2158.307
+    ],
+    [
+     12.539,
+     2181.614
+    ],
+    [
+     13.793,
+     2206.747
+    ],
+    [
+     15.173,
+     2233.965
+    ],
+    [
+     16.69,
+     2263.35
+    ],
+    [
+     18.359,
+     2294.345
+    ],
+    [
+     20.195,
+     2327.715
+    ],
+    [
+     20.599,
+     2334.983
+    ],
+    [
+     20.922,
+     2341.144
+    ],
+    [
+     21.18,
+     2345.152
+    ],
+    [
+     21.222,
+     2345.836
+    ],
+    [
+     21.387,
+     2348.757
+    ],
+    [
+     22.214,
+     2363.459
+    ],
+    [
+     24.436,
+     2400.414
+    ],
+    [
+     26.879,
+     2438.784
+    ],
+    [
+     29.567,
+     2477.839
+    ],
+    [
+     32.524,
+     2516.537
+    ],
+    [
+     35.776,
+     2552.349
+    ],
+    [
+     39.354,
+     2584.24
+    ],
+    [
+     43.289,
+     2609.936
+    ],
+    [
+     47.618,
+     2630.413
+    ],
+    [
+     52.38,
+     2604.861
+    ],
+    [
+     57.618,
+     1697.891
+    ]
+   ]
+  },
+  "tbeam-negm": {
+   "ref": {
+    "input-name": "tbeam.r2t",
+    "units": "si",
+    "factors": "1.00,1.00,1.00",
+    "initial": "0.00,0.00,0.00",
+    "increment": "0.00,-1.00,0.00",
+    "more-detail": "0",
+    "stage-count": "72",
+    "peak-stage": "69"
+   },
+   "sub": {
+    "stage-count": "68",
+    "peak-stage": "65"
+   },
+   "control": [
+    {
+     "chart": "moment_ex",
+     "ref_peak_load": -830.847,
+     "sub_peak_load": -830.869,
+     "ref_peak_x": 19.162,
+     "sub_peak_x": 19.162,
+     "peak_diff_pct": 0.002647900275267071,
+     "curve_max_diff_pct": 0.8050254670337452,
+     "curve_mean_diff_pct": 0.029330753299546153,
+     "shape_ref": [
+      "cracking",
+      "fall",
+      "peak",
+      "ends falling"
+     ],
+     "shape_sub": [
+      "cracking",
+      "fall",
+      "peak",
+      "ends falling"
+     ],
+     "shape_same": true,
+     "floor_pct": 0.009042344147626852,
+     "rising_pct": 0.6985182679508924,
+     "post_peak_pct": 0.0026479002752655134
+    },
+    {
+     "chart": "moment_phi",
+     "ref_peak_load": -830.847,
+     "sub_peak_load": -830.869,
+     "ref_peak_x": -31.079,
+     "sub_peak_x": -31.079,
+     "peak_diff_pct": 0.002647900275267071,
+     "curve_max_diff_pct": 0.9216795212539078,
+     "curve_mean_diff_pct": 0.03081230616291755,
+     "shape_ref": [
+      "fall",
+      "cracking",
+      "peak",
+      "ends falling"
+     ],
+     "shape_sub": [
+      "fall",
+      "cracking",
+      "peak",
+      "ends falling"
+     ],
+     "shape_same": true,
+     "floor_pct": 0.005774028815474848,
+     "rising_pct": 0.9216618782733204,
+     "post_peak_pct": 0.0026479002752655134
+    }
+   ],
+   "missing_control": [],
+   "views_stages": [
+    {
+     "ref_stage": 19,
+     "sub_stage": 16,
+     "feature": "fall",
+     "ref_x": -0.194,
+     "ref_y": -335.38,
+     "sub_x": -0.194,
+     "sub_y": -335.48,
+     "views": [
+      {
+       "view": "longitudinal_strain",
+       "ref_max": 0.1225,
+       "max_diff": 4.69360373935127e-05,
+       "floor": 0.0002,
+       "max_diff_pct": 0.038315132566132816,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "transverse_strain",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        4,
+        4
+       ]
+      },
+      {
+       "view": "shear_strain",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.0002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        5,
+        5
+       ]
+      },
+      {
+       "view": "shear_stress",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.0002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "principal_compressive_stress",
+       "ref_max": 40.0,
+       "max_diff": 0.0009870462008392887,
+       "floor": 0.002,
+       "max_diff_pct": 0.0024676155020982218,
+       "lines": [
+        3,
+        3
+       ]
+      },
+      {
+       "view": "shear_on_crack",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.0002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "principal_tensile_stress",
+       "ref_max": 2.5297,
+       "max_diff": 0.00630000000000001,
+       "floor": 0.0002,
+       "max_diff_pct": 0.24904138830691425,
+       "lines": [
+        3,
+        3
+       ]
+      },
+      {
+       "view": "principal_tensile_strain",
+       "ref_max": 0.111,
+       "max_diff": 0.0003935613323202848,
+       "floor": 0.002,
+       "max_diff_pct": 0.35455975884710345,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "crack_widths",
+       "ref_max": 0.0086,
+       "max_diff": 9.999999999999922e-05,
+       "floor": 0.0002,
+       "max_diff_pct": 1.1627906976744096,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "average_angle",
+       "ref_max": 90.0,
+       "max_diff": 0.19537453964758691,
+       "floor": 0.002,
+       "max_diff_pct": 0.2170828218306521,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "long_crack_spacing",
+       "ref_max": 1006.379,
+       "max_diff": 60.19047239086715,
+       "floor": 0.002,
+       "max_diff_pct": 5.980895109185223,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "transverse_crack_spacing",
+       "ref_max": 6000.0,
+       "max_diff": 41.229861100298955,
+       "floor": 0.002,
+       "max_diff_pct": 0.6871643516716494,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "diagonal_spacing",
+       "ref_max": 651.401,
+       "max_diff": 1.0919999999999885,
+       "floor": 0.002,
+       "max_diff_pct": 0.16763867418072564,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "long_reinforcement_stress",
+       "ref_max": 21.358,
+       "max_diff": 0.004000000000001155,
+       "floor": 0.002,
+       "max_diff_pct": 0.018728345350693676,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "long_reinf_stress_at_crack",
+       "ref_max": 110.356,
+       "max_diff": 0.028999999999992657,
+       "floor": 0.002,
+       "max_diff_pct": 0.026278589292827448,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "long_average_bond",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "stirrup_stress",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "stirrup_stress_at_crack",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "transverse_average_bond",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.0002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "shrinkage_thermal_strain",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        3,
+        3
+       ]
+      },
+      {
+       "view": "longitudinal_concrete_stress",
+       "ref_max": 3.418,
+       "max_diff": 0.006000000000000037,
+       "floor": 0.002,
+       "max_diff_pct": 0.17554125219426675,
+       "lines": [
+        1,
+        1
+       ]
+      }
+     ]
+    },
+    {
+     "ref_stage": 20,
+     "sub_stage": 17,
+     "feature": "cracking",
+     "ref_x": -0.361,
+     "ref_y": -382.021,
+     "sub_x": -0.361,
+     "sub_y": -382.012,
+     "views": [
+      {
+       "view": "longitudinal_strain",
+       "ref_max": 0.256,
+       "max_diff": 5.079945195392688e-05,
+       "floor": 0.0002,
+       "max_diff_pct": 0.019843535919502688,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "transverse_strain",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        4,
+        4
+       ]
+      },
+      {
+       "view": "shear_strain",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.0002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        5,
+        5
+       ]
+      },
+      {
+       "view": "shear_stress",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.0002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "principal_compressive_stress",
+       "ref_max": 40.0,
+       "max_diff": 0.0009999999999993348,
+       "floor": 0.002,
+       "max_diff_pct": 0.002499999999998337,
+       "lines": [
+        3,
+        3
+       ]
+      },
+      {
+       "view": "shear_on_crack",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.0002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "principal_tensile_stress",
+       "ref_max": 2.4295,
+       "max_diff": 0.0016775807725560156,
+       "floor": 0.0002,
+       "max_diff_pct": 0.06905045369648141,
+       "lines": [
+        3,
+        3
+       ]
+      },
+      {
+       "view": "principal_tensile_strain",
+       "ref_max": 0.256,
+       "max_diff": 0.00013381398074501587,
+       "floor": 0.002,
+       "max_diff_pct": 0.05227108622852182,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "crack_widths",
+       "ref_max": 0.092,
+       "max_diff": 0.00038693709017124846,
+       "floor": 0.0002,
+       "max_diff_pct": 0.4205837936644006,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "average_angle",
+       "ref_max": 90.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "long_crack_spacing",
+       "ref_max": 1013.083,
+       "max_diff": 79.20106689578812,
+       "floor": 0.002,
+       "max_diff_pct": 7.817826071090732,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "transverse_crack_spacing",
+       "ref_max": 6000.0,
+       "max_diff": 342.72706515060327,
+       "floor": 0.002,
+       "max_diff_pct": 5.712117752510055,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "diagonal_spacing",
+       "ref_max": 1013.083,
+       "max_diff": 36.3573449596247,
+       "floor": 0.002,
+       "max_diff_pct": 3.5887824551023657,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "long_reinforcement_stress",
+       "ref_max": 45.734,
+       "max_diff": 0.0020000000000000707,
+       "floor": 0.002,
+       "max_diff_pct": 0.004373114094546881,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "long_reinf_stress_at_crack",
+       "ref_max": 263.095,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "long_average_bond",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "stirrup_stress",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "stirrup_stress_at_crack",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "transverse_average_bond",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.0002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "shrinkage_thermal_strain",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        3,
+        3
+       ]
+      },
+      {
+       "view": "longitudinal_concrete_stress",
+       "ref_max": 4.946,
+       "max_diff": 0.0034067140511982856,
+       "floor": 0.002,
+       "max_diff_pct": 0.06887816520821444,
+       "lines": [
+        1,
+        1
+       ]
+      }
+     ]
+    },
+    {
+     "ref_stage": 69,
+     "sub_stage": 65,
+     "feature": "peak",
+     "ref_x": -31.079,
+     "ref_y": -830.847,
+     "sub_x": -31.079,
+     "sub_y": -830.869,
+     "views": [
+      {
+       "view": "longitudinal_strain",
+       "ref_max": 33.9242,
+       "max_diff": 9.99999999978939e-05,
+       "floor": 0.0002,
+       "max_diff_pct": 0.00029477482150763734,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "transverse_strain",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        4,
+        4
+       ]
+      },
+      {
+       "view": "shear_strain",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.0002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        5,
+        5
+       ]
+      },
+      {
+       "view": "shear_stress",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.0002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "principal_compressive_stress",
+       "ref_max": 40.0,
+       "max_diff": 0.00026063542534056805,
+       "floor": 0.002,
+       "max_diff_pct": 0.0006515885633514201,
+       "lines": [
+        3,
+        3
+       ]
+      },
+      {
+       "view": "shear_on_crack",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.0002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "principal_tensile_stress",
+       "ref_max": 2.2212,
+       "max_diff": 0.002600000000000139,
+       "floor": 0.0002,
+       "max_diff_pct": 0.1170538447685998,
+       "lines": [
+        3,
+        3
+       ]
+      },
+      {
+       "view": "principal_tensile_strain",
+       "ref_max": 33.924,
+       "max_diff": 0.0006732385915773095,
+       "floor": 0.002,
+       "max_diff_pct": 0.0019845495565891684,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "crack_widths",
+       "ref_max": 20.8618,
+       "max_diff": 0.9291331473804914,
+       "floor": 0.0002,
+       "max_diff_pct": 4.453753498645809,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "average_angle",
+       "ref_max": 90.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "long_crack_spacing",
+       "ref_max": 1006.379,
+       "max_diff": 60.200334435646,
+       "floor": 0.002,
+       "max_diff_pct": 5.981875062540653,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "transverse_crack_spacing",
+       "ref_max": 6000.0,
+       "max_diff": 342.72706515060327,
+       "floor": 0.002,
+       "max_diff_pct": 5.712117752510055,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "diagonal_spacing",
+       "ref_max": 1006.379,
+       "max_diff": 60.200334435646,
+       "floor": 0.002,
+       "max_diff_pct": 5.981875062540653,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "long_reinforcement_stress",
+       "ref_max": 553.182,
+       "max_diff": 0.019000000000021135,
+       "floor": 0.002,
+       "max_diff_pct": 0.0034346743024937787,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "long_reinf_stress_at_crack",
+       "ref_max": 553.182,
+       "max_diff": 0.019000000000021135,
+       "floor": 0.002,
+       "max_diff_pct": 0.0034346743024937787,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "long_average_bond",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "stirrup_stress",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "stirrup_stress_at_crack",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "transverse_average_bond",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.0002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "shrinkage_thermal_strain",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        3,
+        3
+       ]
+      },
+      {
+       "view": "longitudinal_concrete_stress",
+       "ref_max": 39.999,
+       "max_diff": 0.005581668235919894,
+       "floor": 0.002,
+       "max_diff_pct": 0.013954519452786055,
+       "lines": [
+        1,
+        1
+       ]
+      }
+     ]
+    },
+    {
+     "ref_stage": 71,
+     "sub_stage": 67,
+     "feature": "ends falling",
+     "ref_x": -34.668,
+     "ref_y": -89.0,
+     "sub_x": -34.668,
+     "sub_y": -89.0,
+     "views": [
+      {
+       "view": "longitudinal_strain",
+       "ref_max": 38.5932,
+       "max_diff": 6.802666813740506e-05,
+       "floor": 0.0002,
+       "max_diff_pct": 0.00017626594357919286,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "transverse_strain",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        4,
+        4
+       ]
+      },
+      {
+       "view": "shear_strain",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.0002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        5,
+        5
+       ]
+      },
+      {
+       "view": "shear_stress",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.0002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "principal_compressive_stress",
+       "ref_max": 40.0,
+       "max_diff": 0.0004731760993243034,
+       "floor": 0.002,
+       "max_diff_pct": 0.0011829402483107584,
+       "lines": [
+        3,
+        3
+       ]
+      },
+      {
+       "view": "shear_on_crack",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.0002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "principal_tensile_stress",
+       "ref_max": 2.304,
+       "max_diff": 0.0011571783847190373,
+       "floor": 0.0002,
+       "max_diff_pct": 0.05022475628120822,
+       "lines": [
+        3,
+        3
+       ]
+      },
+      {
+       "view": "principal_tensile_strain",
+       "ref_max": 38.593,
+       "max_diff": 0.0006735354316977546,
+       "floor": 0.002,
+       "max_diff_pct": 0.0017452269367443695,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "crack_widths",
+       "ref_max": 23.9764,
+       "max_diff": 1.1046528970188716,
+       "floor": 0.0002,
+       "max_diff_pct": 4.607250867598436,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "average_angle",
+       "ref_max": 90.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "long_crack_spacing",
+       "ref_max": 1006.379,
+       "max_diff": 60.200334435646,
+       "floor": 0.002,
+       "max_diff_pct": 5.981875062540653,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "transverse_crack_spacing",
+       "ref_max": 6000.0,
+       "max_diff": 342.72706515060327,
+       "floor": 0.002,
+       "max_diff_pct": 5.712117752510055,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "diagonal_spacing",
+       "ref_max": 1006.379,
+       "max_diff": 60.200334435646,
+       "floor": 0.002,
+       "max_diff_pct": 5.981875062540653,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "long_reinforcement_stress",
+       "ref_max": 374.223,
+       "max_diff": 0.006999999999997047,
+       "floor": 0.002,
+       "max_diff_pct": 0.001870542430582045,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "long_reinf_stress_at_crack",
+       "ref_max": 448.914,
+       "max_diff": 0.019000000000007223,
+       "floor": 0.002,
+       "max_diff_pct": 0.004232436502316084,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "long_average_bond",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "stirrup_stress",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "stirrup_stress_at_crack",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "transverse_average_bond",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.0002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        1,
+        1
+       ]
+      },
+      {
+       "view": "shrinkage_thermal_strain",
+       "ref_max": 0.0,
+       "max_diff": 0.0,
+       "floor": 0.002,
+       "max_diff_pct": 0.0,
+       "lines": [
+        3,
+        3
+       ]
+      },
+      {
+       "view": "longitudinal_concrete_stress",
+       "ref_max": 39.914,
+       "max_diff": 0.004247176899598778,
+       "floor": 0.002,
+       "max_diff_pct": 0.010640820012022795,
+       "lines": [
+        1,
+        1
+       ]
+      }
+     ]
+    }
+   ],
+   "views_at": {
+    "ref_stage": 69,
+    "sub_stage": 65,
+    "ref_x": -31.079,
+    "sub_x": -31.079
+   },
+   "views": [
+    {
+     "view": "longitudinal_strain",
+     "ref_max": 0.1225,
+     "max_diff": 4.69360373935127e-05,
+     "floor": 0.0002,
+     "max_diff_pct": 0.038315132566132816,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 19
+    },
+    {
+     "view": "transverse_strain",
+     "ref_max": 0.0,
+     "max_diff": 0.0,
+     "floor": 0.002,
+     "max_diff_pct": 0.0,
+     "lines": [
+      4,
+      4
+     ],
+     "ref_stage": 19
+    },
+    {
+     "view": "shear_strain",
+     "ref_max": 0.0,
+     "max_diff": 0.0,
+     "floor": 0.0002,
+     "max_diff_pct": 0.0,
+     "lines": [
+      5,
+      5
+     ],
+     "ref_stage": 19
+    },
+    {
+     "view": "shear_stress",
+     "ref_max": 0.0,
+     "max_diff": 0.0,
+     "floor": 0.0002,
+     "max_diff_pct": 0.0,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 19
+    },
+    {
+     "view": "principal_compressive_stress",
+     "ref_max": 40.0,
+     "max_diff": 0.0009999999999993348,
+     "floor": 0.002,
+     "max_diff_pct": 0.002499999999998337,
+     "lines": [
+      3,
+      3
+     ],
+     "ref_stage": 20
+    },
+    {
+     "view": "shear_on_crack",
+     "ref_max": 0.0,
+     "max_diff": 0.0,
+     "floor": 0.0002,
+     "max_diff_pct": 0.0,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 19
+    },
+    {
+     "view": "principal_tensile_stress",
+     "ref_max": 2.5297,
+     "max_diff": 0.00630000000000001,
+     "floor": 0.0002,
+     "max_diff_pct": 0.24904138830691425,
+     "lines": [
+      3,
+      3
+     ],
+     "ref_stage": 19
+    },
+    {
+     "view": "principal_tensile_strain",
+     "ref_max": 0.111,
+     "max_diff": 0.0003935613323202848,
+     "floor": 0.002,
+     "max_diff_pct": 0.35455975884710345,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 19
+    },
+    {
+     "view": "crack_widths",
+     "ref_max": 23.9764,
+     "max_diff": 1.1046528970188716,
+     "floor": 0.0002,
+     "max_diff_pct": 4.607250867598436,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 71
+    },
+    {
+     "view": "average_angle",
+     "ref_max": 90.0,
+     "max_diff": 0.19537453964758691,
+     "floor": 0.002,
+     "max_diff_pct": 0.2170828218306521,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 19
+    },
+    {
+     "view": "long_crack_spacing",
+     "ref_max": 1013.083,
+     "max_diff": 79.20106689578812,
+     "floor": 0.002,
+     "max_diff_pct": 7.817826071090732,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 20
+    },
+    {
+     "view": "transverse_crack_spacing",
+     "ref_max": 6000.0,
+     "max_diff": 342.72706515060327,
+     "floor": 0.002,
+     "max_diff_pct": 5.712117752510055,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 20
+    },
+    {
+     "view": "diagonal_spacing",
+     "ref_max": 1006.379,
+     "max_diff": 60.200334435646,
+     "floor": 0.002,
+     "max_diff_pct": 5.981875062540653,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 69
+    },
+    {
+     "view": "long_reinforcement_stress",
+     "ref_max": 21.358,
+     "max_diff": 0.004000000000001155,
+     "floor": 0.002,
+     "max_diff_pct": 0.018728345350693676,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 19
+    },
+    {
+     "view": "long_reinf_stress_at_crack",
+     "ref_max": 110.356,
+     "max_diff": 0.028999999999992657,
+     "floor": 0.002,
+     "max_diff_pct": 0.026278589292827448,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 19
+    },
+    {
+     "view": "long_average_bond",
+     "ref_max": 0.0,
+     "max_diff": 0.0,
+     "floor": 0.002,
+     "max_diff_pct": 0.0,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 19
+    },
+    {
+     "view": "stirrup_stress",
+     "ref_max": 0.0,
+     "max_diff": 0.0,
+     "floor": 0.002,
+     "max_diff_pct": 0.0,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 19
+    },
+    {
+     "view": "stirrup_stress_at_crack",
+     "ref_max": 0.0,
+     "max_diff": 0.0,
+     "floor": 0.002,
+     "max_diff_pct": 0.0,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 19
+    },
+    {
+     "view": "transverse_average_bond",
+     "ref_max": 0.0,
+     "max_diff": 0.0,
+     "floor": 0.0002,
+     "max_diff_pct": 0.0,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 19
+    },
+    {
+     "view": "shrinkage_thermal_strain",
+     "ref_max": 0.0,
+     "max_diff": 0.0,
+     "floor": 0.002,
+     "max_diff_pct": 0.0,
+     "lines": [
+      3,
+      3
+     ],
+     "ref_stage": 19
+    },
+    {
+     "view": "longitudinal_concrete_stress",
+     "ref_max": 3.418,
+     "max_diff": 0.006000000000000037,
+     "floor": 0.002,
+     "max_diff_pct": 0.17554125219426675,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 19
+    }
+   ],
+   "seconds": 4.3,
+   "run": "0c050361e94c",
+   "sub_curve": [
+    [
+     -0.0,
+     -0.0
+    ],
+    [
+     -0.028,
+     -59.476
+    ],
+    [
+     -0.061,
+     -130.847
+    ],
+    [
+     -0.088,
+     -187.943
+    ],
+    [
+     -0.109,
+     -233.62
+    ],
+    [
+     -0.126,
+     -270.162
+    ],
+    [
+     -0.14,
+     -299.394
+    ],
+    [
+     -0.151,
+     -322.781
+    ],
+    [
+     -0.159,
+     -341.489
+    ],
+    [
+     -0.166,
+     -356.455
+    ],
+    [
+     -0.172,
+     -368.43
+    ],
+    [
+     -0.177,
+     -378.009
+    ],
+    [
+     -0.18,
+     -385.672
+    ],
+    [
+     -0.183,
+     -391.802
+    ],
+    [
+     -0.185,
+     -396.706
+    ],
+    [
+     -0.187,
+     -400.63
+    ],
+    [
+     -0.194,
+     -335.48
+    ],
+    [
+     -0.361,
+     -382.012
+    ],
+    [
+     -0.528,
+     -409.175
+    ],
+    [
+     -0.694,
+     -434.658
+    ],
+    [
+     -0.861,
+     -461.077
+    ],
+    [
+     -1.028,
+     -489.054
+    ],
+    [
+     -1.194,
+     -518.334
+    ],
+    [
+     -1.361,
+     -548.144
+    ],
+    [
+     -1.528,
+     -578.447
+    ],
+    [
+     -1.694,
+     -598.398
+    ],
+    [
+     -1.864,
+     -602.957
+    ],
+    [
+     -2.05,
+     -606.434
+    ],
+    [
+     -2.255,
+     -610.499
+    ],
+    [
+     -2.481,
+     -615.511
+    ],
+    [
+     -2.729,
+     -622.961
+    ],
+    [
+     -3.002,
+     -630.971
+    ],
+    [
+     -3.302,
+     -639.6
+    ],
+    [
+     -3.632,
+     -648.868
+    ],
+    [
+     -3.995,
+     -658.832
+    ],
+    [
+     -4.395,
+     -669.516
+    ],
+    [
+     -4.834,
+     -680.945
+    ],
+    [
+     -5.318,
+     -693.171
+    ],
+    [
+     -5.85,
+     -706.162
+    ],
+    [
+     -6.435,
+     -719.606
+    ],
+    [
+     -7.078,
+     -730.649
+    ],
+    [
+     -7.786,
+     -735.078
+    ],
+    [
+     -8.565,
+     -737.44
+    ],
+    [
+     -9.421,
+     -740.54
+    ],
+    [
+     -10.363,
+     -744.362
+    ],
+    [
+     -11.399,
+     -748.201
+    ],
+    [
+     -12.539,
+     -753.99
+    ],
+    [
+     -13.793,
+     -759.443
+    ],
+    [
+     -15.173,
+     -766.269
+    ],
+    [
+     -16.69,
+     -773.858
+    ],
+    [
+     -18.359,
+     -782.185
+    ],
+    [
+     -18.726,
+     -784.023
+    ],
+    [
+     -19.02,
+     -785.464
+    ],
+    [
+     -19.067,
+     -785.586
+    ],
+    [
+     -19.104,
+     -785.799
+    ],
+    [
+     -19.134,
+     -785.935
+    ],
+    [
+     -19.255,
+     -786.573
+    ],
+    [
+     -20.195,
+     -791.326
+    ],
+    [
+     -22.214,
+     -800.702
+    ],
+    [
+     -24.436,
+     -810.125
+    ],
+    [
+     -26.879,
+     -818.94
+    ],
+    [
+     -29.567,
+     -826.916
+    ],
+    [
+     -30.158,
+     -828.588
+    ],
+    [
+     -30.809,
+     -830.169
+    ],
+    [
+     -30.943,
+     -830.546
+    ],
+    [
+     -31.079,
+     -830.869
+    ],
+    [
+     -31.217,
+     -89.68
+    ],
+    [
+     -34.668,
+     -89.0
     ]
    ]
   }
