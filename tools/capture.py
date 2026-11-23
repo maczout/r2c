@@ -13,7 +13,7 @@ under the fixture's input name (r2x records the name), runs r2x's worker with th
 and every stage, and writes ARCHIVE/NAME.r2x.txt.
 
 It then checks the capture against the fixture: the capture is cut down the way the fixture was
-(tools/trim.py) and the two must match byte for byte, apart from header lines that identify the
+(tools/trim.py: the same stages, and the same neighbouring stages) and the two must match byte for byte, apart from header lines that identify the
 machine (r2x and Wine versions). A mismatch means Response, r2x or the input is not what made
 the fixture, and is reported; the capture is kept for inspection.
 
@@ -34,7 +34,8 @@ tbeam.r2t), every stage and all views are captured with the given loads (in the 
 effect; the = form, since a value may start with a minus sign) and, unless --units,
 --factors or --more-detail say otherwise, SI, no factors and More Detail 0, and the capture is cut
 to tests/oracle/NAME.r2x.txt: the control charts and the detail views of the feature stages of
-the curve (tools/compare.py, feature_stages), as tools/retrim.py cuts the others.
+the curve (tools/compare.py, feature_stages), with the stage before and after each of them as
+neighbours (D54; tools/trim.py), as tools/retrim.py cuts the others.
 
 Captures must run one at a time in one Wine prefix, which this tool does. Each takes 25 to
 75 s, nearly all of it r2x reading the charts of every stage. Several can run at once in
@@ -109,7 +110,7 @@ def check(capture: Path, fixture: Path) -> dict:
     fx = record.read(fixture)
     cap = record.read(capture)
     keep = [int(s) for s in fx.stages()]
-    cut = record.decode(trim.trim(cap, keep))
+    cut = record.decode(trim.trim(cap, keep, trim.near_stages(fx)))
     diff_header = sorted(k for k in set(fx.header) | set(cut.header)
                          if k not in MACHINE_KEYS and fx.header.get(k) != cut.header.get(k))
     diff_sections = sorted(k for k in set(fx.sections) | set(cut.sections)
@@ -154,7 +155,7 @@ def add_case(archive: Path, worker: list[str], response_dir: str, fixtures: Path
         rec = record.read(out)
         feats = compare.feature_stages(rec)
         keep = sorted({int(rec.header.get("peak-stage", "0"))} | set(feats))
-        fixture.write_bytes(trim.trim(rec, keep))
+        fixture.write_bytes(trim.trim(rec, keep, trim.near_needed(rec, keep)))
         entry["sha256"] = sha256(out)
         entry["bytes"] = out.stat().st_size
         entry["check"] = check(out, fixture)
