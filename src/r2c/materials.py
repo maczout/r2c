@@ -298,16 +298,30 @@ class SteelLaw:
         k = np.where(rho > 0, np.maximum(1.0, base * 0.014 / np.maximum(rho, 1e-12)), 2.0)
         return k * np.asarray(e, dtype=float) + prestrain + (self.esh - self.fy / self.E)
 
-    def crack_capacity(self, e, prestrain, rho, strand: bool):
+    def unloaded(self, e, ep):
+        """Stress, without the material factor, of steel that carries a plastic strain ep from
+        the stages before: its curve, or the elastic line through ep where that is lower (in
+        compression, higher), never past yield on the other side. nan once ruptured.
+        Response-2000's steel routine [B 004aea40]."""
+        e = np.asarray(e, dtype=float)
+        env = self.raw(e)
+        lin = (e - ep) * self.E
+        with np.errstate(invalid="ignore"):
+            up = np.maximum(np.where(env - lin > 1e-6, lin, env), -self.fy)
+            down = np.minimum(np.maximum(lin, env), self.fy)
+            return np.where(np.isnan(env), NOVAL, np.where(env > 0, up, down))
+
+    def crack_capacity(self, e, prestrain, rho, strand: bool, ep=None):
         """Largest stress the steel can reach at a crack, for an average strain e (thesis 4-5):
-        the bare-bar stress at a concentrated strain, never less than yield. nan: the bar
-        ruptures at the crack."""
+        the stress at a concentrated strain, never less than yield. With ep, the plastic
+        strain the steel carries from the stages before, that stress is the unloaded one, as
+        Response-2000 takes it [B 004ae520]. nan: the bar ruptures at the crack."""
         e = np.asarray(e, dtype=float)
         base = 0.625 if strand else 1.0
         rho = np.asarray(rho, dtype=float)
         k = np.where(rho > 0, np.maximum(1.0, base * 0.014 / np.maximum(rho, 1e-12)), 2.0)
         ec = k * e + prestrain + (self.esh - self.fy / self.E)
-        s = self.raw(ec)
+        s = self.raw(ec) if ep is None else self.unloaded(ec, ep)
         avg = e + prestrain
         gone = np.isnan(s)
         inside = np.where(gone, self.fu, np.maximum(s, self.fy))

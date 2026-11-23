@@ -223,17 +223,10 @@ class Analysis:
             if self.dead[i]:
                 fs[i] = float("nan")
                 continue
-            env = float(l.steel.raw(e))
-            if not math.isnan(env):
-                # a bar that has yielded unloads along its elastic stiffness
-                lin = (e - self.ep[i]) * l.steel.E
-                if env > 0:
-                    if env - lin > 1e-6:
-                        env = lin
-                    env = max(env, -l.steel.fy)
-                elif env < 0:
-                    env = min(max(lin, env), l.steel.fy)
-            cap = float(l.steel.crack_capacity(e - l.prestrain, l.prestrain, l.rho, l.strand))
+            # a bar that has yielded unloads along its elastic stiffness
+            env = float(l.steel.unloaded(e, self.ep[i]))
+            cap = float(l.steel.crack_capacity(e - l.prestrain, l.prestrain, l.rho, l.strand,
+                                               self.ep[i]))
             f = env * l.steel.phi
             fs[i] = float("nan") if math.isnan(cap) or math.isnan(f) else min(f, cap)
         return es, fs
@@ -304,12 +297,13 @@ class Analysis:
         else:
             z4 = zbot
         mtop = mbot = 0.0
-        for l, e, f in zip(sec.layers, es, fs):
+        for l, e, f, ep in zip(sec.layers, es, fs, self.ep):
             if not (l.z > z3 or l.z < z4):
                 continue
             if math.isnan(f):
                 continue
-            cap = float(l.steel.crack_capacity(e - l.prestrain, l.prestrain, l.rho, l.strand))
+            cap = float(l.steel.crack_capacity(e - l.prestrain, l.prestrain, l.rho, l.strand,
+                                               ep))
             df = 0.0 if math.isnan(cap) else max(cap - f, 0.0)
             near = min(min(abs(l.z - z4), abs(l.z - z3)) / (l.db + 0.1), 1.0)
             if l.z > z3:
@@ -735,7 +729,7 @@ class Analysis:
             bars.append((i, l, e, arm))
             if math.isnan(fs[i]):
                 continue
-            cap = float(l.steel.crack_capacity(e, l.prestrain, l.rho, l.strand))
+            cap = float(l.steel.crack_capacity(e, l.prestrain, l.rho, l.strand, self.ep[i]))
             room = 0.0 if math.isnan(cap) else max(cap - fs[i], 0.0)
             if arm > 0:
                 dmin = min(dmin, room / (l.steel.E * l.steel.phi) / arm)
@@ -747,8 +741,9 @@ class Analysis:
             """The bar's stress with an extra strain at the crack; nan when it ruptures."""
             if math.isnan(fs[i]):
                 return float("nan")
-            s = float(l.steel.stress(es[i] + extra))
-            cap = float(l.steel.crack_capacity(e + extra, l.prestrain, l.rho, l.strand))
+            s = float(l.steel.unloaded(es[i] + extra, self.ep[i])) * l.steel.phi
+            cap = float(l.steel.crack_capacity(e + extra, l.prestrain, l.rho, l.strand,
+                                               self.ep[i]))
             if math.isnan(cap):
                 return float("nan")
             return cap if math.isnan(s) else min(s, cap)
