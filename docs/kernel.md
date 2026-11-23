@@ -267,8 +267,7 @@ induce the same moment" [T 4-5, last part]. The particulars are the program's, r
 * *The concrete's moment.* Over the halves of layers that are cracked at both ends, on the
   tension side of that axis: (f1 less the floor after cracking, not below zero, plus
   vci/tan θ) times the width times the distance from the axis. The floor here is
-  max(ft, the node's cracking strength)/(1 + 250·w). Each layer is summed with its own
-  widths: at a step in width the layer below the step has the width below it.
+  max(ft, the node's cracking strength)/(1 + 250·w).
 * *The bars.* Every bar whose strain (without prestrain, net of shrinkage) is tensile takes
   part, cracked concrete around it or not. The extra curvature Δφ₁ that uses up the reserve
   of the first bar to reach its capacity at a crack (reserve/E over its distance from the
@@ -298,8 +297,8 @@ treated as two zones (top bar 210 MPa where Response has 37). Measured on the ph
 both come to 0.0 %, and the same view comes inside at five stages of four shear cases
 (`docs/verification.md`, "A2, part 3").
 
-Three corrections of r2c's reading, 2026-11-22 (second session), found on an I-girder with
-strands and a T-beam under negative moment, each measured in Response's own strain state
+Two corrections of r2c's reading, 2026-11-22 (second session), found on an I-girder with
+strands, each measured in Response's own strain state
 (`tools/diagnose.py states … --views`, records of every stage):
 
 * The step of the solve was a thousand times too small (a slip of units: 0.001/h is per
@@ -310,11 +309,6 @@ strands and a T-beam under negative moment, each measured in Response's own stra
 * The bars' stresses at the extra strain were on the loading curve whatever the history.
   I-girder after the load has fallen: 1801 / +463 / 1791 MPa before, 839.8 / −400.0 /
   785.9 after, Response 839.8 / −400.0 / 785.9.
-* The concrete's moment was summed over the list of distinct nodes, which at a step in
-  width has one node with the upper width: the half layer under a flange was counted as
-  widening to the flange, the moment came out above the capacity moment and there was no
-  value. T-beam, −M, after the top bars have ruptured: no value before, 448.9 MPa after,
-  Response 448.9; the bar in compression shows 0 as in Response.
 
 ### At a step in width [O]
 
