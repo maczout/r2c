@@ -8,8 +8,10 @@ run of `tools/verify.py` and headed by the commit, machine and date of that run.
 numbers below are those of that run; numbers marked "2026-11-15 run" are from the earlier
 comparison.
 
-**Since 2026-11-22 the generated results cover the phase A set alone**: the 17 cases on
-Newbeam that vary only the load (`tests/oracle`; "Phase A baseline" below). The other 68
+**Since 2026-11-22 the generated results cover the development set alone**
+(`tests/oracle`): at first the 17 cases on Newbeam that vary only the load ("Phase A
+baseline" below), since step A-1 the seven on the Quick Define sections as well, since
+step A-2 five on reinforcement: 29 cases. The other 56
 cases are parked until phase B (`tests/oracle/parked`; `docs/summary.md`, D16 and D19) and
 are not run by default. The sections after the baseline describe them as they stood in the
 runs of 2026-11-21; those numbers are no longer in the generated file (they are in its
@@ -28,10 +30,66 @@ run; the detail views of the 7 sample cases were first compared case by case on 
 (see Detail views).
 Whether a difference is acceptable is decided against `docs/acceptance.md`, not here.
 
-Reproduce with `python tools/verify.py tests/oracle --out OUT` (the phase A set needs no
-input folder; the parked set needs `--inputs RESPONSE_FOLDER R2X/tests/reference SCOPE_INPUTS`), then
+Reproduce with `python tools/verify.py tests/oracle --inputs R2X/tests/reference
+SCOPE_INPUTS --out OUT` (the parked set needs RESPONSE_FOLDER among the inputs as well), then
 `python tools/report.py OUT`; compare any two records with
 `python tools/compare.py REF SUBJECT --views`.
+
+## Step A-2: the shear profile handling on; the depth lead; reinforcement (2026-11-23)
+
+The run of record of step A-2 (`docs/verification-results.md`, 29 cases; all measured,
+one machine, `python tools/changes.py` and `python tools/targets.py --counts`). The
+development set since this step is 29 cases: the 24, and five whose variable is the
+reinforcement (`docs/summary.md`, "The development set").
+
+**Response's handling of the shear strain profile, switched on (owner, D49): 11 checks
+came inside, 22 went outside**, on the 24 cases against the run of record of step A-1c;
+it is the same result as the trial of step A-1c, check for check. Inside: the rising
+branch of M/V = 0.5 m (9.9 to 3.6 %, a Must); the post-peak of V alone (6.9 to 3.6 %) and
+of "N constant, then V" (15.4 to 3.5 %); shear stress at the peak of "N constant, then
+M + V" (15.5 to 1.2 %) and of "V constant, then M" (33.0 to 0.1 %), with principal
+tensile stress there (20.9 to 0.0 %); the angle at the peak of M/V = 2 m (71.8 to 2.9 %).
+Outside, and known deviations by D49 (`docs/status.md`): seven views at the peak of
+M/V = 0.5 m (up to 15.5 %) and two at its fall of load by a point; eleven views at one
+stage of V alone, which is compared across cracking (D32). By case: rising branch 23 to
+24, post-peak 16 to 18, Should views 14 to 16, Could views 20 to 18. This run is the
+"before" of step A-2.
+
+**The depth lead (owner, D50): tested with two captures from Response and dropped.** The
+I-girder with shear at M/V = 0.99 m and 1.01 m (`python tools/curves.py CAPTURE
+R2C_RECORD --chart moment_phi`). At 1.01 m Response's stages are those of 1 m up to the
+web cracking. At 0.99 m its base step is half as long, a regular stage falls where the
+top is still cracked (50.0 kN; r2c 49.9), and the curve has the fall of load there; but
+it has none of the stages r2c puts in while closing in on the event (r2c: one more, at
+51.8 kN). So Response puts in no stage at that event at 0.99, 1 and 1.01 m and all of
+them at 2 m: not rounding against the depth. r2c on the two captures: peak +0.4 and
+0.0 %, rising branch 2.2 and 2.4 %, shape different on both (as at 1 m).
+
+**The five cases on reinforcement** (moved into the set as they were; before any kernel
+change for them): every Must inside on all five. Bars with a prestrain and with a thermal
+strain, under M: peak 0.00 %, rising branch 0.01 % and less, every view inside at
+cracking, peak and last stage. No stirrups, M + V: peak −0.02 %, every view inside at
+cracking and at the peak. Interlocking hoops on the column, M + V: peak −0.11 %, every
+view inside at cracking and at the peak, where the column with a single hoop has eleven
+views outside (D47). Prestrained stirrups, M + V: peak +0.04 %, one view outside,
+transverse bond at the peak, 52.8 %.
+
+**Transverse bond with prestrained stirrups: two rules from the binary, 52.8 to 2.7 %.**
+(1) r2c took the stirrups to reach a little beyond their end (a table read between its
+points), and so took the prestress that stops at the end for a change of stress along
+the stirrup: 18.6 MPa of bond at the top end where Response has nothing. (2) Response
+takes a node with next to no shear strain through a routine with no transverse strain
+and no stirrups; with prestrained stirrups its Stirrup Stress chart then shows nothing
+at such a node, and its bond chart at the bottom end of the stirrups jumps from stage to
+stage with which nodes those are (`docs/kernel.md`, "A node with next to no shear
+strain"). With both rules r2c's bond rule gives Response's bond chart from Response's own
+stirrup stress chart within 0.4 % at every stage of that capture (`python tools/bond.py
+CAPTURE`; 355 % at the peak before). On the 29 cases two checks came inside (that view,
+and that case's Should views) and none went outside.
+
+**By case, the 29:** peak 29, rising branch 29, shape 26 (the three of the 24), post-peak
+21 (14 of the 15 without shear), Must views 14 of 15 (the column under N alone, C2),
+Should views 21 (7 of the 14 with shear), Could views 23.
 
 ## Step A-1c: the longitudinal crack spacing table; the shear profile iteration (2026-11-22)
 

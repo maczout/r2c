@@ -186,7 +186,7 @@ such a node; near a face, where a node that carries no shear has a profile value
 millionths (the update adds 10⁻⁶ in each pass, "The shear strain profile between
 passes"), a node falls on one side of the test or the other from stage to stage. Measured
 on Response's capture of Newbeam with a prestrain of 1 mm/m on the stirrups at M/V = 1 m:
-at stage 0 all 19 nodes within the stirrups show no stress; from stage 13 to 28 six to
+at stage 0 all 19 nodes within the stirrups show no stress; from stage 13 to 28 three to
 ten of the nodes 0.4 mm apart at the bottom end of the stirrups do, a different set at
 each stage, and Response's own Transverse Average Bond chart at that end goes with it
 (0.13, 18.6, 37.2, 1.4, 37.3 MPa … at successive stages).

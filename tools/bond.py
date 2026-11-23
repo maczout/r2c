@@ -7,13 +7,18 @@ Stirrup Stress chart, at that chart's nodes, and set against the record's Transv
 Average Bond chart. On a capture from Response this checks the rule; on r2c's own record
 it only checks the export.
 
-    python tools/bond.py RECORD [--input FILE] [--stages N,N] [-v]
+    python tools/bond.py RECORD [--input FILE] [--stages N,N] [-v] [--nodes]
 
 RECORD is an r2x-raw record with both charts; --input the section file where it is not
 Response's built-in one; --stages the stages (default: every stage that has both charts).
 Per stage: the largest difference over the 41 heights of the chart, as a share of the
 chart's largest value, and where; -v lists every height. Stages whose chart is under
 0.01 MPa throughout are listed and left out of the largest.
+
+--nodes answers another question, for prestrained stirrups: at which nodes within the
+stirrups' depth does the Stirrup Stress chart show nothing (in Response, the nodes with
+next to no shear strain, docs/kernel.md), and what is the bond chart's largest value in
+the bottom and the top quarter of the depth at that stage? One line per stage.
 """
 
 from __future__ import annotations
@@ -53,6 +58,7 @@ def main(argv=None) -> int:
     ap.add_argument("--input")
     ap.add_argument("--stages")
     ap.add_argument("-v", action="store_true")
+    ap.add_argument("--nodes", action="store_true")
     a = ap.parse_args(argv)
     rec = record.read(a.record)
     sec = Section(inputs.read(a.input) if a.input else inputs.default_section())
@@ -63,6 +69,21 @@ def main(argv=None) -> int:
             fs = np.asarray(cmp.parse_chart(rec.stage(st, "stirrup_stress"))[3][0])
             bond = np.asarray(cmp.parse_chart(rec.stage(st, "transverse_average_bond"))[3][0])
         except KeyError:
+            continue
+        if a.nodes:
+            z = fs[:, 1] + sec.zaxial
+            within = np.array([any(t.bot <= q <= t.top for t in sec.stirrups) for q in z])
+            none = within & (fs[:, 0] == 0.0)
+            h = sec.ztop - sec.zbot
+            zb = bond[:, 1] + sec.zaxial
+            low = bond[zb < sec.zbot + 0.25 * h, 0]
+            high = bond[zb > sec.ztop - 0.25 * h, 0]
+            print(f"stage {st}: {int(none.sum())} of {int(within.sum())} nodes within the "
+                  f"stirrups show no stress"
+                  + (f", at {', '.join(f'{q:.1f}' for q in fs[none, 1][:12])}"
+                     if 0 < none.sum() < within.sum() else "")
+                  + f"; bond at most {low.max():.2f} MPa in the bottom quarter, "
+                  f"{high.max():.2f} in the top")
             continue
         zz, mine = chart_from_stress(sec, fs[:, 1], fs[:, 0])
         err = mine - bond[:, 0]
@@ -76,7 +97,8 @@ def main(argv=None) -> int:
         if a.v:
             for (r, y), m in zip(bond, mine):
                 print(f"    {y:9.2f} {r:10.4f} {m:10.4f} {m - r:+9.4f}")
-    print(f"largest over {len(stages)} stages: {worst:.1f} %")
+    if not a.nodes:
+        print(f"largest over {len(stages)} stages: {worst:.1f} %")
     return 0
 
 

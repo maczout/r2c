@@ -45,24 +45,27 @@ developer's. Items that need a structural judgement are marked **(structural)**.
   control did, try by try, with shear), `stagematch.py` (does r2c have its stages where
   Response has them), `spacing.py` (r2c's crack spacing tables against a record's charts),
   `earlyends.py` (which shear responses r2c ends early, and where: the diagnostic of the
-  shear profile iteration on the parked I-girders),
+  shear profile iteration on the parked I-girders), `bond.py` (does the bond rule give a
+  record's bond chart from its own stirrup stress chart),
   `check.py` (checks before pushing). `diagnose.py states --out` writes r2c's views in
   Response's states as a record, for `viewlines.py`. `decompile.py` also lists
   a routine's instructions (`a:ADDRESS`).
 - 85 oracle fixtures, each with the detail views of the feature stages of Response's curve
-  (cracking, falls of load, peak, last stage). **The development set, 24 of them, is in
-  `tests/oracle`**: Newbeam with only its loads varied (17) and, since step A-1
-  (2026-11-22, D41), the seven on the Quick Define sections (listed in `docs/summary.md`).
-  **The other 61 are parked in `tests/oracle/parked`** (D16, D19): kept, and not run by
+  (cracking, falls of load, peak, last stage). **The development set, 29 of them, is in
+  `tests/oracle`**: Newbeam with only its loads varied (17), since step A-1 (2026-11-22,
+  D41) the seven on the Quick Define sections, and since step A-2 (2026-11-23) five whose
+  variable is the reinforcement (all listed in `docs/summary.md`).
+  **The other 56 are parked in `tests/oracle/parked`** (D16, D19): kept, and not run by
   default. The folder is the set: verify, capture, retrim and scope read one folder and not
-  the folders under it.
+  the folders under it. The inputs of the five of step A-2 are variants of r2x's
+  (`tools/variants.py`), so verify on the set needs that folder among its `--inputs`.
 - pytest: by default the reader and material rules, the cases of the set without shear
   (the five on Quick Define sections need `R2C_DEFINE_DIR`, r2x's `tests/reference/define`,
-  and are skipped without it); `-m "slow and not parked"` the eleven with shear; `-m parked`
-  the parked cases (`R2C_RESPONSE_DIR` for Response's sample inputs, `R2C_SCOPE_DIR` for
-  the inputs of the scope cases). Eleven parked fixtures need something removed: five have
-  no test, and the six on Response's sample inputs that hold several sections have a test
-  that they are refused (D23). The parked tests were not run in steps A-1, A-1b and A-1c.
+  the two on reinforcement `R2C_SCOPE_DIR`, and are skipped without them); `-m "slow and
+  not parked"` the fourteen with shear; `-m parked` the parked cases (`R2C_RESPONSE_DIR`
+  for Response's sample inputs, `R2C_SCOPE_DIR` for the inputs of the scope cases). Eleven
+  parked fixtures need something removed: five have no test, and the six on Response's
+  sample inputs that hold several sections have a test that they are refused (D23).
 - Docs: `kernel.md` (each rule and its source), `verification.md` (what the results mean),
   `verification-results.md` (generated), `acceptance.md` (the owner's development targets),
   `scope.md` (every input an r2x solve can take, whether the manual documents it, and
@@ -76,17 +79,23 @@ The numbers are in `docs/verification-results.md`, what they mean in `docs/verif
 each case is assessed against the owner's development targets in `docs/acceptance.md`: ±5 %
 on every metric, the curve's shape the same, views at the features of the curve.
 
-**The development set after step A-1c** (run of record of 2026-11-22, the 24 cases;
+**The development set after step A-2** (run of record of 2026-11-23, the 29 cases;
 measured, `python tools/targets.py VERIFY_OUT --counts`; views compared at the stage at the
 same place since D42, the last stage of a shear case left out since D40). Cases inside
-target: peak 24 of 24, rising branch 23, shape 21, post-peak 16 (12 of the 13 without
-shear), views of the stress state without shear (Must) 12 of 13, views Should 14 of 24 (2
-of the 11 with shear), views Could 20 of 24. The one change to what r2c calculates in
-step A-1c is Response's longitudinal crack spacing table, switched on by the owner's
-decision (D46): against the run of record of step A-1b, 43 checks came inside and seven
-went outside, which are known deviations (below). What changed is in
-`docs/verification.md`, "Step A-1c"; the rule is in `docs/kernel.md` ("Crack spacing over
-the depth").
+target: peak 29 of 29, rising branch 29, shape 26, post-peak 21 (14 of the 15 without
+shear), views of the stress state without shear (Must) 14 of 15, views Should 21 of 29 (7
+of the 14 with shear), views Could 23 of 29. Three things changed in what r2c calculates
+or reports in step A-2: Response's handling of the shear strain profile is in use (owner,
+D49: 11 checks inside and 22 outside on the 24 cases, known deviations below); a node
+with next to no shear strain is reported as Response reports it; and the bond chart
+counts stirrups at a node by their own depth (the last two: two checks inside, none
+outside, on the 29). What changed is in `docs/verification.md`, "Step A-2"; the rules are
+in `docs/kernel.md` ("The shear strain profile between passes", "A node with next to no
+shear strain", "The shear charts").
+
+**The five cases on reinforcement** (step A-2): every Must and Should inside. On the
+three with shear the response ends differently in the two programs (a Won't; known
+deviation 3 of the shear cases below).
 
 Outside on a Must (D1, D2):
 
@@ -117,7 +126,9 @@ differ, and three things follow from it:
    off at the same curvature and a load 0.2 % apart (nine of the Must or Should tier):
    the top of the curve is flat within 0.2 % over three stages and the two programs sit
    in different states on it. In Response's own state there r2c agrees on every such view
-   within 2 % but transverse bond (the bond rule was not checked on a hoop).
+   within 2 % but transverse bond (measured in step A-1b; since step A-2 the bond rule
+   itself gives Response's chart of this column from its own stirrup stress within 0.8 %,
+   `python tools/bond.py`, so the rule is not it; not looked at again in Response's state).
 2. *The I-girder with shear, shape* (a Must; D43, D48). The girder's top is cracked under
    no load and the cracks close at a shear of about 34 kN. r2c closes in on that event
    and keeps the stages it puts in between, two of them with the top still cracked (49.5
@@ -197,10 +208,12 @@ then M".
 
 Gone since D49: the rising branch of M/V = 0.5 m and the post-peak of V alone.
 
-**The views related to shear** (Should). Inside on 2 of the 11 shear cases (Newbeam at
-M/V = 1 m, V with constant compression). On the nine Newbeam cases what keeps seven
-outside is in `docs/verification.md`, "A4"; the column with shear and the I-girder with
-shear are in the two lists above.
+**The views related to shear** (Should). Inside on 7 of the 14 shear cases: Newbeam at
+M/V = 1 m, V with constant compression, "N constant, then M + V", "V constant, then M",
+and the three shear cases on reinforcement. Outside: M/V = 0.5 m (D49, D46), M/V = 2 m
+(D46), V alone (D32, D49), the column with shear and the I-girder with shear (the lists
+above), and "M constant, then M + V" and "N + M + V increasing together"
+(`docs/verification.md`, "A4").
 
 Written and off: Response's tests on every pass of a stage (`Shear.pass_code`); its solve of the global
 strains with shear, with its step factor since step A-1c (`Shear.own_solve`; r2c has
@@ -373,21 +386,24 @@ one status. Completion is judged against Response as documented (owner, 2026-11-
   captured once, with `--add`. r2x's clipboard helper can fail transiently (once in 25
   captures); a rerun of that case on its own then matched.
 
-**The parked cases.** All 50 that r2c solves were last run at the end of step A-1b
-(2026-11-22, not a run of record; `docs/log/2026-11-22-08.md`). In step A-1c only the 16
-parked I-girders with shear were run, as the diagnostic of the shear profile iteration,
-every time that part changed (section 2, "Known deviation: the shear profile iteration";
-`docs/kernel.md` has the table). With the longitudinal crack spacing table on, which of
-them end early changed again: softening 12, 7 and 9 now (10, 13 and 7 at the end of step
-A-1b). On the kernel of record, of those 16: peak outside on 6, rising branch on 3, shape
-on 9.
+**The parked cases.** The 56 were run once at the end of step A-2 (2026-11-23, not a
+run of record; `docs/log/2026-11-23-01.md`); r2c solves 45 of them. Inside on peak,
+rising branch and shape: 31 of the 45 (30 at the end of step A-1b, the last run of all of
+them). Outside: eleven I-girders with shear (softening 0, 1, 2, 5, 6, 7, 8, 9, 11, 12,
+14), the two cases in US units at M/V = 1 ft, the T-beam at M/V = 2 m. Since the end of
+step A-1b, check by check, 107 came inside and 51 went outside (the longitudinal crack
+spacing table and the shear profile handling; the rules of step A-2 part 3 moved none).
+Of the 16 parked I-girders with shear, one ends early (softening 12: peak −10.7 %, at a
+curvature of 0.58 rad/km where Response goes to 2.34); softening 9 at M/V = 1 m is on
+the line (−5.0 %). `python tools/earlyends.py VERIFY_OUT`.
 
-**Where a next session picks up**: the owner's answers to D49 and D50 in
-`docs/summary.md`. The suggestion there is reinforcement as the next variable. If the
-shear profile iteration is taken up again, start from what was not read (section 2) and
-from the depth of exactly 1 m; `python tools/trace.py RECORD --set own_profile=1 --set
-own_solve=1 --set pass_code=1` runs a case with any of the program's rules that are
-written and off, and shows the state code by pass and why the program's solve gave up.
+**Where a next session picks up**: the owner's answers to D51 to D53 in
+`docs/summary.md`. The suggestion there is material models as the next variable, the
+cases on Newbeam first. If the shear profile iteration is taken up again, start from
+what was not read (section 2) and from what the two captures at M/V = 0.99 m and 1.01 m
+showed (section 2; D51); `python tools/trace.py RECORD --set own_solve=1 --set
+pass_code=1` runs a case with either of the program's rules that are written and off,
+and shows the state code by pass and why the program's solve gave up.
 
 ## 5. Decisions that are the owner's
 
