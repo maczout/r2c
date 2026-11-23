@@ -704,11 +704,22 @@ test (`00419ff0`: 2 % of the travel, as written above); the mark on the stage (s
 `00433c50` on every new stage, copied by `004330a0`, cleared only in `00418af0`); the
 global solve (`004276a0`, below: r2c's writing of it finds both states in two to four
 steps, at M/V = 1 m and 2 m alike); the state code (0 for r2c's two states); the refusal of a stage
-that has not converged (its load is under the largest so far). Not read: what the forces
-routine `004a9d90` does differently between its iteration mode and its final mode beyond
-the steel stress at a crack (`004440d0` against `00442e50`), and the 3 × 3 solve
-`004688b0` and its 2 × 2 fall-back `00467f20`, whose failure is what makes the profile
-update `0041e840` report a stage as not solved (through `0041fe20`).
+that has not converged (its load is under the largest so far). Read since, in
+step A-1c, and also ruled out: the 3 × 3 solve `004688b0` and its fall-backs `00467f20`
+("When the profile update reports a stage as not solved", below: it takes a section with
+no stiffness against shear at all, which this state is not); the state code on every
+pass (0 on each of the five); the largest load so far while a stage is set aside (it is
+kept, so a stage that has not converged there would not be refused for its load); the
+step factor of the global solve; the profile update itself. With all of these written out
+and switched on r2c still solves that stage in five passes and keeps it. **Not read:** what
+the forces routine `004a9d90` does differently between its iteration mode and its final
+mode beyond the steel stress at a crack (`004440d0` against `00442e50`); the assembly of
+the right-hand side (`004252c0`, `00422570`), which was taken as read in 2026-11-19; the
+iteration counter and the first lines of `004276a0` before its loop. One thing sets
+M/V = 1 m apart on this girder and was not followed up: its depth is exactly 1 m, so
+every test of M/V against the depth in the program (`00419250`: the base step halved
+where M/V is under the depth) is decided by the last digit of the depth as the program
+holds it.
 
 ### The global solve with shear [B `004276a0`, `004267c0`], read 2026-11-22: written, off
 
@@ -720,7 +731,7 @@ other two loads' unbalance is the right-hand side, the stiffness is the section'
 (`00427cd0`, the one of the shear flow calculation) with the control variable's own
 diagonal term multiplied by 10⁹, so that it stays where it is, and a strain is left out of
 the step where its diagonal stiffness is under a ten-thousandth of the control's
-(`004267c0`). Whole steps (half steps with the relaxation flag), no search along the step,
+(`004267c0`). Steps times a step factor ("The step factor of the global solve", below), no search along the step,
 and no account of the load factor changing with the strains. It stops when the squared
 unbalance over (h + 0.1 mm)² is under 10⁻⁶·(N² + V² + M²/h²) + 1 + (1000·A)², after at
 least one step. It fails after 50 steps, when the system cannot be solved, or when a step
@@ -734,7 +745,9 @@ come inside (the post-peak of "constant V, then M", 5.9 to 1.8 %; views at the p
 M/V = 0.5 m and of the I-girder) and 13 go outside (12 views of V alone at its fall of
 load, up to 100 %; transverse bond at the I-girder's peak, 2.5 to 93.5 %), and r2c has
 fewer of Response's stages at M/V = 2 m (`tools/stagematch.py`: 59 to 47 of 87). It does
-not change what happens on the I-girder at M/V = 1 m. Not used.
+not change what happens on the I-girder at M/V = 1 m. Not used. (Those figures are of the
+solve with whole steps throughout; with the step factor, read in step A-1c, they are in
+"The shear strain profile between passes".)
 
 
 **Accepting a stage.** A stage is worked on in passes: solve the global strains for the
@@ -753,6 +766,117 @@ shear is negligible). After each pass:
   stage of many of Response's shear responses;
 * a stage whose state code is not zero (below) is refused while the multiplier is 0.5 or
   more, and one with code 3 is refused while its load is above the largest so far.
+
+### The shear strain profile between passes [B], read 2026-11-22 (step A-1c): written, off
+
+What the program does to the shear strain profile within a stage, when it reports a stage
+as not solved, and what it carries from one stage to the next (`0041e840`, `0041fe20`,
+`004688b0`, `00467f20`, `004b67e0`, `00426f10`, `0041c060`, `004357d0`, `00418af0`,
+`004276a0`). The profile is a table over the depth of the shear strain over the section's
+shear strain (the third global strain), with a mean of one.
+
+**The update** [`0041e840`], after the calculated shear stress has been found at the top,
+middle and bottom of every layer:
+
+* at a node that carries shear: the profile's value times the mean of one and (calculated
+  stress over the state's stress); that factor is held within ten either way (a hundred
+  for a material named "steel"), and the value within a hundred;
+* at a node that carries none (under 10⁻⁸ Pa): the value as it is, plus 10⁻⁶;
+* while the section's shear strain is under 10⁻⁸: every value as it is;
+* nothing at the top and bottom faces;
+* then every value is divided by the profile's mean over the depth, taken by Simpson's
+  rule over each layer's three nodes with no width in it (`004b67e0`), the divisor held
+  between 0.1 and 10 while there is shear; a mean of exactly nothing puts the profile back
+  to that of the uncracked section;
+* and no value may be above eight times the gross area over the concrete area within the
+  depth that has stiffness (`00426f10`; "The depth that counts", above). The cap is
+  applied after the division and the profile is not divided again.
+
+There is no damping in the update. r2c's update (`Shear.update_shape`) differs in four
+things: the mean is weighted by the width; a node that carries no shear is given the
+calculated stress over its tangent stiffness; a value may not change sign; there is no
+cap. On a section of constant width the first makes no difference.
+
+**When the profile update reports a stage as not solved** [`0041fe20`, `004688b0`,
+`00467f20`]. The change of the three global strains along the member is solved from the
+3 × 3 stiffness by elimination with row pivoting, which gives up when a pivot is under
+10⁻⁵ (N and m). Then the fall-backs: axial strain and curvature alone from the first two
+equations; else curvature and shear strain from the last two; else the curvature alone
+from the moment equation. A fall-back is taken only if what it leaves out of the other
+equations is under a thousandth of the shear force; otherwise the update reports the
+stage as not solved, and the stage fails. So this happens only where the section has no
+stiffness against shear strain at all *and* its bending is coupled to its shear. r2c
+does the same in effect (`Shear.shear_flow`: the flexural part alone when there is no
+shear stiffness) without the test of a thousandth.
+
+**The passes** [`00418af0`]. In every pass, after the solve and the update: the profile
+error and the state code of the state just solved. Then, in this order:
+
+* 16 passes done, the error above 3 % and the load above the largest so far: failed;
+* the error above 10 (a thousand per cent) after more than three passes: the profile of
+  the uncracked section again (`004357d0`: the first moment of the area beyond a height
+  over the width there, brought to a mean of one), and half steps in the solve from then
+  on;
+* **the state code not zero: failed at once while the step multiplier is 0.5 or more;
+  and if the load is under that of the stage before, the stage is taken as it is, in
+  this pass**, converged or not;
+* state code 3 with the load above the largest so far: failed at once;
+* otherwise another pass while the error is 1 % or more and fewer than 16 are done.
+
+r2c tests the state code once, on the stage as the passes leave it. Written as
+`Shear.pass_code`, off.
+
+**What a stage leaves behind** [`00418af0`, `0041c060`]. The state of a stage is the one
+solved in its last pass, with the profile that pass started from; nothing is evaluated
+again when it is accepted. The profile the next stage starts from is the last update's,
+whether the stage converged or not. When a stage fails, when a stage is put in between,
+and when a stage set aside is taken up again, the profile is rebuilt from a stage's own
+node strains (`0041c060`: each node's shear strain over the stage's; the profile of the
+uncracked section where the stage's shear strain is under 10⁻⁷). r2c puts back the
+profile a stage left behind, which for a converged stage is the update after it, and
+after a stage that has not converged it starts the next from the profile that stage was
+solved on. Written, with the update, as `Shear.own_profile`, off.
+
+**The step factor of the global solve** [`004276a0`; a correction to "The global solve
+with shear", above, which had "whole steps (half steps with the relaxation flag)"].
+Every step of that solve is multiplied by a factor the analysis keeps. It is set to one
+half once a solve has taken more than ten steps (for a section under 5 m deep), and when
+a try at a stage has failed; it is put back to one at the end of every solve, unless the
+control variable is the shear strain or the flag is set. The flag is set, and the factor
+stays one half for the rest of the response, under control of the axial strain, where
+M/V is between 0.15 and 0.75 of the depth (`00419250`), after a change of control
+variable (`004162d0`) and after the reset of the profile above. The limit of 50 steps is
+100 in the single-state solve. In r2c since step A-1c as part of `Shear.own_solve`
+(`step_share`, `half_steps`), which stays off: without it r2c's writing of that solve
+ran to its 50 steps at states where the program goes on.
+
+**Measured, each switched on by itself** (2026-11-22, one machine; the 24 cases against
+the "before" run of step A-1c with `tools/changes.py` and `tools/targets.py --counts`;
+the 16 parked I-girders with shear with `tools/earlyends.py` and `tools/stagematch.py`):
+
+| Switched on | The 24 cases: checks in / out | Cases inside, where it changed | Parked I-girders ending early (3 of 16 before: softening 12, 7, 9) | Response's stages r2c has |
+|---|---|---|---|---|
+| The tests on every pass | 0 / 7 (all at the peak of M/V = 0.5 m) | Could views 20 to 19 | 3: the same three | as before |
+| The profile handling | 11 / 22 | **rising branch 23 to 24** (M/V = 0.5 m, 9.9 to 3.6 %); post-peak 16 to 18; Should views 14 to 16; Could views 20 to 18 | 2: softening 12 and 9 (9 at −5.0 % of the peak against −5.1 %, on the line); softening 7 now reaches +4.8 % | about as before (Newbeam the same; I-girders three up, three down) |
+| The program's solve, corrected | 12 / 15 | post-peak 16 to 17; Should views 14 to 16; Could views 20 to 19 | 2: softening 12, and softening 6 instead of 7 and 9 | **fewer**: M/V = 2 m 59 to 47 of 87; three parked I-girders about 41 to 31 |
+| Profile handling and solve | 12 / 22 | post-peak 16 to 19; Should views 14 to 15; Could views 20 to 18 | 1: softening 12 | fewer: M/V = 2 m 59 to 53 |
+
+Of the 22 checks that go outside with the profile handling, 11 are one stage of V alone
+and are not a difference of state: r2c's fall of load at cracking there is 1.2 % of the
+peak (1.9 % before; Response's 2.2 %; the measure counts a fall from 2 %, D32), and the
+stage of Response's fall is then compared with r2c's stage before cracking, which has
+the same load. Nine are at the peak of M/V = 0.5 m (up to 15.5 %). No Must goes outside
+in any of the four.
+
+**What none of them changes:** the views of the column with shear at its flat peak (D47:
+eleven views 6 to 28 % off in every run, nine of them of the Must or Should tier); the stage the I-girder at M/V = 1 m keeps and
+Response drops (D48); softening 12 at M/V = 2 m, which ends early in every run. On that
+case the trace shows what an early end is: after the web cracks both programs have a
+stage that has not converged (r2c 144 % off after 16 passes, load 536.0 kN; Response's
+stage at the same curvature 533.0 kN) and then a stage whose load is within 0.2 % of
+the largest so far: Response's is 0.15 % under it and is kept, r2c's is 0.1 % over it
+with 4.3 % of error and is refused. Which side of that line a stage falls on is decided
+by a state that has not converged, to a tenth of a per cent.
 
 **A stage refused, or not solved.** The stage is reset to the one before and tried again.
 The first time a whole step is refused the target goes half a base step *further* and the

@@ -5,24 +5,24 @@
 current at the end of every session (CLAUDE.md, "Ending a session"). Everything else in
 `docs/` is the developer's working record and backs this page; it does not replace it.
 
-Last updated: 2026-11-22, by the developer, at the end of the session on step A-1b (log
-2026-11-22-08).
+Last updated: 2026-11-22, by the developer, at the end of the session on step A-1c (log
+2026-11-22-09).
 
-**What changed.** Step A-1b, the three parts the owner set (D45). (1) The measure now
-compares views at r2c's stage at the same place as Response's, where there is one (D42):
-the column with shear is no longer compared four stages apart. (2) The reading of
-Response's stage control was taken as far as two approaches go. Two of its rules were
-verified against Response's own stages and are in use. **The shape of the I-girder with
-shear is not resolved:** Response keeps the stages in question on every case of that
-girder at M/V = 2 m, where r2c now has them exactly, and drops them at M/V = 1 m; why
-was not found (D48). (3) The crack spacing over the depth was read from the program and
-reproduces Response's charts to 0.001 mm on all three new shapes. The transverse table is
-in use; **the longitudinal table is written and switched off**, because with it the last
-stage of one Newbeam shear case lands on the measure of the rising branch, a Must (D46).
+**What changed.** Step A-1c, the three parts the owner set (D46 to D48). (1) Response's
+longitudinal crack spacing table is switched on (D46): 43 checks came inside and seven
+went outside, as foreseen; the seven are recorded as known deviations. (2) The shear
+profile iteration was read from the program: how it updates the shear profile within a
+stage, when it reports a stage as not solved, what it tests on every pass, and what it
+carries from one stage to the next. Each rule is written in r2c and was tried, alone and
+together, on the 24 cases and on the 16 parked I-girders with shear. **It did not break
+through: neither the column with shear's state on its flat peak (D47) nor the stage the
+I-girder with shear keeps and Response drops (D48) changed in any trial**, and one parked
+I-girder ends early in every trial. Two approaches were used and the bound stops there.
+All of it is written and switched off, so the results are those of part 1. (3) One of the
+rules, Response's handling of the profile, would bring the rising branch of M/V = 0.5 m
+back inside, at a price in view checks: that choice is the owner's (D49).
 
-**No decisions wait for the owner.** D46 to D48 answered 2026-11-22 (owner, after the
-session): the longitudinal crack spacing table goes on; next is step A-1c, the shear
-profile iteration, before reinforcement.
+**Two items wait for the owner: D49 and D50.**
 
 ## Aim
 
@@ -37,7 +37,7 @@ binary differ, the binary is followed without asking, apart from the owner's ove
 
 | Phase | What | State |
 |---|---|---|
-| **A. Develop the kernel** | On a development set that widens step by step (D41): Newbeam varied in its loads (the 17 cases below), then one variable at a time — shape (step A-1, the seven Quick Define cases), then reinforcement, material models, units and material factors. What is not yet in the set stays parked. | **Now.** Step A-1 (shape) and its follow-up A-1b are worked through (2026-11-22). On the 24 cases peak and rising branch are met; shape on 21 and the Must views on 11 of 13. Of the five misses four are known deviations or the owner's override (D32, D36, D35, C2) and one is the shape of the I-girder with shear (accepted for now, D43; still open, D48). The Should on shear views is met on 3 of the 11 shear cases |
+| **A. Develop the kernel** | On a development set that widens step by step (D41): Newbeam varied in its loads (the 17 cases below), then one variable at a time — shape (step A-1, the seven Quick Define cases), then reinforcement, material models, units and material factors. What is not yet in the set stays parked. | **Now.** Step A-1 (shape) and its follow-ups A-1b and A-1c are worked through (2026-11-22). On the 24 cases peak is met; rising branch on 23, shape on 21 and the Must views on 12 of 13. Of the five misses four are known deviations or the owner's override (D46, D32, D36, C2) and one is the shape of the I-girder with shear, now part of one open item, the shear profile iteration (D48, D50). The Should on shear views is met on 2 of the 11 shear cases |
 | **B. Validate and refine** | The parked cases come back; the test set and targets are reviewed; r2c is held to them. | Not started. Starts when the development set has widened to cover the scope and meets the exit criteria (D1, D2). Then the test set and targets are reviewed with the owner. |
 
 ### The development set
@@ -74,61 +74,58 @@ since the removals of D18, six more (all on Response's sample inputs) since D23.
 ## Progress against the Phase A exit criteria
 
 Cases inside target, counted by `tools/targets.py --counts` from the run of record of step
-A-1b (2026-11-22, `docs/verification-results.md`). "Before" is the run of the same 24 cases
-on the kernel of step A-1, measured with the stage matching of D42. (D42 itself, on that
-kernel: the Could views went from 14 to 15 of 24 cases; check by check 44 came inside and
-4 went outside, as foreseen: `docs/verification.md`, "Step A-1b".)
+A-1c (2026-11-22, `docs/verification-results.md`). "Before" is the run of record of step
+A-1b; the only change to what r2c calculates between the two is Response's longitudinal
+crack spacing table (D46). The "before" run the brief asked for in step A-1c, with the
+table on, is the same as the run of record check for check, because nothing else went in.
 
 | Check | Before | Now | Exit tier (D1, D2, D27) |
 |---|---:|---:|---|
 | Peak | 24 of 24 | 24 of 24 | Must: met |
-| Rising branch | 24 of 24 | 24 of 24 | Must: met |
-| Shape | 21 of 24 | 21 of 24 | Must (a shear case's ending left out: D25). Two misses are known deviations (D32, D36); the third is the I-girder with shear (D43, D48) |
-| Views of the stress state, without shear | 11 of 13 | 11 of 13 | Must. The misses: a known deviation (D35; it comes inside with D46) and the column under N alone after its peak (the owner's override, C2) |
+| Rising branch | 24 of 24 | 23 of 24 | Must. The miss is M/V = 0.5 m (9.9 %), a known deviation by D46: the point counted is r2c's last stage. It would come inside with D49 |
+| Shape | 21 of 24 | 21 of 24 | Must (a shear case's ending left out: D25). Two misses are known deviations (D32, D36); the third is the I-girder with shear (D48) |
+| Views of the stress state, without shear | 11 of 13 | 12 of 13 | Must. The miss is the column under N alone after its peak (the owner's override, C2). The point of D35 came inside with D46 |
 | Post-peak, without shear | 12 of 13 | 12 of 13 | Should. The miss is the column under N alone (C2) |
-| Views related to shear, and stress-state views with shear | 14 of 24 (2 of the 11 with shear) | 15 of 24 (3 of the 11 with shear: the I-girder with shear came in) | Should, not met |
-| Views related to cracking | 15 of 24 | 15 of 24 (20 of 24 with D46) | Could |
+| Views related to shear, and stress-state views with shear | 15 of 24 (3 of the 11 with shear) | 14 of 24 (2 of the 11: the I-girder with shear went out again, on transverse bond at its peak, D46) | Should, not met |
+| Views related to cracking | 15 of 24 | 20 of 24 | Could |
 
-Check by check over the 24 cases, 14 came inside and one went outside (shear stress at the
-flat peak of the column with shear, 2.9 to 7.7 %, a Should).
-
-### Step A-1b, part by part
+### Step A-1c, part by part
 
 | Part | What was done | Outcome |
 |---|---|---|
-| 1. The measure (D42) | Views are compared at r2c's stage at the same place as Response's feature stage (within the target in load and control value together), and at the stage of the same feature only where there is none. Never across a fall of load: where the two curves have the same falls, only stages with as many falls behind them are looked at (D13's purpose, kept explicitly) | **Done**, in its own commit; the "before" run recorded. Listed in the pull request under "Measurement changes" |
-| 2. Response's stage control (D43) | Read: how the program tests "cracked" between two stages; what it starts a stage put in between from; what it does when that stage fails; its solve of a stage, which was written out in r2c and tried | **Two rules in use, each checked against Response's own stages** (below). **The I-girder's shape is not resolved** (D48). The program's solve is written and off: it moves checks both ways and changes nothing here |
-| 3. Crack spacing over the depth (D45) | Read: how the program tabulates both spacings (bars around a circle, hoops, the ends of a stirrup, a step in width) | **Reproduces Response's charts within 0.001 mm** on the column, T-beam and I-girder (they were 21, 11 and 6 to 8 % off). **Transverse table in use**; longitudinal table written and off (D46) |
-| The two shear cases on their views | Judged after part 3 | **I-girder with shear: Should views met** (every assessed view inside, the worst 2.5 %). **Column with shear: not met**, at its peak only (D47) |
+| 1. The longitudinal crack spacing table (D46) | Switched on; r2c's earlier table removed. The run with it recorded as "before" | **Done.** 43 checks inside, 7 outside, as foreseen; the seven are known deviations in `docs/status.md` |
+| 2. The shear profile iteration, from the program (D48) | Read: the profile update and its cap; when the update reports a stage as not solved; the tests on every pass; what a stage leaves for the next and what is put back after a failure; and a misreading found in last session's writing of the program's solve (it halves its steps after ten; r2c's writing did not, and gave up where the program goes on) | **Did not break through.** Two approaches, each written and tried (below). All switched off |
+| 3. D47, D48 and the bond spikes of D46, looked at again | In every trial | **D47: unchanged** (eleven views 6 to 28 % off at the column's flat peak). **D48: unchanged** (r2c keeps the stage in five passes under every rule). **The bond spikes:** the I-girder's goes with the program's solve (49.8 to 0.0 %), M/V = 2 m's falls to 8.1 % with the program's profile handling; neither is switched on |
 
-**The two stage control rules now in use.** (a) Between two stages the program asks
-whether the section has cracked using the cracking strain before it is lowered for
-compression. r2c used the lowered one, and so closed in on the first node to crack under
-compression, which the program does not: under V with constant compression r2c had seven
-stages there that Response has not. (b) A stage put in between two others starts from
-whichever of the two is nearer, and is dropped if it fails. On the I-girder at M/V = 2 m
-(parked) Response's three stages around the closing of the top cracks are now r2c's, at
-the same curvatures and within 0.1 kNm. Neither moved any check on the 24 cases to the
-other side.
+**The two approaches, and the diagnostic the owner set** (the 16 parked I-girders with
+shear that r2c solves; before, 3 end early: softening models 12, 7 and 9).
 
-**Whether it explains the parked I-girder that ended early (softening 6, M/V = 2 m): no.**
-That case ends early because r2c refuses a stage just after the web cracks whose shear
-profile it cannot settle (9 % off after sixteen passes, with the load above the largest
-so far), where Response keeps a stage with a lower load. It is the profile iteration at
-that state, not a rule of the stage control read here. The early end has moved to other
-parked cases of the same girder (Risks).
+| Approach | The 24 cases | Parked I-girders that end early |
+|---|---|---|
+| 1. What the program tests on every pass: it looks at a state's code in each pass and fails the stage at once; r2c looks once, at the finished stage | No check inside, 7 outside (the peak of M/V = 0.5 m) | 3 of 16, the same three |
+| 2a. The program's handling of the profile: its update (no width in the mean, a cap, no damping), and the profile a stage leaves behind | 11 checks inside, 22 outside. **Rising branch back to 24 of 24**; post-peak 16 to 18; Should views 14 to 16; Could views 20 to 18 | 2 of 16: softening 7 now runs to Response's peak (+4.8 %); softening 9 is on the line |
+| 2b. The program's solve of a stage, corrected | 12 inside, 15 outside. r2c then has **fewer** of Response's stages (M/V = 2 m: 59 to 47 of 87) | 2 of 16 |
+| 2a and 2b together | 12 inside, 22 outside; post-peak 16 to 19 | 1 of 16: softening 12 |
+
+**What an early end is** (softening 12, traced). Just after the web cracks both programs
+have a stage that does not converge, and then one whose load is within 0.2 % of the
+largest so far. Response's is 0.15 % under it and is kept; r2c's is 0.1 % over it and is
+refused, and from there r2c steps back until it ends. A tenth of a per cent of load, in a
+state that neither program has converged, decides it. That is why the early end moves
+from case to case with every small change to the kernel, and why reading more rules did
+not pin it down.
 
 ### The seven new cases
 
 | Case | Musts | Should | What is left |
 |---|---|---|---|
-| T-beam, M | met | met | Longitudinal crack spacing 7 % (Could; D46) |
-| T-beam, −M | met | met | Longitudinal crack spacing 6 to 8 % (Could; D46) |
-| Column, N alone | met up to the peak | met up to the peak | After the peak: the owner's override (C2, D12). Longitudinal crack spacing 21 % (Could; D46) |
-| Column, N₀ = −4000 kN, then M | met | met | Longitudinal crack spacing 21 % (Could; D46) |
-| Column, M + V | met (peak, rising branch, shape) | **views not met, at the peak only** | At cracking every Must and Should view is inside since D42. At the peak ten views are 8 to 14 % off: the two programs are in different states on a flat top (D47). Longitudinal crack spacing 21 % (D46) |
-| I-girder, M | met | met | One cracking view at 5.1 to 5.3 % (Could; it comes inside with D46) |
-| I-girder, M + V | **shape not met** (accepted for now, D43); peak +0.06 %, rising branch 2.4 % | **met** | D48 |
+| T-beam, M | met | met | Nothing |
+| T-beam, −M | met | met | Nothing |
+| Column, N alone | met up to the peak | met up to the peak | After the peak: the owner's override (C2, D12) |
+| Column, N₀ = −4000 kN, then M | met | met | Nothing |
+| Column, M + V | met (peak, rising branch, shape) | **views not met, at the peak only** | At cracking every Must and Should view is inside. At the peak eleven views are 6 to 28 % off: the two programs are in different states on a flat top (D47; the shear profile iteration) |
+| I-girder, M | met | met | Nothing |
+| I-girder, M + V | **shape not met** (D43, D48; the shear profile iteration); peak +0.01 %, rising branch 2.4 % | **not met**: transverse bond at its peak, 49.8 % (a known deviation that came with D46) | D48, D50 |
 
 ### Which known deviations recur on the other shapes
 
@@ -151,10 +148,11 @@ of 2026-11-22-06.
 
 Known deviations are in `docs/status.md`: how shear responses end (a Won't, D1), the
 circular column under axial load alone, which is not cloned (D12), the fall of load
-before the peak under V alone (D32), tension's shape (D36), and the last-stage point on
-"constant N +200 kN, then M" (D35), and the shape of the I-girder with shear (accepted for
-now, owner 2026-11-22, D43; D48). Put to the owner in step A-1b: the views of the column
-with shear at its peak (D47).
+before the peak under V alone (D32), tension's shape (D36), the seven checks that came
+with the longitudinal crack spacing table (D46: the rising branch of M/V = 0.5 m among
+them), and one open item, the shear profile iteration, with three effects: the views of
+the column with shear at its peak (D47), the shape of the I-girder with shear (D43, D48)
+and the parked I-girders with shear that end early (D50).
 
 ### What was removed (D18)
 
@@ -259,9 +257,16 @@ owner) · *open* (no suggestion yet).
 
 | # | Question | Status | Answer |
 |---|---|---|---|
-| D46 | **The longitudinal crack spacing table, read from the program, is switched off.** It reproduces Response's chart to 0.001 mm on every shape tried. Switched on, 43 checks come inside on the 24 cases (measured against the run of record): every longitudinal crack spacing check, crack widths and diagonal spacing with them, the Could views on 20 of 24 cases instead of 15, and the last-stage point of "constant N +200 kN, then M" (D35, a known deviation on a Must: 6.2 to 1.4 %; the Must views would stand at 12 of 13). In Response's own states the column with shear then agrees on every view but one. Seven checks go outside, and one of them is a Must: **the rising branch of M/V = 0.5 m, 2.7 to 9.9 %.** That figure is r2c's last stage. The response of that case ends differently in the two programs (a Won't), r2c's last stage now falls back further than before, and the point it falls to is nearest to Response's fall of load *before* its peak, so the measure counts it with the rising branch. Response's own rising points stay within 2.7 % of r2c's curve. The others that go outside: transverse bond at the peak of the I-girder with shear (2.5 to 49.8 %, which takes that case's Should views outside again) and of M/V = 2 m (3.7 to 22.5 %), both a spike at the end of the stirrups in a stage r2c has not converged (in Response's own state the I-girder's is 0.00 % off); two views of M/V = 0.5 m by a point; the post-peak of V alone (3.7 to 6.9 %). The no-regression bound says a rising branch may not go outside, so the table is off. (The same case was what kept D39 off.) | decided, owner 2026-11-22 | **Switch the longitudinal table on.** Accept the rising branch of M/V = 0.5 m as a known deviation: the point the measure counts is r2c's last stage, after its own peak, so it belongs to how the shear response ends (a Won't, D1). The other six checks that go outside are recorded with it; the transverse bond spikes are taken up in step A-1c if they come from the shear profile iteration |
-| D47 | The column with shear, views at its peak (a Should). Since D42 its views at cracking are inside. At the peak ten Must- and Should-tier views are 8 to 14 % off although curvature and load agree (417.8 against 417.2 kN): the top of this curve is flat within 0.2 % over three stages and the two programs sit in different states on it. Put into Response's own state at that stage, r2c agrees on every such view within 2 % but two: shear on the crack (6.4 %; 1.5 % with D46) and transverse bond (12.5 %, not explained; that rule was never checked on a hoop). This is the known deviation "a peak reached in a slightly different state" of three Newbeam shear cases, recurring | decided, owner 2026-11-22 | **Accept for now, but not as a separate deviation:** it is recorded as one of the effects of a single open item, the shear profile iteration (with D48 and the parked I-girders that end early), taken up in step A-1c |
-| D48 | **The shape of the I-girder with shear (D43) after the reading.** What is now known: at M/V = 2 m Response keeps the stages where the top cracks close (every parked case of this girder), and r2c has them exactly. At M/V = 1 m (this case and one parked one) Response has none of them, and also none where the web cracks later; a third parked case at M/V = 1 m does close in on the web. By every rule read, Response must have tried a stage in between at those places and had it fail; r2c solves the same stage without trouble, with the program's own solve written out as well as with its own. Two approaches were tried (the rules for a stage put in between; the program's solve), and the bound stops a third. What was not read is named in `docs/kernel.md` ("Open: the same girder at M/V = 1 m") | decided, owner 2026-11-22 | **Not on to reinforcement yet. Step A-1c: the shear profile iteration from the binary**, the part of the shear solve not yet set against the program and the likely common cause of D43/D48, D47 and the parked I-girders with shear that end early. The parked I-girders with shear are its diagnostic (not set members). Usual bounds: two approaches. If it does not break through, D47, D48 and the early ends are accepted together as one known deviation and reinforcement comes next. (The developer had suggested keeping D48 as a known deviation and going on to reinforcement.) |
+| D46 | **The longitudinal crack spacing table, read from the program, is switched off.** It reproduces Response's chart to 0.001 mm on every shape tried. Switched on, 43 checks come inside on the 24 cases (measured against the run of record): every longitudinal crack spacing check, crack widths and diagonal spacing with them, the Could views on 20 of 24 cases instead of 15, and the last-stage point of "constant N +200 kN, then M" (D35, a known deviation on a Must: 6.2 to 1.4 %; the Must views would stand at 12 of 13). In Response's own states the column with shear then agrees on every view but one. Seven checks go outside, and one of them is a Must: **the rising branch of M/V = 0.5 m, 2.7 to 9.9 %.** That figure is r2c's last stage. The response of that case ends differently in the two programs (a Won't), r2c's last stage now falls back further than before, and the point it falls to is nearest to Response's fall of load *before* its peak, so the measure counts it with the rising branch. Response's own rising points stay within 2.7 % of r2c's curve. The others that go outside: transverse bond at the peak of the I-girder with shear (2.5 to 49.8 %, which takes that case's Should views outside again) and of M/V = 2 m (3.7 to 22.5 %), both a spike at the end of the stirrups in a stage r2c has not converged (in Response's own state the I-girder's is 0.00 % off); two views of M/V = 0.5 m by a point; the post-peak of V alone (3.7 to 6.9 %). The no-regression bound says a rising branch may not go outside, so the table is off. (The same case was what kept D39 off.) | decided, owner 2026-11-22 | **Switch the longitudinal table on.** Accept the rising branch of M/V = 0.5 m as a known deviation: the point the measure counts is r2c's last stage, after its own peak, so it belongs to how the shear response ends (a Won't, D1). The other six checks that go outside are recorded with it; the transverse bond spikes are taken up in step A-1c if they come from the shear profile iteration. **Done 2026-11-22** (step A-1c): switched on, 43 in and 7 out as foreseen. The I-girder's spike goes with the program's own solve of a stage, which is off |
+| D47 | The column with shear, views at its peak (a Should). Since D42 its views at cracking are inside. At the peak ten Must- and Should-tier views are 8 to 14 % off although curvature and load agree (417.8 against 417.2 kN): the top of this curve is flat within 0.2 % over three stages and the two programs sit in different states on it. Put into Response's own state at that stage, r2c agrees on every such view within 2 % but two: shear on the crack (6.4 %; 1.5 % with D46) and transverse bond (12.5 %, not explained; that rule was never checked on a hoop). This is the known deviation "a peak reached in a slightly different state" of three Newbeam shear cases, recurring | decided, owner 2026-11-22 | **Accept for now, but not as a separate deviation:** it is recorded as one of the effects of a single open item, the shear profile iteration (with D48 and the parked I-girders that end early), taken up in step A-1c. **Taken up 2026-11-22, unchanged:** D50 |
+| D48 | **The shape of the I-girder with shear (D43) after the reading.** What is now known: at M/V = 2 m Response keeps the stages where the top cracks close (every parked case of this girder), and r2c has them exactly. At M/V = 1 m (this case and one parked one) Response has none of them, and also none where the web cracks later; a third parked case at M/V = 1 m does close in on the web. By every rule read, Response must have tried a stage in between at those places and had it fail; r2c solves the same stage without trouble, with the program's own solve written out as well as with its own. Two approaches were tried (the rules for a stage put in between; the program's solve), and the bound stops a third. What was not read is named in `docs/kernel.md` ("Open: the same girder at M/V = 1 m") | decided, owner 2026-11-22 | **Not on to reinforcement yet. Step A-1c: the shear profile iteration from the binary**, the part of the shear solve not yet set against the program and the likely common cause of D43/D48, D47 and the parked I-girders with shear that end early. The parked I-girders with shear are its diagnostic (not set members). Usual bounds: two approaches. If it does not break through, D47, D48 and the early ends are accepted together as one known deviation and reinforcement comes next. (The developer had suggested keeping D48 as a known deviation and going on to reinforcement.) **Done 2026-11-22, not resolved:** two approaches used; D49, D50 |
+
+### Left by step A-1c (new, 2026-11-22)
+
+| # | Question | Status | Answer |
+|---|---|---|---|
+| D49 | **Response's handling of the shear strain profile is written and switched off.** It is the program's own rule for updating the profile between the passes on a stage and for what one stage hands to the next. Switched on, on the 24 cases: the rising branch of M/V = 0.5 m comes back inside (9.9 to 3.6 %), so that Must stands at 24 of 24 again and the known deviation of D46 goes; post-peak 16 to 18 cases; Should views 14 to 16 cases. Against that, 22 checks go outside and 11 come inside, and the Could views go from 20 to 18 cases. Of the 22, nine are views at the peak of M/V = 0.5 m (up to 15.5 %, Should and Could). Eleven are one stage of V alone and are not a real difference: r2c's fall of load at cracking there becomes 1.2 % of the peak (1.9 % now, Response's 2.2 %, counted from 2 %: D32), and the measure then compares Response's stage after cracking with r2c's stage before cracking, which has the same load. No Must goes outside. On the parked I-girders with shear one fewer ends early. It was not switched on because the brief asked for a rule to be verified against Response's own stages first, and that check is neutral: r2c has about as many of Response's stages with it as without | suggested | **Switch it on**, and accept the stage of V alone as part of D32's known deviation: it is the program's rule, a Must comes back inside, and no Must goes out. Other options: leave it off and keep the rising branch of M/V = 0.5 m as the known deviation of D46; or switch it on and also change the measure so that a stage is not compared across cracking (meta-development, for the owner). Evidence: `docs/kernel.md`, "The shear strain profile between passes" |
+| D50 | **What comes next.** The shear profile iteration did not break through in two approaches (above). What is left of it: the column with shear's views at its flat peak (D47), the shape of the I-girder with shear (D48), and the parked I-girders with shear that end early (3 of 16, or 2 with D49). What was not read is listed in `docs/status.md`. One lead was found and not followed, because the bound was reached: the I-girder is exactly 1 m deep, and M/V = 1 m is the one ratio at which Response drops the stage, so a comparison of M/V with the depth inside the program may fall the other way there by rounding | suggested | **Record the three as one known deviation, "the shear profile iteration", and go on to reinforcement** as the next variable (step A-2), as the owner foresaw in D48. The parked I-girders come into the set with the material models; take the iteration up again then, starting from the lead above. Other option: one more named approach now, on that lead alone |
 
 ### The source rule (2026-11-22, after A2)
 
@@ -309,31 +314,14 @@ H and I (views are now covered by D2).
 - **The set is still narrow.** Three more shapes are in; other reinforcement, material
   models, units and factors are parked. The parked cases are not run on every change, so a
   change that breaks one of them shows only when they are run again.
-- **The parked cases moved with step A-1b, again only the I-girder with shear, and on
-  balance for the worse** (run once at the end, 2026-11-22; the 50 parked cases r2c
-  solves; against the run at the end of step A-1, measured again with the measure of D42
-  so that only the kernel differs). Check by check 54 came inside and 64 went outside,
-  every one of them on an I-girder case with shear: no parked Newbeam, T-beam or column
-  case changed side on any check. On those cases peak is now outside on 8 (6 before),
-  rising branch on 9 (6), shape on 12 (10).
-  - *The early end has moved from case to case.* Softening model 6 at M/V = 2 m, which
-    ended early after step A-1, came back (peak −10.7 to +4.1 %, rising branch 85.8 to
-    0.4 %). Models 10, 13 and 7 at M/V = 2 m now end early instead (peak −0.5 to −9.4 %,
-    −0.5 to −8.9 %, −0.4 to −6.8 %; rising branch to 75, 75 and 46 %), and model 14's
-    rising branch went from 4.9 to 17.9 %. Measured on six of these cases with the two
-    changes apart: the stage control rules moved model 7; the transverse crack spacing
-    moved the others, in both directions.
-  - *What it is:* just after the web cracks r2c cannot settle the shear profile of a
-    stage, refuses it because its load is above the largest so far, and steps back until
-    it ends; Response keeps a stage there with a lower load. Which case trips over it
-    changes with any small change to the kernel. It is the shear profile iteration, the
-    one part of the shear solve not yet set against the program's (D48).
-  - *Better:* transverse bond came inside on models 11, 12 and 15 (90 to 2 to 5 %).
-  - Not looked into further: parked. **But these cases come into the set with the
-    material models, and this will be a Must there.**
-- **The reading of the stage control stopped short of an answer** (D48). Where it stands,
-  routine by routine, is in `docs/kernel.md`; the decompiled routines and traces are
-  outside the repository.
+- **The shear profile iteration is not resolved** (D50), and the parked I-girders with
+  shear will be set members when the material models come in: an early end will be a
+  Must there. Three of 16 end early now (softening 12, 7 and 9); which ones changes with
+  any small change to the kernel, because it is decided by a tenth of a per cent of load
+  in a stage neither program has converged. Only these 16 parked cases were run in step
+  A-1c; the other parked cases were last run at the end of step A-1b.
+- **Five rules of the program are in the code and switched off** (D49 and
+  `docs/status.md`). Each is one more thing to keep working while it is unused.
 - **Part of the crack spacing routines was not read:** they branch on a setting of the
   section that could not be named. The branch taken over fits every chart compared. A
   parked case with another tension stiffening model or factor may take the other branch.
