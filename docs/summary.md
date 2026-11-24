@@ -5,39 +5,45 @@
 current at the end of every session (CLAUDE.md, "Ending a session"). Everything else in
 `docs/` is the developer's working record and backs this page; it does not replace it.
 
-Last updated: 2026-11-24, by the developer, at the end of step A-4, the flat peak
-(log 2026-11-24-01).
+Last updated: 2026-11-24, by the developer, at the end of step A-5, settings of the
+section, units and material factors (log 2026-11-24-02).
 
-**What changed.** Step A-4 (D64) was carried out in the order of the brief. **The target
-is confirmed, and it did not break through.** r2c calculates what it did: one rule of
-the stage control was corrected from the program and changes no check.
+**What changed.** Step A-5 (D68) was carried out in the order of the brief. The set is 52
+cases (37 before). Two rules were read from the program: one is in the kernel, **the
+other is written and switched off, and waits for the owner (D69).**
 
-- **Part 1, the target: confirmed as the main source.** Of the 415 view checks outside
-  target on the 44 shear cases (set and parked), 368 (89 %) are inside when r2c is put
-  into Response's own state at that stage, and 37 (9 %) are not (table "Where the
-  misses come from"). 21 of the 43 shear responses end differently.
-- **Part 2, path or iteration: the path.** Started from Response's own state at the
-  stage before, r2c lands on Response's state at the flat peaks of D47 and D61 (but for
-  one view on the column). A new tool does this. The two small bond checks of D61 are
-  the other kind: inside the 1 % the iteration is allowed.
-- **A new way of reading the program** made the path visible: Response is run as for a
-  capture, with a small tracer that reads the stage control's numbers at every pass.
-  r2c makes Response's tries one for one up to a first difference, and that difference
-  is one of three things (table "Where r2c's tries part from Response's"). The stage of
-  D48 is explained by it. **This method is new and is put to the owner as D65.**
-- **Part 3, two approaches, both read from the program and checked against its own
-  tries.** (1) When the step of the stage control grows: corrected, in the kernel, no
-  check moves. (2) The program's own solve: r2c follows Response further on two flat
-  peaks, but a Must goes outside on the 37 cases (the rising branch of M/V = 0.5 m), so
-  by the bound it stays off.
-- **Part 4, the three softening cases** stand where they stood: one inside on its
-  Musts, two outside. Whether they join is D67.
-- **Part 5, against the run at the start:** nothing moved, on the 37 or on the parked
-  cases (table "Step A-4 against the run at the start").
+- **Part 1, D67:** the I-girder with softening Vecchio-Collins 1992-A is in the set. The
+  run with it, before anything else changed, is the "before" of this step.
+- **Part 2, the I-girder's shear views where its web cracks: found, in one approach, and
+  it is a rule.** r2c took two slopes of the concrete's compressive stress by differences
+  of its own stress relation; the program has them in closed form, and not always as the
+  relation's slope (for the softening models that work on the ratio of the two strains
+  it counts no softening slope at all). With the program's form r2c's calculated shear
+  stress in Response's own states is Response's own on nearly every stage of every shear
+  capture (table "The slopes rule"). It also explains a difference on M/V = 0.5 m and on
+  the US-units cases that had been open since 2026-11-19.
+- **It is off, because of the no-regression bound.** Switched on, 45 checks come inside
+  and 5 go outside on the 52 cases, and one of the five is a Must: the shape of Newbeam
+  with elasto-plastic tension stiffening. On the parked cases it brings two of D62's
+  three softening cases inside on their Musts and removes the one early end, and makes
+  another. **D69.**
+- **Part 3, the 14 cases:** proposed (the eleven of the brief and the three other
+  units cases), captured three times each, moved in. Units are reading and printing
+  only: checked on Response's own captures and on r2c. The CSA factors needed one rule of
+  the crack check (in the kernel; it changes nothing without factors). **12 of the 14
+  meet every Must.** The two US-units cases at M/V = 1 ft are outside on rising branch
+  and shape: the rising branch is the slopes rule (inside with it on), the shape is the
+  named limitation (D66). **D70.**
+- **Part 4, the loads not yet in the set: left for step A-6.** The three were captured
+  three times and repeat; where they stand is in the table "The loads group".
+- **Part 5:** table "Which known deviations recur on the cases of step A-5".
+- The 37 cases are held: against the "before" run no check on them changed side.
 
-**No decisions wait for the owner.** D65 to D68 answered 2026-11-24 (owner, after the
-session): the flat peak is one named limitation, for the owner at the end of phase A
-(D66). **Next: step A-5, settings of the section, units and factors (D68).**
+**Five items wait for the owner: D69** (the slopes rule), **D70** (the two US-units
+cases), **D71** (two Should checks on the CSA shear case), **D72** (a reading: three more
+cases than the brief named) **and D73** (what comes next). Three new Must checks are left
+unassessed by the spike test and are listed for review ("The spike test on the 52
+cases").
 
 ## Aim
 
@@ -52,7 +58,7 @@ binary differ, the binary is followed without asking, apart from the owner's ove
 
 | Phase | What | State |
 |---|---|---|
-| **A. Develop the kernel** | On a development set that widens step by step (D41): Newbeam varied in its loads (the 17 cases below), then one variable at a time — shape (step A-1, the seven Quick Define cases), reinforcement (step A-2, five cases), then material models, units and material factors. What is not yet in the set stays parked. | **Now.** Steps A-1 (shape) and A-2 (reinforcement) are worked through, and of step A-3 (material models) the Newbeam part (2026-11-23). On the 37 cases peak and rising branch are met; shape on 34 and the Must views on 16 of 17. The four misses are known deviations or the owner's override (D32, D36, C2; the I-girder with shear, part of the shear profile iteration, D50). The Should on shear views is met on 10 of the 20 shear cases. Step A-4 (2026-11-24) took up the flat peak (D64): confirmed as the main source of what is left on the shear cases, not broken through, put to the owner as one named limitation (D66). The softening cases wait for D67 |
+| **A. Develop the kernel** | On a development set that widens step by step (D41): Newbeam varied in its loads (the 17 cases below), then one variable at a time — shape (step A-1, the seven Quick Define cases), reinforcement (step A-2, five cases), material models (step A-3, eight cases; one softening model, D67), settings of the section, units and material factors (step A-5, 14 cases), then the loads not yet in the set (step A-6). What is not yet in the set stays parked. | **Now.** 52 cases. Peak is met on all; rising branch on 50 (the two US-units cases at M/V = 1 ft, D70); shape on 47; the Must views on 24 of the 25 without shear. Every Must miss is a known deviation, the owner's override or put to the owner (D32, D36, C2, D50, D70). The Should on shear views is met on 13 of the 27 shear cases. Step A-4 named the limitation behind most of what is left on the shear cases (D66). Step A-5 (2026-11-24) widened the set by 15 cases and found one more rule of the shear calculation, which is written and off (D69) |
 | **B. Validate and refine** | The parked cases come back; the test set and targets are reviewed; r2c is held to them. | Not started. Starts when the development set has widened to cover the scope and meets the exit criteria (D1, D2). Then the test set and targets are reviewed with the owner. |
 
 ### The development set
@@ -121,31 +127,258 @@ the section and not of a material (D60); the parabolic and segmental base curves
 tension stiffening "none", for which there is no fixture (the last cannot be captured:
 Response asks a question first). The softening models are on the I-girder: part 2, D62.
 
-Parked, kept and not run by default (48 cases): the softening models on the I-girder,
-given crack spacings, units, material factors, More Detail, no input, the other cases on
-the T-beam and I-girder, and Response's sample inputs. They sit in a folder of their own and can be run on
-request. Eleven of them need something that has been removed, and r2c refuses them: five
-since the removals of D18, six more (all on Response's sample inputs) since D23.
+**Step A-3, part 2: one softening model on the I-girder (owner 2026-11-24, D67).**
+`igirder-csoft3-m2v`, Vecchio-Collins 1992-A at M/V = 2 m. Moved in at the start of step
+A-5, in a commit of its own.
+
+**Step A-5, settings of the section, units, material factors and More Detail (14 cases,
+proposed by the developer 2026-11-24 to the owner's brief; D68, D72).** All on Newbeam.
+Each was captured three more times through Response first (D57). Moved into the set in a
+commit of their own.
+
+| Case | Loads | The setting it tests |
+|---|---|---|
+| `newbeam-smx-mv` | M + V at M/V = 1 m | crack spacings given (a setting of the section, D60) |
+| `newbeam-us` | M | US units in effect (kip, ft, in, psi), on Newbeam's own SI input |
+| `newbeam-us-mv` | M + V at M/V = 1 ft | the same, with shear |
+| `newbeam-usfile-mv` | M + V at M/V = 1 ft | an input file written in US units |
+| `newbeam-usfile-si-m` | M | that file, solved with SI units in effect |
+| `newbeam-kgcm` | M | kg and cm in effect |
+| `newbeam-kgcmfile-mv` | M + V at M/V = 1 m | an input file written in kg and cm |
+| `newbeam-csa` | M | the CSA material factors (0.65 concrete, 0.85 bars, 0.90 strand), as an option |
+| `newbeam-csa-mv` | M + V at M/V = 1 m | the same, with shear |
+| `newbeam-csafile-m` | M | the CSA factors set in the input file |
+| `newbeam-csafile-none-m` | M | the factors set in the file and switched off by the option |
+| `newbeam-m-md2` | M | More Detail pressed twice (228 stages where the plain case has 60) |
+| `newbeam-m-mdmax` | M | More Detail at its most (327 stages) |
+| `newbeam-mv-md2` | M + V at M/V = 1 m | More Detail pressed twice, with shear (130 stages) |
+
+The brief named eleven. The other three (`newbeam-us`, `newbeam-usfile-mv`,
+`newbeam-usfile-si-m`) are the remaining parked cases whose variable is the units; the
+developer proposed and moved them with the rest (D72). Not proposed: Newbeam with no
+input and Newbeam with negative elevations, which are neither a setting nor a unit.
+
+**How the 14 repeat** (measured, `python tools/repeat.py`: the capture the fixture was cut
+from and three new ones). 13 repeat exactly, every stage and view. **`newbeam-mv-md2` does
+not:** all four captures have the same 130 stages, but 162 to 192 of the 2,732 detail
+sections differ, in the last printed digit of a few stages (0.01 % of the curve at
+most). None of the compared stages differs. Noted, as D57 asks; the fixture is kept.
+
+Parked, kept and not run by default (33 cases): the softening models on the I-girder but
+one, the loads not yet in the set (shrinkage, thermal gradient, where the axial load
+acts), no input, negative elevations, the other cases on the T-beam and I-girder, and
+Response's sample inputs. They sit in a folder of their own and can be run on request.
+Eleven of them need something that has been removed, and r2c refuses them: five since the
+removals of D18, six more (all on Response's sample inputs) since D23.
 
 ## Progress against the Phase A exit criteria
 
-Cases inside target, counted by `tools/targets.py --counts` (measured). "Step A-2" is that
-step's run of record on the 29 cases, under the spike test. "Now" is the run of record of
-step A-4 (`docs/verification-results.md`) on the 37 cases, which is that of step A-3
-check for check: the one rule changed in step A-4 moves none.
+Cases inside target, counted by `tools/targets.py --counts` (measured). "Step A-4" is that
+step's run of record on the 37 cases. "Now" is the run of record of step A-5
+(`docs/verification-results.md`) on the 52 cases. The last column is the same 52 with the
+slopes rule switched on (D69): measured, not the run of record.
 
-| Check | Step A-2 (29) | Now (37) | Exit tier (D1, D2, D27) |
-|---|---:|---:|---|
-| Peak | 29 | 37 of 37 | Must: met |
-| Rising branch | 29 | 37 of 37 | Must: met |
-| Shape | 26 | 34 of 37 | Must (a shear case's ending left out: D25). Two misses are known deviations (D32, D36); the third is the I-girder with shear (the shear profile iteration, D50). None is a new case |
-| Views of the stress state, without shear | 14 of 15 | 16 of 17 | Must. The miss is the column under N alone after its peak (the owner's override, C2) |
-| Post-peak, without shear | 14 of 15 | 16 of 17 | Should. The miss is the column under N alone (C2) |
-| Views related to shear, and stress-state views with shear | 21 of 29 (7 of the 14 with shear) | 26 of 37 (10 of the 20 with shear) | Should, not met. Three of the six new shear cases are outside (D61) |
-| Views related to cracking | 23 of 29 | 31 of 37 | Could. All eight new cases are inside |
+| Check | Step A-4 (37) | Now (52) | With the slopes rule on (52) | Exit tier (D1, D2, D27) |
+|---|---:|---:|---:|---|
+| Peak | 37 | 52 of 52 | 52 | Must: met |
+| Rising branch | 37 | 50 of 52 | 52 | Must. The two misses are the US-units cases at M/V = 1 ft (D70) |
+| Shape | 34 | 47 of 52 | 46 | Must (a shear case's ending left out: D25). Known deviations: tension (D36), V alone (D32), the I-girder with shear (D50). New: the two US-units cases (D70). With the rule on, elasto-plastic tension stiffening as well (D69) |
+| Views of the stress state, without shear | 16 of 17 | 24 of 25 | 24 of 25 | Must. The miss is the column under N alone after its peak (the owner's override, C2) |
+| Post-peak, without shear | 16 of 17 | 24 of 25 | 24 of 25 | Should. The miss is the column under N alone (C2) |
+| Views related to shear, and stress-state views with shear | 26 of 37 (10 of the 20 with shear) | 37 of 52 (13 of the 27 with shear) | 36 of 52 | Should, not met |
+| Views related to cracking | 31 of 37 | 43 of 52 | 45 of 52 | Could |
 
-The 29 cases are held by the no-regression bound: against the last run of record no
-check on them changed side (measured, `python tools/changes.py`).
+The 37 cases, and the softening case of D67, are held by the no-regression bound:
+against the "before" run of this step no check on them changed side (measured, `python
+tools/changes.py`: 0 in, 0 out).
+
+### Step A-5, part by part
+
+| Part | What was done | Outcome |
+|---|---|---|
+| 1. D67 | `igirder-csoft3-m2v` moved into the set, in its own commit; verify and report rerun: the "before" run, 38 cases | Peak −3.0 %, rising branch 3.7 %, shape the same. Should and Could outside: 13 views at its peak, 6 to 16 % |
+| 2. The I-girder's shear views where the web cracks | One approach: the program's routine for the slopes of the compressive stress, read; written fresh; held to Response's own calculated shear stress on every shear capture before any run | **Found: a rule.** Written and off (D69, table below) |
+| 3. The 14 settings cases | Proposed, captured three times, moved in; units checked first; one rule for the material factors | **12 of 14 meet every Must.** The two US-units shear cases are outside on rising branch and shape (D70). Should outside on three shear cases (D70, D71) |
+| 4. The loads not yet in the set | The three captured three times; not moved | **Left for step A-6** (table "The loads group") |
+| 5. Which deviations recur | Table below | The flat peak and the named limitation recur on three of the seven new shear cases; the rest do not |
+| The parked cases, run once | The 33 that remain | **Nothing moved** against the run at the end of step A-4 (Risks) |
+
+### The slopes rule (part 2; D69)
+
+**What it is.** In the shear calculation each node of the section has a stiffness, and
+part of it is how the concrete's compressive stress changes with the compressive strain
+and with the tension across it (the softening). r2c measured both changes on its own
+stress relation. The program has formulas for them, and its formulas are not always the
+slope of its own stress relation: for four of the softening models it counts no softening
+slope at all, for the others it leaves out a secondary effect, and for one (Vecchio-Collins
+1992-B) its formula has the sign the other way from the relation's slope. All of this is taken
+over as read (`docs/kernel.md`, "The slopes of the compressive stress").
+
+**The check it was held to** (measured, `python tools/flowset.py`: r2c put into
+Response's own state at every stage of every shear capture, 46 cases; counted are the
+2,007 stages at which Response's own calculated shear stress is within 2 % of its state).
+
+| | Stages where r2c's calculated shear stress is more than a point further off than Response's own |
+|---|---:|
+| As r2c was | 309 |
+| With the program's slopes | 80 |
+| of those 80: a case's first stage, under next to no load | 25 |
+| of those 80: three softening models (Maekawa, Mehlhorn, Porasz-Collins), 1 to 1.5 points off | 54 |
+
+By case: the I-girder with Vecchio-Collins 1992-A 14 stages to 1; with the default
+softening at M/V = 2 m 13 to 1; with Hsu-Zhang 44 to 1; Newbeam at M/V = 0.5 m 11 to 0;
+the two US-units cases 18 and 17 to 0. Newbeam at M/V = 1 m and its variants agreed
+before and agree now.
+
+**What it moves, switched on** (measured: verify runs from a copy of the tree with the
+rule on, `python tools/changes.py`, `tools/targets.py`, `tools/earlyends.py`,
+`tools/ends.py`, `tools/limits.py`).
+
+| | Rule off (the run of record) | Rule on |
+|---|---|---|
+| Checks that change side, the 52 cases | | **45 in, 5 out** |
+| The I-girder with Vecchio-Collins 1992-A (D67), views at its peak | 13 outside, 6 to 16 %; peak −3.0 % | 1 outside (shear on the crack, 13.5 %); peak +0.1 % |
+| M/V = 0.5 m, views at its peak and fall of load (D49, D46) | 17 outside, up to 15.5 % | 7 outside, 5.0 to 14.3 %; post-peak 8.1 to 3.1 % |
+| The US-units cases, views | 42 outside | 26 outside |
+| "M constant, then M + V", shear stress and shear on the crack at the peak | 8.6, 16.7 % | 0.3, 1.0 % |
+| The US-units cases, rising branch (a Must) | 12.7, 8.2 % | **4.4, 2.2 %: inside** |
+| The US-units cases, peak | −1.6, −1.2 % | −0.1, +0.2 % |
+| The regression guard on the US-units case (1.3 % on the peak) | fails (1.4, 1.6 %) | passes |
+| **Newbeam with elasto-plastic tension stiffening, shape (a Must)** | the same as Response's | **different** (below) |
+| The column with interlocking hoops, two views at its peak (Should) | 2.2, 2.7 % | 5.5, 9.0 % |
+| V alone, post-peak (how a shear response ends) | 3.6 % | 41 % |
+| Shear responses that end as Response's does, the 52 | 18 of 26 | 17 of 26 |
+| Checks that change side, the 33 parked | | 116 in, 42 out |
+| D62's diagnostics: Vecchio-Collins 1986 | peak −0.6 %, rising 2.0 %, shape outside | **+0.0 %, 0.6 %, shape the same** |
+| Hsu-Zhang 1998 | −0.8 %, 6.9 %, shape outside | **+0.4 %, 0.3 %, shape the same** |
+| The parked I-girder that ends early (Kaufmann-Marti) | peak −10.7 % | +0.0 %, inside on peak, rising branch and shape |
+| Mehlhorn on the I-girder | peak +5.4 % | **ends early, peak −13.2 %** |
+| Vecchio-Collins 1982 on the I-girder, rising branch | 2.1 % | 22.3 % |
+| The I-girder at M/V = 2 m, default softening, shape | the same | different (a fall of load before the web cracks) |
+| Parked cases inside on peak, rising branch and shape | 10 of 22 | 12 of 22 |
+
+**The one Must that goes outside.** With elasto-plastic tension stiffening Response's
+curve reaches 219.1 kN, falls to 192.7, and its last stage is back at 212.4. r2c without
+the rule reaches 219.6 kN and stands still. With the rule r2c reaches 219.6, falls to
+192.7 as Response does, and then recovers to 222.6 kN, 1.4 % above its first top. The
+measure then reads r2c's peak after the fall ("cracking, fall, peak") where Response's is
+before it ("cracking, peak"). The peak is inside (+1.6 %), the rising branch 0.2 %. So
+r2c follows Response one stage further than before and then carries on where Response's
+response ends. Whether that is the ending of a shear response (a Won't, D1) or a
+different shape is the owner's to say.
+
+### The 14 cases of step A-5
+
+| Case | Musts | Should | What is left |
+|---|---|---|---|
+| Crack spacings given, M + V | met (peak +0.07 %, rising branch 0.06 %) | met | How the response ends (a Won't): both fall, Response's to 88 % |
+| US units, M | met (0.00 %, every view inside) | met | Nothing |
+| kg and cm, M | met (0.00 %) | met | Nothing |
+| US file solved in SI, M | met (0.00 %) | met | Nothing |
+| kg-cm file, M + V | met (0.00 %, 0.01 %) | met | It ends as Response's does |
+| CSA factors, M (option, and in the file) | met, **after one rule** (below): the limit line of principal tensile stress at the last stage 11.3 to 0.0 % | met | Nothing |
+| CSA in the file, switched off, M | met (0.00 %) | met | Nothing |
+| CSA factors, M + V | met (−0.06 %, 0.07 %) | **two checks outside** at its peak: shear stress 11.9 %, transverse bond 11.0 % | Those two (D71). It ends as Response's does |
+| More Detail, M (twice, and most) | met (0.00 %, 0.02 and 0.03 %) | met | Nothing |
+| More Detail, M + V | met (+0.04 %, 0.04 %) | met | It ends as Response's does |
+| **US units, M + V at 1 ft** | **rising branch 12.7 %, shape different**; peak −1.6 % | 26 checks outside | D70 |
+| **US file, M + V at 1 ft** | **rising branch 8.2 %, shape different**; peak −1.2 % | 16 checks outside | D70 |
+
+**Units are reading and printing** (measured, `python tools/unitcheck.py`: two records
+set side by side after conversion to SI).
+
+- *Response's own captures.* Under M, the US and the kg-cm responses are the SI response:
+  the same 60 stages, peaks 0.00 % apart, curves within 0.03 %. With shear at M/V = 1 m
+  the kg-cm file gives 38 stages for 43 and a peak 0.2 % higher (the file's numbers are
+  rounded in its own units). At M/V = 1 ft, a diagnostic capture of Newbeam in SI at
+  M/V = 0.3048 m was made for this: Response's SI and US responses agree to the peak
+  within 1.0 % and end differently (52 and 57 stages); its two US responses (units as an
+  option, and in the file) differ from each other by 5 to 15 % on the way up.
+- *r2c* converts on reading and on writing and calculates in one set of units, so its
+  US response is its SI response by construction.
+- *In Response's own states* r2c differs by the same amounts on the SI and the US capture
+  at M/V = 1 ft (shear stress 0.71 and 0.71 %, 5.27 and 5.26 %; transverse bond 2.93 and
+  2.92 %): nothing in the rules depends on the units.
+
+So the misses of the two US-units cases are not units. They are this load: M/V = 1 ft
+is under the depth, the curve has two falls of load before its peak, and the top is flat
+(0.2 % over the last stages).
+
+**The rule for the material factors** (in the kernel; `docs/kernel.md`, "The longitudinal
+reserve over a tension zone"). Where the bars crossing a crack limit the concrete's
+tension, the program compares the bars' capacity with two moments of the concrete in the
+tension zone, and takes those two without the concrete's material factor, although the
+limits themselves carry it. Without factors nothing changes. With the CSA factors the
+limit line of the Principal Tensile Stress chart at the last stage of the two moment
+cases came from 11.3 % to 0.0 %.
+
+**The two US-units cases against the named limitation** (measured: Response's own tries
+read from the running program, `python tools/rtrace.py`, and r2c's beside them, `python
+tools/tries.py`; D65: a diagnostic, not reference data). r2c makes Response's first 27
+tries one for one (29 with the slopes rule on). At the next, Response's solve of a stage
+gives up and r2c's keeps a stage that has not settled after 16 passes (error 2.8 %):
+the first kind of the table "Where r2c's tries part from Response's". From there the two
+are on different stages, r2c has one fall of load where Response has two, and that is
+the shape. Of the 44 view checks outside on the three new shear cases with misses, 39 are
+inside when r2c is put into Response's own state (21 of them on a flat part), 4 are not
+(shear stress at the second fall of load, which is the slopes rule; transverse bond at
+three stages, 7 to 18 %), 1 cannot be computed in a lone state (`python tools/sources.py`).
+
+### The loads group (part 4, left for step A-6)
+
+Captured three more times each: all three repeat exactly. Not moved. Where they stand on
+today's kernel (the parked run, not of record):
+
+| Case | The load it tests | Musts | What a first look showed |
+|---|---|---|---|
+| `newbeam-axialloc-nm` | where the axial load acts (constant N = −1000 kN, then M) | met: peak −0.02 %, rising branch 0.03 %, every view inside | Nothing to do |
+| `newbeam-shrink-m` | shrinkage of 0.4 mm/m over the depth | peak −0.02 %, rising 0.9 %, shape the same; **Must views outside** at cracking and after (longitudinal strain 14.6 %, principal tensile strain 15.0 %, principal tensile stress 12.4 to 5.8 %); post-peak 13.1 % | Not looked into |
+| `newbeam-thermgrad-m` | a thermal gradient (0.3 mm/m at the top) | peak 0.00 %, rising 0.1 %, shape the same; **Must views outside**: longitudinal strain 23.8 % and principal tensile strain 82 % at cracking, principal compressive stress 43 to 45 % at the peak and after | At cracking the two Longitudinal Strain charts differ over the upper half by about the thermal strain itself (0.26 mm/m at the top): which strain the views show under a thermal profile is the first thing to read |
+
+### Which known deviations recur on the cases of step A-5
+
+The owner asked for this (D41). The 15 new cases: one softening model on the I-girder,
+and the 14 settings cases, seven of them with shear.
+
+| Known deviation | On the 15 cases of step A-5 |
+|---|---|
+| How a shear response ends (a Won't, D1) | **Recurs on three of the eight shear cases:** the I-girder with Vecchio-Collins 1992-A (Response's falls to 17 % of the peak, r2c's stands still) and the two US-units cases (Response's ends at its peak, r2c's stands still). The other five end as Response's does |
+| The named limitation (D66), with its effects: views on a flat peak (D47) | **Recurs on three:** the two US-units cases (their shape and most of their 42 view misses; the top is flat within 0.2 %) and the CSA shear case (two views at its peak, 0.2 and 0.0 % in Response's own state; r2c's stage there has not converged, 1.1 % against 1 %). Recorded under it, not chased |
+| A stage Response does not put in (D48) | Does not recur |
+| D32 (V alone), D36 (tension), C2 (the column under N) | Not tested: no new case has those loads |
+| D35 (the last-stage point under N + M) | Does not recur |
+| D38: a limit line one program draws and the other does not | Does not recur |
+| D39: the stirrups' memory of yielding | No miss points to it |
+| D46: transverse bond at the stirrups' end | **Recurs on the two US-units cases** (18.8 and 19.8 % at the peak; 18.0 and 10.4 % in Response's own state, so not the state) and on the CSA shear case as part of the flat peak |
+| D49: views at the peak of M/V = 0.5 m | Not on the new cases. On that case itself the slopes rule would bring 10 of its 17 view misses inside (D69) |
+| The I-girder's shear views where the web cracks (step A-4, Risks) | **Shear stress: explained, the slopes rule** (D69). **Shear on the crack: not settled.** With the rule on it is still 13.5 % off on the case in the set, as it is with r2c in Response's own state (13.6 %). One approach was allowed; recorded as a known deviation (`docs/status.md`) |
+
+What the pattern says (the developer's reading): the settings themselves are right.
+Units, More Detail, given crack spacings and the factors under moment agree to the last
+digit or nearly. What is outside is on the shear cases, and is the same two things as
+before: a state that does not settle, and one rule of the shear calculation that was not
+the program's.
+
+### The spike test on the 52 cases
+
+Measured, `python tools/unstable.py VERIFY_OUT --list`. Of 2,772 view checks 2,182 are
+tested and 10 are left unassessed (6 on the 37 cases); all ten are checks r2c is inside
+on. By tier, inside, outside and unassessed: Must 604, 7, 5 of 616; Should 1,394, 100, 2
+of 1,496; Could 642, 15, 3 of 660. No case's result in any tier changes against no rule.
+
+**The Must checks left unassessed, for the owner's review** (the rule asks for this):
+the two on the 37 cases stand as they were (`column-n4000-m` at cracking,
+`newbeam-n2000-m` at its peak). **Three are new:**
+
+| Case | Response's stage | View | Response's departure from the blend of its neighbours | Its two neighbours apart | r2c's difference |
+|---|---|---|---:|---:|---:|
+| CSA factors, M (`newbeam-csa`) | 46 (peak) | principal tensile stress | 42.3 % | 3.4 % | 0.1 % |
+| CSA factors in the file, M (`newbeam-csafile-m`) | 46 (peak) | principal tensile stress | 42.3 % | 3.4 % | 0.1 % |
+| More Detail twice, M (`newbeam-m-md2`) | 224 (peak) | principal tensile stress | 22.4 % | 2.7 % | 0.1 % |
+
+The fourth new one is a Could (`newbeam-kgcmfile-mv`, longitudinal bond at the peak:
+7.4 %, 3.2 %, r2c 0.0 %). These are real spikes of Response's chart at its peak stage, and
+r2c has the same spike (0.1 % off), so leaving them out hides nothing.
 
 ### Step A-4, the flat peak (D64)
 
@@ -589,6 +822,16 @@ owner) · *open* (no suggestion yet).
 | D67 | **D62's three softening cases: do they join the set?** As diagnostics they did not move. Vecchio-Collins 1992-A is inside on peak, rising branch and shape (−3.0 %, 3.7 %, same). Vecchio-Collins 1986 is outside on shape, Hsu-Zhang on rising branch (6.9 %) and shape: on both r2c's curve has a fall of load before the web cracks that Response's has not, and both part from Response's tries early (softening 2 at a stage not settled after 16 passes, softening 14 at a stage put in between that Response drops) | decided, owner 2026-11-24 (suggestion approved) | **Vecchio-Collins 1992-A (`igirder-csoft3-m2v`) joins the set; Vecchio-Collins 1986 and Hsu-Zhang stay parked as diagnostics** until D66 is decided |
 | D68 | **What comes next.** By D41's order the variables left are the settings of the section and units (the given crack spacings of D60, US units, kg and cm) and material factors. Two parked cases in US units at M/V = 1 ft are outside on rising branch and shape, and one regression guard on them fails (Risks) | decided, owner 2026-11-24 (suggestion approved, widened) | **Step A-5: settings of the section, units and material factors,** each case captured three times first (D57), after a bounded look (one approach) at the I-girder's shear views where its web cracks. **The loads not yet in the set** (shrinkage, thermal gradient, where the axial load acts) are a group of their own: in A-5 if time allows, otherwise step A-6 |
 
+### Left by step A-5 (new, 2026-11-24)
+
+| # | Question | Status | Answer |
+|---|---|---|---|
+| D69 | **The slopes rule: a rule of the shear calculation read from the program is written and switched off, because one Must goes outside with it.** What it is and what it moves is in "The slopes rule" above. For it: it is the program's rule, and with it r2c's calculated shear stress in Response's own states is Response's own (309 stages off before, 80 after, of 2,007); 45 checks come inside on the 52 cases; the rising branch of both US-units cases comes inside (a Must on two new cases); the failing regression guard passes; two of D62's three softening diagnostics come inside on every Must; the parked I-girder's early end goes. Against it: **the shape of Newbeam with elasto-plastic tension stiffening goes outside** (r2c now follows Response's fall of load after the peak and then recovers 1.4 % above its first top, where Response's response ends at 212 kN of 219); two Should views at the peak of the column with interlocking hoops go outside (5.5, 9.0 %); V alone ends differently (post-peak 3.6 to 41 %); on the parked cases Mehlhorn ends early (−13.2 %) and Vecchio-Collins 1982 loses its rising branch (22 %). The no-regression bound says a shape may not go outside, so it is off. This is the pattern of D46 and D49 | suggested | **Switch it on**, and accept the shape of the elasto-plastic case as a known deviation: the point the measure reads is r2c carrying on after Response's last stage, which belongs to how a shear response ends (a Won't, D1). The other four checks that go outside are recorded with it. The regression limit of the elasto-plastic case is then reset in its own commit. Other options: leave it off (the US-units rising branches then stay outside, D70); or switch it on only for the softening models where the program counts no softening slope (not suggested: that is half of the program's rule) |
+| D70 | **The two US-units cases at M/V = 1 ft are in the set with two Must misses each: rising branch (12.7 and 8.2 %) and shape (one fall of load before the peak where Response has two).** Not units: Response's and r2c's US responses are their SI responses after conversion (above). The rising branch is the slopes rule: inside with it on (4.4 and 2.2 %). The shape is the named limitation: r2c makes Response's first 27 tries one for one, then Response's solve of a stage gives up where r2c keeps a stage that has not settled, and from there the two are on different stages. Their Should and Could views are outside for the same two reasons (42 checks; 26 with the rule on). Response itself is unsteady here: its own two US responses differ by 5 to 15 % on the way up | suggested | **Accept as known deviations, and the two stand in the set:** the shape under the named limitation (D66), the rising branch until D69 is decided. Other option: park the two again until D66 is decided, as with the two softening cases of D67 |
+| D71 | **Two Should checks outside at the peak of the CSA shear case** (shear stress 11.9 %, transverse bond 11.0 %). They came with the rule for the material factors, which is what brought the two CSA moment cases inside on a Must; before it both were inside. In Response's own state at that stage r2c is 0.2 and 0.0 % off, so it is the state: the top of this curve is flat (157.7, 160.6, 159.5 kN while the shear strain doubles), r2c's stage there has not converged (1.1 % against 1 %), and the difference is four nodes at the top of the cracked zone. With the slopes rule on they are inside | suggested | **Accept as a known deviation under the named limitation (D66)** |
+| D72 | **Reading of the brief, for the owner to confirm: 14 cases, where the brief named eleven.** "Propose the list" was read as leave to add the three other parked cases whose variable is the units (US units under M; the US file with shear; the US file solved in SI). They were captured three times and moved with the rest. Two of them are inside on everything; the third is one of the two of D70 | suggested | Confirm. Other option: move any of the three back |
+| D73 | **What comes next.** Part 4 was not started beyond its captures. The loads group is three cases; one meets everything, two are outside on Must views, and the thermal gradient points at which strain the views show under a thermal profile ("The loads group"). After it, what is parked is the softening models on the I-girder, Newbeam with no input and with negative elevations, the T-beam and the I-girder at M/V = 2 m, and the refused cases | suggested | **Step A-6: the loads group** (shrinkage, thermal gradient, where the axial load acts), with D69 carried out first if the owner approves it, since it changes the shear cases the step is measured against. Then the owner's review of what phase A still lacks before phase B |
+
 ### The source rule (2026-11-22, after A2)
 
 | # | Question | Status | Answer |
@@ -632,27 +875,34 @@ H and I (views are now covered by D2).
   answer: one page per session, not one log per step.
 - **Unattended runs** without a scoped GitHub token (setup, not yet done). Branch protection on
   `main` and auto-delete of merged branches are on (owner, 2026-11-22).
-- **The set is still narrow.** Three more shapes, five reinforcement cases and eight
-  material cases on Newbeam are in; the softening models, units and factors are parked.
-  The parked cases are not run on every change, so a change that breaks one of them
-  shows only when they are run again.
-- **What moved on the parked cases in step A-3: nothing** (the 48 that remain, run once in step A-3
-  against the run at the end of step A-2; measured, `python tools/changes.py`; not a run
-  of record). The kernel is the same, so this is as expected: no check changed side. Of
-  the 37 that r2c solves, 23 are inside on peak, rising branch and shape. Outside, as
-  before: eleven I-girders with shear (softening 0, 1, 2, 5, 6, 7, 8, 9, 11, 12, 14), the
-  two cases in US units at M/V = 1 ft, the T-beam at M/V = 2 m. One I-girder ends early
-  (softening 12).
-- **The Should on shear views is getting no nearer as the set widens.** 10 of the 20
-  shear cases are inside. Every miss on the new cases is a state on or after a flat
-  peak, and the measure reads one stage there (D61).
-- **What moved on the parked cases in step A-4: nothing** (the 48, run once at the end;
-  measured, `python tools/changes.py` against the run at the start; not a run of
-  record). One I-girder ends early, softening 12, as before.
-- **A miss on the I-girder that is not the limitation** (found in step A-4, not looked
-  into): where the web cracks, shear stress and shear on the crack are 8 to 15 % off
-  on the parked softening cases even with r2c in Response's own state. 34 Should
-  checks. It may be a rule, or a state the charts do not give closely enough (D68).
+- **The set is wider, and the parked cases fewer.** 52 cases are in; 33 are parked, 22 of
+  which r2c solves. The parked cases are not run on every change, so a change that
+  breaks one of them shows only when they are run again.
+- **The Should on shear views is getting no nearer as the set widens.** 13 of the 27
+  shear cases are inside. The misses on the new cases are again a state that does not
+  settle (D70, D71), and the measure reads one stage there.
+- **What moved on the parked cases in step A-5: nothing** (the 33 that remain, run once at
+  the end on the present kernel; measured, `python tools/changes.py` against the run at
+  the end of step A-4; not a run of record). Of the 22 r2c solves, 10 are inside on
+  peak, rising branch and shape. Outside: eleven I-girders with shear (softening 0, 1,
+  2, 5, 6, 7, 8, 9, 11, 12, 14) and the T-beam at M/V = 2 m (+6.7 %). One I-girder ends
+  early (softening 12). With the slopes rule on, measured as well: 116 checks in and 42
+  out, 12 of 22 inside, and another I-girder ends early (D69).
+- **A rule of the shear calculation is known and not in use** (the slopes rule, D69).
+  Until the owner decides, r2c's shear stiffness is knowingly not the program's where
+  the concrete softens: most on the I-girder and on loads with a fall and recovery
+  before the peak.
+- **Shear on the crack where the I-girder's web cracks is still 13.5 % off** on the
+  softening case in the set, with the slopes rule on or off, and in Response's own
+  state too. The one approach of this step settled the shear stress and not this. A
+  known deviation (`docs/status.md`); not looked into further.
+- **Three softening models are not Response's to within a point even with the slopes
+  rule** (Maekawa, Mehlhorn, Porasz-Collins: r2c's calculated shear stress 1.5 to 2.0 %
+  off where Response's own is 0.5 %). All parked. Where the softening sits at a bound
+  was read from the program; what is left was not looked into.
+- **One formula of the program is taken over with a sign that looks wrong**
+  (Vecchio-Collins 1992-B, in the slopes rule). It fits Response's own figures better
+  than the formula's own slope does, on the one capture there is. Parked case, rule off.
 - **The tracer is a new dependency of the diagnostics, not of r2c** (D65): it needs
   r2x, Wine and the compiler r2x's worker already needs. On four of 16 cases it upset
   r2x's wait for Response to finish; the logs are good up to there.
@@ -663,6 +913,14 @@ H and I (views are now covered by D2).
 - **One more test of the program's pass routine is not in r2c** (under control of the
   shear strain, a stage whose extreme fibre is near cracking is kept unconverged from
   the twelfth pass). No traced case shows it deciding anything.
+- **The loads group was not worked on** (shrinkage, thermal gradient, where the axial
+  load acts): two of its three cases are outside on Must views today (D73).
+- **`newbeam-mv-md2` does not repeat in Response to the last digit** (D57): four captures,
+  the same stages, small differences at a few of them, none at a compared stage. The
+  fixture is one of the four.
+- **Two tools do not convert units** (`tools/spacing.py`, `tools/bond.py`): on a record in
+  US or kg-cm units they report differences that are only the unit. The comparison
+  itself (`tools/compare.py`) is in each record's own units and is not affected.
 - **The shear profile iteration is not resolved** (D50, D64, now D66), and the parked I-girders with
   shear will be set members when the softening models come in (D62): an early end will
   be a Must there. Of the three proposed, two are outside on a Must today. One of 16 ends early now (softening 12; softening 9 is on the line at
@@ -672,36 +930,35 @@ H and I (views are now covered by D2).
   are still evaluated r2c's way. The difference in the forces is taken to be nothing
   (stirrups carry no axial load or moment); it was not measured by writing the other
   form. Which nodes these are near a face is not Response's node for node.
-- **Four rules of the program are in the code and switched off** (`docs/status.md`); the
-  program's solve was measured again in step A-4 and stays off.
-  Each is one more thing to keep working while it is unused.
+- **Five rules of the program are in the code and switched off** (`docs/status.md`): the
+  four of before, and the slopes rule (D69). Each is one more thing to keep working
+  while it is unused.
 - **Part of the crack spacing routines was not read:** they branch on a setting of the
   section that could not be named. The branch taken over fits every chart compared,
-  since step A-3 also with the other tension stiffening models and the factor 0.5. A
-  case with crack spacings given, or in other units, may take the other branch.
+  since step A-5 also with crack spacings given and with the CSA factors (to 0.001 and
+  0.05 mm) and, by the view checks, in kg-cm units.
 - **A stage control status that the program never returns with shear** is still acted on
   in r2c (it carries on from a solve that has not closed if it is nearly balanced). Found
   while reading the solve; left as it is, because taking it out is a change with no
   check to weigh it by. It is noted in `docs/status.md`.
 - **One inferred detail in the new layering:** which side the middle node of the thin layer
   belongs to (the wider one) is taken from Response's charts on one section, not read.
-- **One parked regression test fails:** Newbeam in US units at M/V = 1 ft, peak 1.4 to
-  1.6 % under Response's against a guard of 1.3 %. It has been over the guard since
-  step A-1 (the parked tests were not run in between) and moved 0.1 % further since.
-  The guard was left as it is; the case is inside the 5 % target on its peak.
+- **One regression test of the set fails:** Newbeam in US units at M/V = 1 ft, peak 1.4
+  and 1.6 % under Response's against a guard of 1.3 %. Over the guard since step A-1.
+  The guard was left as it is. With the slopes rule on the peak is 0.1 % under and the
+  test passes (D69). It is the only limit over on the 52 cases (`python tools/limits.py
+  VERIFY_OUT`: 51 cases checked against the run of record).
 - **Still standing on the parked cases:** eleven I-girder cases with shear outside on peak,
-  rising branch or shape; the two cases in US units at M/V = 1 ft outside on rising
-  branch and shape; the T-beam at M/V = 2 m on its peak (+6.7 %).
+  rising branch or shape; the T-beam at M/V = 2 m on its peak (+6.7 %).
 - **Response is not repeatable on three cases found so far**, all on the I-girder with
   shear (D57, D63): the one in the set and softening 11, both at M/V = 1 m, and
   softening 16 at M/V = 2 m. Each time the difference is whether stages put in while
   closing in on an event are kept. A fixture is one capture, so on such a case it holds
   one of the variants. The eight new cases and 16 of the 18 parked softening cases
   repeated exactly in four captures each; the other 30 parked cases have one capture.
-- **The rule on unstable views now does almost nothing** (D56 carried out, D59). Every
-  check at cracking, a fall of load and the peak is assessed again but four. Views that
-  Response itself changes from stage to stage without returning (the bond chart with
-  prestrained stirrups) are assessed as they stand: inside today, not promised to stay
-  so when the kernel or a case changes.
-- **Speed.** Not worked on. The 29 cases take about two minutes on the owner's machine
-  with all of them running at once (measured).
+- **The rule on unstable views does little** (D56 carried out, D59): 10 checks of 2,772 are
+  left unassessed, all of them checks r2c is inside on, five of them Musts (listed
+  above). Views that Response itself changes from stage to stage without returning (the
+  bond chart with prestrained stirrups) are assessed as they stand.
+- **Speed.** Not worked on. The longest case of the set is now More Detail with shear,
+  97 s (measured, the run of record); the whole set was not timed in this step.

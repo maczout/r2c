@@ -165,6 +165,28 @@ still take (longitudinal reserve f1cx, transverse reserve f1cy) and by shear on 
 with Bentz's lower bound 0.25·ft/(0.31 + 24w/(a + 16)). Crack width w = (ε1 − εcr)·sθ,
 sθ = 1/(|sin θ|/smx + |cos θ|/smy).
 
+### The longitudinal reserve over a tension zone [T 4-5; B `00441d80`, `00440400`]
+
+The limit f1cx is a profile over each flexural tension zone, from the neutral axis to the
+face (`Analysis.crack_check`; read in increment A2, the factor's place in step A-5). The
+bars crossing the zone give it a capacity moment about the axis: each bar's reserve at a
+crack times its area and its distance from the axis. That moment is set against two
+moments of the concrete in the zone: Ma, a uniform tension of 0.6·ft, and Mb, a further
+tension rising from nothing at the face to 2.4·ft at the axis.
+
+* Capacity up to Ma: a uniform limit, the capacity moment over the zone's first moment.
+* Between Ma and Ma + Mb: 0.6·ft at the face, rising linearly to the axis by what the
+  capacity has over Ma.
+* Over Ma + Mb: 3·ft at the axis, and at the face 0.6·ft plus what is left over.
+* A zone no bar crosses has no capacity moment and a limit of nothing (D30).
+
+**With material factors** [B `00440400`, read 2026-11-24, step A-5]: the limits at the face
+and at the axis (0.6·ft, 3·ft) carry the concrete's factor, but Ma and Mb are summed with
+the unfactored ft. So with the CSA factor of 0.65 the uniform branch reaches further than
+its own face value: where r2c had a sloping limit from 0.76 MPa at the face, Response has
+a flat 0.83 MPa (Newbeam with CSA factors under M, last stage: the limit line of the
+Principal Tensile Stress chart 11.3 % off before, 0.0 % with the rule).
+
 ### A node with next to no shear strain [B `004a8b20`, `004a7b60`], read 2026-11-23 (step A-2)
 
 With shear, before Response solves a node's transverse strain (`004a8b20`) it tests the
@@ -521,7 +543,62 @@ point of Response's figure) at every stage of Marshall, se100 and the Newbeam at
 with and without axial load, and at all but one stage of shear alone; at M/V = 2 m to stage 78 of 87 (2 % at the end, was 13
 to 35 % from stage 57); at M/V = 0.5 m to stage 39 (was 7 to 27 % from 37). What is left: 3
 to 7 % after the load has fallen and is recovering (M/V = 0.5 m from stage 41; US case from
-31), and 2 to 5 % on Liping LB1 from stage 13. Not explained.
+31), and 2 to 5 % on Liping LB1 from stage 13. The first of these is explained since step
+A-5 (the slopes of the compressive stress, below); Liping LB1 is refused since D23 and was
+not looked at again.
+
+**The slopes of the compressive stress [B `004ac960`, called from `0046b940`], read
+2026-11-24 (step A-5): written, off** (`Shear.own_slopes`, `ConcreteLaw.compression_slopes`;
+`docs/summary.md`, D69). Until now r2c took the two slopes along the principal compression
+as differences of its own stress relation. The program has them in closed form, and its
+form is not everywhere the relation's slope:
+
+* *Against the compressive strain, softening held:* the slope of the base curve's shape at
+  ε2 over the strain at peak stress, times the lowered peak stress. Popovics: the exponent
+  n = 0.8 + β·fc′/17 and k = 0.67 + β·fc′/62 (1 before the peak, and never under 1) are
+  those of the lowered strength, with no lower bound on n here; the slope is divided by the
+  unlowered ε0 also for the models that lower the strain at peak stress (9, 14, 15 and 1,
+  11), so it is β times the relation's slope there. Model 3 (Vecchio-Collins 1992-A): on
+  its plateau the curve is taken at its peak, with the unlowered n; past ε0 the unlowered
+  curve, with β applied twice. Parabola: the tail past the lowered peak strain for models
+  1, 9, 14 and 15 (not 11). Linear and elasto-plastic: 1/εp up to the peak, then nothing.
+  Segmental: the table's slope.
+* *Against the principal tension, through the softening alone:* the curve's shape times
+  fc′ times −dβ/dε1, with dβ/dε1 the slope of the model's own formula, and nothing where β
+  sits at a bound (1; 0.8 for Mehlhorn; 0.65 and 1 for Maekawa). **Nothing at all for the
+  models that soften by a ratio or sum of the two strains (1, 3, 11), for Noguchi (8) and
+  for "none".** The change of n, k and of the strain at peak stress with β is left out for
+  every model (with the default at 60 MPa that makes this slope about a sixth larger than
+  the relation's). For Vecchio-Collins 1992-B (5) the program's expression is
+  (1 − 0.27/ε0)/d², d = 1 + 0.27·(ε1/ε0 − 0.37): the sign is the other way from the
+  formula's slope and a 1 is added to 0.27/ε0. Taken over as read; set against Response's
+  own figures on that girder the read form fits (0.7, 0.6 against 0.8, 0.6 % at stages 33
+  and 34) and the formula's slope does not (1.1, 1.4 %).
+* The slope against the tension is counted with the ratio of the change of ε1 to that of
+  ε2 that the column brings (tan²θ for the longitudinal strain, 1/tan²θ for the
+  transverse), and with nothing for the shear strain: the routine is called with −1 there
+  and takes a negative ratio as none. (This is the rule already recorded above, now with
+  its place.)
+* A principal "compressive" strain that is tensile (over −1e-9) takes the tension side of
+  the same routine; r2c keeps its difference there, which is that slope.
+
+Measured with `python tools/flowset.py ARCHIVE --inputs …` (2026-11-24; r2c in Response's
+own state at every stage of every shear capture, 46 cases, 2,007 stages at which Response's
+own calculated line is within 2 % of its state): r2c's calculated shear stress is more
+than a point further from the state than Response's own at **309 stages with the
+differences and 80 with the program's slopes**. By case: the I-girder with softening 3
+(Vecchio-Collins 1992-A) 14 to 1, the worst excess 11.6 to 3.5 points; with the default
+softening at M/V = 2 m 13 to 1; Hsu-Zhang 44 to 1; M/V = 0.5 m on Newbeam 11 to 0, which
+is the difference "after a fall of load, on the recovery" left unexplained on 2026-11-19;
+the two cases in US units at M/V = 1 ft 18 and 17 to 0. Every case's one stage left is its
+first (a shear of 2 kN on the I-girder). What is left after it: Maekawa (7) 40 stages, at
+1.5 to 2.0 % against Response's 0.5; Mehlhorn (6) 10; Porasz-Collins (13) 7. Not looked
+into (one approach, D68).
+
+Why it is off: on the 38 cases 27 checks come inside and 5 go outside, and one of the five
+is a Must, the shape of Newbeam with elasto-plastic tension stiffening
+(`docs/verification.md`, "Step A-5"). The no-regression bound keeps it off until the owner
+decides (D69).
 
 ## The state under the constant loads [T 7-3; O]
 

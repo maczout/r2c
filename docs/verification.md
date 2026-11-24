@@ -1142,3 +1142,40 @@ tension stiffening factor of 0.5 it solves one target three times and gets loads
 0.14 % apart, the peak being the middle one. A view check at such a stage compares two
 such samples.
 
+
+## Step A-5 (2026-11-24): settings of the section, units and material factors
+
+The run of record (`docs/verification-results.md`) is on 52 cases: the 37 of step A-4,
+the I-girder with softening Vecchio-Collins 1992-A (D67) and 14 on Newbeam whose variable
+is a setting of the section, the units, the material factors or More Detail. On the 38
+that were in the set before the 14 joined, no check changed side against the "before" run
+of the step (measured, `python tools/changes.py`). The tables are in `docs/summary.md`;
+what they mean:
+
+- **Units change nothing but the numbers read and printed.** Under M the US and kg-cm
+  cases agree with Response to the same digits as the SI case does (peak 0.00 %), and
+  Response's own US and kg-cm captures are its SI capture after conversion (`python
+  tools/unitcheck.py`). A miss on a case in other units is therefore a miss of the
+  section and load, not of the units. The two US-units cases with shear show it: their
+  load is M/V = 1 ft, under the depth, with two falls of load before a flat peak, and
+  Response's own SI capture at M/V = 0.3048 m differs from r2c in its own states by the
+  same amounts as the US capture does.
+- **More Detail** adds stages and changes none: 228, 327 and 130 stages, every check
+  inside as on the plain cases. The case with shear is the first on Newbeam that Response
+  does not repeat to the last digit (four captures; `python tools/repeat.py`).
+- **The material factors** needed one rule (the crack check's two capacity moments without
+  the concrete's factor, `docs/kernel.md`). It showed only after the peak, in the limit
+  line of the Principal Tensile Stress chart: 11.3 to 0.0 %.
+- **The figures of the shear cases are still read with the slopes rule off.** r2c's
+  stiffness in the shear flow calculation is not the program's where the concrete softens
+  (`docs/kernel.md`, "The slopes of the compressive stress"; measured with `python
+  tools/flowset.py`: 309 stages of 2,007 more than a point off, 80 with the rule). On the
+  set that is behind the view misses at the peak of the I-girder with softening, 10 of
+  the 17 on M/V = 0.5 m, two on "M constant, then M + V", and the rising branch of the
+  two US-units cases. With the rule on 45 checks come inside and 5 go outside on the 52;
+  it is off because one of the five is a Must (`docs/summary.md`, D69).
+- **The view misses of the new shear cases are mostly the state reached.** Of 44 view
+  checks outside on the CSA shear case and the two US-units cases, 39 are inside with r2c
+  in Response's own state at the stage (`python tools/sources.py`), 21 of them on a flat
+  part of the curve. That is the named limitation of step A-4 again
+  (`docs/status.md`).

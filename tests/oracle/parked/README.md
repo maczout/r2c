@@ -1,8 +1,8 @@
 # Parked fixtures
 
 The oracle cases outside phase A (`docs/summary.md`, D16 and D19; owner, 2026-11-22): other
-sections, other materials and reinforcement, units, material factors, More Detail, no input,
-and Response's sample inputs. They are kept and not run by default; they come back in
+sections, other materials and reinforcement, loads not yet in the set, no input, and
+Response's sample inputs. They are kept and not run by default; they come back in
 phase B.
 
 The development set is the fixtures directly in `tests/oracle` (`docs/summary.md`, "The
@@ -12,7 +12,13 @@ given `tests/oracle` reads that set alone, because the tools read one folder and
 folders under it. Since step A-3 (2026-11-23) the set also holds eight cases whose variable
 is a material model on Newbeam, moved from here after each was captured three more times
 and repeated exactly (D57): two concrete base curves, five tension stiffening models and
-the tension stiffening factor.
+the tension stiffening factor. Since step A-5 (2026-11-24, D67) it holds one compression
+softening model on the I-girder, Vecchio-Collins 1992-A (`igirder-csoft3-m2v`); the other
+softening cases stay here, two of them as diagnostics of the named limitation (D62, D66).
+Also since step A-5 (D68) it holds 14 cases on Newbeam whose variable is a setting of the
+section, the units, the material factors or More Detail, each captured three more times
+first (D57): 13 repeat exactly; `newbeam-mv-md2` differs between captures in the last
+printed digit of a few stages (not at its compared stages).
 
 To run the parked set on request:
 
