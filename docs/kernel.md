@@ -583,7 +583,7 @@ form is not everywhere the relation's slope:
   the same routine; r2c keeps its difference there, which is that slope.
 
 Measured with `python tools/flowset.py ARCHIVE --inputs …` (2026-11-24; r2c in Response's
-own state at every stage of every shear capture, 47 cases, 2,007 stages at which Response's
+own state at every stage of every shear capture, 46 cases, 2,007 stages at which Response's
 own calculated line is within 2 % of its state): r2c's calculated shear stress is more
 than a point further from the state than Response's own at **309 stages with the
 differences and 80 with the program's slopes**. By case: the I-girder with softening 3
