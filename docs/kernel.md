@@ -746,6 +746,19 @@ with moments of 49.6, 51.8, 32.6 and 34.5 kNm; r2c's are now 49.5, 51.8, 32.5 an
 the same places. Before, r2c had 49.5 at −0.539, 51.1 at −0.532 and no stage at −0.533:
 its stage at −0.532 started from the cracked stage before and stayed cracked.]
 
+**Seen since, on the captures (step A-3, 2026-11-23) [O].** Whether Response keeps the
+stages it puts in while closing in on an event is not the same from run to run. On this
+girder at M/V = 1 m the web cracks between the curvatures −0.251 and −0.171 rad/km
+(shears of 366 and 463 kN). In three captures of five Response has ten stages there,
+each a fifth of the way on, and r2c has the same ten; in the other two, the fixture
+among them, it has none. The parked case with Collins 1978 softening does the same (one
+capture of four without them), and with softening 16 at M/V = 2 m one capture of four
+lacks one of the stages put in where the top cracks close. So "nothing in between" at
+the web cracking, in the paragraph below, describes one of Response's two variants and
+is not a deviation of r2c's; the stage at −0.539 is in none of the 13 captures at
+M/V = 1 m and remains open. Inferred from this, not read: a stage put in between takes
+something from the run that the input does not fix. `python tools/repeat.py`.
+
 **Open: the same girder at M/V = 1 m (D43).** There Response has no stage at −0.539 or
 −0.533: it goes from −0.571 (cracked) to −0.530 (un-cracked), and later from −0.251 to
 −0.171, where the web cracks, with nothing in between. By the rules above it must have
