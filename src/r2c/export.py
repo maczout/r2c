@@ -96,8 +96,17 @@ def envelope(st: Stage, before: Stage | None):
     for name, own in (("gxy", d.gxy), ("ey", d.ey)):
         own = np.asarray(own, dtype=float)
         if old is None:
-            # the first stage: nothing at the two faces, and its own profile
-            hi, lo = np.maximum(own, 0.0), np.minimum(own, 0.0)
+            # the first stage: what a node starts from at the two faces, straight between
+            # them, and its own profile. A node starts from no shear strain and from its
+            # shrinkage or thermal strain across the member [B 004a9d90: a new node's
+            # transverse strain is its offset; O: Response's first envelope of
+            # newbeam-thermgrad-m is the straight line between the profile's two ends]
+            sh = getattr(d, "sh", None)
+            if name == "ey" and sh is not None and len(z) > 1 and z[0] != z[-1]:
+                base = sh[-1] + (sh[0] - sh[-1]) * (z - z[-1]) / (z[0] - z[-1])
+            else:
+                base = 0.0
+            hi, lo = np.maximum(own, base), np.minimum(own, base)
         else:
             zo = old["z"]
             order = np.argsort(zo)
