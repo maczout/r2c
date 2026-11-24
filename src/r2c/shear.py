@@ -125,11 +125,11 @@ class Shear(Flexure):
         return zlo, zhi
 
     # the slopes of the compressive stress in the node's stiffness: the program's analytic
-    # ones [B 004ac960] in place of differences taken on the stress relation. Written and
-    # off: with them r2c's calculated shear stress in Response's states is Response's own
-    # (tools/flowset.py), and one Must goes outside on the set (docs/kernel.md, "The
-    # stiffness in the shear flow calculation"; docs/summary.md, D69)
-    own_slopes = False
+    # ones [B 004ac960] in place of differences taken on the stress relation. With them
+    # r2c's calculated shear stress in Response's states is Response's own
+    # (tools/flowset.py). In use since step A-6 (owner 2026-11-24, D69; docs/kernel.md,
+    # "The stiffness in the shear flow calculation")
+    own_slopes = True
 
     def tangent(self, e0, phi, gam):
         """Per node: the condensed tangent stiffness (j, k, m, n) of thesis eq. 6-4, with the

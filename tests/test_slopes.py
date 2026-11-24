@@ -1,6 +1,6 @@
 """The slopes of the compressive stress as Response's node stiffness takes them
 (docs/kernel.md, "The stiffness in the shear flow calculation"; B 004ac960): written in
-step A-5, off (docs/summary.md, D69)."""
+step A-5, in use since step A-6 (docs/summary.md, D69)."""
 
 import numpy as np
 import pytest
@@ -19,8 +19,8 @@ def _differences(law):
     return (f(E2 + D, E1) - f(E2 - D, E1)) / (2 * D), (f(E2, E1 + D) - f(E2, E1)) / D
 
 
-def test_the_switch_is_off():
-    assert Shear.own_slopes is False
+def test_the_switch_is_on():
+    assert Shear.own_slopes is True
 
 
 @pytest.mark.parametrize("c_mod", [0, 1, 2, 3])
