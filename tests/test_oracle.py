@@ -2,10 +2,10 @@
 
 The development set (docs/summary.md, D16 and D41: Newbeam with only its loads varied, and
 since step A-1 the seven cases on the Quick Define sections, since step A-2 five cases whose
-variable is the reinforcement) is in tests/oracle and is what runs by default. The Quick
-Define inputs are r2x's: without R2C_DEFINE_DIR those tests are skipped; the inputs of the
-five of step A-2 are variants of r2x's (tools/variants.py): without R2C_SCOPE_DIR those tests
-are skipped. Every other case is parked (D19): its fixture is in tests/oracle/parked and its test
+variable is the reinforcement, since step A-3 eight whose variable is a material model) is
+in tests/oracle and is what runs by default. The Quick Define inputs are r2x's: without
+R2C_DEFINE_DIR those tests are skipped; the inputs of the cases of steps A-2 and A-3 are
+variants of r2x's (tools/variants.py): without R2C_SCOPE_DIR those tests are skipped. Every other case is parked (D19): its fixture is in tests/oracle/parked and its test
 is marked "parked", run on request with `pytest -m parked` (`-m "parked and not slow"` to
 leave out the parked shear cases).
 
@@ -75,8 +75,6 @@ PARKED_DEFINE_SLOW = {
 # r2x's (tools/variants.py), found by name or SHA-256 under R2C_SCOPE_DIR; the two on Newbeam
 # itself need none.
 SCOPE = {
-    "newbeam-cmod0-m": (0.05, 0.1),
-    "newbeam-cmod3-m": (0.05, 0.1),
     "newbeam-axialloc-nm": (0.05, 0.1),
     "newbeam-shrink-m": (0.1, 0.8),
     "newbeam-thermgrad-m": (0.05, 0.3),
@@ -96,6 +94,22 @@ REINF_SLOW = {
     "newbeam-nostirrups-mv": (0.1, 0.5),
     "newbeam-stirrupdep-mv": (0.1, 0.3),
     "column-interlock-mv": (0.4, 1.0),
+}
+# Step A-3 of the development set (owner, 2026-11-23, D53): a material model varied on
+# Newbeam: two concrete base curves under M, five tension stiffening models and the tension
+# stiffening factor under M + V. Inputs as for SCOPE
+MATERIAL = {
+    "newbeam-cmod0-m": (0.05, 0.1),
+    "newbeam-cmod3-m": (0.05, 0.1),
+}
+# at the run before step A-3 (2026-11-23)
+MATERIAL_SLOW = {
+    "newbeam-tstiff1-mv": (0.2, 0.3),
+    "newbeam-tstiff2-mv": (0.1, 0.3),
+    "newbeam-tstiff3-mv": (0.1, 0.2),
+    "newbeam-tstiff4-mv": (0.1, 0.2),
+    "newbeam-tstiff6-mv": (0.4, 0.4),
+    "newbeam-tsfactor-mv": (0.3, 0.4),
 }
 # Phase A, with shear
 SLOW = {
@@ -219,6 +233,17 @@ def test_reinforcement(case, oracle_dir, scope_dirs):
 @pytest.mark.parametrize("case", sorted(REINF_SLOW))
 def test_reinforcement_shear(case, oracle_dir, scope_dirs):
     _scope(case, oracle_dir, scope_dirs, REINF_SLOW[case])
+
+
+@pytest.mark.parametrize("case", sorted(MATERIAL))
+def test_material_models(case, oracle_dir, scope_dirs):
+    _scope(case, oracle_dir, scope_dirs, MATERIAL[case])
+
+
+@pytest.mark.slow
+@pytest.mark.parametrize("case", sorted(MATERIAL_SLOW))
+def test_material_models_shear(case, oracle_dir, scope_dirs):
+    _scope(case, oracle_dir, scope_dirs, MATERIAL_SLOW[case])
 
 
 def test_same_charts_as_the_oracle(oracle_dir):

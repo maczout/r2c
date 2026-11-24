@@ -9,7 +9,10 @@ The development set is the fixtures directly in `tests/oracle` (`docs/summary.md
 development set"): Newbeam with only its loads varied (17), the Quick Define sections (7,
 step A-1) and the reinforcement varied (5, step A-2: moved from here on 2026-11-23). A tool
 given `tests/oracle` reads that set alone, because the tools read one folder and not the
-folders under it.
+folders under it. Since step A-3 (2026-11-23) the set also holds eight cases whose variable
+is a material model on Newbeam, moved from here after each was captured three more times
+and repeated exactly (D57): two concrete base curves, five tension stiffening models and
+the tension stiffening factor.
 
 To run the parked set on request:
 
