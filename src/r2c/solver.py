@@ -587,7 +587,7 @@ class Analysis:
         pos = f > 0
         first = np.argmax(pos, axis=1)
         none = ~pos.any(axis=1)
-        first = np.where(none, len(ladder) - 1, first)
+        first = np.where(none, ladder.shape[1] - 1, first)
         first = np.maximum(first, 1)
         rows = np.arange(n)
         lo, hi = ladder[rows, first - 1], ladder[rows, first]
