@@ -12,7 +12,9 @@ given `tests/oracle` reads that set alone, because the tools read one folder and
 folders under it. Since step A-3 (2026-11-23) the set also holds eight cases whose variable
 is a material model on Newbeam, moved from here after each was captured three more times
 and repeated exactly (D57): two concrete base curves, five tension stiffening models and
-the tension stiffening factor.
+the tension stiffening factor. Since step A-5 (2026-11-24, D67) it holds one compression
+softening model on the I-girder, Vecchio-Collins 1992-A (`igirder-csoft3-m2v`); the other
+softening cases stay here, two of them as diagnostics of the named limitation (D62, D66).
 
 To run the parked set on request:
 

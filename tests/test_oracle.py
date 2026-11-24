@@ -2,7 +2,8 @@
 
 The development set (docs/summary.md, D16 and D41: Newbeam with only its loads varied, and
 since step A-1 the seven cases on the Quick Define sections, since step A-2 five cases whose
-variable is the reinforcement, since step A-3 eight whose variable is a material model) is
+variable is the reinforcement, since step A-3 eight whose variable is a material model, since step
+A-5 one compression softening model on the I-girder) is
 in tests/oracle and is what runs by default. The Quick Define inputs are r2x's: without
 R2C_DEFINE_DIR those tests are skipped; the inputs of the cases of steps A-2 and A-3 are
 variants of r2x's (tools/variants.py): without R2C_SCOPE_DIR those tests are skipped. Every other case is parked (D19): its fixture is in tests/oracle/parked and its test
@@ -110,6 +111,11 @@ MATERIAL_SLOW = {
     "newbeam-tstiff4-mv": (0.1, 0.2),
     "newbeam-tstiff6-mv": (0.4, 0.4),
     "newbeam-tsfactor-mv": (0.3, 0.4),
+}
+# Step A-5 (owner, 2026-11-24, D67): the one softening case on the I-girder that joined the
+# set, Vecchio-Collins 1992-A at M/V = 2 m. Limits at the "before" run of step A-5
+SOFTENING_SLOW = {
+    "igirder-csoft3-m2v": (3.2, 4.0),
 }
 # Phase A, with shear
 SLOW = {
@@ -244,6 +250,12 @@ def test_material_models(case, oracle_dir, scope_dirs):
 @pytest.mark.parametrize("case", sorted(MATERIAL_SLOW))
 def test_material_models_shear(case, oracle_dir, scope_dirs):
     _scope(case, oracle_dir, scope_dirs, MATERIAL_SLOW[case])
+
+
+@pytest.mark.slow
+@pytest.mark.parametrize("case", sorted(SOFTENING_SLOW))
+def test_softening_shear(case, oracle_dir, scope_dirs):
+    _scope(case, oracle_dir, scope_dirs, SOFTENING_SLOW[case])
 
 
 def test_same_charts_as_the_oracle(oracle_dir):
