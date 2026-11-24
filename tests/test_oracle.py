@@ -4,7 +4,8 @@ The development set (docs/summary.md, D16 and D41: Newbeam with only its loads v
 since step A-1 the seven cases on the Quick Define sections, since step A-2 five cases whose
 variable is the reinforcement, since step A-3 eight whose variable is a material model, since step
 A-5 one compression softening model on the I-girder and 14 cases on the settings of the
-section, units, material factors and More Detail) is
+section, units, material factors and More Detail, since step A-6 the three loads that were
+not in it: shrinkage, a thermal gradient, where the axial load acts) is
 in tests/oracle and is what runs by default. The Quick Define inputs are r2x's: without
 R2C_DEFINE_DIR those tests are skipped; the inputs of the cases of steps A-2 and A-3 are
 variants of r2x's (tools/variants.py): without R2C_SCOPE_DIR those tests are skipped. Every other case is parked (D19): its fixture is in tests/oracle/parked and its test
@@ -102,10 +103,15 @@ PARKED_DEFINE_SLOW = {
 # r2x's (tools/variants.py), found by name or SHA-256 under R2C_SCOPE_DIR; the two on Newbeam
 # itself need none.
 SCOPE = {
+    "newbeam-negelev-m": (0.05, 0.1),
+}
+# Step A-6 of the development set (owner, 2026-11-24, D73): the loads that were not in it,
+# on Newbeam under M: where the axial load acts, shrinkage, a thermal gradient. Inputs as
+# for SCOPE; the limits are those the cases had while parked
+LOADS = {
     "newbeam-axialloc-nm": (0.05, 0.1),
     "newbeam-shrink-m": (0.1, 0.8),
     "newbeam-thermgrad-m": (0.05, 0.3),
-    "newbeam-negelev-m": (0.05, 0.1),
 }
 # Step A-2 of the development set (owner, 2026-11-23, D50): the reinforcement varied on
 # shapes already in the set. Inputs as for SCOPE
@@ -253,6 +259,11 @@ def _scope(case, folder, scope_dirs, limits):
     if path is None:
         pytest.skip(f"{ref.header['input-name']} is not under R2C_SCOPE_DIR")
     _check(ref, _solve(ref, path), *limits)
+
+
+@pytest.mark.parametrize("case", sorted(LOADS))
+def test_loads(case, oracle_dir, scope_dirs):
+    _scope(case, oracle_dir, scope_dirs, LOADS[case])
 
 
 @pytest.mark.parametrize("case", sorted(REINF))

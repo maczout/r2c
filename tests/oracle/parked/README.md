@@ -1,7 +1,7 @@
 # Parked fixtures
 
 The oracle cases outside phase A (`docs/summary.md`, D16 and D19; owner, 2026-11-22): other
-sections, other materials and reinforcement, loads not yet in the set, no input, and
+sections, the softening models on the I-girder, no input, negative elevations, and
 Response's sample inputs. They are kept and not run by default; they come back in
 phase B.
 
@@ -19,6 +19,10 @@ Also since step A-5 (D68) it holds 14 cases on Newbeam whose variable is a setti
 section, the units, the material factors or More Detail, each captured three more times
 first (D57): 13 repeat exactly; `newbeam-mv-md2` differs between captures in the last
 printed digit of a few stages (not at its compared stages).
+Since step A-6 (2026-11-24, D73) it holds the three loads that were not in it, on Newbeam:
+shrinkage (`newbeam-shrink-m`), a thermal gradient (`newbeam-thermgrad-m`) and where the
+axial load acts (`newbeam-axialloc-nm`). Each was captured three more times in step A-5
+and repeats exactly.
 
 To run the parked set on request:
 
