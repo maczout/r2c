@@ -3,7 +3,8 @@
 The development set (docs/summary.md, D16 and D41: Newbeam with only its loads varied, and
 since step A-1 the seven cases on the Quick Define sections, since step A-2 five cases whose
 variable is the reinforcement, since step A-3 eight whose variable is a material model, since step
-A-5 one compression softening model on the I-girder) is
+A-5 one compression softening model on the I-girder and 14 cases on the settings of the
+section, units, material factors and More Detail) is
 in tests/oracle and is what runs by default. The Quick Define inputs are r2x's: without
 R2C_DEFINE_DIR those tests are skipped; the inputs of the cases of steps A-2 and A-3 are
 variants of r2x's (tools/variants.py): without R2C_SCOPE_DIR those tests are skipped. Every other case is parked (D19): its fixture is in tests/oracle/parked and its test
@@ -39,14 +40,39 @@ PHASE_A = {
     "newbeam-tension": (0.5, 1.0),
     "newbeam-nm": (0.2, 0.5),
 }
-# Parked: Newbeam with no input, material factors, other units, More Detail
+# Parked: Newbeam with no input
 BUILT_IN = {
     "newbeam-new": (0.05, 0.1),
+}
+# Step A-5 of the development set (owner, 2026-11-24, D68): the settings of the section,
+# units, material factors and More Detail, on Newbeam. Those on Newbeam's own input need no
+# file; the others' inputs are variants of r2x's, as for SCOPE
+SETTINGS = {
     "newbeam-csa": (0.05, 0.1),
     "newbeam-us": (0.05, 0.1),
     "newbeam-kgcm": (0.1, 0.2),
     "newbeam-m-md2": (0.05, 0.1),
     "newbeam-m-mdmax": (0.05, 0.1),
+}
+SETTINGS_FILE = {
+    "newbeam-usfile-si-m": (0.05, 0.1),
+    "newbeam-csafile-m": (0.05, 0.1),
+    "newbeam-csafile-none-m": (0.05, 0.1),
+}
+SETTINGS_SLOW = {
+    # through Response's load drop and recovery, stepping in the shear strain. r2c steps
+    # over the lowest point of the drop, which is the 13 % on the moment-curvature chart.
+    # The limit on the peak is as it was set before step A-1; r2c has been over it since
+    # (1.4 and 1.6 % at step A-5) and the test fails. Left as it is: docs/summary.md, D69
+    "newbeam-us-mv": (1.3, 14.0),
+    # at the run of step A-5 when the cases joined (2026-11-24)
+    "newbeam-csa-mv": (0.1, 0.3),
+    "newbeam-mv-md2": (0.1, 0.2),
+}
+SETTINGS_FILE_SLOW = {
+    "newbeam-smx-mv": (0.1, 0.2),
+    "newbeam-usfile-mv": (1.4, 4.3),
+    "newbeam-kgcmfile-mv": (0.1, 0.2),
 }
 # Response's sample inputs that hold several sections in one file, and Liping LB1 with its
 # horizontal ties besides: refused since 2026-11-22 (D23). Their fixtures are kept (D19).
@@ -79,10 +105,7 @@ SCOPE = {
     "newbeam-axialloc-nm": (0.05, 0.1),
     "newbeam-shrink-m": (0.1, 0.8),
     "newbeam-thermgrad-m": (0.05, 0.3),
-    "newbeam-usfile-si-m": (0.05, 0.1),
     "newbeam-negelev-m": (0.05, 0.1),
-    "newbeam-csafile-m": (0.05, 0.1),
-    "newbeam-csafile-none-m": (0.05, 0.1),
 }
 # Step A-2 of the development set (owner, 2026-11-23, D50): the reinforcement varied on
 # shapes already in the set. Inputs as for SCOPE
@@ -133,11 +156,6 @@ SLOW = {
     "newbeam-m0neg-mv": (0.1, 1.9),
     "newbeam-v0-m": (0.05, 0.1),
 }
-PARKED_SLOW = {
-    # through Response's load drop and recovery, stepping in the shear strain. r2c steps
-    # over the lowest point of the drop, which is the 13 % on the moment-curvature chart
-    "newbeam-us-mv": (1.3, 14.0),
-}
 
 
 def _solve(ref, path=None):
@@ -182,12 +200,17 @@ def test_shear(case, oracle_dir):
     _check(ref, _solve(ref), *SLOW[case])
 
 
-@pytest.mark.parked
+@pytest.mark.parametrize("case", sorted(SETTINGS))
+def test_settings(case, oracle_dir):
+    ref = record.read(oracle_dir / f"{case}.r2x.txt")
+    _check(ref, _solve(ref), *SETTINGS[case])
+
+
 @pytest.mark.slow
-@pytest.mark.parametrize("case", sorted(PARKED_SLOW))
-def test_parked_shear(case, parked_dir):
-    ref = record.read(parked_dir / f"{case}.r2x.txt")
-    _check(ref, _solve(ref), *PARKED_SLOW[case])
+@pytest.mark.parametrize("case", sorted(SETTINGS_SLOW))
+def test_settings_shear(case, oracle_dir):
+    ref = record.read(oracle_dir / f"{case}.r2x.txt")
+    _check(ref, _solve(ref), *SETTINGS_SLOW[case])
 
 
 def _define(case, oracle_dir, define_dirs, limits):
@@ -256,6 +279,17 @@ def test_material_models_shear(case, oracle_dir, scope_dirs):
 @pytest.mark.parametrize("case", sorted(SOFTENING_SLOW))
 def test_softening_shear(case, oracle_dir, scope_dirs):
     _scope(case, oracle_dir, scope_dirs, SOFTENING_SLOW[case])
+
+
+@pytest.mark.parametrize("case", sorted(SETTINGS_FILE))
+def test_settings_from_a_file(case, oracle_dir, scope_dirs):
+    _scope(case, oracle_dir, scope_dirs, SETTINGS_FILE[case])
+
+
+@pytest.mark.slow
+@pytest.mark.parametrize("case", sorted(SETTINGS_FILE_SLOW))
+def test_settings_from_a_file_shear(case, oracle_dir, scope_dirs):
+    _scope(case, oracle_dir, scope_dirs, SETTINGS_FILE_SLOW[case])
 
 
 def test_same_charts_as_the_oracle(oracle_dir):
