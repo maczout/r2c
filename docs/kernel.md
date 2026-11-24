@@ -702,7 +702,25 @@ if shear is the largest and b < a.
 **Stepping.** The first stage after the initial one is at Δ0/6. Each next target is the
 previous *target* plus Δ0 times a multiplier, which starts at 1. From the fifth stage, while
 the multiplier is not above 1, Δ0 is raised to a tenth of the target's value when it is less
-(the 10 % growth seen on the control charts).
+(the 10 % growth seen on the control charts); at which moment, below.
+
+*When the base step grows* [`00418860`, the wrapper of the pass routine; `00418af0`,
+`0041a870`], in r2c since 2026-11-24 (step A-4; `Shear.late_growth`). The test (from the
+fifth stage, multiplier not above 1, Δ0 under a tenth of the target) is made before
+every pass on a stage, with the target as it is at that moment, and a new stage's target
+is set inside its first pass. So: after a stage is kept, Δ0 grows from that stage's
+target and the next target follows from it, as before; **a first try that fails in its
+first pass leaves Δ0 as it was**, and one that fails later has grown it from its own
+target; a further try grows Δ0 from the target it was given when the try before failed.
+Until now r2c grew Δ0 from a new target before the first try at it. [O, seen in the
+program's own values, `python tools/rtrace.py`: with a tension stiffening factor of 0.5,
+after the stage at 4.6797 rad/km the try at 5.1477 fails in its first pass with Δ0 at
+0.4680; the next tries are at 4.8925 with Δ0 0.4892, then 4.7701 and 4.7090. r2c had
+0.5148 and went to 4.7638 and 4.6994. With elasto-plastic tension stiffening the first
+try runs its 16 passes, Δ0 is 0.5148 and Response's own tries are at 4.7638 and 4.6994.]
+No check changes on the 37 cases (`tools/changes.py`): r2c's failing tries do not fail
+in the same pass as Response's (below), so the rule alone moves no stage onto
+Response's.
 
 **Events.** After a stage is accepted it is compared with the one before: newly cracked
 (principal tensile strain above the cracking strain at any node), newly crushing (principal
@@ -759,7 +777,11 @@ is not a deviation of r2c's; the stage at −0.539 is in none of the 13 captures
 M/V = 1 m and remains open. Inferred from this, not read: a stage put in between takes
 something from the run that the input does not fix. `python tools/repeat.py`.
 
-**Open: the same girder at M/V = 1 m (D43).** There Response has no stage at −0.539 or
+**The same girder at M/V = 1 m (D43): seen 2026-11-24, see "What the running program
+shows" below.** Response does try the stage at −0.539, its solve gives up in the first
+pass on a section it takes to have next to no stiffness, and the stage is dropped. The
+paragraph that follows is the record of what was ruled out before that was seen. There
+Response has no stage at −0.539 or
 −0.533: it goes from −0.571 (cracked) to −0.530 (un-cracked), and later from −0.251 to
 −0.171, where the web cracks, with nothing in between. By the rules above it must have
 put a stage in between at both places and dropped it, which needs that stage to be
@@ -786,6 +808,58 @@ M/V = 1 m apart on this girder and was not followed up: its depth is exactly 1 m
 every test of M/V against the depth in the program (`00419250`: the base step halved
 where M/V is under the depth) is decided by the last digit of the depth as the program
 holds it.
+
+**What the running program shows (step A-4, 2026-11-24) [O; B where an address is
+given].** Response's own tries were read from the program as it ran, on 16 cases
+(`python tools/rtrace.py`: the values of the stage control at every pass), and set
+beside r2c's (`python tools/tries.py`). Up to a first difference r2c makes Response's
+tries one for one: the same targets, kept and failed alike, mostly the same number of
+passes and a profile error within a few tenths of a per cent. The first difference is
+one of three things, and after it the two responses are on different paths:
+
+* *Response's solve of the global strains gives up where r2c finds a state* (seven of the
+  16). Its steps are whole Newton steps with no search along them (`004276a0`): near a
+  limit point they overshoot, the shear strain is driven negative and the section is
+  left with no stiffness. r2c's own solve finds the state, or runs its 16 passes. The
+  stage the I-girder at M/V = 1 m "must have dropped" (the open item above, D43, D48) is
+  this: at −0.5385 rad/km the stage put in between is not solved in its first pass and
+  is dropped, exactly as the rules say. The same on two parked I-girders (softening 9
+  and 14).
+* *The depth range with stiffness is a stored value of the stage* [`00427cd0` reads it
+  at +0x148 and +0x150; `00440ea0` sets it; `004190a0` copies it from the stage before
+  after a failure], and the first step of a solve can be taken on a range left by an
+  earlier evaluation. Where concrete has crushed inside the depth with both faces sound
+  the routine leaves a hundredth of the depth about the axis (r2c: nothing). On that
+  range the 3 × 3 stiffness is singular, the step routine gives up and the try fails
+  without having moved. Seen at the dropped stage of the I-girder, and twice with the
+  factor 0.5, where the try after a solve that broke down fails "at once" (4.8925 and
+  4.7090 rad/km) although the state exists; r2c keeps a stage at 4.6994. It is not a
+  rule that can be stated from the input: over the 16 cases a try after a failed solve
+  fails at once in 2 of about 60. Not taken over.
+* *A stage that has not converged after 16 passes is kept by one program and refused by
+  the other* (four of the 16; and once, under V alone, Response keeps a stage 617 % off
+  where r2c finds no state), because its error falls on the other side of 3 % (4.4
+  against 1.1 %; 3.0 against 9.5 %) or its load on the other side of the largest so far
+  (219.95 against a peak of 219.30 in Response; 217.40 against 219.64 in r2c). Such a
+  state is where the sixteenth pass happened to leave it.
+
+Of the other four, two are continuous differences that shift every later target by a
+few thousandths (the state under the constant loads, "M constant, then M + V"; the shear
+strain of a stage that has not converged, from which the first target after a change of
+control variable is taken, the column), and two were not looked into (softening 12, at
+its fourth try; M/V = 2 m, where the traced run is not the capture's). Also seen:
+on a flat peak Response solves the same target more than once (the factor 0.5: stages
+35, 36 and 37 are all at a shear strain of 3.9638 mm/m, with loads of 193.19, 193.46 and
+193.19 kN; the peak is the middle one). And run under the tracer, which only slows the
+program down, two cases gave another number of stages than in their captures (M/V = 2 m:
+80 for 88; V alone: 53 for 52): what Response does at such tries depends on something
+besides the input, timing among it [inferred; the stage control runs one pass at a time
+from the program's idle loop].
+
+The pass routine's tests were set against the listing once more [`00418af0`]: one was
+not on record. Under control of the shear strain, from the twelfth pass, a stage whose
+top or bottom fibre is within a fifth of its cracking strain is kept as it is once its
+error is under 50 % [`004156b0`]. Not in r2c; no traced case shows it deciding a try.
 
 ### The global solve with shear [B `004276a0`, `004267c0`], read 2026-11-22: written, off
 

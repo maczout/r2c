@@ -600,6 +600,14 @@ class Shear(Flexure):
 
     # Response's tests on every pass of a stage [B 00418af0]: written, off until verified
     pass_code = False
+    # r2c's own: a solve of the global strains that has not closed is carried on from when
+    # it is nearly balanced. Not the program's with shear (docs/kernel.md); on until
+    # taking it out has been weighed
+    soft_solve = True
+    # when the base step grows to a tenth of the target: at every pass, as the program
+    # does it [B 00418860], and not once before a stage's first try (docs/kernel.md,
+    # "When the base step grows")
+    late_growth = True
 
     def _solve(self, c, prev: Stage | None, ctx=None) -> Stage:
         """One load stage as Response works on it [B 00418af0]: up to 16 passes of solving the
@@ -619,6 +627,7 @@ class Shear(Flexure):
         an.coarsen()
         saved_shape = an.profile()
         self.evals = 0
+        self.tried = 0          # passes begun on this try, for the stage control
         info = None
         ok = False
         err = 1.0
@@ -629,6 +638,7 @@ class Shear(Flexure):
         while passes < self.passes:
             x0 = np.array(x, dtype=float)
             soft = False
+            self.tried = passes + 1
             if self.own_solve:
                 x, info, ok = self._general(c, x0)
                 if not ok:
@@ -643,7 +653,8 @@ class Shear(Flexure):
                     # [B 00418af0, the solve's status -2]: here, the nearest state found,
                     # if it is out of balance by less than 2 % of the section's scale
                     x, info, res = near
-                    if info is None or not all(math.isfinite(q) for q in info) or res > 0.02:
+                    if not self.soft_solve or info is None \
+                            or not all(math.isfinite(q) for q in info) or res > 0.02:
                         ok = False
                         break
                     ok = soft = True
@@ -967,15 +978,24 @@ class Shear(Flexure):
         peak = 0.0
         retries = 0
         solves = 0
+        def grow(at):
+            """The base step grows to a tenth of the target [B 00418860]: tested before
+            every pass on a stage, with the target as it is then."""
+            nonlocal d0
+            if len(self.stages) > 4 and mult <= 1.0 and abs(at) > 1e-4 * unit() \
+                    and abs(d0) < abs(at) / 10.0:
+                d0 = math.copysign(abs(at) / 10.0, d0)
+
         while len(self.stages) + len(pending) < max_stages and solves < 327:
             prev = self.stages[-1]
             n_st = len(self.stages)
-            # the step grows to a tenth of the control value [B 00418860]
-            if n_st > 4 and mult <= 1.0 and abs(target) > 1e-4 * unit() \
-                    and abs(d0) < abs(target) / 10.0:
-                d0 = math.copysign(abs(target) / 10.0, d0)
+            if not self.late_growth:
+                grow(target)    # r2c's earlier reading: once, before a stage's first try
+            elif retries:
+                grow(target)    # a further try: its target was set when the last one failed
             solves += 1
             self.why = ""
+            self.tried = 0
             try:
                 st = self.solve(target, start or prev, dict(
                     mult=mult, peak=peak,
@@ -988,6 +1008,8 @@ class Shear(Flexure):
                     st, ok = None, False
             except SolveError:
                 st, ok = None, False
+            if self.late_growth and (st.passes if st is not None else self.tried) >= 2:
+                grow(target)    # from the second pass on, against this try's own target
             code = 0
             if ok:
                 st.cmode = self.mode
@@ -1015,6 +1037,8 @@ class Shear(Flexure):
                     pending[-1].closed = True
                     if self.trace is not None:
                         self.trace[-1]["what"] = "dropped"
+                    if self.late_growth:
+                        grow(target)
                     next_target()
                     continue
                 retries += 1
@@ -1078,6 +1102,10 @@ class Shear(Flexure):
             if abs(st.lam) < 0.01 * abs(prev.lam) and len(self.stages) > 2:
                 self.stages.pop()       # the load has run out: not a load stage
                 break
+            if self.late_growth:
+                # a new stage's first pass is begun before its target is set: the step
+                # is tested once more against the target of the stage just kept
+                grow(target)
             next_target()
         return self.stages[:max_stages]
 

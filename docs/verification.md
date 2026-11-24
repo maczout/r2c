@@ -1123,3 +1123,22 @@ the set), each of every stage, made with `r2x` (worker, `--stage all`) from Resp
 records cut down to the control charts and the feature stages with tools/trim.py; nothing in
 them is edited. Response's sample inputs are not in this repository. The archive of full captures
 was rebuilt with `tools/capture.py` on 2026-11-19 and every capture matched its fixture.
+
+## Step A-4 (2026-11-24): the flat peak
+
+The run of record (`docs/verification-results.md`) is that of step A-3 check for check
+(measured, `python tools/changes.py`: 0 in, 0 out on the 37 cases). One rule of the
+stage control changed, when its base step grows (`docs/kernel.md`), and by itself it
+moves no stage.
+
+What the figures of the shear cases mean was measured in this step, and it bears on how
+to read them. Of the view checks outside target on the shear cases, set and parked, 89 %
+are inside when r2c is put into Response's own state at the stage (`python
+tools/sources.py`): they measure the state the two programs reached, not a rule of r2c.
+The states differ because the two make different tries where a stage does not settle
+(`docs/status.md`, "Named limitation"; `python tools/rtrace.py`, `python tools/tries.py`),
+and on a flat peak Response's own state is one of several it could have kept: with a
+tension stiffening factor of 0.5 it solves one target three times and gets loads
+0.14 % apart, the peak being the middle one. A view check at such a stage compares two
+such samples.
+
