@@ -1,14 +1,14 @@
 {
  "run": {
   "r2c_version": "0.1.0",
-  "commit": "7c0a4c750c98107941890d98b2e22bf90b810c53",
+  "commit": "da408d9fca54ffb5e347c3a9b7017e68472c6d34",
   "dirty": false,
-  "started": "2026-11-23T22:30:19-07:00",
+  "started": "2026-11-24T11:24:17-07:00",
   "host": "Makertyre",
   "machine": "Linux x86_64, 32 cores",
   "python": "3.12.3",
   "numpy": "2.5.5",
-  "jobs": 32,
+  "jobs": 12,
   "inputs_dir": true,
   "reference_dir": "tests/oracle",
   "cases": [
@@ -1255,8 +1255,8 @@
      "ref_stage": 42
     }
    ],
-   "seconds": 101.2,
-   "run": "7c0a4c750c98",
+   "seconds": 146.9,
+   "run": "da408d9fca54",
    "sub_curve": [
     [
      -0.0,
@@ -2647,8 +2647,8 @@
      "ref_stage": 40
     }
    ],
-   "seconds": 77.5,
-   "run": "7c0a4c750c98",
+   "seconds": 106.7,
+   "run": "da408d9fca54",
    "sub_curve": [
     [
      -0.0,
@@ -4041,8 +4041,8 @@
      "ref_stage": 54
     }
    ],
-   "seconds": 4.7,
-   "run": "7c0a4c750c98",
+   "seconds": 5.0,
+   "run": "da408d9fca54",
    "sub_curve": [
     [
      -0.0,
@@ -5466,8 +5466,8 @@
      "ref_stage": 41
     }
    ],
-   "seconds": 1.3,
-   "run": "7c0a4c750c98",
+   "seconds": 0.6,
+   "run": "da408d9fca54",
    "sub_curve": [
     [
      0.0,
@@ -6854,7 +6854,7 @@
     }
    ],
    "seconds": 5.1,
-   "run": "7c0a4c750c98",
+   "run": "da408d9fca54",
    "sub_curve": [
     [
      -0.665,
@@ -7994,8 +7994,8 @@
      "ref_stage": 14
     }
    ],
-   "seconds": 25.3,
-   "run": "7c0a4c750c98",
+   "seconds": 28.7,
+   "run": "da408d9fca54",
    "sub_curve": [
     [
      -0.665,
@@ -9350,7 +9350,7 @@
     }
    ],
    "seconds": 2.2,
-   "run": "7c0a4c750c98",
+   "run": "da408d9fca54",
    "sub_curve": [
     [
      -0.495,
@@ -10804,8 +10804,8 @@
      "ref_stage": 47
     }
    ],
-   "seconds": 3.6,
-   "run": "7c0a4c750c98",
+   "seconds": 3.7,
+   "run": "da408d9fca54",
    "sub_curve": [
     [
      0.429,
@@ -12208,8 +12208,8 @@
      "ref_stage": 48
     }
    ],
-   "seconds": 2.8,
-   "run": "7c0a4c750c98",
+   "seconds": 3.0,
+   "run": "da408d9fca54",
    "sub_curve": [
     [
      -0.0,
@@ -13643,7 +13643,7 @@
     }
    ],
    "seconds": 2.4,
-   "run": "7c0a4c750c98",
+   "run": "da408d9fca54",
    "sub_curve": [
     [
      -0.0,
@@ -15102,8 +15102,8 @@
      "ref_stage": 16
     }
    ],
-   "seconds": 3.0,
-   "run": "7c0a4c750c98",
+   "seconds": 3.3,
+   "run": "da408d9fca54",
    "sub_curve": [
     [
      -0.0,
@@ -16872,8 +16872,8 @@
      "ref_stage": 55
     }
    ],
-   "seconds": 94.0,
-   "run": "7c0a4c750c98",
+   "seconds": 134.4,
+   "run": "da408d9fca54",
    "sub_curve": [
     [
      -0.0,
@@ -18321,8 +18321,8 @@
      "ref_stage": 14
     }
    ],
-   "seconds": 60.6,
-   "run": "7c0a4c750c98",
+   "seconds": 68.8,
+   "run": "da408d9fca54",
    "sub_curve": [
     [
      -0.999,
@@ -19766,8 +19766,8 @@
      "ref_stage": 86
     }
    ],
-   "seconds": 117.2,
-   "run": "7c0a4c750c98",
+   "seconds": 161.0,
+   "run": "da408d9fca54",
    "sub_curve": [
     [
      -0.0,
@@ -21249,8 +21249,8 @@
      "ref_stage": 42
     }
    ],
-   "seconds": 58.1,
-   "run": "7c0a4c750c98",
+   "seconds": 64.1,
+   "run": "da408d9fca54",
    "sub_curve": [
     [
      -0.0,
@@ -22660,8 +22660,8 @@
      "ref_stage": 16
     }
    ],
-   "seconds": 1.8,
-   "run": "7c0a4c750c98",
+   "seconds": 1.2,
+   "run": "da408d9fca54",
    "sub_curve": [
     [
      0.174,
@@ -22861,7 +22861,7 @@
     "peak-stage": "24"
    },
    "sub": {
-    "stage-count": "50",
+    "stage-count": "49",
     "peak-stage": "23"
    },
    "control": [
@@ -22887,7 +22887,7 @@
      "shape_same": true,
      "floor_pct": 0.1464142163217285,
      "rising_pct": 0.43145085535957045,
-     "post_peak_pct": 41.761013448078934
+     "post_peak_pct": 41.13978077830424
     },
     {
      "chart": "shear_ex",
@@ -23737,8 +23737,8 @@
      "ref_stage": 38
     }
    ],
-   "seconds": 61.0,
-   "run": "7c0a4c750c98",
+   "seconds": 64.4,
+   "run": "da408d9fca54",
    "sub_curve": [
     [
      -0.117,
@@ -23934,11 +23934,7 @@
     ],
     [
      -0.083,
-     291.496
-    ],
-    [
-     -0.084,
-     290.125
+     291.5
     ]
    ]
   },
@@ -25489,8 +25485,8 @@
      "ref_stage": 13
     }
    ],
-   "seconds": 3.3,
-   "run": "7c0a4c750c98",
+   "seconds": 3.4,
+   "run": "da408d9fca54",
    "sub_curve": [
     [
      -0.0,
@@ -26957,8 +26953,8 @@
      "ref_stage": 14
     }
    ],
-   "seconds": 1.6,
-   "run": "7c0a4c750c98",
+   "seconds": 1.2,
+   "run": "da408d9fca54",
    "sub_curve": [
     [
      -0.0,
@@ -27969,8 +27965,8 @@
      "ref_stage": 41
     }
    ],
-   "seconds": 67.4,
-   "run": "7c0a4c750c98",
+   "seconds": 76.4,
+   "run": "da408d9fca54",
    "sub_curve": [
     [
      -0.0,
@@ -29366,8 +29362,8 @@
      "ref_stage": 44
     }
    ],
-   "seconds": 61.7,
-   "run": "7c0a4c750c98",
+   "seconds": 70.3,
+   "run": "da408d9fca54",
    "sub_curve": [
     [
      0.042,
@@ -30754,7 +30750,7 @@
     }
    ],
    "seconds": 0.6,
-   "run": "7c0a4c750c98",
+   "run": "da408d9fca54",
    "sub_curve": [
     [
      0.0,
@@ -30940,7 +30936,7 @@
      "shape_same": true,
      "floor_pct": 0.22910058663455193,
      "rising_pct": 0.20939232949078254,
-     "post_peak_pct": 208.9609688383609
+     "post_peak_pct": 208.96091847292038
     },
     {
      "chart": "moment_phi",
@@ -32102,8 +32098,8 @@
      "ref_stage": 29
     }
    ],
-   "seconds": 49.8,
-   "run": "7c0a4c750c98",
+   "seconds": 54.1,
+   "run": "da408d9fca54",
    "sub_curve": [
     [
      -0.0,
@@ -32291,7 +32287,7 @@
     ],
     [
      2.37,
-     120.774
+     120.778
     ]
    ]
   },
@@ -33845,8 +33841,8 @@
      "ref_stage": 72
     }
    ],
-   "seconds": 2.8,
-   "run": "7c0a4c750c98",
+   "seconds": 3.0,
+   "run": "da408d9fca54",
    "sub_curve": [
     [
      -0.017,
@@ -35326,8 +35322,8 @@
      "ref_stage": 42
     }
    ],
-   "seconds": 66.4,
-   "run": "7c0a4c750c98",
+   "seconds": 76.3,
+   "run": "da408d9fca54",
    "sub_curve": [
     [
      -0.0,
@@ -37012,8 +37008,8 @@
      "ref_stage": 12
     }
    ],
-   "seconds": 1.8,
-   "run": "7c0a4c750c98",
+   "seconds": 1.5,
+   "run": "da408d9fca54",
    "sub_curve": [
     [
      0.0,
@@ -38680,8 +38676,8 @@
      "ref_stage": 36
     }
    ],
-   "seconds": 54.6,
-   "run": "7c0a4c750c98",
+   "seconds": 62.8,
+   "run": "da408d9fca54",
    "sub_curve": [
     [
      -0.0,
@@ -40040,8 +40036,8 @@
      "ref_stage": 38
     }
    ],
-   "seconds": 75.2,
-   "run": "7c0a4c750c98",
+   "seconds": 83.4,
+   "run": "da408d9fca54",
    "sub_curve": [
     [
      -0.0,
@@ -41429,8 +41425,8 @@
      "ref_stage": 38
     }
    ],
-   "seconds": 48.4,
-   "run": "7c0a4c750c98",
+   "seconds": 52.8,
+   "run": "da408d9fca54",
    "sub_curve": [
     [
      -0.0,
@@ -42798,8 +42794,8 @@
      "ref_stage": 41
     }
    ],
-   "seconds": 49.2,
-   "run": "7c0a4c750c98",
+   "seconds": 53.5,
+   "run": "da408d9fca54",
    "sub_curve": [
     [
      -0.0,
@@ -44171,8 +44167,8 @@
      "ref_stage": 39
     }
    ],
-   "seconds": 57.7,
-   "run": "7c0a4c750c98",
+   "seconds": 62.4,
+   "run": "da408d9fca54",
    "sub_curve": [
     [
      -0.0,
@@ -45545,8 +45541,8 @@
      "ref_stage": 33
     }
    ],
-   "seconds": 62.1,
-   "run": "7c0a4c750c98",
+   "seconds": 64.8,
+   "run": "da408d9fca54",
    "sub_curve": [
     [
      -0.0,
@@ -46885,8 +46881,8 @@
      "ref_stage": 69
     }
    ],
-   "seconds": 57.1,
-   "run": "7c0a4c750c98",
+   "seconds": 61.3,
+   "run": "da408d9fca54",
    "sub_curve": [
     [
      -0.0,
@@ -48377,8 +48373,8 @@
      "ref_stage": 10
     }
    ],
-   "seconds": 66.1,
-   "run": "7c0a4c750c98",
+   "seconds": 70.6,
+   "run": "da408d9fca54",
    "sub_curve": [
     [
      0.0,
@@ -49130,7 +49126,7 @@
     }
    ],
    "seconds": 0.0,
-   "run": "7c0a4c750c98",
+   "run": "da408d9fca54",
    "sub_curve": [
     [
      -0.0,
@@ -50378,8 +50374,8 @@
      "ref_stage": 12
     }
    ],
-   "seconds": 4.3,
-   "run": "7c0a4c750c98",
+   "seconds": 4.8,
+   "run": "da408d9fca54",
    "sub_curve": [
     [
      -0.0,
@@ -52195,8 +52191,8 @@
      "ref_stage": 19
     }
    ],
-   "seconds": 4.7,
-   "run": "7c0a4c750c98",
+   "seconds": 5.3,
+   "run": "da408d9fca54",
    "sub_curve": [
     [
      -0.0,
