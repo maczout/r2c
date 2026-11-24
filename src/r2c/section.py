@@ -433,6 +433,24 @@ class Section:
                  if l.prestrain != 0.0)
         pm = sum(float(l.steel.stress(l.prestrain)) * l.area * (l.z - zb) for l in self.layers
                  if l.prestrain != 0.0)
+        if self.shrink:
+            # shrinkage or thermal strain of the concrete counts as a prestress too, as if
+            # fully restrained: a straight line fitted by least squares to the points given
+            # (their strains, at their heights from the centroid of the gross concrete), its
+            # value at that centroid times the area and its slope times the inertia, each
+            # times the concrete's stiffness [B 00423e50, 004b5770; O: with the heights from
+            # the centroid the limit line of newbeam-thermgrad-m is Response's to the last
+            # digit, from the bottom or the transformed centroid it is not]
+            zs = np.array([z for z, _ in self.shrink]) - self.zc
+            es = np.array([e for _, e in self.shrink])
+            n = len(zs)
+            sxx = float(np.sum(zs * zs) - np.sum(zs) ** 2 / n)
+            if n > 1 and abs(sxx) > 0.0:
+                slope = float(np.sum(zs * es) - np.sum(es) * np.sum(zs) / n) / sxx
+                at0 = float(np.sum(es) - slope * np.sum(zs)) / n
+                ec = self.conc0.Ec
+                pf += at0 * a * ec
+                pm += slope * i * ec
         out = []
         for face, c, law in ((0, ct, self.law_at(self.ztop)), (1, cb, self.law_at(self.zbot))):
             if not law.auto_ft:
