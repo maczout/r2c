@@ -11,8 +11,8 @@ comparison.
 **Since 2026-11-22 the generated results cover the development set alone**
 (`tests/oracle`): at first the 17 cases on Newbeam that vary only the load ("Phase A
 baseline" below), since step A-1 the seven on the Quick Define sections as well, since
-step A-2 five on reinforcement: 29 cases. The other 56
-cases are parked until phase B (`tests/oracle/parked`; `docs/summary.md`, D16 and D19) and
+step A-2 five on reinforcement, since step A-3 eight on material models: 37 cases. The
+other 48 cases are parked until phase B (`tests/oracle/parked`; `docs/summary.md`, D16 and D19) and
 are not run by default. The sections after the baseline describe them as they stood in the
 runs of 2026-11-21; those numbers are no longer in the generated file (they are in its
 history in git, and come back with
@@ -37,8 +37,76 @@ SCOPE_INPUTS --out OUT` (the parked set needs RESPONSE_FOLDER among the inputs a
 
 **Since 2026-11-23 a view check where Response's own view spikes is reported and not
 assessed** (owner, D54, narrowed by D56): see "The spike test" below. It applies to four
-checks of the 29 cases, so the sections written before that date, which count every
+checks of the 29 cases (six of the 37 since step A-3), so the sections written before that date, which count every
 check as inside or outside, read almost as they would today.
+
+## Step A-3: material models on Newbeam; the softening cases captured again (2026-11-23)
+
+The set went from 29 to 37 cases; the kernel did not change. The figures are in
+`docs/verification-results.md` and, for the owner, in `docs/summary.md`.
+
+**The eight new cases** (two concrete base curves under M; five tension stiffening
+models and the factor 0.5 under M + V at M/V = 1 m). Peak within 0.16 % and rising
+branch within 0.18 % on every one, shape the same. The two without shear agree at every
+compared stage on every view (largest difference 4 %) and end as
+Response's do (0.3 and 0.0 %). Read with the earlier check of the same models in
+Response's own peak states (forces within 0.4 %, "The scope cases after step 3"), the
+material rules themselves are Response's; what is left is where a shear response sits
+at and after its peak.
+
+**The five view checks outside** (all Should; `python tools/viewmisses.py VERIFY_OUT
+--only …`). For each, r2c was put into Response's own state at that stage (`python
+tools/diagnose.py states FIXTURE --input INPUT --stages N --views`):
+
+| Case, stage | View | Driver | In Response's state |
+|---|---|---:|---:|
+| Factor 0.5, peak (36) | shear on crack | 106.3 % | 0.03 % |
+| Factor 0.5, fall (11), cracking (12) | transverse bond | 5.2, 6.7 % | 0.38, 0.15 % |
+| Tamai, peak (38) | shear on crack | 10.6 % | 18.4 % |
+| Elasto-plastic, peak (30) | transverse bond | 7.0 % | 0.60 % |
+
+- *Factor 0.5 at the peak.* Response's peak is stage 36 of 38 at a curvature of
+  4.731 rad/km, r2c's nearest stage is at 4.741; the loads of the last six stages of
+  both lie between 192.8 and 193.5 kN. Shear on the crack is small everywhere with half
+  the tension stiffening (0.15 MPa at most). Response's values start at 186 mm above
+  mid-depth, r2c's at 180 mm, so over 6 mm one has 0.15 MPa and the other nothing: that
+  alone is the chart's largest value. On top of it Response's largest positive value is
+  0.0020 MPa against a largest negative of 0.147 (under a fiftieth: no positive limit
+  line), r2c's 0.0043 against 0.19 (over a fiftieth: the line is drawn), and a line
+  one program draws is counted as 100 % (D38).
+- *Factor 0.5 at the fall of load and at cracking.* The bond chart's largest value is
+  0.05 and 0.10 MPa; the differences are 0.003 and 0.009 MPa. The curves agree there
+  within 0.02 kN.
+- *Tamai at the peak.* Response's peak is stage 38 of 40 and the load is 193.0 to
+  193.1 kN over seven stages. The limit line of shear on the crack is nothing above the
+  cracked zone and 3.4 MPa at its first node (a crack of 0.004 mm); r2c's cracked zone
+  starts 1.3 mm lower. In Response's own state the 18.4 % is that first node alone:
+  Response has it cracked by 0.004 mm and r2c, from the printed strains, not yet.
+  Every other point of the chart agrees within 0.003 MPa.
+- *Elasto-plastic at the peak.* Both programs have the stage at 4.254 rad/km (219.30
+  and 219.64 kN). The bond chart differs by 1.9 to 2.7 MPa of 20 over the bottom 60 mm
+  of the stirrups. `python tools/trace.py` shows r2c's stage accepted after eight
+  passes with a profile error of 0.90 %, under the program's 1 %.
+
+**The spike test on the new cases.** Two more checks are left unassessed, both inside:
+shear stress at the peak with Collins-Mitchell 1987 (Response's departure 6.8 %, its
+neighbours 4.2 % apart, r2c 0.1 % from Response) and longitudinal bond at the peak with
+Izumo (6.8, 1.8, 0.0 %). On the 37 cases: 6 of 1,953 checks.
+
+**How the responses end** (`python tools/ends.py VERIFY_OUT`). Izumo and the factor 0.5:
+both programs end standing still, at 98 and 100 % of the peak, with the same number of
+stages. Vecchio-Collins 1982 and Collins-Mitchell 1987: both end falling, Response's
+last stage at 19 and 23 % of its peak, r2c's at 92 and 94 %. Tamai and elasto-plastic:
+Response's ends falling (25, 97 %), r2c's stands still. A Won't (D1).
+
+**The softening cases on the I-girder, captured three more times** (not set members).
+`python tools/repeat.py ARCHIVE NEW1 NEW2 NEW3`: 16 of the 18 are the same record four
+times. The two that are not, and the reading of the ten stages that come and go, are in
+`docs/status.md`, "Where Response does not repeat itself". Against the long variant of
+the I-girder with shear of the set (25 stages) r2c's stages from the web's cracking
+on are Response's one for one; its peak, rising branch and shape checks come out as
+against the fixture (peak +0.04 %; rising branch 0.04 % on the shear chart and 2.4 % on
+the moment chart, where the two stages of D48 are; shape different by that fall).
 
 ## The spike test (D56), a change to the measure (2026-11-23)
 

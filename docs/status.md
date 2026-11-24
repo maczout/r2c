@@ -46,23 +46,25 @@ developer's. Items that need a structural judgement are marked **(structural)**.
   Response has them), `spacing.py` (r2c's crack spacing tables against a record's charts),
   `earlyends.py` (which shear responses r2c ends early, and where: the diagnostic of the
   shear profile iteration on the parked I-girders), `bond.py` (does the bond rule give a
-  record's bond chart from its own stirrup stress chart),
+  record's bond chart from its own stirrup stress chart), `repeat.py` (do several
+  captures of a case give the same record: D57),
   `check.py` (checks before pushing). `diagnose.py states --out` writes r2c's views in
   Response's states as a record, for `viewlines.py`. `decompile.py` also lists
   a routine's instructions (`a:ADDRESS`).
 - 85 oracle fixtures, each with the detail views of the feature stages of Response's curve
-  (cracking, falls of load, peak, last stage). **The development set, 29 of them, is in
+  (cracking, falls of load, peak, last stage). **The development set, 37 of them, is in
   `tests/oracle`**: Newbeam with only its loads varied (17), since step A-1 (2026-11-22,
-  D41) the seven on the Quick Define sections, and since step A-2 (2026-11-23) five whose
-  variable is the reinforcement (all listed in `docs/summary.md`).
-  **The other 56 are parked in `tests/oracle/parked`** (D16, D19): kept, and not run by
+  D41) the seven on the Quick Define sections, since step A-2 (2026-11-23) five whose
+  variable is the reinforcement, and since step A-3 (2026-11-23) eight whose variable is
+  a material model on Newbeam (all listed in `docs/summary.md`).
+  **The other 48 are parked in `tests/oracle/parked`** (D16, D19): kept, and not run by
   default. The folder is the set: verify, capture, retrim and scope read one folder and not
-  the folders under it. The inputs of the five of step A-2 are variants of r2x's
+  the folders under it. The inputs of the cases of steps A-2 and A-3 are variants of r2x's
   (`tools/variants.py`), so verify on the set needs that folder among its `--inputs`.
 - pytest: by default the reader and material rules, the cases of the set without shear
   (the five on Quick Define sections need `R2C_DEFINE_DIR`, r2x's `tests/reference/define`,
-  the two on reinforcement `R2C_SCOPE_DIR`, and are skipped without them); `-m "slow and
-  not parked"` the fourteen with shear; `-m parked` the parked cases (`R2C_RESPONSE_DIR`
+  the two on reinforcement and the two on base curves `R2C_SCOPE_DIR`, and are skipped
+  without them); `-m "slow and not parked"` the twenty with shear; `-m parked` the parked cases (`R2C_RESPONSE_DIR`
   for Response's sample inputs, `R2C_SCOPE_DIR` for the inputs of the scope cases). Eleven
   parked fixtures need something removed: five have no test, and the six on Response's
   sample inputs that hold several sections have a test that they are refused (D23).
@@ -83,16 +85,39 @@ The numbers are in `docs/verification-results.md`, what they mean in `docs/verif
 each case is assessed against the owner's development targets in `docs/acceptance.md`: ±5 %
 on every metric, the curve's shape the same, views at the features of the curve.
 
-**The development set under the rule on unstable views** (run of record of 2026-11-23
-after the measure change of D56, the 29 cases; measured, `python tools/targets.py
-VERIFY_OUT --counts`; views compared at the stage at the same place since D42, the last
-stage of a shear case left out since D40, a check where Response's view spikes left out
-since D56). Cases inside target: peak 29 of 29, rising branch 29, shape 26, post-peak
-21 (14 of the 15 without shear), views of the stress state without shear (Must) 14 of 15,
-views Should 21 of 29 (7 of the 14 with shear), views Could 23 of 29. These are the
-counts with no rule at all (`--before-d54`): the spike test changes no case. Under the
-rule as first written (`--d54-first`): Should 24 of 29, Could 26 of 29. The kernel is the
-same in all three and so is every difference r2c has from Response.
+**The development set** (run of record of 2026-11-23, step A-3, the 37 cases; measured,
+`python tools/targets.py VERIFY_OUT --counts`; views compared at the stage at the same
+place since D42, the last stage of a shear case left out since D40, a check where
+Response's view spikes left out since D56). Cases inside target: peak 37 of 37, rising
+branch 37, shape 34, post-peak 25 (16 of the 17 without shear), views of the stress state
+without shear (Must) 16 of 17, views Should 26 of 37 (10 of the 20 with shear), views
+Could 31 of 37. The spike test changes no case against no rule (`--before-d54`); under
+the rule as first written (`--d54-first`) Should would be 31 of 37 and Could 34. The
+kernel is that of step A-2: against its run of record no check on the 29 changed side.
+
+**The eight cases on material models** (step A-3; `docs/summary.md` has the table and
+`docs/verification.md`, "Step A-3", the detail). Every Must inside as they stood. Five
+Should checks outside on three of the six with shear, known deviations if the owner
+accepts them (D61); in Response's own state at those stages r2c is within 3 % on each
+view, but for one node with Tamai tension stiffening:
+
+1. *Tension stiffening factor 0.5, shear on the crack at the peak, 106 %.* A flat top
+   (193.1 to 193.5 kN over six stages); the cracked zone ends 6 mm lower in r2c's state;
+   the chart is 0.15 MPa at most, and the limit line on the positive side is drawn by r2c
+   and not by Response (positive over negative extreme 0.022 against 0.014, the rule
+   counts from a fiftieth: D38's kind).
+2. *The same case, transverse bond at the fall of load before cracking and at cracking,
+   5.2 and 6.7 %*, on a chart of 0.05 to 0.10 MPa.
+3. *Tamai, shear on the crack at the peak, 10.6 %.* A flat top (193.0 to 193.1 kN over
+   seven stages); the limit line jumps from 0 to 3.4 MPa at the top of the cracked zone,
+   which is one node lower in r2c's state.
+4. *Elasto-plastic tension stiffening, transverse bond at the peak, 7.0 %*, at the bottom
+   end of the stirrups, in a stage of r2c's that has converged (profile error 0.9 %).
+
+On four of the six the response ends differently in the two programs (a Won't; known
+deviation 3 of the shear cases below): Vecchio-Collins 1982, Collins-Mitchell 1987, Tamai,
+elasto-plastic. With Izumo and with the factor 0.5 both end standing still at the same
+place.
 
 **The rule on unstable views** (owner, 2026-11-23, D54, narrowed to the spike test by
 D56; `docs/acceptance.md`, "Where Response is unstable"). How it is carried out:
@@ -118,35 +143,58 @@ D56; `docs/acceptance.md`, "Where Response is unstable"). How it is carried out:
   (the departure alone) is kept as `is_unstable(..., "departure")` so the three counts
   can be set side by side.
 - *The readings.* Place and blend are the owner's (D55). How "agree with each other" is
-  measured is the developer's and waits for the owner (D58); `python tools/unstable.py
+  measured is the developer's, confirmed by the owner (D58); `python tools/unstable.py
   VERIFY_OUT --readings` measures the others.
-- *What it does on the 29* (measured, `python tools/unstable.py VERIFY_OUT --list`): of
-  1,554 view checks 1,216 are tested and 4 are unstable (Must 2, Should 1, Could 1), all
-  four inside before; the rule as first written left 318. The figures are in
-  `docs/summary.md`.
+- *What it does on the 37* (measured, `python tools/unstable.py VERIFY_OUT --list`): of
+  1,953 view checks 1,573 are tested and 6 are unstable (Must 2, Should 2, Could 2), all
+  six checks r2c is inside on; the rule as first written would leave 487. The figures
+  are in `docs/summary.md`.
 - *What it does not catch.* The bond chart along the prestrained stirrups
   (`newbeam-stirrupdep-mv`, the example D54 was written for): at its peak Response's
   chart reads 9.5, 20.9 and 32.7 MPa at stages 27, 28 and 29, so the neighbours are 71 %
   apart and the check is assessed (r2c 2.7 %, inside). Along the whole response the
   chart changes level at about half its stages; `python tools/unstable.py --trace CAPTURE
   transverse_average_bond` lists it stage by stage. Agreement on this view at one stage
-  is not promised at another (D59).
+  is not promised at another (owner, 2026-11-23, D59: on record as such; if it goes
+  outside the owner may exempt it by name).
 - *A property of the measure worth knowing here.* The comparison measures the points of
   one chart against the curve of the other, as a share of the first chart's largest
   value. A stage whose chart is nearly empty between two full ones therefore shows a
   small departure (stage 19 of the same case: 37, 1.4, 37 MPa, departure 4.9 %): its few
   points lie near the foot of the blend, and the peak it lacks is not counted.
 
-**Response does not repeat itself on the I-girder with shear** (measured 2026-11-23,
-five captures of `igirder-mv` in all: `python tools/capture.py NEW_ARCHIVE … --only
-igirder-mv`). Two responses come back: 15 stages with the peak at stage 12 (the fixture,
-and one run of four on 2026-11-23) or 25 stages with the peak at 22 (three runs of
-four, one of them in the Wine prefix the fixture was captured in). The 25 are the 15
-with ten more stages after stage 9, at shears of 385 to 451 kN between 366 and 463 kN;
-every view of the 15 is the same byte for byte in both. So `tools/capture.py` may report
-this case as differing from its fixture, and that is not a fault of r2x or the input.
-The other 28 cases of the set matched their fixtures, neighbours included. Not looked
-into: why, and whether any parked case does the same (D57).
+**Where Response does not repeat itself** (measured 2026-11-23; `python tools/repeat.py
+ARCHIVE ARCHIVE …` sets full captures side by side). Since D57 a case is captured three
+more times before it joins the set: `python tools/capture.py NEW_ARCHIVE --response-dir
+RESPONSE_FOLDER --inputs … --from tests/oracle/parked --only NAME …`, three times into
+three archives (each run in a Wine prefix of its own if they run at once), then
+`tools/repeat.py` on the first archive and the three.
+
+- *The eight cases of step A-3:* four captures each, the same byte for byte.
+- *The I-girder with shear of the set (`igirder-mv`, M/V = 1 m):* five captures in all,
+  15 stages with the peak at stage 12 (the fixture, and one of four on 2026-11-23) or 25
+  stages with the peak at 22 (three of four). The 25 are the 15 with ten more stages
+  after stage 9, at shears of 385 to 451 kN between 366 and 463 kN; every view of the 15
+  is the same byte for byte in both. So `tools/capture.py` may report this case as
+  differing from its fixture, and that is not a fault of r2x or the input.
+- *The 18 parked softening cases on the I-girder:* 16 repeat exactly in four captures.
+  Softening 11 (Collins 1978, M/V = 1 m): 22 stages in the capture of its fixture, 32 in
+  three new ones, the ten more at the same shears as above. Softening 16 (M/V = 2 m,
+  refused by r2c): 62 stages three times and 61 once; the one missing is stage 5, at a
+  moment of 37.1 kNm between 53.0 and 38.2, among the stages put in where the top cracks
+  close.
+- *What the ten stages are* (measured on the captures): each is a fifth of the way from
+  the one before to the stage at 463 kN, where the web cracks. That is the program's
+  closing in on an event (`docs/kernel.md`, "Events"). In the long variant Response
+  keeps the stages it puts in; in the short one it has none. r2c has exactly the ten
+  (385.2, 400.4, 412.5, 422.3, 430.1, 436.3, 441.3, 445.3, 448.5, 451.1 kN against
+  Response's 385.3, 400.5, 412.6, 422.4, 430.2, 436.4, 441.4, 445.4, 448.3, 450.7), and
+  on softening 9 at M/V = 1 m, which repeats, exactly the six Response has there.
+- *What it means for the shear profile iteration* (inferred): whether Response keeps or
+  drops a stage put in between is not fixed by the input. The stage of D48 (item 2
+  below) is such a stage, at the other event on this girder; there Response has none in
+  any of the 13 captures at M/V = 1 m. Put to the owner as D63. Not read: why.
+- Not captured again: the other 30 parked cases.
 
 The known deviations below are all assessed and counted as misses again: the spike
 test leaves none of them out (the rule as first written had set aside 32 misses, on the
@@ -204,6 +252,9 @@ differ, and three things follow from it:
    and 51.8 kN), from which the load falls to 32.5 kN: 2.9 % of the peak. Response has no
    stage there at M/V = 1 m (30.9, then 34.5 kN), and has exactly r2c's stages at
    M/V = 2 m. `python tools/trace.py tests/oracle/igirder-mv.r2x.txt --input INPUT`.
+   The second place named in D48, the web cracking at 366 to 463 kN, is not a deviation
+   of r2c's: Response has the ten stages there in most runs and r2c has the same ten
+   ("Where Response does not repeat itself" above; the fixture is the short variant).
 3. *Parked I-girders with shear that end early* (not set members; they come into the set
    with the material models). `python tools/earlyends.py VERIFY_OUT`; the count on the
    present kernel is in section 4, "The parked cases". On softening 12 the trace shows
@@ -277,15 +328,17 @@ then M".
 
 Gone since D49: the rising branch of M/V = 0.5 m and the post-peak of V alone.
 
-**The views related to shear** (Should). Inside on 7 of the 14 shear cases: Newbeam at
+**The views related to shear** (Should). Inside on 10 of the 20 shear cases: Newbeam at
 M/V = 1 m, V with constant compression, "N constant, then M + V", "V constant, then M",
-and the three shear cases on reinforcement. Outside: M/V = 0.5 m (D49, D46), M/V = 2 m
+the three shear cases on reinforcement, and tension stiffening Vecchio-Collins 1982,
+Collins-Mitchell 1987 and Izumo. Outside among the new ones: Tamai, elasto-plastic and
+the tension stiffening factor (above). Outside: M/V = 0.5 m (D49, D46), M/V = 2 m
 (D46), V alone (D32, D49), the column with shear and the I-girder with shear (the lists
 above), and "M constant, then M + V" and "N + M + V increasing together"
 (`docs/verification.md`, "A4").
-The spike test (D56) leaves none of these misses out: inside on 7 of the 14. (Under the
-rule as first written the column with shear, the I-girder with shear and "N + M + V
-increasing together" were not outside: 10 of the 14.)
+The spike test (D56) leaves none of these misses out. (Under the rule as first written
+the column with shear, the I-girder with shear, "N + M + V increasing together", Tamai
+and elasto-plastic would not be outside: 15 of the 20.)
 
 Written and off: Response's tests on every pass of a stage (`Shear.pass_code`); its solve of the global
 strains with shear, with its step factor since step A-1c (`Shear.own_solve`; r2c has
@@ -295,7 +348,9 @@ fewer of Response's stages with it); its history of the stirrups' plastic strain
 late.
 
 **Crack spacing** (Could). Both spacings are Response's tables on every shape (within
-0.001 mm of its charts but at one node of the I-girder and one of the T-beam). `python
+0.001 mm of its charts but at one node of the I-girder and one of the T-beam), and with
+the other tension stiffening models and the factor 0.5 (within 0.05 mm on four captures,
+step A-3). `python
 tools/spacing.py RECORD` sets r2c's tables against a record's charts without solving
 anything.
 
@@ -458,27 +513,29 @@ one status. Completion is judged against Response as documented (owner, 2026-11-
   captured once, with `--add`. r2x's clipboard helper can fail transiently (once in 25
   captures); a rerun of that case on its own then matched.
 
-**The parked cases.** The 56 were run once at the end of step A-2 (2026-11-23, not a
-run of record; `docs/log/2026-11-23-01.md`); r2c solves 45 of them. Inside on peak,
-rising branch and shape: 31 of the 45 (30 at the end of step A-1b, the last run of all of
-them). Outside: eleven I-girders with shear (softening 0, 1, 2, 5, 6, 7, 8, 9, 11, 12,
-14), the two cases in US units at M/V = 1 ft, the T-beam at M/V = 2 m. Since the end of
-step A-1b, check by check, 107 came inside and 51 went outside (the longitudinal crack
-spacing table and the shear profile handling; the rules of step A-2 part 3 moved none).
-Of the 16 parked I-girders with shear, one ends early (softening 12: peak −10.7 %, at a
-curvature of 0.58 rad/km where Response goes to 2.34); softening 9 at M/V = 1 m is on
-the line (−5.0 %). `python tools/earlyends.py VERIFY_OUT`.
+**The parked cases.** The 48 that remain were run once in step A-3 (2026-11-23, not a
+run of record; `docs/log/2026-11-23-04.md`); r2c solves 37 of them. Inside on peak,
+rising branch and shape: 23 of the 37. Outside: eleven I-girders with shear (softening
+0, 1, 2, 5, 6, 7, 8, 9, 11, 12, 14), the two cases in US units at M/V = 1 ft, the T-beam
+at M/V = 2 m. Against the run at the end of step A-2 no check changed side (the kernel
+is the same). Of the 16 parked I-girders with shear that r2c solves, one ends early
+(softening 12: peak −10.7 %, at a curvature of 0.58 rad/km where Response goes to 2.34);
+softening 9 at M/V = 1 m is on the line (−5.0 %). `python tools/earlyends.py
+VERIFY_OUT`. The parked fixtures hold no neighbouring stages, so nothing on them is
+tested for a spike; a case that joins the set gets them (`python tools/retrim.py ARCHIVE
+--oracle FOLDER`).
 
-**Where a next session picks up**: the owner's answers to D58 and D59 in
-`docs/summary.md` (one reading of the spike test, and the bond chart it does not catch).
-Then material models as the next variable (step A-3, D53), the cases on Newbeam first;
-each case that joins the set is captured three times and any that does not repeat is
-noted (D57), and needs its neighbouring stages cut into its fixture
-(`python tools/retrim.py ARCHIVE --oracle FOLDER`). If the shear profile iteration is taken up again, start from
-what was not read (section 2) and from what the two captures at M/V = 0.99 m and 1.01 m
-showed (section 2; D51); `python tools/trace.py RECORD --set own_solve=1 --set
-pass_code=1` runs a case with either of the program's rules that are written and off,
-and shows the state code by pass and why the program's solve gave up.
+**Where a next session picks up**: the owner's answers to D60 to D63 in
+`docs/summary.md`. If softening cases join (D62): the three proposed have their three
+captures already and repeat; move them, cut their neighbours, and bring them to the
+tiers, Musts first. Two are outside on a Must today: Vecchio-Collins 1986 on shape (r2c
+has a fall of load before cracking that Response's curve has not, and ends standing
+still where Response's falls), Hsu-Zhang on rising branch (6.9 %) and shape. Not looked
+into yet. If the shear profile iteration is taken up again, start from D63 (the two
+variants of one capture), from what was not read (section 2) and from what the two
+captures at M/V = 0.99 m and 1.01 m showed (D51); `python tools/trace.py RECORD --set
+own_solve=1 --set pass_code=1` runs a case with either of the program's rules that are
+written and off, and shows the state code by pass and why the program's solve gave up.
 
 ## 5. Decisions that are the owner's
 
