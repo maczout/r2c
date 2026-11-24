@@ -132,7 +132,9 @@ MATERIAL_SLOW = {
     "newbeam-tstiff2-mv": (0.1, 0.3),
     "newbeam-tstiff3-mv": (0.1, 0.2),
     "newbeam-tstiff4-mv": (0.1, 0.2),
-    "newbeam-tstiff6-mv": (0.4, 0.4),
+    # reset at the "before" run of step A-6 (2026-11-24): with the slopes rule on (D69)
+    # r2c carries on after Response's last stage and its peak is 1.6 % above Response's
+    "newbeam-tstiff6-mv": (1.7, 0.4),
     "newbeam-tsfactor-mv": (0.3, 0.4),
 }
 # Step A-5 (owner, 2026-11-24, D67): the one softening case on the I-girder that joined the
