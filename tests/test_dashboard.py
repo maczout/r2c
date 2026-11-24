@@ -28,7 +28,7 @@ def test_loading_labels():
 
 
 def test_unstable_checks_are_shown_and_left_out_of_the_cells():
-    # owner, 2026-11-23 (D54): shown with Response's departure beside r2c's difference
+    # owner, 2026-11-23 (D54, D56): shown with Response's departure beside r2c's difference
     import report
     run, results = dashboard.load_results(ROOT / "docs" / "verification-results.json")
     acc = report.read_acceptance(ROOT / "docs" / "acceptance.md")
@@ -37,9 +37,12 @@ def test_unstable_checks_are_shown_and_left_out_of_the_cells():
     for t in data["tiers"]:
         assert t["inside"] + t["outside"] + t["unstable"] == t["checks"]
         assert t["plain_inside"] + t["plain_outside"] == t["checks"]
+        assert t["first_inside"] + t["first_outside"] + t["first_unstable"] == t["checks"]
+        assert t["unstable"] <= t["first_unstable"]         # a spike also departs
     for c in data["cases"]:
         shown = {(v["view"], v.get("stage")) for v in c.get("views", [])}
         for u in c.get("unstable", []):
-            assert u["dep"] > lim and (u["view"], u["stage"]) not in shown
+            assert u["dep"] > lim and u["apart"] <= lim
+            assert (u["view"], u["stage"]) not in shown
     page = dashboard.render(data)
     assert "Where Response itself is unstable" in page

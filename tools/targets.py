@@ -17,9 +17,10 @@ outside on one of the three, or failed.
 checks (peak, rising branch, shape, post-peak, and the views tier by tier) the number of cases not outside target
 and the names of those outside. It is the progress table of docs/summary.md. A case on which
 a check cannot be made (no curve after the peak, no load at all) counts as inside on it.
-A view check where Response itself is unstable takes no part (owner, 2026-11-23, D54;
-tools/report.py); --before-d54 counts as the measure did before that rule, to set the two
-side by side. tools/unstable.py counts the view checks one by one.
+A view check where Response itself is unstable takes no part (owner, 2026-11-23, D54, the
+spike test of D56; tools/report.py). To set them side by side: --before-d54 counts as the
+measure did before any such rule, --d54-first as it did under the rule as first written
+(before D56). tools/unstable.py counts the view checks one by one.
 """
 
 from __future__ import annotations
@@ -60,7 +61,7 @@ def row(name: str, res: dict, acc: dict) -> tuple[bool, str]:
     return ok, f"{name}: {flag}: " + "; ".join(parts)
 
 
-def counts(names, results: dict, acc: dict, rule: bool = True) -> int:
+def counts(names, results: dict, acc: dict, rule=True) -> int:
     """Per check: how many of the cases are not outside target, and which are outside."""
     failed = [n for n in names if "control" not in results[n]]
     for n in failed:
@@ -90,6 +91,9 @@ def main(argv=None) -> int:
     ap.add_argument("--counts", action="store_true", help="cases inside, check by check")
     ap.add_argument("--before-d54", action="store_true",
                     help="with --counts: no view check left unassessed for instability")
+    ap.add_argument("--d54-first", action="store_true",
+                    help="with --counts: the rule on unstable views as first written "
+                         "(before D56)")
     a = ap.parse_args(argv)
     results = json.loads((Path(a.verify_out) / "results.json").read_text())
     acc = report.read_acceptance(ROOT / "docs" / "acceptance.md")
@@ -101,7 +105,8 @@ def main(argv=None) -> int:
         new = {c["name"] for c in scope_cases.CASES}
         names = [n for n in names if n in new]
     if a.counts:
-        return counts(names, results, acc, not a.before_d54)
+        return counts(names, results, acc,
+                      False if a.before_d54 else "departure" if a.d54_first else True)
     inside = 0
     for n in names:
         ok, text = row(n, results[n], acc)

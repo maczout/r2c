@@ -72,16 +72,17 @@ def test_a_last_stage_that_is_the_peak_is_assessed():
     assert report.assess(r, ACC)["views_should"][2] is False
 
 
-# -- where Response is unstable (owner, 2026-11-23, D54) -----------------------------------------
+# -- where Response is unstable (owner, 2026-11-23, D54; the spike test, D56) --------------------
 
 def unstable_case(shear=False):
-    """Two stages. View a at stage 0: r2c 9 % off where Response itself departs 20 % from
-    the blend of its neighbours. Everything else steady or not tested."""
+    """Two stages. View a at stage 0: r2c 9 % off where Response itself spikes, departing
+    20 % from the blend of its neighbours, which agree. Everything else steady or not
+    tested."""
     r = staged(shear, [("cracking", {"a": 9.0, "b": 1.0}), ("peak", {"a": 1.0, "c": 9.0}),
                        ("ends falling", {})])
     rows = {(i, v["view"]): v for i, st in enumerate(r["views_stages"]) for v in st["views"]}
-    rows[0, "a"].update(departure=20.0, departure_pct=20.0)
-    rows[0, "b"].update(departure=2.0, departure_pct=2.0)       # steady: stays assessed
+    rows[0, "a"].update(departure=20.0, departure_pct=20.0, apart_pct=1.0)
+    rows[0, "b"].update(departure=2.0, departure_pct=2.0, apart_pct=4.0)   # steady: assessed
     return r, rows
 
 
@@ -97,6 +98,25 @@ def test_an_unstable_check_counts_neither_inside_nor_outside():
     n = report.tier_counts({"x": r}, ACC)["views"]
     assert (n["checks"], n["inside"], n["outside"], n["unstable"]) == (2, 1, 0, 1)
     assert (n["plain_inside"], n["plain_outside"]) == (1, 1)
+    assert (n["first_inside"], n["first_outside"], n["first_unstable"]) == (1, 0, 1)
+
+
+def test_a_step_stays_assessed():
+    # owner, 2026-11-23 (D56): the neighbours differ, so Response moved and stayed: a step
+    r, rows = unstable_case()
+    rows[0, "a"].update(apart_pct=30.0)
+    assert report.assess(r, ACC)["views"][2] is False
+    assert report.assess(r, ACC, rule="departure")["views"] == (1.0, 5.0, True)
+    c = next(c for c in report.stage_checks(r, ACC) if (c["view"], c["ref_stage"]) == ("a", 0))
+    assert (c["state"], c["first"], c["plain"]) == ("outside", "unstable", "outside")
+    n = report.tier_counts({"x": r}, ACC)["views"]
+    assert (n["outside"], n["unstable"], n["first_unstable"]) == (1, 0, 1)
+    # neighbours exactly at the target agree
+    rows[0, "a"].update(apart_pct=5.0)
+    assert report.assess(r, ACC)["views"][2] is True
+    # a result from before the neighbours were measured against each other: not tested
+    del rows[0, "a"]["apart_pct"]
+    assert report.assess(r, ACC)["views"][2] is False
 
 
 def test_a_check_that_is_not_tested_stays_assessed():
@@ -117,5 +137,5 @@ def test_a_departure_within_the_printed_precision_is_not_unstable():
 def test_the_report_shows_response_departure_beside_r2c_difference():
     r, _rows = unstable_case()
     text = "\n".join(report.unstable_sections({"x": r}, ACC))
-    assert "| Must | x | 0 (cracking) | a: 20.0 / 9.0 (outside) |" in text
-    assert "| Must | 2 | 1 | 0 | 1 | 1 | 1 |" in text
+    assert "| Must | x | 0 (cracking) | a: 20.0 / 1.0 / 9.0 (outside) |" in text
+    assert "| Must | 2 | 1 | 0 | 1 | 1 | 1 | 1 | 0 | 1 |" in text

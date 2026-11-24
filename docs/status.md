@@ -84,17 +84,18 @@ each case is assessed against the owner's development targets in `docs/acceptanc
 on every metric, the curve's shape the same, views at the features of the curve.
 
 **The development set under the rule on unstable views** (run of record of 2026-11-23
-after the measure change of D54, the 29 cases; measured, `python tools/targets.py
+after the measure change of D56, the 29 cases; measured, `python tools/targets.py
 VERIFY_OUT --counts`; views compared at the stage at the same place since D42, the last
-stage of a shear case left out since D40, a check where Response itself is unstable left
-out since D54). Cases inside target: peak 29 of 29, rising branch 29, shape 26, post-peak
+stage of a shear case left out since D40, a check where Response's view spikes left out
+since D56). Cases inside target: peak 29 of 29, rising branch 29, shape 26, post-peak
 21 (14 of the 15 without shear), views of the stress state without shear (Must) 14 of 15,
-views Should 24 of 29 (10 of the 14 with shear), views Could 26 of 29. Without the rule
-(`--before-d54`), as at the end of step A-2: Should 21 of 29 (7 of 14), Could 23 of 29;
-the kernel is the same and so is every difference r2c has from Response.
+views Should 21 of 29 (7 of the 14 with shear), views Could 23 of 29. These are the
+counts with no rule at all (`--before-d54`): the spike test changes no case. Under the
+rule as first written (`--d54-first`): Should 24 of 29, Could 26 of 29. The kernel is the
+same in all three and so is every difference r2c has from Response.
 
-**The rule on unstable views** (owner, 2026-11-23, D54; `docs/acceptance.md`, "Where
-Response is unstable"). How it is carried out:
+**The rule on unstable views** (owner, 2026-11-23, D54, narrowed to the spike test by
+D56; `docs/acceptance.md`, "Where Response is unstable"). How it is carried out:
 
 - *Fixtures.* Each of the 29 fixtures holds, besides its compared stages, Response's
   views at the stage before and after each of them, as sections `neighbour/N/VIEW`
@@ -102,20 +103,39 @@ Response is unstable"). How it is carried out:
   curve. `tools/retrim.py ARCHIVE` cuts them from the full captures; `tools/capture.py`
   checks a fresh capture against a fixture with its neighbours. The parked fixtures have
   none, so on them nothing is tested and everything stays assessed.
-- *The measure.* `tools/compare.py` (`place`, `blend_lines`, `departure`) blends the two
-  neighbours' views in proportion to where the stage lies between them along the bottom
-  control chart, and measures Response's own view against the blend as r2c's view is
-  measured against Response's. Each compared view carries that departure in the results.
-- *The assessment.* `tools/report.py` (`is_unstable`, `stage_checks`): a departure over
-  `views_pct`, and over the printed precision, makes the check unstable; it is left out of
-  its tier and listed with Response's departure beside r2c's difference. The results page
-  marks such a view with a ring and lists the checks.
-- *The readings* of what the wording leaves open are the developer's and wait for the
-  owner (D55); `python tools/unstable.py VERIFY_OUT --readings` measures the others.
-- *What it does on the 29* (measured, `python tools/unstable.py VERIFY_OUT`): of 1,554
-  view checks 1,216 are tested and 318 are unstable (Must 64, Should 193, Could 61); 286
-  of those were inside and 32 outside. The figures and every unassessed Must are in
-  `docs/summary.md`; D56 puts the reach of the rule to the owner.
+- *The measure.* `tools/compare.py` measures two distances for each compared view, both
+  by the comparison's own measure. `departure` (with `place`, `blend_lines`): Response's
+  view at the stage against the blend of its two neighbours' views, taken where the stage
+  lies between them along the bottom control chart. `apart`: the two neighbours' views
+  against each other, each as the reference in turn and on its own largest value, the
+  larger of the two, a distance within the printed precision as none. Each compared view
+  carries both in the results (`departure_pct`, `apart_pct`).
+- *The assessment.* `tools/report.py` (`is_unstable`, `stage_checks`): a check is
+  unstable where the neighbours are within `views_pct` of each other and the departure is
+  over `views_pct` and over the printed precision. It is left out of its tier and listed
+  with Response's departure, its neighbours' distance and r2c's difference. The results
+  page marks such a view with a ring and lists the checks. The rule as first written
+  (the departure alone) is kept as `is_unstable(..., "departure")` so the three counts
+  can be set side by side.
+- *The readings.* Place and blend are the owner's (D55). How "agree with each other" is
+  measured is the developer's and waits for the owner (D58); `python tools/unstable.py
+  VERIFY_OUT --readings` measures the others.
+- *What it does on the 29* (measured, `python tools/unstable.py VERIFY_OUT --list`): of
+  1,554 view checks 1,216 are tested and 4 are unstable (Must 2, Should 1, Could 1), all
+  four inside before; the rule as first written left 318. The figures are in
+  `docs/summary.md`.
+- *What it does not catch.* The bond chart along the prestrained stirrups
+  (`newbeam-stirrupdep-mv`, the example D54 was written for): at its peak Response's
+  chart reads 9.5, 20.9 and 32.7 MPa at stages 27, 28 and 29, so the neighbours are 71 %
+  apart and the check is assessed (r2c 2.7 %, inside). Along the whole response the
+  chart changes level at about half its stages; `python tools/unstable.py --trace CAPTURE
+  transverse_average_bond` lists it stage by stage. Agreement on this view at one stage
+  is not promised at another (D59).
+- *A property of the measure worth knowing here.* The comparison measures the points of
+  one chart against the curve of the other, as a share of the first chart's largest
+  value. A stage whose chart is nearly empty between two full ones therefore shows a
+  small departure (stage 19 of the same case: 37, 1.4, 37 MPa, departure 4.9 %): its few
+  points lie near the foot of the blend, and the peak it lacks is not counted.
 
 **Response does not repeat itself on the I-girder with shear** (measured 2026-11-23,
 five captures of `igirder-mv` in all: `python tools/capture.py NEW_ARCHIVE … --only
@@ -128,15 +148,10 @@ this case as differing from its fixture, and that is not a fault of r2x or the i
 The other 28 cases of the set matched their fixtures, neighbours included. Not looked
 into: why, and whether any parked case does the same (D57).
 
-Of the known deviations below, these are now unassessed under the rule and no longer
-count as misses, though r2c's differences are what they were: the views of the column
-with shear at its peak (D47, 9 Should and 2 Could); transverse bond at the peak of the
-I-girder with shear (D46, item 1); M/V = 0.5 m at its fall of load (4 Should) and three
-views at its peak (transverse bond, stirrup stress, principal tensile stress); V alone
-at the stage of Response's fall of load (D32 and D49 item 2, 9 Should and 2 Could); the
-diagonal crack spacing of tension at cracking; transverse bond at cracking of "N + M + V
-increasing together". The seven views of M/V = 0.5 m at its peak listed under D49
-item 1 are steady in Response and stay misses.
+The known deviations below are all assessed and counted as misses again: the spike
+test leaves none of them out (the rule as first written had set aside 32 misses, on the
+column with shear at its peak, M/V = 0.5 m, V alone, the I-girder with shear, tension and
+"N + M + V increasing together").
 
 Three things changed in what r2c calculates
 or reports in step A-2: Response's handling of the shear strain profile is in use (owner,
@@ -268,9 +283,9 @@ and the three shear cases on reinforcement. Outside: M/V = 0.5 m (D49, D46), M/V
 (D46), V alone (D32, D49), the column with shear and the I-girder with shear (the lists
 above), and "M constant, then M + V" and "N + M + V increasing together"
 (`docs/verification.md`, "A4").
-Under the rule on unstable views (D54) the column with shear, the I-girder with shear
-and "N + M + V increasing together" are no longer outside, because their misses are at
-checks where Response itself is unstable: inside on 10 of the 14.
+The spike test (D56) leaves none of these misses out: inside on 7 of the 14. (Under the
+rule as first written the column with shear, the I-girder with shear and "N + M + V
+increasing together" were not outside: 10 of the 14.)
 
 Written and off: Response's tests on every pass of a stage (`Shear.pass_code`); its solve of the global
 strains with shear, with its step factor since step A-1c (`Shear.own_solve`; r2c has
@@ -454,11 +469,12 @@ Of the 16 parked I-girders with shear, one ends early (softening 12: peak −10.
 curvature of 0.58 rad/km where Response goes to 2.34); softening 9 at M/V = 1 m is on
 the line (−5.0 %). `python tools/earlyends.py VERIFY_OUT`.
 
-**Where a next session picks up**: the owner's answers to D55 and D56 in
-`docs/summary.md` (the readings of the rule on unstable views, and its reach). Then
-material models as the next variable (step A-3, D53), the cases on Newbeam first; the
-parked cases that join the set need their neighbouring stages cut into their fixtures
-first (`python tools/retrim.py ARCHIVE --oracle FOLDER`). If the shear profile iteration is taken up again, start from
+**Where a next session picks up**: the owner's answers to D58 and D59 in
+`docs/summary.md` (one reading of the spike test, and the bond chart it does not catch).
+Then material models as the next variable (step A-3, D53), the cases on Newbeam first;
+each case that joins the set is captured three times and any that does not repeat is
+noted (D57), and needs its neighbouring stages cut into its fixture
+(`python tools/retrim.py ARCHIVE --oracle FOLDER`). If the shear profile iteration is taken up again, start from
 what was not read (section 2) and from what the two captures at M/V = 0.99 m and 1.01 m
 showed (section 2; D51); `python tools/trace.py RECORD --set own_solve=1 --set
 pass_code=1` runs a case with either of the program's rules that are written and off,
