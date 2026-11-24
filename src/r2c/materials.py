@@ -181,6 +181,109 @@ class ConcreteLaw:
         s = np.maximum(s, 0.0)
         return -s * self.phi, -fmax * self.phi
 
+    def soften_slope(self, e1: np.ndarray) -> np.ndarray:
+        """-d(beta)/d(e1) as Response's stiffness routine takes it [B 004ac960]: the slope of
+        the model's own formula where it has one in e1 alone and beta is not at a bound;
+        nothing for the models that soften by a ratio or sum of the two strains (1, 3, 11),
+        for Noguchi (8) and for none. docs/kernel.md, "The stiffness in the shear flow
+        calculation"."""
+        m = self.c_soft
+        f = self.fcp
+        e0 = self.e0
+        e1 = np.maximum(e1, 0.0)
+        zero = np.zeros_like(e1)
+        if m in (0, 1, 3, 8, 11):
+            return zero
+        if m in (2, 6, 13):
+            d = 0.8 + 0.34 * e1 / e0
+            h = 0.9 + 0.0045 * f if m == 13 else 1.0
+            beta = 1.0 / (h * d)
+            free = beta <= 1.0
+            if m == 6:
+                free &= beta >= 0.8
+            return np.where(free, 0.34 / e0 / (d * d * h), 0.0)
+        if m == 5:
+            # the program's expression is not the formula's slope: it has the sign the other
+            # way and a 1 added to 0.27/e0 (as read; see docs/kernel.md)
+            d = 1.0 + 0.27 * (e1 / e0 - 0.37)
+            return np.where(1.0 / d <= 1.0, (1.0 - 0.27 / e0) / (d * d), 0.0)
+        if m == 7:
+            beta = 1.15 - 125.0 * e1
+            return np.where((beta >= 0.65) & (beta <= 1.0), 125.0, 0.0)
+        if m == 9:
+            return 180.0 / np.power(1.0 + 400.0 * e1, 1.5)
+        if m in (10, 18):
+            c = 170.0 if m == 10 else max(170.0, 3.0 * f)
+            d = 0.8 + c * e1
+            return np.where(1.0 / d <= 1.0, c / (d * d), 0.0)
+        if m == 12:
+            d = 0.4 + 30.0 * e1
+            a = f ** 0.6667 / f
+            return np.where(a / d <= 1.0, 30.0 * a / (d * d), 0.0)
+        if m == 14:
+            return min(0.9, 5.8 / math.sqrt(f)) * 200.0 / np.power(1.0 + 400.0 * e1, 1.5)
+        if m == 15:
+            return 270.0 / np.power(1.0 + 600.0 * e1, 1.5)
+        raise InputError(f"compression softening model {m} is not implemented")
+
+    def compression_slopes(self, e2: np.ndarray, e1: np.ndarray):
+        """The two slopes of the compressive stress that Response's node stiffness is built
+        from [B 004ac960, called from 0046b940]: against the compressive strain e2 itself
+        with the softening held, and against the transverse tension e1 through the softening
+        alone. Analytic, as the program has them; they are not everywhere the slopes of the
+        stress relation (the softening's effect on the curve's exponent and on the strain at
+        peak stress is left out, and some models have no softening slope)."""
+        m = self.c_soft
+        e1 = np.maximum(e1, 0.0)
+        beta = self.soften(e1, e2)
+        f = self.fcp
+        e0 = self.e0
+        ae = -e2
+        fpk = f * beta                      # the peak stress the curve is scaled to
+        ep = e0 * beta if m in SOFTEN_STRAIN or m in SOFTEN_PLATEAU else np.full_like(ae, e0)
+        if m in SOFTEN_PLATEAU:
+            # on the plateau the curve is taken at its peak; past the unlowered strain at
+            # peak stress it is the unlowered curve
+            ep = np.where(ae >= ep, ae, ep)
+            past = ae > e0
+            ep = np.where(past, e0, ep)
+            fpk = np.where(past, f, fpk)
+        x = ae / ep
+        cm = self.c_mod
+        if cm == BC_POPOVICS:
+            n = np.full_like(ae, self.n) if m in SOFTEN_PLATEAU else 0.8 + fpk / 17.0
+            k = np.where(ae < ep, 1.0, np.maximum(0.67 + fpk / 62.0, 1.0))
+            with np.errstate(over="ignore", invalid="ignore", divide="ignore"):
+                p = np.power(x, n * k)
+                den = n - 1.0 + p
+                shape = x * n / den
+                dshape = ((n - k * n * n) * p + (n - 1.0) * n) / e0 / (den * den)
+        elif cm == BC_PARABOLA:
+            shape = 2.0 * x - x * x
+            dshape = 2.0 / ep - 2.0 * x / ep
+            if m in (1, 9, 14, 15):
+                u = ae - ep
+                end = 2.0 * e0 - ep
+                tail = ae > ep
+                shape = np.where(tail, 1.0 - u * u / (end * end), shape)
+                dshape = np.where(tail, -2.0 * u / (end * end), dshape)
+        elif cm == BC_LINEAR:
+            shape = np.where(x > 1.0, 0.0, x)
+            dshape = np.where(x > 1.0, 0.0, 1.0 / ep)
+        elif cm == BC_PLASTIC:
+            shape = np.where(x > 2.0, 0.0, np.minimum(x, 1.0))
+            dshape = np.where(x > 1.0, 0.0, 1.0 / ep)
+        else:                               # segmental: the table's value and slope
+            shape = np.interp(ae, self.seg_e, self.seg_s, right=0.0) / f
+            i = np.clip(np.searchsorted(self.seg_e, ae, side="right") - 1, 0,
+                        len(self.seg_e) - 2)
+            dshape = (self.seg_s[i + 1] - self.seg_s[i]) / (self.seg_e[i + 1] - self.seg_e[i]) / f
+            dshape = np.where(ae > self.seg_e[-1], 0.0, dshape)
+        if m in SOFTEN_PLATEAU:
+            again = np.where(ae > e0, beta, 1.0)
+            shape, dshape, fpk = shape * again, dshape * again, fpk * again
+        return dshape * fpk * self.phi, shape * f * self.soften_slope(e1) * self.phi
+
     # -- tension --------------------------------------------------------------------------------
     def crack_strain(self, ft_eff: np.ndarray) -> np.ndarray:
         return np.maximum(ft_eff / self.Ec, self.ecr)

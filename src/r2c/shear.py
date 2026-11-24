@@ -124,6 +124,13 @@ class Shear(Flexure):
             zlo, zhi = ztop, zbot
         return zlo, zhi
 
+    # the slopes of the compressive stress in the node's stiffness: the program's analytic
+    # ones [B 004ac960] in place of differences taken on the stress relation. Written and
+    # off: with them r2c's calculated shear stress in Response's states is Response's own
+    # (tools/flowset.py), and one Must goes outside on the set (docs/kernel.md, "The
+    # stiffness in the shear flow calculation"; docs/summary.md, D69)
+    own_slopes = False
+
     def tangent(self, e0, phi, gam):
         """Per node: the condensed tangent stiffness (j, k, m, n) of thesis eq. 6-4, with the
         state it was taken at. The node's stiffness is Response's own [B 0046b940, 00427cd0]:
@@ -172,6 +179,13 @@ class Shear(Flexure):
                               (f(e1[k] + d, e2[k]) - f(e1[k], e2[k])) / d)
             a2[k] = (f(e2[k] + d, e1[k]) - f(e2[k] - d, e1[k])) / (2 * d)
             b2[k] = (f(e2[k], e1[k] + d) - f(e2[k], e1[k])) / d
+            if self.own_slopes:
+                # in compression the program's own two slopes, not the stress relation's
+                cmp_ = e2[k] < -1e-9
+                if cmp_.any():
+                    sa, sb = law.compression_slopes(e2[k][cmp_], e1[k][cmp_])
+                    ka = np.flatnonzero(k)[cmp_]
+                    a2[ka], b2[ka] = sa, sb
             phic[k] = law.phi
             # slope of the limit of the shear on the crack against the principal strain
             aa = 24.0 * out.w[k] / (law.agg + 16.0)
