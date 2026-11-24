@@ -2,8 +2,8 @@
 
 # Verification results
 
-- r2c 0.1.0 at commit `41d67031208d`
-- Run 2026-11-23T10:29:14-07:00 on Makertyre (Linux x86_64, 32 cores), Python 3.12.3, numpy 2.5.5, 29 case(s) at a time
+- r2c 0.1.0 at commit `7c0a4c750c98`
+- Run 2026-11-23T22:30:19-07:00 on Makertyre (Linux x86_64, 32 cores), Python 3.12.3, numpy 2.5.5, 32 case(s) at a time
 - Reference: the oracle fixtures (`tests/oracle`), captured from Response-2000 1.9.7 with r2x
 - Tolerances: `docs/acceptance.md`
 
@@ -13,40 +13,48 @@ Times are measured wall-clock seconds for r2c on that machine. Nothing here time
 
 | Case | Input | Initial; increment | Stages Resp. / r2c | Chart | Peak Resp. | Peak r2c | Peak diff % | Rising % | Post-peak % | Shape | Views % (worst) | Assessment | Time s |
 |---|---|---|---|---|---:|---:|---:|---:|---:|---|---:|---|---:|
-| column-n4000-m: column, N₀, then M, N₀ = -4000 kN | column.r2t | -4000.00,0.00,0.00; 0.00,1.00,0.00 | 55 / 58 | moment_phi | 1130.1 | 1130.3 | +0.02 ≤ 5 | 0.02 ≤ 5 | 0.02 ≤ 5 | same | 1.9 (principal_tensile_stress) | within; 1 view check unstable in Response, not assessed | 4.5 |
-| column-nonly: column, N comp. | column.r2t | 0.00,0.00,0.00; -1.00,0.00,0.00 | 42 / 38 | axial_ex | -16916.2 | -16916.3 | +0.00 ≤ 5 | 0.00 ≤ 5 | 160.94 > 5 | same | 100.0 (principal_tensile_strain) | outside: post-peak, views (Must), views (Should), views (Could) | 0.9 |
-| igirder-m: igirder, M | igirder.r2t | 0.00,0.00,0.00; 0.00,1.00,0.00 | 66 / 60 | moment_phi | 2129.4 | 2129.4 | +0.00 ≤ 5 | 0.18 ≤ 5 | 0.01 ≤ 5 | same | 0.2 (principal_tensile_stress) | within | 4.5 |
+| column-n4000-m: column, N₀, then M, N₀ = -4000 kN | column.r2t | -4000.00,0.00,0.00; 0.00,1.00,0.00 | 55 / 58 | moment_phi | 1130.1 | 1130.3 | +0.02 ≤ 5 | 0.02 ≤ 5 | 0.02 ≤ 5 | same | 1.9 (principal_tensile_stress) | within; 1 view check unstable in Response, not assessed | 4.7 |
+| column-nonly: column, N comp. | column.r2t | 0.00,0.00,0.00; -1.00,0.00,0.00 | 42 / 38 | axial_ex | -16916.2 | -16916.3 | +0.00 ≤ 5 | 0.00 ≤ 5 | 160.94 > 5 | same | 100.0 (principal_tensile_strain) | outside: post-peak, views (Must), views (Should), views (Could) | 1.3 |
+| igirder-m: igirder, M | igirder.r2t | 0.00,0.00,0.00; 0.00,1.00,0.00 | 66 / 60 | moment_phi | 2129.4 | 2129.4 | +0.00 ≤ 5 | 0.18 ≤ 5 | 0.01 ≤ 5 | same | 0.2 (principal_tensile_stress) | within | 5.1 |
 | newbeam-bardep-m: newbeam-bardep, M | newbeam-bardep.r2t | 0.00,0.00,0.00; 0.00,1.00,0.00 | 53 / 55 | moment_phi | 338.9 | 338.9 | +0.00 ≤ 5 | 0.01 ≤ 5 | 0.00 ≤ 5 | same | 1.2 (principal_tensile_stress) | within | 2.2 |
-| newbeam-bartherm-m: newbeam-bartherm, M | newbeam-bartherm.r2t | 0.00,0.00,0.00; 0.00,1.00,0.00 | 48 / 46 | moment_phi | 335.8 | 335.8 | +0.00 ≤ 5 | 0.00 ≤ 5 | 0.01 ≤ 5 | same | 2.4 (principal_tensile_stress) | within | 2.9 |
-| newbeam-m: Newbeam, M | input.r2t | 0.00,0.00,0.00; 0.00,1.00,0.00 | 60 / 62 | moment_phi | 336.8 | 336.8 | +0.00 ≤ 5 | 0.00 ≤ 5 | 0.00 ≤ 5 | same | 0.1 (principal_tensile_stress) | within | 2.6 |
-| newbeam-n2000-m: Newbeam, N₀, then M, N₀ = -2000 kN | input.r2t | -2000.00,0.00,0.00; 0.00,1.00,0.00 | 46 / 46 | moment_phi | 477.1 | 477.0 | -0.00 ≤ 5 | 0.03 ≤ 5 | 0.12 ≤ 5 | same | 5.3 (crack_widths) | within; 1 view check unstable in Response, not assessed | 1.2 |
-| newbeam-negm: Newbeam, −M | input.r2t | 0.00,0.00,0.00; 0.00,-1.00,0.00 | 60 / 60 | moment_phi | -92.1 | -92.1 | +0.00 ≤ 5 | 0.01 ≤ 5 | 0.00 ≤ 5 | same | 0.4 (principal_tensile_strain) | within | 3.4 |
-| newbeam-nm: Newbeam, N comp. + M, N/M = -10 /m | input.r2t | 0.00,0.00,0.00; -10.00,1.00,0.00 | 33 / 30 | moment_phi | 337.5 | 337.7 | +0.05 ≤ 5 | 0.34 ≤ 5 | 0.23 ≤ 5 | same | 1.7 (principal_tensile_stress) | within | 1.5 |
+| newbeam-bartherm-m: newbeam-bartherm, M | newbeam-bartherm.r2t | 0.00,0.00,0.00; 0.00,1.00,0.00 | 48 / 46 | moment_phi | 335.8 | 335.8 | +0.00 ≤ 5 | 0.00 ≤ 5 | 0.01 ≤ 5 | same | 2.4 (principal_tensile_stress) | within | 3.6 |
+| newbeam-cmod0-m: newbeam-cmod0, M | newbeam-cmod0.r2t | 0.00,0.00,0.00; 0.00,1.00,0.00 | 49 / 49 | moment_phi | 309.8 | 309.8 | +0.00 ≤ 5 | 0.00 ≤ 5 | 0.29 ≤ 5 | same | 3.9 (principal_tensile_stress) | within | 2.8 |
+| newbeam-cmod3-m: newbeam-cmod3, M | newbeam-cmod3.r2t | 0.00,0.00,0.00; 0.00,1.00,0.00 | 54 / 54 | moment_phi | 347.0 | 347.0 | +0.00 ≤ 5 | 0.01 ≤ 5 | 0.00 ≤ 5 | same | 0.5 (principal_tensile_stress) | within | 2.4 |
+| newbeam-m: Newbeam, M | input.r2t | 0.00,0.00,0.00; 0.00,1.00,0.00 | 60 / 62 | moment_phi | 336.8 | 336.8 | +0.00 ≤ 5 | 0.00 ≤ 5 | 0.00 ≤ 5 | same | 0.1 (principal_tensile_stress) | within | 3.0 |
+| newbeam-n2000-m: Newbeam, N₀, then M, N₀ = -2000 kN | input.r2t | -2000.00,0.00,0.00; 0.00,1.00,0.00 | 46 / 46 | moment_phi | 477.1 | 477.0 | -0.00 ≤ 5 | 0.03 ≤ 5 | 0.12 ≤ 5 | same | 5.3 (crack_widths) | within; 1 view check unstable in Response, not assessed | 1.8 |
+| newbeam-negm: Newbeam, −M | input.r2t | 0.00,0.00,0.00; 0.00,-1.00,0.00 | 60 / 60 | moment_phi | -92.1 | -92.1 | +0.00 ≤ 5 | 0.01 ≤ 5 | 0.00 ≤ 5 | same | 0.4 (principal_tensile_strain) | within | 3.3 |
+| newbeam-nm: Newbeam, N comp. + M, N/M = -10 /m | input.r2t | 0.00,0.00,0.00; -10.00,1.00,0.00 | 33 / 30 | moment_phi | 337.5 | 337.7 | +0.05 ≤ 5 | 0.34 ≤ 5 | 0.23 ≤ 5 | same | 1.7 (principal_tensile_stress) | within | 1.6 |
 | newbeam-nonly: Newbeam, N comp. | input.r2t | 0.00,0.00,0.00; -1.00,0.00,0.00 | 35 / 36 | axial_ex | -5385.3 | -5371.4 | -0.26 ≤ 5 | 0.26 ≤ 5 | 0.37 ≤ 5 | same | 2.6 (principal_tensile_stress) | within | 0.6 |
-| newbeam-ntension-m: Newbeam, N₀, then M, N₀ = 200 kN | input.r2t | 200.00,0.00,0.00; 0.00,1.00,0.00 | 73 / 69 | moment_phi | 310.3 | 310.3 | +0.00 ≤ 5 | 0.01 ≤ 5 | 0.00 ≤ 5 | same | 1.4 (principal_tensile_stress) | within | 3.0 |
-| newbeam-tension: Newbeam, N tens. | input.r2t | 0.00,0.00,0.00; 1.00,0.00,0.00 | 31 / 29 | axial_ex | 353.0 | 352.3 | -0.21 ≤ 5 | 0.48 ≤ 5 | 0.22 ≤ 5 | different: Resp. cracking, fall, peak, ends standing still; r2c fall, cracking, peak, ends standing still | 100.0 (crack_widths) | outside: shape, views (Could) | 1.3 |
+| newbeam-ntension-m: Newbeam, N₀, then M, N₀ = 200 kN | input.r2t | 200.00,0.00,0.00; 0.00,1.00,0.00 | 73 / 69 | moment_phi | 310.3 | 310.3 | +0.00 ≤ 5 | 0.01 ≤ 5 | 0.00 ≤ 5 | same | 1.4 (principal_tensile_stress) | within | 2.8 |
+| newbeam-tension: Newbeam, N tens. | input.r2t | 0.00,0.00,0.00; 1.00,0.00,0.00 | 31 / 29 | axial_ex | 353.0 | 352.3 | -0.21 ≤ 5 | 0.48 ≤ 5 | 0.22 ≤ 5 | different: Resp. cracking, fall, peak, ends standing still; r2c fall, cracking, peak, ends standing still | 100.0 (crack_widths) | outside: shape, views (Could) | 1.8 |
 | newbeam-zero: Newbeam, no load | input.r2t | 0.00,0.00,0.00; 0.00,0.00,0.00 | 2 / 2 | moment_phi | -0.0 | -0.0 | +0.00 ≤ 5 |  |  |  | 100.0 (long_average_bond) | outside: views (Could) | 0.0 |
-| tbeam-m: tbeam, M | tbeam.r2t | 0.00,0.00,0.00; 0.00,1.00,0.00 | 64 / 64 | moment_phi | 2631.4 | 2631.4 | +0.00 ≤ 5 | 0.01 ≤ 5 | 0.03 ≤ 5 | same | 0.3 (longitudinal_concrete_stress) | within | 4.0 |
-| tbeam-negm: tbeam, −M | tbeam.r2t | 0.00,0.00,0.00; 0.00,-1.00,0.00 | 72 / 68 | moment_phi | -830.8 | -830.9 | +0.00 ≤ 5 | 0.92 ≤ 5 | 0.00 ≤ 5 | same | 1.2 (crack_widths) | within | 5.0 |
+| tbeam-m: tbeam, M | tbeam.r2t | 0.00,0.00,0.00; 0.00,1.00,0.00 | 64 / 64 | moment_phi | 2631.4 | 2631.4 | +0.00 ≤ 5 | 0.01 ≤ 5 | 0.03 ≤ 5 | same | 0.3 (longitudinal_concrete_stress) | within | 4.3 |
+| tbeam-negm: tbeam, −M | tbeam.r2t | 0.00,0.00,0.00; 0.00,-1.00,0.00 | 72 / 68 | moment_phi | -830.8 | -830.9 | +0.00 ≤ 5 | 0.92 ≤ 5 | 0.00 ≤ 5 | same | 1.2 (crack_widths) | within | 4.7 |
 
 ## With shear
 
 | Case | Input | Initial; increment | Stages Resp. / r2c | Chart | Peak Resp. | Peak r2c | Peak diff % | Rising % | Post-peak % | Shape | Views % (worst) | Assessment | Time s |
 |---|---|---|---|---|---:|---:|---:|---:|---:|---|---:|---|---:|
-| column-interlock-mv: column-interlock, M + V, M/V = 1 m | column-interlock.r2t | 0.00,0.00,0.00; 0.00,1.00,1.00 | 43 / 46 | moment_phi | 423.8 | 423.3 | -0.11 ≤ 5 | 0.23 ≤ 5 | 9.10 > 5 | same but the ending (not assessed): Resp. cracking, peak, ends falling; r2c cracking, peak, ends standing still | 2.7 (transverse_average_bond) | outside: post-peak | 92.9 |
-| column-mv: column, M + V, M/V = 1 m | column.r2t | 0.00,0.00,0.00; 0.00,1.00,1.00 | 41 / 42 | moment_phi | 417.8 | 417.2 | -0.16 ≤ 5 | 0.61 ≤ 5 | 9.61 > 5 | same but the ending (not assessed): Resp. cracking, peak, ends falling; r2c cracking, peak, ends standing still | 28.5 (transverse_average_bond) | outside: post-peak, views (Should), views (Could) | 71.7 |
-| igirder-mv: igirder, M + V, M/V = 1 m | igirder.r2t | 0.00,0.00,0.00; 0.00,1.00,1.00 | 15 / 27 | moment_phi | 655.9 | 656.0 | +0.00 ≤ 5 | 2.40 ≤ 5 | 4.09 ≤ 5 | different: Resp. peak, ends falling; r2c fall, peak, ends falling | 49.8 (transverse_average_bond) | outside: shape, views (Should) | 22.9 |
-| newbeam-m05v: Newbeam, M + V, M/V = 0.5 m | input.r2t | 0.00,0.00,0.00; 0.00,0.50,1.00 | 56 / 57 | moment_phi | 128.5 | 129.0 | +0.34 ≤ 5 | 3.57 ≤ 5 | 8.07 > 5 | same but the ending (not assessed): Resp. cracking, fall, peak, ends falling; r2c cracking, fall, peak, ends standing still | 21.6 (stirrup_stress) | outside: post-peak, views (Should), views (Could) | 88.7 |
-| newbeam-m0neg-mv: Newbeam, M₀, then M + V, M/V = 1 m | input.r2t | 0.00,-50.00,0.00; 0.00,1.00,1.00 | 44 / 54 | moment_phi | 169.3 | 169.2 | -0.08 ≤ 5 | 0.86 ≤ 5 | 0.08 ≤ 5 | same | 16.7 (shear_on_crack) | outside: views (Should) | 54.1 |
-| newbeam-m2v: Newbeam, M + V, M/V = 2 m | input.r2t | 0.00,0.00,0.00; 0.00,2.00,1.00 | 88 / 68 | moment_phi | 297.7 | 308.0 | +3.47 ≤ 5 | 0.08 ≤ 5 | 58.17 > 5 | same | 8.1 (transverse_average_bond) | outside: post-peak, views (Should) | 107.9 |
-| newbeam-mv: Newbeam, M + V, M/V = 1 m | input.r2t | 0.00,0.00,0.00; 0.00,1.00,1.00 | 43 / 41 | moment_phi | 201.5 | 201.6 | +0.04 ≤ 5 | 0.03 ≤ 5 | 9.81 > 5 | same | 4.4 (transverse_average_bond) | outside: post-peak; 1 view check unstable in Response, not assessed | 50.9 |
-| newbeam-ncomp-v: Newbeam, N₀, then V, N₀ = -500 kN | input.r2t | -500.00,0.00,0.00; 0.00,0.00,1.00 | 39 / 50 | shear_ex | 320.2 | 320.1 | -0.06 ≤ 5 | 0.43 ≤ 5 | 3.47 ≤ 5 | same | 3.2 (transverse_average_bond) | within | 54.1 |
-| newbeam-nmv: Newbeam, N₀, then M + V, N₀ = -500 kN, M/V = 1 m | input.r2t | -500.00,0.00,0.00; 0.00,1.00,1.00 | 45 / 44 | moment_phi | 253.5 | 252.9 | -0.23 ≤ 5 | 0.23 ≤ 5 | 0.22 ≤ 5 | same | 4.8 (transverse_average_bond) | within | 55.2 |
-| newbeam-nmv-incr: Newbeam, N comp. + M + V, M/V = 1 m, N/M = -5 /m | input.r2t | 0.00,0.00,0.00; -5.00,1.00,1.00 | 42 / 42 | moment_phi | 330.4 | 331.0 | +0.19 ≤ 5 | 0.16 ≤ 5 | 0.82 ≤ 5 | same | 71.5 (transverse_average_bond) | outside: views (Should) | 59.6 |
-| newbeam-nostirrups-mv: newbeam-nostirrups, M + V, M/V = 1 m | newbeam-nostirrups.r2t | 0.00,0.00,0.00; 0.00,1.00,1.00 | 30 / 47 | moment_phi | 125.9 | 125.9 | -0.02 ≤ 5 | 0.02 ≤ 5 | 3.51 ≤ 5 | same | 1.1 (long_crack_spacing) | within | 44.1 |
-| newbeam-stirrupdep-mv: newbeam-stirrupdep, M + V, M/V = 1 m | newbeam-stirrupdep.r2t | 0.00,0.00,0.00; 0.00,1.00,1.00 | 43 / 37 | moment_phi | 203.3 | 203.4 | +0.04 ≤ 5 | 0.03 ≤ 5 | 9.69 > 5 | same | 3.5 (transverse_average_bond) | outside: post-peak | 59.0 |
-| newbeam-v0-m: Newbeam, V₀, then M | input.r2t | 0.00,0.00,50.00; 0.00,1.00,0.00 | 70 / 65 | moment_phi | 333.2 | 333.2 | +0.00 ≤ 5 | 0.01 ≤ 5 | 5.89 > 5 | same | 2.6 (transverse_average_bond) | outside: post-peak; 1 view check unstable in Response, not assessed | 52.0 |
-| newbeam-vonly: Newbeam, V | input.r2t | 0.00,0.00,0.00; 0.00,0.00,1.00 | 52 / 52 | shear_ex | 217.7 | 217.6 | -0.04 ≤ 5 | 0.28 ≤ 5 | 3.60 ≤ 5 | different: Resp. fall, peak, ends falling; r2c peak, ends falling | 100.0 (stirrup_stress) | outside: shape, views (Should), views (Could) | 62.7 |
+| column-interlock-mv: column-interlock, M + V, M/V = 1 m | column-interlock.r2t | 0.00,0.00,0.00; 0.00,1.00,1.00 | 43 / 46 | moment_phi | 423.8 | 423.3 | -0.11 ≤ 5 | 0.23 ≤ 5 | 9.10 > 5 | same but the ending (not assessed): Resp. cracking, peak, ends falling; r2c cracking, peak, ends standing still | 2.7 (transverse_average_bond) | outside: post-peak | 101.2 |
+| column-mv: column, M + V, M/V = 1 m | column.r2t | 0.00,0.00,0.00; 0.00,1.00,1.00 | 41 / 42 | moment_phi | 417.8 | 417.2 | -0.16 ≤ 5 | 0.61 ≤ 5 | 9.61 > 5 | same but the ending (not assessed): Resp. cracking, peak, ends falling; r2c cracking, peak, ends standing still | 28.5 (transverse_average_bond) | outside: post-peak, views (Should), views (Could) | 77.5 |
+| igirder-mv: igirder, M + V, M/V = 1 m | igirder.r2t | 0.00,0.00,0.00; 0.00,1.00,1.00 | 15 / 27 | moment_phi | 655.9 | 656.0 | +0.00 ≤ 5 | 2.40 ≤ 5 | 4.09 ≤ 5 | different: Resp. peak, ends falling; r2c fall, peak, ends falling | 49.8 (transverse_average_bond) | outside: shape, views (Should) | 25.3 |
+| newbeam-m05v: Newbeam, M + V, M/V = 0.5 m | input.r2t | 0.00,0.00,0.00; 0.00,0.50,1.00 | 56 / 57 | moment_phi | 128.5 | 129.0 | +0.34 ≤ 5 | 3.57 ≤ 5 | 8.07 > 5 | same but the ending (not assessed): Resp. cracking, fall, peak, ends falling; r2c cracking, fall, peak, ends standing still | 21.6 (stirrup_stress) | outside: post-peak, views (Should), views (Could) | 94.0 |
+| newbeam-m0neg-mv: Newbeam, M₀, then M + V, M/V = 1 m | input.r2t | 0.00,-50.00,0.00; 0.00,1.00,1.00 | 44 / 54 | moment_phi | 169.3 | 169.2 | -0.08 ≤ 5 | 0.86 ≤ 5 | 0.08 ≤ 5 | same | 16.7 (shear_on_crack) | outside: views (Should) | 60.6 |
+| newbeam-m2v: Newbeam, M + V, M/V = 2 m | input.r2t | 0.00,0.00,0.00; 0.00,2.00,1.00 | 88 / 68 | moment_phi | 297.7 | 308.0 | +3.47 ≤ 5 | 0.08 ≤ 5 | 58.17 > 5 | same | 8.1 (transverse_average_bond) | outside: post-peak, views (Should) | 117.2 |
+| newbeam-mv: Newbeam, M + V, M/V = 1 m | input.r2t | 0.00,0.00,0.00; 0.00,1.00,1.00 | 43 / 41 | moment_phi | 201.5 | 201.6 | +0.04 ≤ 5 | 0.03 ≤ 5 | 9.81 > 5 | same | 4.4 (transverse_average_bond) | outside: post-peak; 1 view check unstable in Response, not assessed | 58.1 |
+| newbeam-ncomp-v: Newbeam, N₀, then V, N₀ = -500 kN | input.r2t | -500.00,0.00,0.00; 0.00,0.00,1.00 | 39 / 50 | shear_ex | 320.2 | 320.1 | -0.06 ≤ 5 | 0.43 ≤ 5 | 3.47 ≤ 5 | same | 3.2 (transverse_average_bond) | within | 61.0 |
+| newbeam-nmv: Newbeam, N₀, then M + V, N₀ = -500 kN, M/V = 1 m | input.r2t | -500.00,0.00,0.00; 0.00,1.00,1.00 | 45 / 44 | moment_phi | 253.5 | 252.9 | -0.23 ≤ 5 | 0.23 ≤ 5 | 0.22 ≤ 5 | same | 4.8 (transverse_average_bond) | within | 61.7 |
+| newbeam-nmv-incr: Newbeam, N comp. + M + V, M/V = 1 m, N/M = -5 /m | input.r2t | 0.00,0.00,0.00; -5.00,1.00,1.00 | 42 / 42 | moment_phi | 330.4 | 331.0 | +0.19 ≤ 5 | 0.16 ≤ 5 | 0.82 ≤ 5 | same | 71.5 (transverse_average_bond) | outside: views (Should) | 67.4 |
+| newbeam-nostirrups-mv: newbeam-nostirrups, M + V, M/V = 1 m | newbeam-nostirrups.r2t | 0.00,0.00,0.00; 0.00,1.00,1.00 | 30 / 47 | moment_phi | 125.9 | 125.9 | -0.02 ≤ 5 | 0.02 ≤ 5 | 3.51 ≤ 5 | same | 1.1 (long_crack_spacing) | within | 49.8 |
+| newbeam-stirrupdep-mv: newbeam-stirrupdep, M + V, M/V = 1 m | newbeam-stirrupdep.r2t | 0.00,0.00,0.00; 0.00,1.00,1.00 | 43 / 37 | moment_phi | 203.3 | 203.4 | +0.04 ≤ 5 | 0.03 ≤ 5 | 9.69 > 5 | same | 3.5 (transverse_average_bond) | outside: post-peak | 66.4 |
+| newbeam-tsfactor-mv: newbeam-tsfactor, M + V, M/V = 1 m | newbeam-tsfactor.r2t | 0.00,0.00,0.00; 0.00,1.00,1.00 | 38 / 38 | moment_phi | 193.4 | 193.1 | -0.14 ≤ 5 | 0.18 ≤ 5 | 0.34 ≤ 5 | same | 106.3 (shear_on_crack) | outside: views (Should) | 54.6 |
+| newbeam-tstiff1-mv: newbeam-tstiff1, M + V, M/V = 1 m | newbeam-tstiff1.r2t | 0.00,0.00,0.00; 0.00,1.00,1.00 | 39 / 46 | moment_phi | 209.7 | 209.8 | +0.07 ≤ 5 | 0.05 ≤ 5 | 9.15 > 5 | same | 4.9 (transverse_average_bond) | outside: post-peak | 75.2 |
+| newbeam-tstiff2-mv: newbeam-tstiff2, M + V, M/V = 1 m | newbeam-tstiff2.r2t | 0.00,0.00,0.00; 0.00,1.00,1.00 | 39 / 38 | moment_phi | 204.8 | 204.9 | +0.04 ≤ 5 | 0.03 ≤ 5 | 9.76 > 5 | same | 2.5 (transverse_average_bond) | outside: post-peak; 1 view check unstable in Response, not assessed | 48.4 |
+| newbeam-tstiff3-mv: newbeam-tstiff3, M + V, M/V = 1 m | newbeam-tstiff3.r2t | 0.00,0.00,0.00; 0.00,1.00,1.00 | 42 / 42 | moment_phi | 196.1 | 196.1 | +0.01 ≤ 5 | 0.02 ≤ 5 | 0.06 ≤ 5 | same | 1.6 (stirrup_stress) | within; 1 view check unstable in Response, not assessed | 49.2 |
+| newbeam-tstiff4-mv: newbeam-tstiff4, M + V, M/V = 1 m | newbeam-tstiff4.r2t | 0.00,0.00,0.00; 0.00,1.00,1.00 | 40 / 43 | moment_phi | 193.1 | 193.1 | -0.02 ≤ 5 | 0.06 ≤ 5 | 9.38 > 5 | same but the ending (not assessed): Resp. cracking, peak, ends falling; r2c cracking, peak, ends standing still | 10.6 (shear_on_crack) | outside: post-peak, views (Should) | 57.7 |
+| newbeam-tstiff6-mv: newbeam-tstiff6, M + V, M/V = 1 m | newbeam-tstiff6.r2t | 0.00,0.00,0.00; 0.00,1.00,1.00 | 34 / 36 | moment_phi | 219.3 | 219.6 | +0.16 ≤ 5 | 0.09 ≤ 5 | 30.91 > 5 | same but the ending (not assessed): Resp. cracking, peak, ends falling; r2c cracking, peak, ends standing still | 7.0 (transverse_average_bond) | outside: post-peak, views (Should) | 62.1 |
+| newbeam-v0-m: Newbeam, V₀, then M | input.r2t | 0.00,0.00,50.00; 0.00,1.00,0.00 | 70 / 65 | moment_phi | 333.2 | 333.2 | +0.00 ≤ 5 | 0.01 ≤ 5 | 5.89 > 5 | same | 2.6 (transverse_average_bond) | outside: post-peak; 1 view check unstable in Response, not assessed | 57.1 |
+| newbeam-vonly: Newbeam, V | input.r2t | 0.00,0.00,0.00; 0.00,0.00,1.00 | 52 / 52 | shear_ex | 217.7 | 217.6 | -0.04 ≤ 5 | 0.28 ≤ 5 | 3.60 ≤ 5 | different: Resp. fall, peak, ends falling; r2c peak, ends falling | 100.0 (stirrup_stress) | outside: shape, views (Should), views (Could) | 66.1 |
 
 ## View checks by tier
 
@@ -54,9 +62,9 @@ A check is one detail view at one compared stage of one case (the last stage of 
 
 | Tier | Checks | Inside | Outside | Unstable in Response, not assessed | No rule: inside | No rule: outside | As first written: inside | As first written: outside | As first written: unassessed |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| Must | 376 | 367 | 7 | 2 | 369 | 7 | 305 | 7 | 64 |
-| Should | 808 | 763 | 44 | 1 | 764 | 44 | 598 | 17 | 193 |
-| Could | 370 | 360 | 9 | 1 | 361 | 9 | 305 | 4 | 61 |
+| Must | 424 | 415 | 7 | 2 | 417 | 7 | 346 | 7 | 71 |
+| Should | 1064 | 1013 | 49 | 2 | 1015 | 49 | 724 | 18 | 322 |
+| Could | 465 | 454 | 9 | 2 | 456 | 9 | 367 | 4 | 94 |
 
 ## Detail views where Response is unstable
 
@@ -66,17 +74,19 @@ Reported, not assessed (owner, 2026-11-23, D54 and D56). For each check: Respons
 |---|---|---|---|
 | Must | column-n4000-m | 28 (cracking) | principal_tensile_stress: 5.0 / 4.1 / 0.4 |
 | Must | newbeam-n2000-m | 37 (peak) | principal_tensile_stress: 6.3 / 3.8 / 0.1 |
+| Should | newbeam-tstiff2-mv | 30 (peak) | shear_stress: 6.8 / 4.2 / 0.1 |
 | Should | newbeam-v0-m | 61 (peak) | shear_on_crack: 8.9 / 1.4 / 0.1 |
 | Could | newbeam-mv | 30 (peak) | long_average_bond: 7.3 / 3.7 / 0.0 |
+| Could | newbeam-tstiff3-mv | 30 (peak) | long_average_bond: 6.8 / 1.8 / 0.0 |
 
 ## Detail views at the features of the curve, worst case per view
 
 | View | Worst % | Case |
 |---|---:|---|
+| shear_on_crack | 106.3 | newbeam-tsfactor-mv |
 | stirrup_stress | 100.0 | newbeam-vonly |
 | longitudinal_strain | 100.0 | newbeam-vonly |
 | transverse_strain | 100.0 | newbeam-vonly |
-| shear_on_crack | 100.0 | newbeam-vonly |
 | principal_tensile_strain | 100.0 | column-nonly |
 | crack_widths | 100.0 | column-nonly |
 | average_angle | 100.0 | column-nonly |
@@ -101,24 +111,24 @@ Reported, not assessed (owner, 2026-11-22, D40): how a shear response ends is a 
 
 | View | Worst % | Case |
 |---|---:|---|
+| shear_on_crack | 106.2 | newbeam-tsfactor-mv |
+| shear_strain | 100.2 | newbeam-tstiff4-mv |
 | long_reinf_stress_at_crack | 100.0 | newbeam-ncomp-v |
 | transverse_strain | 100.0 | igirder-mv |
-| shear_on_crack | 100.0 | igirder-mv |
 | crack_widths | 100.0 | newbeam-ncomp-v |
 | diagonal_spacing | 100.0 | igirder-mv |
 | stirrup_stress | 100.0 | column-interlock-mv |
 | principal_tensile_strain | 100.0 | igirder-mv |
-| shear_strain | 99.6 | igirder-mv |
 | principal_compressive_stress | 99.4 | newbeam-nostirrups-mv |
-| principal_tensile_stress | 85.5 | newbeam-mv |
+| principal_tensile_stress | 86.0 | newbeam-tstiff4-mv |
 | shear_stress | 79.7 | newbeam-v0-m |
 | transverse_average_bond | 59.1 | newbeam-vonly |
 | longitudinal_concrete_stress | 55.3 | newbeam-ncomp-v |
+| average_angle | 50.1 | newbeam-tstiff4-mv |
 | longitudinal_strain | 50.0 | newbeam-m05v |
-| average_angle | 48.0 | newbeam-ncomp-v |
 | long_average_bond | 47.4 | newbeam-nmv-incr |
 | long_reinforcement_stress | 10.1 | newbeam-nostirrups-mv |
-| stirrup_stress_at_crack | 5.7 | newbeam-vonly |
+| stirrup_stress_at_crack | 7.5 | newbeam-tstiff6-mv |
 | long_crack_spacing | 1.2 | column-mv |
 | transverse_crack_spacing | 1.1 | newbeam-nmv-incr |
 | shrinkage_thermal_strain | 0.0 | column-interlock-mv |
