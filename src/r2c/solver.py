@@ -332,8 +332,11 @@ class Analysis:
                 i1 += a1
                 i2 += a2
                 i3 += a3
-                ma += law.ft * law.phi * a1 * 0.6
-                mb += law.ft * law.phi * a2 * (3.0 - 0.6)
+                # the two capacity moments the zone's own is set against are summed without
+                # the concrete's material factor; the limits at the face and at the axis
+                # (below) carry it [B 00440400, 00441d80]
+                ma += law.ft * a1 * 0.6
+                mb += law.ft * a2 * (3.0 - 0.6)
             lawf = sec.law_at(face)
             lawn = sec.law_at(min(max(zn, zbot), ztop))
             p4 = 0.6 * lawf.ft * lawf.phi

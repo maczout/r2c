@@ -165,6 +165,28 @@ still take (longitudinal reserve f1cx, transverse reserve f1cy) and by shear on 
 with Bentz's lower bound 0.25·ft/(0.31 + 24w/(a + 16)). Crack width w = (ε1 − εcr)·sθ,
 sθ = 1/(|sin θ|/smx + |cos θ|/smy).
 
+### The longitudinal reserve over a tension zone [T 4-5; B `00441d80`, `00440400`]
+
+The limit f1cx is a profile over each flexural tension zone, from the neutral axis to the
+face (`Analysis.crack_check`; read in increment A2, the factor's place in step A-5). The
+bars crossing the zone give it a capacity moment about the axis: each bar's reserve at a
+crack times its area and its distance from the axis. That moment is set against two
+moments of the concrete in the zone: Ma, a uniform tension of 0.6·ft, and Mb, a further
+tension rising from nothing at the face to 2.4·ft at the axis.
+
+* Capacity up to Ma: a uniform limit, the capacity moment over the zone's first moment.
+* Between Ma and Ma + Mb: 0.6·ft at the face, rising linearly to the axis by what the
+  capacity has over Ma.
+* Over Ma + Mb: 3·ft at the axis, and at the face 0.6·ft plus what is left over.
+* A zone no bar crosses has no capacity moment and a limit of nothing (D30).
+
+**With material factors** [B `00440400`, read 2026-11-24, step A-5]: the limits at the face
+and at the axis (0.6·ft, 3·ft) carry the concrete's factor, but Ma and Mb are summed with
+the unfactored ft. So with the CSA factor of 0.65 the uniform branch reaches further than
+its own face value: where r2c had a sloping limit from 0.76 MPa at the face, Response has
+a flat 0.83 MPa (Newbeam with CSA factors under M, last stage: the limit line of the
+Principal Tensile Stress chart 11.3 % off before, 0.0 % with the rule).
+
 ### A node with next to no shear strain [B `004a8b20`, `004a7b60`], read 2026-11-23 (step A-2)
 
 With shear, before Response solves a node's transverse strain (`004a8b20`) it tests the
