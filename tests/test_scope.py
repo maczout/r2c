@@ -77,6 +77,12 @@ def test_softening_models_that_are_not_in_the_manual_are_refused(model):
         inputs.parse(beam(concrete=f'c_soft="{model}"'))
 
 
+def test_tension_stiffening_turned_off_is_refused_as_r2x_fails_on_it():
+    # Response asks "Do you wish to leave tension off?" and r2x fails there (interface parity)
+    with pytest.raises(OutOfScope, match="turned off"):
+        inputs.parse(beam(concrete='t_stiff="0"'))
+
+
 @pytest.mark.parametrize("model", [9, 14, 15])
 def test_hsu_softening_with_tamai_tension_stiffening_is_refused(model):
     with pytest.raises(OutOfScope, match="Tamai"):

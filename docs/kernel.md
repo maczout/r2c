@@ -210,7 +210,15 @@ as the binary has them.
 
 * Bars: linear, a plateau to εsh, a parabola with its vertex at (εu, fu) [T]. The curve
   carries on down past εu; the bar ruptures at εsh + 1.5·(εu − εsh) [B]. With material factors
-  in effect the stress is capped at fy [O].
+  in effect the stress is capped at fy [B `004aea40`: the test is at the routine's end, the
+  concrete's factor plus twice the reinforcing steel's under 3; the factors' places are
+  told apart in `004ac800`]. r2c has the same test. The slope used in the shear stress calculation is not capped
+  [B `004ae630` has no such test]: past the plateau a bar keeps its hardening slope there.
+  Until 2026-11-25 r2c gave such a bar no slope; on the T-beam with CSA factors at M/V = 2 m
+  the stage at which the bars pass their plateau then had no state, and the response ended
+  9 % under Response's peak. With the slope kept r2c's passes on that stage are Response's
+  (profile error 0.388, 0.291, 0.192 against 0.391, 0.291, 0.187; 15 passes in both)
+  [measured, r2c beside `tools/rtrace.py`'s log].
 * Tendons: Ramberg-Osgood [T]. Response derives the rest: the strength is capped at the
   curve's value at the rupture strain, and "yield" is 0.9 of the strength [B].
 * A segmental curve for reinforcing steel (points of strain and stress in the `<rebar>`
@@ -768,7 +776,15 @@ now [O, one run of the parked cases, 2026-11-22; not looked into].
 
 The control variable's value at the initial stage is the curvature or the centroid's strain
 there. More Detail adds a stage between every two up to the peak, among the stages found in
-the first control variable, to at most 327 stages. A response has at most 101 stages [O].
+the first control variable, to at most 327 stages.
+
+**How many stages.** Without shear a response has at most 101 stages [O: every capture
+without shear stops there or sooner]. With shear there is no such limit: Response's
+captures run to 148 stages (the Liping sample at M/V = 2.5 m; 113 to 139 on four more
+development cases) [O], and the stage control has none; what ends a long response there is
+the count of solves, 327 [B `00418860`], in a table of stages with 330 places [B
+`00417d50`]. Until 2026-11-25 r2c stopped every response at 101 stages, and so ended five
+shear cases well before Response does.
 
 ## The stage solve without shear [B], read 2026-11-22
 
@@ -777,10 +793,12 @@ How Response-2000 finds the state of a stage when there is no shear. Read for in
 `004a9030`). **The secant, under a stepped curvature, is in use since increment A4**
 (owner, 2026-11-22, D35; `Flexure.own_curvature`): it brings M's last stage inside and
 leaves one point outside at the last stage of "constant N +200 kN, then M", a known
-deviation (`docs/status.md`). **The general solve, under a stepped axial strain, is written
-and not in use** (owner, 2026-11-22, D36: tension's shape is a known deviation for phase A;
-`Flexure.own_axial`); there r2c's own solve (the balanced state, to a root of the unbalanced
-force) is still what runs.
+deviation (`docs/status.md`). **The general solve, under a stepped axial strain, is in use
+since 2026-11-25** (`Flexure.own_axial`), with two exceptions that are r2c's own: under
+axial load alone, while the section stays uniform (the strain differs over the depth by
+under 2 % of the centroid's), r2c keeps the balanced, uniform state, which is the owner's
+override for the circular column past its peak; and where the general solve finds no state
+r2c takes the balanced one.
 
 *Which solve.* Under a stepped curvature, the secant below. Under a stepped axial strain
 Response sets its relaxation flag, and with that flag the stage goes to the general solve it
@@ -811,9 +829,15 @@ larger than 0.5 in all. The tolerance is wide: on Newbeam under tension the stat
 cracking carry 40 to 130 N m of unbalanced moment, each about half a step short of balance
 [O: the same figures come out of r2c in Response's states and out of this solve]. That is
 how Response has one more rising stage before the fall at cracking than r2c's balanced
-solve can find (D31). Still r2c's own in this solve: the stiffness is taken numerically
-(Response's is `00427cd0`, which r2c has for the shear cases), and the step for a moment
-that grows with the axial load is r2c's reading (`004267c0` was not read).
+solve can find. Since 2026-11-25 this is the solve r2c has for the cases with shear, with
+no shear strain: Response's stiffness [`00427cd0`] and its step [`004267c0`]
+(`Flexure._general_own`, which calls `Shear._general`). The earlier copy took the stiffness
+numerically and the step by r2c's reading; with it tension's shape came inside and two
+views at its peak went outside. With the program's own, Newbeam under axial tension is
+inside on every check and r2c's points are Response's to the printed figure up to the last
+three stages [measured, `tools/verify.py --only` on the four cases stepped in the axial
+strain, `tools/changes.py`]; nothing went outside, and the circular column's record is
+unchanged.
 
 *A stage put in between that is not solved* [`00418af0`] is dropped, the stage set aside is
 taken as it was found, and the event is closed in on no further. A stage set aside and
@@ -1261,7 +1285,6 @@ Response shows when the solve ends is the one with the largest load.
 | Shear alone stepped in the shear strain | 0.02 mm/m; half under constant compression | two cases |
 | "Large" constant axial load for the base step | above 0.1 MPa on the gross area | one case |
 | State code 1 needs no stirrup at the node | yes | one case (no stirrups) |
-| Factored steel capped at fy | yes | one case (CSA factors) |
 | The offset across the member is the shrinkage and thermal profile alone; the second table of the tension zone walk is the outline | above ("What the concrete's offset does") | two cases, both rectangular |
 | The first envelope of the Transverse Strain chart | straight between the offsets at the two faces | two cases |
 | Interlocking hoops are stirrups | yes | one case (column, M/V = 1 m) |

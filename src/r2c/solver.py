@@ -1166,43 +1166,26 @@ class Flexure:
             found = abs(r) < ((tn if tn > 1.0 else abs(n)) * 1e-3 + 1.0)
         return x, found and -13 < k <= 30
 
-    def _general(self, c, x):
-        """Response-2000's solve when the axial strain c is stepped [B 004276a0]: half steps
-        of Newton's method on the curvature x (1/m), at least one, until the unbalanced
-        moment is inside a tolerance that is wide next to the secant's. Returns (x, found)."""
-        an, sec = self.an, self.sec
-        hh = (sec.h / 1e3 + 1e-4) ** 2
-        floor = 1.0 + (1000.0 * sec.area / 1e6) ** 2
-        ratio = an.dm / 1e3 / an.dn
-        count = 0
-        while True:
-            phi = x / 1e3
-            an.refine(c, phi, 0.0)
-            n, m, _v = an.forces(c, phi)
-            off = (m - (an.m0 + (n - an.n0) * an.dm / an.dn)) / 1e3
-            tol = (n * n + (m / 1e3) ** 2 / hh) * 1e-6 + floor
-            err = off * off / hh
-            if err < tol and count:
-                return x, True
-            h = 1e-7
-            fa, fb = an.forces(c, (x + h) / 1e3), an.forces(c, (x - h) / 1e3)
-            den = (fa[1] - fb[1]) / 1e3 / (2 * h) - ratio * (fa[0] - fb[0]) / (2 * h)
-            if den == 0.0:
-                return x, False
-            dx = -off / den
-            if abs(dx) > 0.5:
-                return x, False
-            x += 0.5 * dx
-            count += 1
-            if count > 50:
-                return x, False
-            if not tol < err:
-                return x, True
+    def _general_own(self, c, x):
+        """Response-2000's solve when the axial strain c is stepped [B 004276a0, its step
+        004267c0, its stiffness 00427cd0]: the one r2c has for the cases with shear
+        (Shear._general), here with no shear strain and in half steps. x is the curvature
+        (1/m) it starts from. Returns (x, found)."""
+        from r2c.shear import Shear
+        if self._helper is None:
+            self._helper = Shear(self.an)
+            self._helper.mode = self._helper.mode0 = "e0"
+        sh = self._helper
+        sh.half_steps, sh.step_share = True, 0.5
+        _x, info, found = sh._general(c, np.array([x / 1e3, 0.0]))
+        return info[1] * 1e3, found
+
+    _helper = None
 
     # which of Response's own solves are in use (docs/kernel.md, "The stage solve without
-    # shear"): under a stepped axial strain (off: owner, D36), and under a stepped
-    # curvature (on: owner, D35)
-    own_axial = False
+    # shear"): under a stepped axial strain (on since 2026-11-25), and under a stepped
+    # curvature
+    own_axial = True
     own_curvature = True
 
     def response_solve(self) -> bool:
@@ -1218,12 +1201,25 @@ class Flexure:
         if not self.response_solve():
             return self._solve_balanced(c, prev)
         an = self.an
+        if self.mode == "e0" and an.dm == 0.0 and an.m0 == 0.0 \
+                and (prev is None or abs(prev.phi) * self.sec.h <= 0.02 * abs(prev.e0)):
+            # axial load alone on a section that has stayed uniform (the strain differs over
+            # the depth by under 2 % of the centroid's; r2c's own figure): r2c
+            # stays with the balanced, uniform state. Past the peak Response's solve leaves
+            # it; that r2c does not is the owner's override for the circular column
+            # (docs/brief.md)
+            return self._solve_balanced(c, prev)
         src = prev
         if aside is not None and prev is not None \
                 and abs(aside.control - c) < abs(prev.control - c):
             src = aside
         if self.mode == "e0":
-            x, ok = self._general(c, 0.0 if src is None else src.phi * 1e3)
+            x, ok = self._general_own(c, 0.0 if src is None else src.phi * 1e3)
+            if not ok:
+                # r2c's own: where that solve finds no state, the balanced state. This is
+                # what keeps the uniform response of a column past its peak (the owner's
+                # override, docs/brief.md)
+                return self._solve_balanced(c, prev)
         else:
             x, ok = self._secant(c, 0.0 if src is None else src.e0, fresh)
             if not ok:

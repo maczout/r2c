@@ -350,7 +350,7 @@ def cmd_own(a) -> int:
     ref = record.decode(Path(a.record).read_bytes())
     su = _setup(ref, a.input)
     u = su.units
-    stages = su.driver().run(run.MAX_STAGES)
+    stages = su.driver().run(su.max_stages)
     print(f"{'stage':>5} {'by':>4} {'e0 mm/m':>9} {'phi rad/km':>11} {'gxy mm/m':>9} "
           f"{'N':>9} {'M':>9} {'V':>9} {'profile %':>9}")
     for i, st in enumerate(stages):

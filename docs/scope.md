@@ -102,7 +102,7 @@ is inside target on the case is in `docs/verification-results.md` when its set w
 | A Hsu softening model (9, 14, 15) with Tamai tension stiffening (4): Response's "RA-STM mode" | yes: A-16. Out of scope by the owner's decision (D5) | runs with a steel ratio and a tensile strength of its own (the binary; not probed) | refuses the file as out of scope (never built; before 2026-11-22 it ran the two models as if they were independent) | **removed** | |
 | Tension stiffening 7, Bentz 1999 (default) | yes: A-16 ("Bentz 2000"); thesis 5-3, 5-4 | | implemented | compared | all |
 | Tension stiffening 1 (Vecchio-Collins 1982), 2 (Collins-Mitchell 1987), 3 (Izumo et al), 4 (Tamai et al), 6 (elasto-plastic) | yes: A-16 | solves each; peaks −4 to +9 % (probes newbeam-tstiff1 … 6) | implemented | compared since 2026-11-21 | **newbeam-tstiff1-mv, -tstiff2-, -tstiff3-, -tstiff4-, -tstiff6-mv** (A) |
-| Tension stiffening 0, none | yes: A-16 | Response asks "Do you wish to leave tension off?" before solving; r2x stops at the question (probe newbeam-tstiff0) | implemented | not solvable | |
+| Tension stiffening 0, none | yes: A-16 | Response asks "Do you wish to leave tension off?" before solving; r2x stops at the question (probe newbeam-tstiff0; again 2026-11-25, under moment alone too) | built, and refused since 2026-11-25 so that r2c refuses what r2x refuses (`docs/brief.md`, interface parity) | not solvable | |
 | Tension stiffening 5 (Stuart Oliver) | no | Response refuses the file: "Stuart Oliver Model Unsupported" (probe newbeam-tstiff5) | rejects the file as an input error (since 2026-11-21) | not solvable | |
 
 The softening cases are on the I-girder with strands at M/V = 2 m because that is where the
@@ -277,8 +277,10 @@ with each was confirmed by the owner on 2026-11-22 (D6, D7).
 - **A shape without an outline.** Response opens the file with no concrete and the solve
   fails. r2c rejects the file as an input error (D6).
 - **Tension stiffening "None"** needs an answer to Response's question that r2x does not
-  give. r2c implements it (the thesis' base case; the manual, A-16). It stays not compared
-  until r2x answers the question.
+  give, so r2x fails on every such input. The model is built in r2c (the thesis' base case;
+  the manual, A-16) and the input is refused since 2026-11-25, as r2x refuses it: the
+  brief's interface parity. The refusal is one test in `src/r2c/inputs.py`; it comes out
+  when r2x answers the question.
 - **Tension stiffening 5**: Response refuses the file; so does r2c, as an input error.
 - **`units="roman"`**: see the table. r2c rejects it as an input error.
 - **Three load combinations on Newbeam** (table in section 2): they may solve on another

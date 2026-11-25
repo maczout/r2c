@@ -68,3 +68,11 @@ def test_owner_left_define_and_report_out_of_the_score():
 def test_refusals_outside_the_manual_are_known_differences():
     assert parity.outside_manual("probe x: r2x solves, r2c refuses: draped tendons")
     assert not parity.outside_manual("probe x: r2x fails, r2c solves")
+
+
+def test_the_headline_is_the_owner_s_of_2026_11_25():
+    assert parity.verdict(311, 326, 15) == \
+        "Interface parity: complete except accepted refusals (15; 311 of 326 checks the same)"
+    assert parity.verdict(306, 326, 15).startswith("Interface parity: not complete: 5 difference(s)")
+    assert parity.verdict(10, 10, 0) == "Interface parity: complete (10 of 10 checks the same)"
+    assert "partial" in parity.verdict(10, 10, 0, every_part=False)
