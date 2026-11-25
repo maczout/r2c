@@ -47,3 +47,25 @@ def test_the_bond_parameter_is_the_lesser_of_the_two_tables_each_read_at_the_hei
     b = float(sec.width(np.array([mid]))[0])
     t = s.db * np.pi * s.legs / (b * s.space + 100.0)
     assert float(np.interp(mid, sec.tz, sec.t_mtrans)) == pytest.approx(3.6 / (t + 1e-7))
+
+
+def test_the_tent_of_the_bond_parameter_reaches_as_far_as_the_spacing_table_says():
+    # a section wider than deep: the node's crack spacing is held to the depth, the table
+    # the tent is built on is not [B 004fec60, 004ff450]
+    su = run.setup(None, increment=(0.0, 1.0, 0.0))
+    sec = su.section
+    law = sec.segs[0][4]
+    sec.segs = [(600.0, 0.0, 2000.0, 2000.0, law)]
+    sec.stirrups = []
+    sec._tables()
+    bot = min(sec.layers, key=lambda l: l.z)
+    reach = float(np.interp(bot.z, *sec.p_smx))
+    assert reach > sec.h and float(sec.smx_at(bot.z)) == sec.h
+    # the tent falls to nothing at the table's value from the bar, not at the depth: the
+    # bottom bars' share at mid-depth is what a tent of that reach leaves
+    sec.layers = [bot]
+    sec._tables()
+    mid = 0.5 * sec.h
+    share = (reach - (mid - bot.z)) / (reach + 0.1)
+    at_bar, at_mid = (3.6 / float(np.interp(z, sec.tz, sec.t_mlong)) for z in (bot.z, mid))
+    assert at_mid / at_bar == pytest.approx(share, rel=0.02)

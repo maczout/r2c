@@ -267,7 +267,9 @@ class Section:
             # spacing, and 1e-4 m2 on the stirrups' width times spacing below [B 004fec60,
             # 004ff1a0]
             perim = l.db * math.pi * l.num / (self.bond_area(dn, up) + 1.0)
-            sbar = float(self.smx_at(l.z))
+            # the spacing table's own value at the layer, not the node's, which is held to
+            # the depth [B 004fec60 reads the table, 004ff450; O: three probes of a slab]
+            sbar = float(np.interp(l.z, *self.p_smx))
             kk = perim * 2.5 / (sbar + 0.1)
             tent = np.minimum((l.z + sbar - self.tz) * kk, (self.tz - (l.z - sbar)) * kk)
             tl += np.maximum(tent, 0.0)

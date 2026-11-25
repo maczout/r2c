@@ -417,6 +417,18 @@ routines add are in metres: 1e-6 m² to the area, 1e-4 m to the crack spacing th
 built on, 1e-4 m² to the stirrups' width times spacing (r2c had 1e-4 mm and 1e-4 mm², which
 is nothing), and 1e-4 per metre to the sum.
 
+**The tent's reach is the spacing table's own value at the layer** [`004fec60` reads the
+table through `004ff450`], not the spacing a node takes, which is held to the depth. On a
+section whose bars are further apart than it is deep (a slab strip: three bars in 1000 mm,
+300 mm deep) the table gives 674 to 1379 mm where the node's spacing is 300 mm, and the
+tent reaches that much further. Until 2026-11-25 r2c built the tent on the node's spacing,
+and its tension stiffening on such a section was 10 to 15 % under Response's away from the
+bars. Checked by asking Response: three probes of the 1000 x 300 mm slab strip (the top
+layer with one bar, with two, and taken out), the bond parameter worked back from the
+charts as above; with the rule r2c's is Response's within 0.15 % at every node read, where
+it was 15 to 46 % off [measured; the probes are kept with the run, not in the repository].
+The same probes show that a layer given no number of bars has one.
+
 Found on the Liping sample (flanges with tapers, a web of 75 mm, stirrups at 125 mm): from
 Response's charts of principal tensile stress and strain the bond parameter can be worked
 back, M = (ft/f1 − 1)²/ε1 where the crack check does not govern. Before, Response's M was
