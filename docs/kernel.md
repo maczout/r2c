@@ -31,6 +31,15 @@ axis 200 mm above the bottom]. Moments are taken about that axis. Plane sections
 mean one over the width-weighted depth [T 7-3]. Concrete is taken net of the bars (a bar's
 force is As·(fs − fc)) [O].
 
+**Which control charts [O]**, by the load increment (N, M, V), as r2x captures them
+(`export.control_keys`). With shear: shear against shear strain, then moment against
+curvature when M increases, axial load against axial strain when N increases without M,
+shear against axial strain otherwise. Without shear: moment against axial strain and
+against curvature; when N increases together with M the first is axial load against axial
+strain (the capture `newbeam-nm`); N alone, axial load against axial strain. In kg-cm units
+a force on these charts is labelled "ton" [O: Newbeam in kg-cm units under axial load alone
+and under shear, through r2x].
+
 The outline is the list of (height, width) rows of the input, straight between rows; two rows
 at one height make a step in width (a flange). Quick Define writes a circle as 13 such rows,
 points of the circle every 15°, and Response analyses those rows as they are, straight between
@@ -213,8 +222,11 @@ as the binary has them.
   below [O: on the circular column Response's result with pattern 6 is not its result with
   a hoop; r2c as stirrups is within 0.8 % in shear in Response's peak state]. Patterns 1, 2,
   3 and 5 give the same charts byte for byte in Response on a rectangular section [O: the
-  probes]. A horizontal tie (7) is not in the manual and is refused [owner, 2026-11-22,
-  D23], as is a file that holds several sections.
+  probes]. A horizontal tie (7) is solved as a stirrup and shows no transverse bond: with
+  ties alone the bond chart is zero [O: the probe newbeam-pattern7 through r2x, 22 of 23
+  charts byte for byte those of a stirrup, the bond chart zero]; with ties and stirrups
+  together the stirrups' bond is drawn as without the ties [inferred]. Of several sections
+  in one file the first is read [O: Response opens the first; its sample files].
 * Draped tendons are out of scope [owner, 2026-11-22, D4]: a layer with a drape other than
   zero is refused.
 * Unloading is elastic from a plastic strain kept per layer; it is tracked from the first load
