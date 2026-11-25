@@ -122,8 +122,8 @@ summary.
   increments in a row with no gain in any area's held-out total).
 
 Asking means: say it under "Needed from the owner" in `docs/summary.md` and in the pull
-request, with a suggested answer, stop that line of work, and carry on with something else. Everything else, decide
-and note in the log.
+request, with a suggested answer, stop that line of work, and carry on with something
+else. Everything else, decide and note in the log.
 
 ## Where things are
 
