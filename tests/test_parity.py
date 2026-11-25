@@ -76,3 +76,10 @@ def test_the_headline_is_the_owner_s_of_2026_11_25():
     assert parity.verdict(306, 326, 15).startswith("Interface parity: not complete: 5 difference(s)")
     assert parity.verdict(10, 10, 0) == "Interface parity: complete (10 of 10 checks the same)"
     assert "partial" in parity.verdict(10, 10, 0, every_part=False)
+    # the four inputs on which Response gives up part-way (owner, 2026-11-25)
+    assert parity.verdict(307, 326, 15, gave_up=4).startswith(
+        "Interface parity: complete except accepted refusals (15, and 4 accepted inputs")
+    assert parity.verdict(306, 326, 15, gave_up=4).startswith(
+        "Interface parity: not complete: 1 difference(s)")
+    assert parity.gives_up("probe newbeam-csoft1: r2x fails, r2c solves")
+    assert not parity.gives_up("probe newbeam-other: r2x fails, r2c solves")
