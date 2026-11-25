@@ -7,7 +7,7 @@ For the developer: what exists now and how to work on it. The owner reads
 
 - **`r2c solve`** (`src/r2c/cli.py`): r2x's options, exit statuses and record format
   (r2x-raw 1, all views). Not there: `--report`, `define`, `setup`; `health` prints a
-  version line. How far this is from r2x: `docs/parity.md`.
+  version line. An input with tension stiffening turned off is refused, as r2x fails on it. How far this is from r2x: `docs/parity.md`.
 - **The kernel** (`src/r2c`, numpy only): the MCFT node with the crack check, Response's
   layering, the solves without shear, shear by the longitudinal stiffness method with
   Response's stiffness rules and its load stage control. Each rule and its source:
@@ -26,21 +26,28 @@ For the developer: what exists now and how to work on it. The owner reads
 
 ## Next
 
-1. **Accuracy on priority 1 with shear**, the area furthest from its threshold. The lead
-   is in `docs/kernel.md`, "Seen in increment 2": at one traced state Response's stiffness
-   differs from r2c's copy of it, its solve runs away and its response ends, while r2c
-   carries on to a higher peak. Read `00427cd0` and `0046b940` again at that state (the
-   Marshall sample at M/V = 3 m, try 58; logs with `tools/rtrace.py --steps`). Then the
-   other wider cases outside on priority 1: `python tools/priority.py
-   docs/verification-results.json --views` lists them.
-2. **Priority 1 without shear** needs every held-out case. On the development set three
-   are outside: the override, axial tension (Response's solve for a stepped axial strain is
-   half built), and one view on the Liping sample under compression and moment.
-3. **Interface parity**: `tools/parity.py`, `docs/parity.md`. `define` and `--report` are
-   left out of the score and inputs outside the manual stay refused (owner, 2026-11-24).
-   What is left besides those: five inputs on which Response gives up part-way and r2c
-   solves. Not yet checked: the two programs run end to end on the same input.
-4. **Regression limits for the 52 wider cases**, and the parked fixtures.
+1. **Accuracy on priority 1 with shear**, still the area furthest from its threshold. What
+   is outside on the development set now is of three kinds (`python tools/priority.py
+   docs/verification-results.json --views`): r2c carrying on where Response's solve gives
+   up, which is the owner's override since 2026-11-25 and is not chased; a fall of load at
+   cracking on the edge of what the measure counts (shear alone, the US-units cases); and
+   single stages that one program keeps and the other drops (the I-girder at M/V = 1 m,
+   elasto-plastic tension stiffening). The parked I-girder cases with the softening models
+   are mostly the first kind.
+2. **Priority 2 with shear** (the shear-related views at the peak) is the lowest total. On
+   most cases the two programs sit in different states near a flat peak; transverse bond is
+   the view most often outside, alone on six cases. Put into Response's state r2c gives its
+   views, so it is the path through the stages, not the rules.
+3. **Long shear responses are slow** now that they are not stopped at 101 stages: where
+   r2c creeps along a flat peak in small steps (the column under 3000 kN at M/V = 2 m,
+   171 stages) a case takes minutes. The step rule is Response's (the multiplier doubles
+   after a stage kept at its first try and halves after a failed one); what differs is
+   that r2c's small steps keep finding states where Response's tries fail and its
+   response ends: the override again.
+4. **Interface parity**: `tools/parity.py`, `docs/parity.md`. Left besides the accepted
+   refusals: four inputs on which Response gives up part-way and r2c solves (the owner has
+   been asked). Not yet checked: the two programs run end to end on the same input.
+5. **Regression limits for the 52 wider cases**, and the parked fixtures.
 
 ## How to run things
 

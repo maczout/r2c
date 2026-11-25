@@ -324,7 +324,7 @@ class SteelLaw:
     """One reinforcement type (bars or strand), with material factors applied."""
     src: Rebar
     phi: float = 1.0          # this steel's material factor
-    factored: bool = False    # any material factor in effect: no strain hardening above fy
+    factored: bool = False    # material factors in effect [B 004aea40]: the stress is capped at fy
 
     def __post_init__(self):
         r = self.src

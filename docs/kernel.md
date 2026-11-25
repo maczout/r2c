@@ -210,9 +210,9 @@ as the binary has them.
 
 * Bars: linear, a plateau to εsh, a parabola with its vertex at (εu, fu) [T]. The curve
   carries on down past εu; the bar ruptures at εsh + 1.5·(εu − εsh) [B]. With material factors
-  in effect the stress is capped at fy [B `004aea40`: the test is at the routine's end,
-  on the sum of one factor and twice another being under 3; which two was not read, and r2c
-  takes any factor in effect]. The slope used in the shear stress calculation is not capped
+  in effect the stress is capped at fy [B `004aea40`: the test is at the routine's end, the
+  concrete's factor plus twice the reinforcing steel's under 3; the factors' places are
+  told apart in `004ac800`]. r2c has the same test. The slope used in the shear stress calculation is not capped
   [B `004ae630` has no such test]: past the plateau a bar keeps its hardening slope there.
   Until 2026-11-25 r2c gave such a bar no slope; on the T-beam with CSA factors at M/V = 2 m
   the stage at which the bars pass their plateau then had no state, and the response ended
