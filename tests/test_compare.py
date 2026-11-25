@@ -241,3 +241,17 @@ def test_no_cut_without_shear_nor_after_a_fall_of_load_nor_when_both_end_togethe
     # the subject never passes the reference's last stage
     off = [(0, 0), (1, 30), (2, 50), (3, 60), (6, 90)]
     assert "upto" not in compare.compare(_curve_record(RISE), _curve_record(off))
+
+
+def test_a_difference_of_exactly_two_printed_units_is_within_the_floor():
+    # 0.0026 - 0.0024 is 0.00020000000000000017 in floating point: still two units
+    def rec(top):
+        from r2c import record
+        chart = ("Title : v\r\nLine type : 0\r\n   0.0000   \t   0.000\r\n"
+                 f"   {top:.4f}   \t   10.000\r\n").encode()
+        return record.decode(record.encode({"peak-stage": "1"}, [
+            ("control/c", _chart([(0, 0), (1, 10), (2, 20)])), ("stage/1/v", chart)]))
+    row = compare.compare_views(rec(0.0026), rec(0.0024), 1, 1)[0]
+    assert row["max_diff"] <= row["floor"]
+    row = compare.compare_views(rec(0.0026), rec(0.0023), 1, 1)[0]
+    assert row["max_diff"] > row["floor"]

@@ -95,6 +95,11 @@ def resolution(body: bytes) -> tuple[float, float]:
 # A difference within this many units of the last printed digit is never a miss (owner,
 # 2026-11-21: absolute limits for small values close to the numerical precision).
 FLOOR_DIGITS = 2
+# A difference of exactly that many units is within them, but the subtraction of two
+# printed numbers rarely gives it exactly (0.0026 - 0.0024 is 0.00020000000000000017): the
+# floor of the views carries this much room for the arithmetic. Fixed 2026-11-25; before,
+# such a difference was not floored.
+FLOOR_ROUNDING = 1.0 + 1e-9
 
 
 def control_keys(rec) -> list[str]:
@@ -624,7 +629,7 @@ def apart(ref, stage, key, how=APART):
     worst = 0.0
     for la, lb, body in ((lp, lq, before), (lq, lp, after)):
         d, s = lines_distance(la, lb, scale)
-        if d > FLOOR_DIGITS * resolution(body)[0] and s > 1e-9:
+        if d > FLOOR_DIGITS * resolution(body)[0] * FLOOR_ROUNDING and s > 1e-9:
             worst = max(worst, 100.0 * d / s)
     return float(worst)
 
@@ -652,7 +657,7 @@ def compare_views(ref, sub, ref_stage, sub_stage, t=None):
         worst, scale = lines_distance(la, lb)
         rx, ry = resolution(ref.stage(ref_stage, key))
         rows.append({"view": key, "ref_max": scale, "max_diff": worst,
-                     "floor": FLOOR_DIGITS * rx,
+                     "floor": FLOOR_DIGITS * rx * FLOOR_ROUNDING,
                      "max_diff_pct": float(100.0 * worst / scale) if scale > 1e-9 else 0.0,
                      "lines": [len(la), len(lb)]})
         dep = departure(ref, ref_stage, key, t)

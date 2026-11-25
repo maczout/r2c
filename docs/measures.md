@@ -27,7 +27,9 @@ an absolute floor applies in place of the percentage.
   the peak, the peak, and how the response ends: falling, standing still, or at the peak)
   must be the same. For a case with shear, shape leaves out how the response ends.
 - **Small values:** a difference within two units of the last digit Response prints is never
-  a miss, for the curves and the views alike. The resolution is read from the data.
+  a miss, for the curves and the views alike. The resolution is read from the data. A
+  difference of exactly two units counts as within them (the floor has room for the
+  arithmetic of subtracting two printed numbers; before 2026-11-25 it did not).
 - `views_pct`: the largest difference in a detail view at a compared stage, relative to that
   chart's largest value.
 
