@@ -815,6 +815,28 @@ target nor at a half, quarter and eighth of the step, and when the load has run 
 Response's end tests for these cases (the next section, 3 to 6) come to the same on the
 cases compared.
 
+*Closing in on first cracking* [B `00415e30`, `00419ff0`; O], since 2026-11-25. A stage
+that is cracked where the stage before was not is set aside, and a stage a fifth of the way
+to it is tried. If that one is cracked it is set aside in its turn and a fifth of the way to
+it is tried; if it is not it is kept, and the next try is a fifth of what is left from it
+to the nearest stage set aside. This goes on while what is left is more than 2 % of the
+way the control variable has come from the first stage; then the stages set aside are
+kept as they were found, nearest first. Seen stage for stage on two captures [O]: the
+Liping sample under axial tension (curvatures 0.041, 0.0423, 0.0433, 0.0441, 0.0474,
+0.073 rad/km, where r2c had 0.041, 0.0474, 0.073) and a slab strip under negative moment
+(−1.167, −1.175, −1.181, −1.186, −1.207, −1.367, −2.167, where r2c had −1.167, −1.207,
+−1.367, −2.167). Until then r2c set aside two stages at most, tried 14 times at most and
+stopped at a step of 0.0036 of the base step, which stood in for the way come from the
+first stage where that stage is not at zero (a thermal gradient). Measured on the 95
+development cases without shear: those whose first 25 stages are at Response's control
+values went from 72 to 87, the first 40 from 68 to 81 [`python tools/stagesat.py`]. The
+closing in on the extreme fibre reaching its peak strain is as it was (14 tries, 3 on a
+stage put in between): Response's own count there was not found, and it closes in further
+than r2c on some cases (Newbeam under axial load and moment: 3.608, 3.622, 3.633 against
+r2c's 3.608) [O]. Not taken over: Response also closes in where the cracks close (the
+I-girder under moment, from its second stage) and takes three small first steps where
+the section is cracked from the start (the I-girder under axial tension) [O].
+
 *Bar rupture within a step, and the end after it* [B `00415e30`, `00419ff0`, `00418fd0`,
 `00419990`], since 2026-11-22. A stage in which the number of ruptured bars has changed is
 set aside (deleted, unlike the stage set aside at cracking or crushing, which is kept for

@@ -85,3 +85,20 @@ def test_the_transverse_spacing_takes_its_means_over_every_transverse_type():
     sec.n_trans = 3
     assert sec._trans_spacing(mid, True) == pytest.approx(
         np.hypot(b - 100.0, st.space / 3) + 0.1 * (st.db / 3) / rho)
+
+
+def test_first_cracking_is_closed_in_on_until_two_per_cent_of_the_way_is_left():
+    # every stage kept before the first cracked one is uncracked, each a fifth of what was
+    # left further on, and what is left to the cracked stage from the last of them is under
+    # 2 % of the way come from the first stage [B 00415e30, 00419ff0]
+    su = run.setup(None, increment=(0.0, 1.0, 0.0))
+    drv = su.driver()
+    kept = drv.run(40)
+    k = next(i for i, s in enumerate(kept) if drv._marks(s)[0])
+    assert k > 3
+    left = abs(kept[k].control - kept[k - 1].control)
+    way = abs(kept[k - 1].control - kept[0].control)
+    assert left < 0.02 * way
+    # the try before it was still worth making: more than 2 % was left then
+    before = abs(kept[k].control - kept[k - 2].control)
+    assert before >= 0.02 * abs(kept[k - 2].control - kept[0].control)

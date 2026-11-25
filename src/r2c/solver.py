@@ -1386,11 +1386,17 @@ class Flexure:
                     break
             self.accept(trial)
             return trial
-        if depth < 2 and kind and kind != "rupture":
-            for _ in range(14 if (depth == 0 or kind == "crack") else 3):
+        if kind == "crack" or (kind == "crush" and depth < 2):
+            # cracking: the stage is set aside and one a fifth of the way to it is tried,
+            # again and again, each one that shows the cracking set aside in its turn,
+            # while what is left to the nearest stage set aside is more than 2 % of the
+            # way come from the first stage [B 00415e30, 00419ff0; O: docs/kernel.md,
+            # "Closing in on first cracking"]. The extreme fibre at its peak strain: as
+            # before, 14 tries, 3 on a stage that was itself put in between [O]
+            for _ in range(100 if kind == "crack" else 14 if depth == 0 else 3):
                 t1 = cur.control + 0.2 * (target - cur.control)
-                if kind == "crack" and abs(t1 - cur.control) < max(
-                        0.004 * abs(cur.control), 0.0036 * self.step0):
+                travel = abs(cur.control - self.stages[0].control)
+                if kind == "crack" and abs(target - cur.control) < 0.02 * travel:
                     break
                 try:
                     sub = self.advance(cur, t1, depth + 1, aside=trial)
