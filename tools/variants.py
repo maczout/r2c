@@ -337,6 +337,67 @@ for _n, _ini, _inc, _what in (
     VARIANTS[f"newbeam-loads-{_n}"] = Variant("newbeam", "loads: " + _what, [], _ini, _inc)
 
 
+# ---------------------------------------------------------------------------------------
+# Wider development cases (increment 2): the kinds of variation the held-out set draws on
+# (materials, shapes, reinforcement), with numbers of their own. None is a held-out case:
+# tools/heldout.py's recipes use other values.
+# ---------------------------------------------------------------------------------------
+
+def _sub(key, old, new, count=None):
+    e = (attr(key, old), attr(key, new))
+    return e + (count,) if count else e
+
+
+_OUTLINE = "600.0\t250.0\r\n\t\t\t\t\t0.0\t250.0"
+_STIRRUPS = ("\t\t<transreinfz\t" + attr("A", "100.0") + T4 + attr("type", "Trans") + T4
+             + attr("pattern", "5") + T4 + attr("space", "250.0") + T4
+             + attr("disttop", "554.3") + T4 + attr("distbot", "45.7") + T4
+             + attr("bartitle", "10M") + T4 + attr("name", "stirrup") + "\t/>\r\n")
+_TOP_END = attr("bartitle", "20M") + T4 + attr("name", "top") + "\t/>\r\n"
+
+VARIANTS["newbeam-fc20"] = Variant("newbeam", "Newbeam with 20 MPa concrete",
+                                   [_sub("fcp", "35.0", "20.0")])
+VARIANTS["newbeam-fc50"] = Variant("newbeam", "Newbeam with 50 MPa concrete",
+                                   [_sub("fcp", "35.0", "50.0")])
+VARIANTS["newbeam-fc80"] = Variant("newbeam", "Newbeam with 80 MPa concrete, 10 mm aggregate",
+                                   [_sub("fcp", "35.0", "80.0"), _sub("maxagg", "19.0", "10.0")])
+VARIANTS["newbeam-fy600"] = Variant("newbeam", "Newbeam with 600 MPa steel throughout",
+                                    [_sub("fy", "400.0", "600.0", 2)])
+VARIANTS["newbeam-deep900"] = Variant(
+    "newbeam", "a deep beam, 350 x 900 mm, 2000 mm2 bottom steel, stirrups at 150 mm",
+    [(_OUTLINE, "900.0\t350.0\r\n\t\t\t\t\t0.0\t350.0"), _sub("par1", "250.0", "350.0"),
+     _sub("par2", "600.0", "900.0"), _sub("z", "538.95", "838.95"),
+     _sub("A", "1500.0", "2000.0"), _sub("space", "250.0", "150.0"),
+     _sub("disttop", "554.3", "854.3")])
+VARIANTS["newbeam-slab200"] = Variant(
+    "newbeam", "a slab strip, 1000 x 200 mm, no stirrups",
+    [(_OUTLINE, "200.0\t1000.0\r\n\t\t\t\t\t0.0\t1000.0"), _sub("par1", "250.0", "1000.0"),
+     _sub("par2", "600.0", "200.0"), _sub("z", "538.95", "160.00"), _sub("A", "300.0", "400.0"),
+     _sub("z", "63.90", "40.00"), (_STIRRUPS, "")])
+VARIANTS["newbeam-light800"] = Variant("newbeam", "Newbeam with 800 mm2 bottom steel",
+                                       [_sub("A", "1500.0", "800.0")])
+VARIANTS["newbeam-heavy2500"] = Variant("newbeam", "Newbeam with 2500 mm2 bottom, 800 mm2 top",
+                                        [_sub("A", "1500.0", "2500.0"), _sub("A", "300.0", "800.0")])
+VARIANTS["newbeam-st150"] = Variant("newbeam", "Newbeam with stirrups at 150 mm",
+                                    [_sub("space", "250.0", "150.0")])
+VARIANTS["newbeam-st2leg200"] = Variant(
+    "newbeam", "Newbeam with closed stirrups of 200 mm2 at 200 mm",
+    [_sub("A", "100.0", "200.0"), _sub("pattern", "5", "3"), _sub("space", "250.0", "200.0")])
+VARIANTS["newbeam-mid400"] = Variant(
+    "newbeam", "Newbeam with a third layer of steel, 400 mm2 at 250 mm",
+    [(_TOP_END, _TOP_END + "\t\t<longreinfx\t" + attr("z", "250.00") + T4
+      + attr("type", "Steel 1") + T4 + attr("num", "2") + T4 + attr("A", "400.0") + T4
+      + attr("bartitle", "15M") + T4 + attr("name", "mid") + "\t/>\r\n")])
+VARIANTS["tbeam-fc30"] = Variant("tbeam", "the T-beam with 30 MPa concrete, stirrups at 200 mm",
+                                 [_sub("fcp", "40.0", "30.0"), _sub("space", "300.0", "200.0")])
+VARIANTS["column-fc35"] = Variant("column", "the column with 35 MPa concrete, hoops at 150 mm",
+                                  [_sub("fcp", "50.0", "35.0"), _sub("space", "300.0", "150.0")])
+VARIANTS["igirder-dep5"] = Variant("igirder", "the I-girder, strands prestrained to 5.00 mm/m",
+                                   [_sub("dep", "6.50", "5.00", 2)])
+VARIANTS["igirder-fc45"] = Variant("igirder", "the I-girder with 45 MPa concrete",
+                                   [_sub("fcp", "60.0", "45.0")])
+
+
 def find_base(key: str, folders) -> Path:
     digest = BASES[key]
     for d in folders:
