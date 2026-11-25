@@ -137,6 +137,22 @@ from the text above, it governs.
    left both choices standing, "clone Response's ending / keep r2c carrying on"; asked
    the same day, the owner chose this one.)
 
+**2026-11-25**, in answer to the questions of the summary after increment 3:
+
+1. For cases under the override where Response's solve gives up and r2c carries on,
+   compare up to Response's last stage. Apply it to the development and held-out
+   measures alike, in its own commit.
+2. The four parity differences where Response gives up part-way are accepted as known
+   differences: parity is complete except accepted refusals.
+3. The held-out scorer may also report the failing cases by kind (section type, loading
+   path, area and priority), with no curves, numbers or case names. Use it to choose
+   what to add to the development set.
+4. Budget: about three hours of work, and it is meant to be used. When a line of work
+   ends, start the next. Questions for the owner do not end the increment: record them
+   with a suggested answer, act on that answer where it can be undone, and carry on.
+   Stop only when the budget is spent or a stop-and-ask condition in the brief is met.
+   Open-ended work on stages that do not settle is in bounds; measure and log it.
+
 ## First increment
 
 This increment changes how the work is governed, with the owner's approval.
