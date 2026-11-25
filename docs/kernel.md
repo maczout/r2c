@@ -47,9 +47,73 @@ up unrestrained: a node's concrete strain is εx(z) − εsh(z), and the bars' i
 The profile is a parabola through the points given [T, manual 3-5: "parabolically
 interpolates between these points"; O: Response's Shrinkage & Thermal Strain chart for three
 points is the parabola through them (newbeam-thermgrad-m)]: straight between two points,
-constant beyond the end points; with more than three points, the parabola through the three
-nearest [O, r2c's own reading of "parabolically"; not compared]. A bar layer's thermal strain
+constant beyond the end points. With more than three points the program reads its table
+three points at a time from the top down: a parabola through the first three, another
+through the third to the fifth, and so on, and a straight line to a point left over
+[B `004b6df0`, read 2026-11-24, step A-6; no case has more than three points, so nothing
+compares it]. A bar layer's thermal strain
 is taken off its prestrain [T, manual 3-5: "can be used the same way as prestrains"].
+
+### What the concrete's offset does [B], read 2026-11-24 (step A-6)
+
+Each node carries offsets: the strain the concrete would have unrestrained, along the
+member and across it. The routine that makes the nodes sets them from the section
+(`004a9d90`, through `004ff8f0`): along the member the sum of two tables over the depth,
+across it one of the two alone. The one in both is the shrinkage and thermal profile; the
+other was taken to be the strain discontinuity, which is out of scope (inferred: it is
+empty in every case here, and Response's Transverse Strain chart under a thermal profile
+is that profile). So in r2c the offset is the same strain εsh(z) in both directions. Four
+things follow, all read, and all without effect where εsh is nothing:
+
+* **The node** (`0046aaa0`). The concrete's strains are the node's less the offsets, εx − εsh
+  and εy − εsh; angle, principal strains and stresses come from those. The principal
+  strains the node keeps, and the charts show, are the whole strains: the concrete's own
+  plus the offset in that direction (the same εsh). The Longitudinal Strain and Transverse
+  Strain charts show the whole strain too. r2c: `Detail.sh`, added back in `export`.
+* **The transverse strain is solved for, also without shear** (`004a8b20`). The test for a
+  node with next to no shear strain (below) fails where the node has an offset: the sizes
+  of its four offsets (along, across, and in the two principal directions) must come to
+  under 10⁻⁶. Such a node goes through the transverse solve: concrete on εy − εsh, stirrups
+  on the whole εy, no total stress across the member. A new node starts from εy = εsh. So
+  under a thermal gradient the stirrups are stressed with no shear on the section
+  (newbeam-thermgrad-m at cracking: 46 MPa at their top end in Response and in r2c).
+  r2c: `Analysis.eval_nodes` and `transverse`, whenever the section has a profile.
+* **The flexural tension zones are those of the concrete's own strain** (`00441d80`, with
+  `004bb0d0`). From a face whose own strain εx − εsh is tension the program walks over the
+  depth, from one height to the next at which the profile is given (and at which a second
+  table over the depth has a point: taken to be the outline's, inferred; on a rectangle it
+  cannot matter), and puts the zone's axis where the own strain changes sign, on a
+  straight line between the two heights. With a curved profile the axis is therefore not
+  where the own strain is nothing: under the thermal gradient of the set, at cracking, 42
+  mm above mid-depth where the parabola's zero is 65 mm above (estimated from Response's
+  strains at that stage). Without a profile this is the neutral axis, as before.
+  r2c: `Analysis._net_axes`. With shrinkage of 0.4 mm/m the zone begins 57 mm higher
+  than the neutral axis at the stage the bars yield, and the limit of the concrete's
+  tension over those 57 mm is the zone's and not three times the tensile strength
+  (measured: Principal Tensile Stress there 1.1 to 1.4 MPa before, Response's 0.05 to 0.4).
+* **The cracking strength over the depth counts the restrained strain as a prestress**
+  (`00423e50`, `004b5770`). To the force and moment of the prestressed bars the routine
+  adds those of the profile as if fully restrained: a straight line is fitted by least
+  squares to the points given (not to the curve: the points, unweighted), and its value
+  at the centroid times the area, and its slope times the inertia, each times the
+  concrete's stiffness, are added. Heights from the centroid of the gross concrete [O:
+  with that origin the limit line of the thermal case's Principal Tensile Stress chart at
+  cracking is Response's to the fourth decimal, 2.4607 MPa at the top and 2.9973 at the
+  bottom; from the transformed centroid it is 0.4 % off, from the bottom 18 %]. The
+  routine does the same with a second table, taken to be the strain discontinuity (out of
+  scope). r2c: `Section.cracking_table`.
+
+*The first envelope of the Transverse Strain chart* [O, with B `004a9d90`]: at the first
+stage the envelope ("The shear charts" below) starts from the straight line between the
+offsets at the two faces, not from nothing: under the thermal gradient the upper line is
+straight from 0.3 mm/m at the top to nothing at the bottom, the lower one the parabola.
+r2c: `export.envelope`.
+
+*Not cloned:* the program's transverse solve stops at a tolerance, and in the shrinkage
+case its stirrup stresses at the nodes of the compression zone differ by up to 0.6 MPa in
+59 where the solution is the same at every node (r2c: −59.06 at each). The Transverse
+Average Bond chart, which is the difference between neighbours, shows 0.05 to 0.07 MPa
+there on a chart of 1.06 (6.1 %, a Should check at the last stage: `docs/summary.md`, D75).
 
 ## Concrete
 
@@ -189,8 +253,9 @@ Principal Tensile Stress chart 11.3 % off before, 0.0 % with the rule).
 
 ### A node with next to no shear strain [B `004a8b20`, `004a7b60`], read 2026-11-23 (step A-2)
 
-With shear, before Response solves a node's transverse strain (`004a8b20`) it tests the
-node: if the size of its shear strain is under two millionths of the difference of its
+Before Response solves a node's transverse strain (`004a8b20`) it tests the
+node (with or without shear; without shear and without shrinkage every node passes, and
+r2c then solves no transverse strain at all): if the size of its shear strain is under two millionths of the difference of its
 longitudinal and transverse strains (each less its shrinkage or thermal strain), plus
 10⁻¹⁰, and the node has no shrinkage or thermal strain (the sum of the sizes of its four
 strain offsets under 10⁻⁶), and a value read from a table over the depth that the analysis
@@ -222,8 +287,8 @@ the axial load or the moment, and the transverse strain r2c solves there is the 
 mm/m of the prestress at most) [O: with the rule in the reported state alone no check on
 the 29 cases moves but the two it was written for]; the table over the depth in the test
 was taken to hold nothing in every case here (inferred: no input of the manual was found
-to fill it); the offsets were taken to be the shrinkage and thermal strains (inferred
-from how the routine uses them). Which nodes near a face fall under the test at a given
+to fill it); the offsets are the shrinkage and thermal strains (read in step A-6: "What the
+concrete's offset does"). Which nodes near a face fall under the test at a given
 stage is not Response's node for node: it hangs on a profile value of millionths.
 
 Tables over the depth [B]:
@@ -1157,7 +1222,8 @@ Response shows when the solve ends is the one with the largest load.
 | "Large" constant axial load for the base step | above 0.1 MPa on the gross area | one case |
 | State code 1 needs no stirrup at the node | yes | one case (no stirrups) |
 | Factored steel capped at fy | yes | one case (CSA factors) |
-| Shrinkage profile through more than three points | parabola through the nearest three | r2c's own reading of the manual; three points compared |
+| The offset across the member is the shrinkage and thermal profile alone; the second table of the tension zone walk is the outline | above ("What the concrete's offset does") | two cases, both rectangular |
+| The first envelope of the Transverse Strain chart | straight between the offsets at the two faces | two cases |
 | Interlocking hoops are stirrups | yes | one case (column, M/V = 1 m) |
 | Second starting plane and step cut-back for the initial state | above | r2c's own; three cases |
 

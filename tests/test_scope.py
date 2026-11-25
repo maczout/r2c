@@ -162,6 +162,21 @@ def test_shrinkage_is_a_parabola_through_three_points():
     assert sec.shrinkage(np.array([0.0, 300.0, 600.0])) * 1e3 == pytest.approx([0, 0, 0.3])
 
 
+def test_shrinkage_through_more_points_is_read_three_at_a_time_from_the_top():
+    # the program's table read [B 004b6df0]: a parabola through the first three points from
+    # the top, another through the third to the fifth; a point left over is joined straight
+    from r2c.section import Section
+    rows = '600.0 0.400\n500.0 0.100\n400.0 0.000\n200.0 0.200\n100.0 0.000\n0.0 0.300\n'
+    sec = Section(inputs.parse(beam(extra=f'<shrinktherm>\n{rows}</shrinktherm>')), 1.0, 1.0, 1.0)
+    sh = lambda z: float(sec.shrinkage(np.array([z]))[0]) * 1e3      # noqa: E731
+    assert [sh(z) for z in (600, 500, 400, 200, 100, 0)] == pytest.approx(
+        [0.4, 0.1, 0.0, 0.2, 0.0, 0.3])
+    assert sh(550.0) == pytest.approx(0.4 * 0.375 + 0.1 * 0.75)         # through 600, 500, 400
+    # through 400, 200, 100, where only the middle point has a strain
+    assert sh(300.0) == pytest.approx(0.2 * (300 - 400) * (300 - 100) / ((200 - 400) * (200 - 100)))
+    assert sh(50.0) == pytest.approx(0.15)                              # straight, 100 to 0
+
+
 # -- compression softening: beta at a transverse strain of 2 mm/m, 60 MPa, e0 2.4 mm/m ------------
 E1, E2, FC, E0 = 2e-3, -1.5e-3, 60.0, 2.4e-3
 KF = 0.1825 * math.sqrt(FC)

@@ -96,8 +96,17 @@ def envelope(st: Stage, before: Stage | None):
     for name, own in (("gxy", d.gxy), ("ey", d.ey)):
         own = np.asarray(own, dtype=float)
         if old is None:
-            # the first stage: nothing at the two faces, and its own profile
-            hi, lo = np.maximum(own, 0.0), np.minimum(own, 0.0)
+            # the first stage: what a node starts from at the two faces, straight between
+            # them, and its own profile. A node starts from no shear strain and from its
+            # shrinkage or thermal strain across the member [B 004a9d90: a new node's
+            # transverse strain is its offset; O: Response's first envelope of
+            # newbeam-thermgrad-m is the straight line between the profile's two ends]
+            sh = getattr(d, "sh", None)
+            if name == "ey" and sh is not None and len(z) > 1 and z[0] != z[-1]:
+                base = sh[-1] + (sh[0] - sh[-1]) * (z - z[-1]) / (z[0] - z[-1])
+            else:
+                base = 0.0
+            hi, lo = np.maximum(own, base), np.minimum(own, base)
         else:
             zo = old["z"]
             order = np.argsort(zo)
@@ -229,10 +238,14 @@ class Views:
             out.append((0.0, ybot))
             return out
 
+        # the strain charts show a node's whole strain: the concrete's own and its shrinkage
+        # or thermal strain [B 0046aaa0: the principal strains are stored with the offset]
+        sh = getattr(d, "sh", None)
+        sh = 0.0 if sh is None else sh
         made = {}
         for key in keys:
             if key == "longitudinal_strain":
-                r = [(0.0, ytop)] + rows(d.ex * 1e3) + [(0.0, ybot)]
+                r = [(0.0, ytop)] + rows((d.ex + sh) * 1e3) + [(0.0, ybot)]
                 made[key] = chart("Longitudinal Strain", f"|e_x Strain ({u.l_strain})", depth, [(0, r)], 4)
             elif key == "transverse_strain":
                 hi, lo = st.envelope["ey"]
@@ -270,7 +283,7 @@ class Views:
                                   [(0, rows(o.f1 / cs)), (1, rows(o.f1draw / cs))], 4)
             elif key == "principal_tensile_strain":
                 made[key] = chart("Principal Tensile Strain", f"|e_1 Strain ({u.l_strain})", depth,
-                                  [(0, rows(o.e1 * 1e3))], 3)
+                                  [(0, rows((o.e1 + sh) * 1e3))], 3)
             elif key == "crack_widths":
                 made[key] = chart("Crack Widths", f"Crack Width ({u.l_len})", depth,
                                   [(0, rows(o.w / ln))], 4)

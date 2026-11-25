@@ -52,6 +52,9 @@ class Detail:
     f1cx: np.ndarray
     vcalc: np.ndarray | None = None     # shear stress from the longitudinal stiffness method
     lone: np.ndarray | None = None      # nodes with next to no shear strain (lone_nodes)
+    # the concrete's shrinkage or thermal strain at the nodes, where the section has any: ex
+    # and the principal strains of out are the concrete's own, less it; ey is the whole strain
+    sh: np.ndarray | None = None
 
 
 @dataclass
@@ -289,14 +292,17 @@ class Analysis:
 
         na = crossing()
         # tension zone reaching the top face: z in (z3, ztop]; the bottom face: [zbot, z4)
-        if etop > 0:
-            z3 = na if (na is not None and ebot < 0) else -FAR
+        if sec.shrink:
+            z3, z4 = self._net_axes(e0, phi)
         else:
-            z3 = ztop
-        if ebot > 0:
-            z4 = na if (na is not None and etop <= 0) else FAR
-        else:
-            z4 = zbot
+            if etop > 0:
+                z3 = na if (na is not None and ebot < 0) else -FAR
+            else:
+                z3 = ztop
+            if ebot > 0:
+                z4 = na if (na is not None and etop <= 0) else FAR
+            else:
+                z4 = zbot
         mtop = mbot = 0.0
         for l, e, f, ep in zip(sec.layers, es, fs, self.ep):
             if not (l.z > z3 or l.z < z4):
@@ -379,6 +385,39 @@ class Analysis:
         f1cx.mcap, f1cx.zref = (mtop, z3) if dbot <= dtop else (mbot, z4)
         return f1cx
 
+    def _net_axes(self, e0, phi):
+        """The axes of the two flexural tension zones where the concrete has a shrinkage or
+        thermal strain [B 00441d80, 004bb0d0, 004ff8f0]: a zone is where the concrete's own
+        strain (the section's less the offset) is tension. From each face in tension the
+        program walks over the heights at which the shrinkage profile is given (and those
+        of a second table over the depth, taken here to be the outline's) and puts the axis
+        where the concrete's own strain changes sign, on a straight line between the two
+        heights. Returns (z3, z4) as crack_check uses them."""
+        sec = self.sec
+        ztop, zbot = sec.ztop, sec.zbot
+        pts = {ztop, zbot} | {z for z, _ in sec.shrink}
+        for z1, z2, *_ in sec.segs:
+            pts |= {z1, z2}
+        pts = sorted(z for z in pts if zbot <= z <= ztop)
+
+        def net(z):
+            return float(self.strain(e0, phi, z)) - float(sec.shrinkage(np.array([z]))[0])
+
+        def walk(order, start_in_tension, none):
+            prev, nprev = order[0], net(order[0])
+            if not start_in_tension(nprev):
+                return order[0]
+            for z in order[1:]:
+                n = net(z)
+                if n < 0.0 and nprev > 0.0:
+                    return prev - (prev - z) * nprev / (nprev - n)
+                prev, nprev = z, n
+            return none
+
+        z3 = walk(pts[::-1], lambda n: n >= 0.0, -FAR)
+        z4 = walk(pts, lambda n: n > 0.0, FAR)
+        return z3, z4
+
     # -- nodes ----------------------------------------------------------------------------------
     def eval_nodes(self, e0, phi, gam, z, f1cx, ey=None):
         """Concrete stresses at heights z (any shape) for the global strain state."""
@@ -386,8 +425,10 @@ class Analysis:
         shp = z.shape
         zf = z.ravel()
         # the concrete's own strain: the section's, less what shrinkage or temperature
-        # would give it unrestrained
-        ex = self.strain(e0, phi, zf) - sec.shrinkage(zf)
+        # would give it unrestrained. The offset is the same along and across the member
+        # [B 004a9d90, 004ff8f0]
+        sh = sec.shrinkage(zf)
+        ex = self.strain(e0, phi, zf) - sh
         m = sec.tab(sec.t_m, zf)
         ft = np.interp(zf, sec.tz, self.t_ft)
         smx = sec.smx_at(zf)
@@ -395,13 +436,19 @@ class Analysis:
         cx = f1cx(zf)
         g = gam * np.interp(self.profile_z(z).ravel(), self.shape_z, self.shape) \
             if gam != 0.0 else np.zeros_like(zf)
-        if self.shear and ey is None:
-            out, eyv = self.transverse(zf, z, ex, g, m, ft, smx, smt, cx)
+        if (self.shear or sec.shrink) and ey is None:
+            # with shear, and at any node with shrinkage or thermal strain, the transverse
+            # strain is solved for [B 004a8b20: its test for the node with no stirrups]
+            out, eyv = self.transverse(zf, z, ex, g, m, ft, smx, smt, cx, sh)
             return out, ex, g, smx, smt, eyv
         eyv = np.zeros_like(zf) if ey is None else ey.ravel()
         cy = np.zeros_like(zf)
+        if sec.shrink:
+            eyc = eyv - sh          # a transverse strain given is the node's whole one
+        else:
+            eyc = eyv
         if len(sec.laws) == 1:
-            out = nodelib.evaluate(sec.laws[0], ex, eyv, g, m, ft, smx, smt, cx, cy)
+            out = nodelib.evaluate(sec.laws[0], ex, eyc, g, m, ft, smx, smt, cx, cy)
         else:
             # a node on the boundary of two concretes belongs to the layer it was made for
             idx = self.law_index(zf, z)
@@ -410,7 +457,7 @@ class Analysis:
                 k = idx == j
                 if not k.any():
                     continue
-                o = nodelib.evaluate(law, ex[k], eyv[k], g[k], m[k], ft[k], smx[k], smt[k],
+                o = nodelib.evaluate(law, ex[k], eyc[k], g[k], m[k], ft[k], smx[k], smt[k],
                                      cx[k], cy[k])
                 for name, val in o.__dict__.items():
                     fields.setdefault(name, np.zeros(len(zf), dtype=val.dtype))[k] = val
@@ -491,9 +538,11 @@ class Analysis:
         res = eff * (np.maximum(yld, capt) - tot)
         return tot, res, rho_t
 
-    def transverse(self, zf, z, ex, g, m, ft, smx, smt, cx):
+    def transverse(self, zf, z, ex, g, m, ft, smx, smt, cx, sh=None):
         """The transverse strain of every node, from the condition that there is no total
-        stress across the member: concrete fcy and the stirrups balance (thesis 7-2)."""
+        stress across the member: concrete fcy and the stirrups balance (thesis 7-2). sh is
+        the concrete's shrinkage or thermal strain at each node: the concrete works on the
+        transverse strain less it, the stirrups on the whole of it [B 004a8b20, 0046aaa0]."""
         sec = self.sec
         sts = self.stirrups_at(zf, self.node_width(z))
         rcrit = sec.tab(sec.t_rhocrit, zf)
@@ -518,8 +567,9 @@ class Analysis:
                 subs = [(st, np.repeat(rho[sel], k), np.repeat(fac[sel], k))
                         for st, rho, fac in sts]
                 st_tot, st_res, _ = self.stirrup_stress(subs, eyl, rep(rcrit), rep(epy))
-                o = nodelib.evaluate(law, rep(ex), eyl, rep(g), rep(m), rep(ft), rep(smx),
-                                     rep(smt), rep(cx), st_res)
+                o = nodelib.evaluate(law, rep(ex), eyl if sh is None else eyl - rep(sh),
+                                     rep(g), rep(m), rep(ft), rep(smx), rep(smt), rep(cx),
+                                     st_res)
                 tot[sel] = (o.fcy + st_tot).reshape(-1, k)
                 outs.append(o)
             return tot.reshape(shp), outs
@@ -527,14 +577,20 @@ class Analysis:
         # scan a ladder of transverse strains for the first change of sign, then close in
         mag = 1e-6 * 1.7 ** np.arange(0, 21)
         ladder = np.concatenate([-mag[::-1][6:], [0.0], mag])
-        f, _ = run(np.broadcast_to(ladder, (n, len(ladder))).copy())
+        if sh is not None and sh.any():
+            # the ladder is laid about the strain at which the concrete is unstrained
+            ladder = sh[:, None] + ladder[None, :]
+        else:
+            sh = None
+            ladder = np.broadcast_to(ladder, (n, len(ladder))).copy()
+        f, _ = run(ladder)
         pos = f > 0
         first = np.argmax(pos, axis=1)
         none = ~pos.any(axis=1)
-        first = np.where(none, len(ladder) - 1, first)
+        first = np.where(none, ladder.shape[1] - 1, first)
         first = np.maximum(first, 1)
         rows = np.arange(n)
-        lo, hi = ladder[first - 1], ladder[first]
+        lo, hi = ladder[rows, first - 1], ladder[rows, first]
         flo, fhi = f[rows, first - 1], f[rows, first]
         ok = (flo <= 0) & (fhi > 0)
         ey = np.where(np.abs(flo) < np.abs(fhi), lo, hi)
@@ -678,7 +734,7 @@ class Analysis:
         ey = eyn[sel]
         fsy = np.zeros(len(sel))
         fsycr = np.zeros(len(sel))
-        if self.shear and sec.stirrups:
+        if (self.shear or sec.shrink) and sec.stirrups:
             tot, _res, rho_t = self.stirrup_stress(self.stirrups_at(zz, b.ravel()[sel]), ey,
                                                    sec.tab(sec.t_rhocrit, zz),
                                                    np.interp(zz, self.epy_z, self.epy))
@@ -691,28 +747,34 @@ class Analysis:
             extra = np.maximum(o2.f1 - fl, 0.0) - o2.vci * o2.tan
             on = has & (o2.w > 0)
             fsycr[on] = extra[on] / rho_t[on] + fsy[on]
-        lone = self.lone_nodes(zz, ex[sel], ey, g[sel])
+        sh = sec.shrinkage(zz) if sec.shrink else None
+        lone = self.lone_nodes(zz, ex[sel], ey if sh is None else ey - sh, g[sel])
         if lone.any():
-            ey = np.where(lone, 0.0, ey)
+            # (such a node's transverse strain is its offset: next to nothing)
+            ey = np.where(lone, 0.0 if sh is None else sh, ey)
             fsy[lone] = 0.0
             fsycr[lone] = 0.0
         return Detail(z=zz, b=b.ravel()[sel], ex=ex[sel], ey=ey, gxy=g[sel],
                       out=o2, smx=smx[sel], smt=smt[sel], fsy=fsy,
                       fsycr=fsycr, rhov=rhov, fs=fs, fscr=fscr, es=es,
-                      f1cx=f1cx(zz), lone=lone)
+                      f1cx=f1cx(zz), lone=lone, sh=sh)
 
     def lone_nodes(self, z, ex, ey, g):
         """The nodes Response-2000 takes through its node routine for no shear strain
-        [B 004a8b20, 004a7b60]: with shear, a node whose shear strain is under two
-        millionths of the difference of its longitudinal and transverse strains, plus
-        1e-10, where the concrete has no shrinkage or thermal strain. Such a node has no
-        transverse strain and no stirrups: their stress and their ratio are nothing there.
-        Applied to the state a stage reports; the forces are not evaluated differently
-        (docs/kernel.md, "A node with next to no shear strain")."""
-        if not self.shear:
+        [B 004a8b20, 004a7b60]: a node whose shear strain is under two millionths of the
+        difference of its longitudinal and transverse strains (each less the shrinkage or
+        thermal strain; ex and ey are given so), plus 1e-10, where the concrete has next to
+        no shrinkage or thermal strain: the sizes of the node's four offsets (along, across
+        and in the two principal directions, all the same strain here) come to under 1e-6.
+        Such a node has no transverse strain but its offset and no stirrups: their stress
+        and their ratio are nothing there. Applied to the state a stage reports; the forces
+        are not evaluated differently (docs/kernel.md, "A node with next to no shear
+        strain"). Without shear and without shrinkage every node is one, and r2c solves no
+        transverse strain at all."""
+        if not self.shear and not self.sec.shrink:
             return np.zeros(len(z), dtype=bool)
         lone = np.abs(g) < 2e-6 * np.abs(ex - ey) + 1e-10
-        return lone & (np.abs(self.sec.shrinkage(z)) < 1e-6)
+        return lone & (4.0 * np.abs(self.sec.shrinkage(z)) < 1e-6)
 
     def steel_at_crack(self, e0, phi, es, fs, z, out, b, f1cx):
         """Stress of each longitudinal layer at a crack (thesis 4-5, last part; the details

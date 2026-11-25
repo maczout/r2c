@@ -122,28 +122,32 @@ class Section:
 
     def shrinkage(self, z):
         """The shrinkage or thermal strain of the concrete at heights z: the strain the
-        concrete would take up unrestrained, which carries no stress. A parabola through
-        the points given (the manual, 3-5: "Response-2000 parabolically interpolates between
+        concrete would take up unrestrained, which carries no stress. Parabolas through the
+        points given (the manual, 3-5: "Response-2000 parabolically interpolates between
         these points"; Response's own Shrinkage & Thermal Strain chart shows it for three
-        points, measured); constant beyond the end points; straight between two points."""
+        points, measured), taken three at a time from the top down: the first three points,
+        then the third to the fifth, and so on; straight between points left over (two
+        points, or the last of an even number) [B 004b6df0]; constant beyond the end
+        points."""
         z = np.asarray(z, dtype=float)
         pts = self.shrink
         if not pts:
             return np.zeros_like(z)
-        zs = np.array([p[0] for p in pts])
-        es = np.array([p[1] for p in pts])
-        if len(pts) < 3:
-            return np.interp(z, zs, es)
-        zc = np.clip(z, zs[0], zs[-1])
-        # the three points nearest each height (all three when there are only three)
-        i = np.clip(np.searchsorted(zs, zc) - 1, 0, len(zs) - 3)
-        i = np.where((i + 3 <= len(zs) - 1) & (zc - zs[i + 1] > zs[np.minimum(i + 2, len(zs) - 1)] - zc),
-                     i + 1, i)
-        z0, z1, z2 = zs[i], zs[i + 1], zs[i + 2]
-        e0, e1, e2 = es[i], es[i + 1], es[i + 2]
-        return (e0 * (zc - z1) * (zc - z2) / ((z0 - z1) * (z0 - z2))
-                + e1 * (zc - z0) * (zc - z2) / ((z1 - z0) * (z1 - z2))
-                + e2 * (zc - z0) * (zc - z1) / ((z2 - z0) * (z2 - z1)))
+        zs = np.array([p[0] for p in pts])[::-1]        # from the top down
+        es = np.array([p[1] for p in pts])[::-1]
+        zc = np.clip(z, zs[-1], zs[0])
+        out = np.interp(zc, zs[::-1], es[::-1])
+        for i in range(0, len(zs) - 2, 2):
+            z0, z1, z2 = zs[i], zs[i + 1], zs[i + 2]
+            if z0 == z1 or z1 == z2:
+                continue
+            k = (zc <= z0) & (zc >= z2)
+            e0, e1, e2 = es[i], es[i + 1], es[i + 2]
+            par = (e0 * (zc - z1) * (zc - z2) / ((z0 - z1) * (z0 - z2))
+                   + e1 * (zc - z0) * (zc - z2) / ((z1 - z0) * (z1 - z2))
+                   + e2 * (zc - z0) * (zc - z1) / ((z2 - z0) * (z2 - z1)))
+            out = np.where(k, par, out)
+        return out
 
     # -- geometry -------------------------------------------------------------------------------
     @staticmethod
@@ -433,6 +437,24 @@ class Section:
                  if l.prestrain != 0.0)
         pm = sum(float(l.steel.stress(l.prestrain)) * l.area * (l.z - zb) for l in self.layers
                  if l.prestrain != 0.0)
+        if self.shrink:
+            # shrinkage or thermal strain of the concrete counts as a prestress too, as if
+            # fully restrained: a straight line fitted by least squares to the points given
+            # (their strains, at their heights from the centroid of the gross concrete), its
+            # value at that centroid times the area and its slope times the inertia, each
+            # times the concrete's stiffness [B 00423e50, 004b5770; O: with the heights from
+            # the centroid the limit line of newbeam-thermgrad-m is Response's to the last
+            # digit, from the bottom or the transformed centroid it is not]
+            zs = np.array([z for z, _ in self.shrink]) - self.zc
+            es = np.array([e for _, e in self.shrink])
+            n = len(zs)
+            sxx = float(np.sum(zs * zs) - np.sum(zs) ** 2 / n)
+            if n > 1 and abs(sxx) > 0.0:
+                slope = float(np.sum(zs * es) - np.sum(es) * np.sum(zs) / n) / sxx
+                at0 = float(np.sum(es) - slope * np.sum(zs)) / n
+                ec = self.conc0.Ec
+                pf += at0 * a * ec
+                pm += slope * i * ec
         out = []
         for face, c, law in ((0, ct, self.law_at(self.ztop)), (1, cb, self.law_at(self.zbot))):
             if not law.auto_ft:

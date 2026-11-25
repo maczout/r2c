@@ -1179,3 +1179,47 @@ what they mean:
   in Response's own state at the stage (`python tools/sources.py`), 21 of them on a flat
   part of the curve. That is the named limitation of step A-4 again
   (`docs/status.md`).
+
+## Step A-6 (2026-11-24): the slopes rule on; the loads group
+
+The run of record (`docs/verification-results.md`) is on 55 cases: the 52 of step A-5 and
+three on Newbeam under M whose variable is a load that was not in the set (shrinkage, a
+thermal gradient, where the axial load acts). Two runs come before it. The tables are in
+`docs/summary.md`; what they mean:
+
+- **The "before" run is the 52 cases with the slopes rule on** (owner, 2026-11-24, D69).
+  Against the run of record of step A-5 45 checks came inside and 5 went outside
+  (measured, `python tools/changes.py`), check for check what the trial run of step A-5
+  had shown. Both rising branches that were outside are inside (the two US-units cases,
+  12.7 and 8.2 % to 4.4 and 2.2 %), so the rising branch is met on every case. The shape
+  of Newbeam with elasto-plastic tension stiffening is outside, as accepted with D69.
+  One thing the summary of step A-5 had wrong: the two Should checks at the peak of the
+  CSA shear case (D71) do **not** come inside with the rule on. They are 11.9 and 12.6 %
+  in this run (11.9 and 11.0 % before).
+- **Where the axial load acts needed nothing.** Inside on every check as it stood.
+- **Shrinkage and the thermal gradient were outside on Must views because r2c applied
+  the concrete's offset along the member only.** In the program a node's offset acts
+  across the member too, which makes three differences, each read from the binary
+  (`docs/kernel.md`, "What the concrete's offset does"): the node's transverse strain is
+  solved for also without shear, and the strain charts show the whole strain; the
+  flexural tension zones are those of the concrete's own strain; and the cracking
+  strength over the depth counts the restrained strain as a prestress. With the three,
+  every Must view of both cases is inside, and the shrinkage case has Response's 47
+  stages where it had 48 (measured: the run of record against a run of the three cases
+  on the kernel before, `python tools/viewmisses.py`: 35 views outside at the assessed
+  stages before, 1 after).
+- **The one check left** is a Should on the shrinkage case at its last stage: transverse
+  bond, 6.1 %. Response's own transverse solve stops at a tolerance, and its stirrup
+  stresses differ a little from node to node where the solution is the same at each
+  (−59.06 to −59.69 MPa; r2c −59.06 at every node). The bond chart is that difference.
+  Not a state, not a rule: the program's tolerance (`docs/summary.md`, D75).
+- **The 52 cases did not move.** Against the "before" run no check changed side, and
+  r2c's 52 records are the same line for line (compared with `diff`, the header's times
+  left out). The new rules act only where the concrete has a shrinkage or thermal strain.
+- **Of the 72 view checks outside on the shear cases of the set, 65 are the state
+  reached** (`python tools/sources.py VERIFY_OUT --archive ARCHIVE --inputs … [--by-case]`):
+  inside when r2c is put into Response's own state at the stage, 38 of them on a flat
+  part of the curve. The seven that are not: transverse bond at five stages (the column
+  with shear, M/V = 0.5 m, the two US-units cases) and shear on the crack at two (the
+  I-girder with softening where its web cracks, and one node with Tamai tension
+  stiffening).
