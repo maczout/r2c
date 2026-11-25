@@ -173,7 +173,8 @@ def curve_chart(res: dict, fixture: Path, d: dict) -> str:
     x0, x1, y0, y1 = min(0, *xs), max(0, *xs), min(0, *ys), max(0, *ys)
     x1 = x1 if x1 > x0 else x0 + 1
     y1 = y1 if y1 > y0 else y0 + 1
-    y1 += 0.08 * (y1 - y0)
+    pad = 0.08 * (y1 - y0)
+    y1, y0 = y1 + pad, (y0 - pad if y0 < 0 else y0)
 
     def X(x):
         return m["l"] + (x - x0) / (x1 - x0) * (w - m["l"] - m["r"])
@@ -188,8 +189,10 @@ def curve_chart(res: dict, fixture: Path, d: dict) -> str:
          f'{esc(yt)} against {esc(xt)}: r2c over Response-2000, {esc(d["case"])}">']
     s.append(f'<line x1="{m["l"]}" x2="{w - m["r"]}" y1="{Y(0):.1f}" y2="{Y(0):.1f}" stroke="var(--grid)"/>'
              f'<line x1="{X(0):.1f}" x2="{X(0):.1f}" y1="{m["t"]}" y2="{h - m["b"]}" stroke="var(--grid)"/>')
-    s.append(f'<text x="{m["l"] - 5}" y="{Y(max(ys)) + 4:.1f}" text-anchor="end">{max(ys):.4g}</text>'
-             f'<text x="{m["l"] - 5}" y="{Y(0) + 4:.1f}" text-anchor="end">0</text>'
+    ends = [v for v in (max(ys), min(ys)) if abs(v) > 0.02 * (y1 - y0)]
+    s.append("".join(f'<text x="{m["l"] - 5}" y="{Y(v) + 4:.1f}" text-anchor="end">{v:.4g}</text>'
+                     for v in ends)
+             + f'<text x="{m["l"] - 5}" y="{Y(0) + 4:.1f}" text-anchor="end">0</text>'
              f'<text x="{w - m["r"]}" y="{h - m["b"] + 14}" text-anchor="end">{x1:.4g}</text>'
              f'<text x="{m["l"]}" y="{h - m["b"] + 14}">{x0:.4g}</text>'
              f'<text x="{(m["l"] + w) / 2}" y="{h - 4}" text-anchor="middle">{esc(xt)}</text>'
@@ -405,7 +408,7 @@ def entry_html(e: dict, data: dict, ref_dir: Path) -> str:
     c, w, ind = e["cause"], e["worst"], e["independent"]
     res = data["results"][w["case"]]
     n, k = len(e["cases"]), len(e["instances"])
-    disagree = ind.get("verdict") == "contradicts"
+    disagree = ind.get("verdict") == "contradicts" or bool(c.get("disagreement"))
     out = [f'<section class="entry{" disagree" if disagree else ""}" id="{esc(e["id"])}">',
            f"<h3>{e['rank']}. {esc(c['name'])}</h3><div>",
            f'<span class="chip must">{review.TIER_NAME[e["tier"]]}</span>',
@@ -439,10 +442,16 @@ def entry_html(e: dict, data: dict, ref_dir: Path) -> str:
                    "entry's evidence file and docs/acceptance.md, and the developer's reason "
                    "only after it had written its own. Shown as written "
                    f'(<a href="{esc(ind["path"])}">the file</a>).</p>'
-                   f'<details{" open" if disagree else ""}><summary>Read it</summary>'
+                   f'<details{" open" if ind.get("verdict") == "contradicts" else ""}><summary>Read it</summary>'
                    f'<div class="md">{md(ind["text"])}</div></details>')
     else:
         out.append('<p class="note">None has been made for this entry.</p>')
+    if c.get("disagreement"):
+        out.append('<ul class="reason"><li class="inferred"><span class="basis">Where it '
+                   f"disagrees</span>{esc(c['disagreement'])}<span class='src'> · the "
+                   "developer's account of the assessment above</span></li>"
+                   + (f'<li><span class="basis">The developer, after it</span>{esc(c["after"])}</li>'
+                      if c.get("after") else "") + "</ul>")
     acc, pen = review.decided(e["instances"])
     out.append('<div class="ask"><b>Status.</b> '
                + (f"Accepted by the owner: {esc(', '.join(acc))}. " if acc else
@@ -499,8 +508,10 @@ def render(data: dict, ref_dir: Path) -> str:
              + trend_chart(data["trend"]))
     H.append("<h4>What changed side</h4>" + changes_html(data))
 
-    dis = [e for e in ents if e["independent"].get("verdict") == "contradicts"]
-    und = [e for e in ents if e["independent"].get("verdict") == "does not decide"]
+    dis = [e for e in ents if e["independent"].get("verdict") == "contradicts"
+           or e["cause"].get("disagreement")]
+    und = [e for e in ents if e["independent"].get("verdict") == "does not decide"
+           and e not in dis]
     none = [e for e in ents if not e["independent"]]
     H.append("<h2>2. The deviations, worst first</h2>"
              f'<p class="sub">{len(data["devs"]) - wo} checks outside target in the Must, Should '
@@ -510,12 +521,14 @@ def render(data: dict, ref_dir: Path) -> str:
              "the owner has accepted stay in the list: the review decides them again.</p>")
     if dis:
         H.append('<div class="warn"><b>Where the independent assessment contradicts the '
-                 "developer's reason</b> (raised whatever the rank):<ul>"
-                 + "".join(f'<li><a href="#{esc(e["id"])}">{e["rank"]}. {esc(e["cause"]["name"])}</a></li>'
+                 "developer's reason, in whole or in part</b> (raised whatever the rank):<ul>"
+                 + "".join(f'<li><a href="#{esc(e["id"])}">{e["rank"]}. {esc(e["cause"]["name"])}</a>'
+                           f': {esc(e["cause"].get("disagreement", ""))}</li>'
                            for e in dis) + "</ul></div>")
     if und or none:
         H.append('<p class="note">'
-                 + (f"The evidence does not decide the developer's reason on {len(und)}: "
+                 + (f"On {len(und)} more the assessment's verdict is that the evidence does "
+                    "not decide the developer's reason: "
                     + ", ".join(f'<a href="#{esc(e["id"])}">{e["rank"]}</a>' for e in und) + ". "
                     if und else "")
                  + (f"No independent assessment yet on {len(none)}: "

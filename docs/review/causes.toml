@@ -25,6 +25,10 @@
 #                         {verify} {archive} {repeats} {fixture:CASE} {capture:CASE}
 #                         {record:CASE} {input:CASE} {trace:CASE}
 #   ask, suggestion     what the owner is asked now, and the developer's suggestion
+#   disagreement        where the independent assessment contradicts a part of the reason
+#                       (the developer's account of it; the assessment itself is beside
+#                       the page, as written), and `after`, the developer's answer. The
+#                       reason above is left as the assessor saw it.
 #   decision            the number of that question in docs/summary.md
 #
 # A deviation that no cause matches is shown on the page as "not classified", one entry a
@@ -171,6 +175,8 @@ name = "Shrinkage: transverse bond at the last stage, where the stirrups are in 
 decision = "D83"
 ask = "Accept as a known deviation (D75), or leave transverse bond unassessed on cases without shear?"
 suggestion = "Accept as a known deviation, as suggested under D75."
+disagreement = "The assessor says Response's stirrup stresses do not differ \"a little from point to point\": one unbroken block of five nodes at the top end of the stirrups is 0.62 MPa off and the rest agree within 0.03, which looks systematic, not like where an iteration stops. It also says the tolerance could be tested without copying the iteration."
+after = "Accepted as a fair reading of the same chart. The developer's inferred part is weaker than it was written; the test the assessor names (the routine's exit test at Response's own transverse strain at those nodes) has not been made."
 [[cause.match]]
 cases = ["newbeam-shrink-m"]
 checks = ["view"]
@@ -199,6 +205,8 @@ name = "The I-girder with shear: a stage where the top cracks close, which Respo
 decision = "D84"
 ask = "Keep accepted (D48, D50, D63), make it part of the named limitation, or take it up again?"
 suggestion = "Keep accepted, as its own item beside the named limitation: Response does not repeat itself on this case, so there is no single response to clone."
+disagreement = "The assessor supports the mechanism and questions one part: if no capture has a stage where the top cracks close, Response fails at that try every time, which points to a repeatable rule of its solve and not to something outside the input."
+after = "A fair point. What does not repeat is the other event on this girder (the web cracking); at the closing of the top cracks every capture is the same. The inferred part should say: a rule of Response's solve not yet read."
 [[cause.match]]
 cases = ["igirder-mv"]
 checks = ["shape"]
@@ -234,6 +242,8 @@ name = "Elasto-plastic tension stiffening: r2c carries on after Response's last 
 decision = "D85"
 ask = "Keep accepted (D69) as a shape, or count it with how a shear response ends (the Won't tier)?"
 suggestion = "Keep accepted. Whether it is a shape or an ending is the owner's reading; the measure is not changed for it."
+disagreement = "The assessor contradicts the description: the two programs part two stages before Response's last, where both reach the same unsettled state and r2c keeps the stage that Response refuses; Response then has two more stages. It also says the mark \"read\" on the second part is wrong: that the behaviour came with the slopes rule is a comparison of two runs, which is measured."
+after = "Accepted on both points. The split is a try kept by one program and refused by the other (the kind the named limitation describes), not r2c running on after Response has ended; and the second part is measured (the run of record of step A-5 against the first run of step A-6), not read."
 [[cause.match]]
 cases = ["newbeam-tstiff6-mv"]
 checks = ["shape"]
@@ -263,6 +273,8 @@ name = "Shear on Crack: a limit line that one program draws and the other does n
 decision = "D86"
 ask = "Keep accepted (D61, D38's kind), or take up the rule for drawing the line?"
 suggestion = "Keep accepted: the rule is the program's; which side of it a state falls on follows from the state on a flat peak."
+disagreement = "The assessor says the reason leaves out a second difference that is enough by itself: the limit line both programs draw starts 7.7 mm lower in r2c, so the check would be far outside with the drawing rule made identical. And the chart's largest value is the limit line (2.07 MPa), not 0.15 MPa."
+after = "Accepted. The entry is a difference of state on a flat peak that shows twice on this chart; the name and the question point too much at the drawing rule. The developer agrees with the assessor's suggestion to count it under the named limitation."
 [[cause.match]]
 cases = ["newbeam-tsfactor-mv"]
 checks = ["view"]
@@ -345,6 +357,8 @@ name = "Tamai tension stiffening: shear on the crack at the top of the cracked z
 decision = "D89"
 ask = "Keep accepted (D61), or look at it with the other shear-on-crack entry?"
 suggestion = "Keep accepted for phase A, and look at it together with the I-girder's shear on the crack: both are outside in Response's own state."
+disagreement = "The assessor says \"one node lower\" is not what the chart shows: r2c's jump is about 1 mm lower, its top value is lower and its band of high values is three points against Response's seven, with the points at other depths. It leans against \"one node and not a rule\"."
+after = "Accepted as a correction of the wording; the cause stays unknown. The diagnostic the assessor names (r2c's view on Response's own depths at that stage) has not been run."
 [[cause.match]]
 cases = ["newbeam-tstiff4-mv"]
 checks = ["view"]
@@ -372,6 +386,8 @@ name = "Transverse bond at the end of the stirrups, outside in Response's own st
 decision = "D90"
 ask = "Keep accepted (D46, D47, D49, D70), take the bond chart's rule up again, or leave this chart unassessed at the stirrups' end?"
 suggestion = "Keep accepted for phase A; one bounded look at the bond rule on a hoop and at a stirrup's end in phase B. This is the entry where the developer's reason is weakest."
+disagreement = "The assessor says the location does not fit: on the column and the US file case the charts differ mostly inside the depth of the stirrups, not at their ends. The check of the rule holds for the two SI cases only (on the US case the tool returns nothing, which is the tool not converting units), and the remark that the rule was never checked on a hoop is contradicted by the record of the rule itself."
+after = "Accepted. The name of the entry and the third part of the reason are not borne out; the remark on the hoop was out of date. What stands is the measurement: outside in Response's own state. The cause is not known."
 [[cause.match]]
 cases = ["column-mv"]
 checks = ["view"]
@@ -425,6 +441,8 @@ name = "Where a stage does not settle, r2c and Response make different tries (th
 decision = "D91"
 ask = "The decision D66 left for the end of phase A: accept the named limitation for phase A, make it an owner's override, move the shear views it governs down a tier, or allow the one further attempt on record?"
 suggestion = "Accept it for phase A as a named limitation and make the one further attempt (tries held one for one to the running program) the first item of phase B."
+disagreement = "The assessor contradicts the reason given for the two Must shape checks: r2c's curves have both falls of load, at Response's stages; the first is just under what the measure counts as a fall, and it comes before the two programs' tries part. It also notes that on the column the tries agree through the peak (it is the passes within a try that end differently), and that Response refuses the stage at the first difference where the reason says its solve gives up."
+after = "The assessor is right on the shapes, and the record (D70) is wrong. Measured, python tools/falls.py: the first fall is 1.99 and 1.97 % of the peak in r2c against 2.06 and 2.07 % in Response, and the measure counts from 2 %. So the two Must shape checks are not the named limitation; they are a fall just under the measure's limit, the kind of V alone (D32). They stay in this entry as assessed; regrouping them is asked under D91. The view checks stand as measured."
 [[cause.match]]
 cases = ["newbeam-us-mv", "newbeam-usfile-mv"]
 checks = ["shape"]

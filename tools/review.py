@@ -390,6 +390,8 @@ def heading(e: dict, ind: dict | None = None) -> str:
          f"{n} case{'s' if n != 1 else ''}, {k} check{'s' if k != 1 else ''}")
     if ind and ind.get("verdict") == "contradicts":
         s += " · the independent assessment disagrees"
+    elif e["cause"].get("disagreement"):
+        s += " · the independent assessment disagrees in part"
     return s
 
 
