@@ -56,30 +56,30 @@ developer's. Items that need a structural judgement are marked **(structural)**.
   Response's states as a record, for `viewlines.py`. `decompile.py` also lists
   a routine's instructions (`a:ADDRESS`).
 - 85 oracle fixtures, each with the detail views of the feature stages of Response's curve
-  (cracking, falls of load, peak, last stage). **The development set, 52 of them, is in
+  (cracking, falls of load, peak, last stage). **The development set, 55 of them, is in
   `tests/oracle`**: Newbeam with only its loads varied (17), since step A-1 (2026-11-22,
   D41) the seven on the Quick Define sections, since step A-2 (2026-11-23) five whose
   variable is the reinforcement, since step A-3 (2026-11-23) eight whose variable is
   a material model on Newbeam, and since step A-5 (2026-11-24) one softening model on
   the I-girder (D67) and 14 on the settings of the section, units, material factors and
-  More Detail (all listed in `docs/summary.md`).
-  **The other 33 are parked in `tests/oracle/parked`** (D16, D19): kept, and not run by
+  More Detail, and since step A-6 (2026-11-24) the three loads that were not in it:
+  shrinkage, a thermal gradient, where the axial load acts (all listed in
+  `docs/summary.md`).
+  **The other 30 are parked in `tests/oracle/parked`** (D16, D19): kept, and not run by
   default. The folder is the set: verify, capture, retrim and scope read one folder and not
   the folders under it. The inputs of the cases of steps A-2 and A-3 are variants of r2x's
   (`tools/variants.py`), so verify on the set needs that folder among its `--inputs`.
 - pytest: by default the reader and material rules, the cases of the set without shear
   (the five on Quick Define sections need `R2C_DEFINE_DIR`, r2x's `tests/reference/define`,
   the two on reinforcement and the two on base curves `R2C_SCOPE_DIR`, and are skipped
-  without them); `-m "slow and not parked"` the 27 with shear (one fails, below); `-m parked` the parked cases (`R2C_RESPONSE_DIR`
+  without them); `-m "slow and not parked"` the 27 with shear; `-m parked` the parked cases (`R2C_RESPONSE_DIR`
   for Response's sample inputs, `R2C_SCOPE_DIR` for the inputs of the scope cases). Eleven
   parked fixtures need something removed: five have no test, and the six on Response's
   sample inputs that hold several sections have a test that they are refused (D23).
-  One regression test of the set fails: Newbeam in US units at M/V = 1 ft, whose peak
-  is 1.41 and 1.57 % under Response's on its two charts against a limit of 1.3 % (over it
-  since step A-1; the limit is left as it is; with the slopes rule on, which is off, the
-  peak is 0.1 % under: `docs/summary.md`, D69). `python tools/limits.py VERIFY_OUT` sets
-  every limit against a verify run without solving the slow cases again: on the run of
-  record that case is the only one over.
+  No regression test of the set fails: `python tools/limits.py VERIFY_OUT` sets every
+  limit against a verify run without solving the slow cases again, and on the run of
+  record none is over (54 cases with a limit). The guard on Newbeam in US units at
+  M/V = 1 ft, over since step A-1, passes since the slopes rule went on.
 - Docs: `kernel.md` (each rule and its source), `verification.md` (what the results mean),
   `verification-results.md` (generated), `acceptance.md` (the owner's development targets),
   `scope.md` (every input an r2x solve can take, whether the manual documents it, and
@@ -93,16 +93,39 @@ The numbers are in `docs/verification-results.md`, what they mean in `docs/verif
 each case is assessed against the owner's development targets in `docs/acceptance.md`: ±5 %
 on every metric, the curve's shape the same, views at the features of the curve.
 
-**The development set** (run of record of 2026-11-24, step A-5, the 52 cases; measured,
+**The development set** (run of record of 2026-11-24, step A-6, the 55 cases; measured,
 `python tools/targets.py VERIFY_OUT --counts`; views compared at the stage at the same
 place since D42, the last stage of a shear case left out since D40, a check where
-Response's view spikes left out since D56). Cases inside target: peak 52 of 52, rising
-branch 50, shape 47, post-peak 35 (24 of the 25 without shear), views of the stress state
-without shear (Must) 24 of 25, views Should 37 of 52 (13 of the 27 with shear), views
-Could 43 of 52. On the 38 cases that were in the set at the start of the step no check
-changed side (`python tools/changes.py`). One rule changed in the kernel in step A-5 (the
-crack check with material factors, below); a second is written and off (the slopes of
-the compressive stress, below).
+Response's view spikes left out since D56). Cases inside target: peak 55 of 55, rising
+branch 55, shape 49, post-peak 38 (27 of the 28 without shear), views of the stress state
+without shear (Must) 27 of 28, views Should 38 of 55 (12 of the 27 with shear), views
+Could 48 of 55. Two things changed in the kernel in step A-6: the slopes of the
+compressive stress are the program's (D69, below), and the concrete's shrinkage and
+thermal strain is handled as the program handles it (below). Against the run with the
+first alone, the second changed no check on the 52 cases that were in the set (`python
+tools/changes.py`), and r2c's records of them are the same line for line.
+
+**The loads group** (step A-6; `docs/summary.md` has the tables, `docs/verification.md`,
+"Step A-6", the detail; the rules are in `docs/kernel.md`, "What the concrete's offset
+does").
+
+- *Where the axial load acts:* inside on every check.
+- *Shrinkage and the thermal gradient:* every Must view inside (14.6 to 82 % off before
+  the rules below), peak and rising branch 0.00 %, Response's stages one for one. One
+  Should check is outside: the shrinkage case's transverse bond at its last stage, 6.1 %
+  (the tolerance of Response's own transverse solve; `docs/summary.md`, D75).
+- *The rules* (`Analysis.eval_nodes`, `transverse`, `_net_axes`; `Section.cracking_table`,
+  `shrinkage`; `export.envelope`): the concrete's offset acts across the member as along
+  it, so a node with an offset gets a transverse solve also without shear and the strain
+  charts show whole strains; the crack check's tension zones are those of the
+  concrete's own strain; the cracking strength over the depth counts the restrained
+  strain as a prestress; the envelope of the Transverse Strain chart starts from the
+  offsets at the two faces; a profile of more than three points is read three at a time.
+  None acts where the section has no profile.
+- *Not compared:* shrinkage with shear (no fixture); a profile of more than three
+  points (no capture). *Inferred, not read:* that the offset across the member is the
+  shrinkage profile alone, and that the heights walked for the tension zone are the
+  profile's and the outline's (`docs/kernel.md`).
 
 **The cases of step A-5** (`docs/summary.md` has the tables, `docs/verification.md`,
 "Step A-5", the detail).
@@ -125,39 +148,52 @@ zone's bars are set against are summed without the concrete's material factor, a
 program does it; the limits at the face and at the axis carry the factor. In use. No
 effect without factors.
 
-**The slopes of the compressive stress: written, off** (`Shear.own_slopes`; step A-5,
-`docs/kernel.md`, "The slopes of the compressive stress"; `docs/summary.md`, D69). The
-program's closed forms for how the compressive stress changes with its own strain and
-with the tension across it, in place of differences of r2c's stress relation. Held to
-`python tools/flowset.py ARCHIVE --inputs …`: stages where r2c's calculated shear stress
-in Response's own state is more than a point further off than Response's own, 309 as r2c
-is and 80 with the rule, of 2,007 (25 of the 80 are a case's first stage, 54 are three
-softening models). Switched on, on the 52 cases: 45 checks in, 5 out, one of them a Must
-(the shape of `newbeam-tstiff6-mv`); the rising branch of the two US-units cases comes
-inside. On the 33 parked: 116 in, 42 out. Off by the no-regression bound.
+**The slopes of the compressive stress: in use** (`Shear.own_slopes`; written in step
+A-5, on since step A-6 by the owner's decision of 2026-11-24, D69; `docs/kernel.md`, "The
+slopes of the compressive stress"). The program's closed forms for how the compressive
+stress changes with its own strain and with the tension across it, in place of
+differences of r2c's stress relation. Held to `python tools/flowset.py ARCHIVE --inputs
+…`: stages where r2c's calculated shear stress in Response's own state is more than a
+point further off than Response's own, 309 without it and 80 with it, of 2,007. On the 52
+cases 45 checks came inside and 5 went outside with it (the "before" run of step A-6
+against the run of record of step A-5); on the parked cases 116 and 42.
 
-**Known deviations of step A-5** (put to the owner as D70 and D71; the last is recorded
-here by the brief).
+**Known deviations that came with the slopes rule** (owner, 2026-11-24, D69; the last
+three are the developer's reading of the answer, `docs/summary.md`, D74).
 
-1. *The two US-units cases at M/V = 1 ft* (`newbeam-us-mv`, `newbeam-usfile-mv`): rising
-   branch 12.7 and 8.2 %, shape (one fall of load before the peak where Response has
-   two), and 42 view checks at the two falls and the peak. The rising branch is the
-   slopes rule (4.4 and 2.2 % with it). The shape is the named limitation: r2c makes
-   Response's first 27 tries one for one, then Response's solve gives up on a stage r2c
-   keeps unsettled after 16 passes (`python tools/tries.py`, on a trace of the running
-   program). Of the view checks, all but four are inside in Response's own state
-   (`python tools/sources.py`); the four are shear stress at the second fall (the slopes
-   rule) and transverse bond at three stages (7 to 18 %; D46's kind).
+1. *The shape of Newbeam with elasto-plastic tension stiffening* (a Must; accepted):
+   r2c follows Response's fall of load after the peak and then recovers to 1.5 % above
+   its first top, where Response's response ends. The measure reads r2c's peak after the
+   fall. The regression limit of the case was reset to that.
+2. *The column with interlocking hoops, two views at its peak* (Should): principal
+   tensile stress 5.5 %, transverse bond 9.0 % (2.2 and 2.7 % before). Both are inside
+   with r2c in Response's own state (`python tools/sources.py`): the state on a flat
+   peak.
+3. *V alone, how it ends* (a Won't): post-peak 41 % (3.6 % before).
+4. *On the parked cases:* Mehlhorn on the I-girder ends early (peak −13.2 %);
+   Vecchio-Collins 1982 has a rising branch of 22 %.
+
+**Known deviations of step A-5** (owner, 2026-11-24: D70 and D71 accepted; the third
+is recorded by that step's brief and has no decision of its own, `docs/summary.md`, D76).
+
+1. *The two US-units cases at M/V = 1 ft* (`newbeam-us-mv`, `newbeam-usfile-mv`): shape
+   (one fall of load before the peak where Response has two), and 26 view checks at the
+   falls and the peak. The rising branch is inside since the slopes rule (4.4 and
+   2.2 %). The shape is the named limitation: r2c makes Response's first 29 tries one
+   for one, then Response's solve gives up on a stage r2c keeps unsettled after 16
+   passes (`python tools/tries.py`, on a trace of the running program). Of the view
+   checks, 23 are inside in Response's own state (`python tools/sources.py`); the three
+   that are not are transverse bond (6 to 18 %; D46's kind).
 2. *The CSA shear case, two views at its peak* (shear stress 11.9 %, transverse bond
-   11.0 %): the state on a flat peak; 0.2 and 0.0 % in Response's own state; r2c's stage
-   there has not converged (1.1 %). Under the named limitation.
+   12.6 %): the state on a flat peak; inside in Response's own state; r2c's stage there
+   has not converged. Under the named limitation. (The slopes rule did not bring them
+   inside, as the summary of step A-5 had said it would.)
 3. *Shear on the crack at the stage where the I-girder's web cracks* (the bounded look of
-   D68; one approach). On `igirder-csoft3-m2v` at its peak 15.9 %, and 13.6 % with r2c in
-   Response's own state. The look found the slopes rule, which settles the shear stress
-   there (12.8 to within a point in Response's own state) and with it most views of that
-   stage, but not this one: with the rule on it is still 13.5 %. Not looked into further;
-   the same view is 11 to 18 % off in Response's own state on the parked softening cases
-   (`python tools/sources.py`, step A-4).
+   D68; one approach). On `igirder-csoft3-m2v` at its peak 13.5 %, and 13.6 % with r2c in
+   Response's own state. The slopes rule settled the shear stress there and with it
+   every other view of that stage (13 outside before, this one now). Not looked into
+   further; the same view was 11 to 18 % off in Response's own state on the parked
+   softening cases (`python tools/sources.py`, step A-4).
 
 **The eight cases on material models** (step A-3; `docs/summary.md` has the table and
 `docs/verification.md`, "Step A-3", the detail). Every Must inside as they stood. Five
@@ -209,9 +245,9 @@ D56; `docs/acceptance.md`, "Where Response is unstable"). How it is carried out:
 - *The readings.* Place and blend are the owner's (D55). How "agree with each other" is
   measured is the developer's, confirmed by the owner (D58); `python tools/unstable.py
   VERIFY_OUT --readings` measures the others.
-- *What it does on the 52* (measured, `python tools/unstable.py VERIFY_OUT --list`): of
-  2,772 view checks 2,182 are tested and 10 are unstable (Must 5, Should 2, Could 3), all
-  ten checks r2c is inside on; the rule as first written would leave 680. The figures
+- *What it does on the 55* (measured, `python tools/unstable.py VERIFY_OUT --list`): of
+  2,961 view checks 2,308 are tested and 14 are unstable (Must 8, Should 3, Could 3), all
+  14 checks r2c is inside on; the rule as first written would leave 701. The figures
   are in `docs/summary.md`.
 - *What it does not catch.* The bond chart along the prestrained stirrups
   (`newbeam-stirrupdep-mv`, the example D54 was written for): at its peak Response's
@@ -479,16 +515,17 @@ then M".
 
 Gone since D49: the rising branch of M/V = 0.5 m and the post-peak of V alone.
 
-**The views related to shear** (Should). Inside on 13 of the 27 shear cases: Newbeam at
+**The views related to shear** (Should). Inside on 12 of the 27 shear cases: Newbeam at
 M/V = 1 m, V with constant compression, "N constant, then M + V", "V constant, then M",
-the three shear cases on reinforcement, tension stiffening Vecchio-Collins 1982,
-Collins-Mitchell 1987 and Izumo, and of step A-5 crack spacings given, the kg-cm file
-and More Detail with shear. Outside among the cases of step A-3: Tamai, elasto-plastic
-and the tension stiffening factor (above); of step A-5: the I-girder with softening
-Vecchio-Collins 1992-A, the CSA shear case and the two US-units cases (above). Outside: M/V = 0.5 m (D49, D46), M/V = 2 m
-(D46), V alone (D32, D49), the column with shear and the I-girder with shear (the lists
-above), and "M constant, then M + V" and "N + M + V increasing together"
-(`docs/verification.md`, "A4").
+the three shear cases on reinforcement on Newbeam, tension stiffening Vecchio-Collins
+1982, Collins-Mitchell 1987 and Izumo, and of step A-5 crack spacings given, the kg-cm
+file and More Detail with shear. Outside, with what each has outside in
+`docs/summary.md` ("Which misses fall under the named limitation"): the column with
+shear, the column with interlocking hoops, the I-girder with shear, the I-girder with
+softening Vecchio-Collins 1992-A, M/V = 0.5 m, M/V = 2 m, "M constant, then M + V",
+"N + M + V increasing together", V alone, Tamai, elasto-plastic, the tension stiffening
+factor, the CSA shear case and the two US-units cases. Of their 72 view checks outside,
+65 are inside with r2c in Response's own state.
 The spike test (D56) leaves none of these misses out. (Under the rule as first written
 the column with shear, the I-girder with shear, "N + M + V increasing together", Tamai
 and elasto-plastic would not be outside: 15 of the 20.)
@@ -499,8 +536,7 @@ the 16 traced cases' tries up to their first difference (`tools/tries.py --set
 soft_solve=0`; measured once in step A-4, before the growth rule was put right); not
 measured on the checks.
 
-Written and off: the program's slopes of the compressive stress in the node's stiffness
-(`Shear.own_slopes`, step A-5, D69); Response's tests on every pass of a stage (`Shear.pass_code`); its solve of the global
+Written and off: Response's tests on every pass of a stage (`Shear.pass_code`); its solve of the global
 strains with shear, with its step factor since step A-1c (`Shear.own_solve`; r2c has
 fewer of Response's stages with it); its history of the stirrups' plastic strain
 (`Analysis.own_stirrup_history`, D39); its general solve under a stepped axial strain
@@ -673,31 +709,28 @@ one status. Completion is judged against Response as documented (owner, 2026-11-
   captured once, with `--add`. r2x's clipboard helper can fail transiently (once in 25
   captures); a rerun of that case on its own then matched.
 
-**The parked cases.** The 33 that remain were run once at the end of step A-5
-(2026-11-24, not a run of record; `docs/log/2026-11-24-02.md`), with the same result as
-in step A-4 check for check; r2c solves 22 of them. Inside on peak, rising branch and
-shape: 10 of the 22. Outside: eleven I-girders with shear (softening 0, 1, 2, 5, 6, 7, 8,
-9, 11, 12, 14) and the T-beam at M/V = 2 m. Of the 17 parked shear cases that r2c
-solves, one ends early (softening 12: peak −10.7 %); softening 9 at M/V = 1 m is on the
-line (−5.0 %). `python tools/earlyends.py VERIFY_OUT`. The two softening diagnostics of
-D62 that stayed parked: Vecchio-Collins 1986 peak −0.6 %, rising branch 2.0 %, shape
-outside; Hsu-Zhang −0.8 %, 6.9 %, shape outside (with the slopes rule on both are inside
-on all three: +0.0 %, 0.6 %; +0.4 %, 0.3 %). The loads group (D73): where the axial load
-acts is inside on every check; shrinkage and the thermal gradient are inside on peak,
-rising branch and shape and outside on Must views (`docs/summary.md`, "The loads
-group"). The parked fixtures hold no neighbouring stages, so nothing on them is tested
-for a spike; a case that joins the set gets them (`python tools/retrim.py ARCHIVE
---oracle FOLDER`).
+**The parked cases.** The 30 that remain were run once at the end of step A-6
+(2026-11-24, not a run of record; `docs/log/2026-11-24-03.md`); r2c solves 19 of them.
+Against the parked run of step A-5 with the slopes rule on, no check changed side.
+Inside on peak, rising branch and shape: 9 of the 19. Outside: nine I-girders with shear
+(softening 0, 1, 5, 6, 7, 8, 9, 11, and the default at M/V = 2 m) and the T-beam at
+M/V = 2 m (+6.5 %). Of the 17 parked shear cases that r2c solves, one ends early
+(softening 6, Mehlhorn: peak −13.2 %). `python tools/earlyends.py VERIFY_OUT`. The two
+softening diagnostics of D62 that stayed parked are inside on all three:
+Vecchio-Collins 1986 peak +0.0 %, rising branch 0.6 %; Hsu-Zhang +0.4 %, 0.3 %. Newbeam
+with no input and with negative elevations are inside on every check. The parked
+fixtures hold no neighbouring stages, so nothing on them is tested for a spike; a case
+that joins the set gets them (`python tools/retrim.py ARCHIVE --oracle FOLDER`).
 
-**Where a next session picks up**: the owner's answers to D69 to D73 in
-`docs/summary.md`. If D69 is approved: set `Shear.own_slopes = True`, rerun verify and
-report, reset the regression limit of `newbeam-tstiff6-mv` in its own commit, and record
-the checks that go outside as known deviations here. For the loads group the three
-captures and their repeats are made (all repeat). For a stiffness rule the check is
-`python tools/flowset.py ARCHIVE --inputs … [--set NAME=VALUE] [--out DIR] [--against
-DIR]`; for the stage control, `tools/rtrace.py` and `tools/tries.py` (step A-4). Two
-tools do not convert units and mislead on a record in US or kg-cm units:
-`tools/spacing.py` and `tools/bond.py`.
+**Where a next session picks up**: the owner's answers to D74 to D77 in
+`docs/summary.md`. D77 is whether phase A closes. If cases are to move in first (the two
+softening diagnostics, the two Newbeam cases): each softening case has three repeat
+captures from step A-3; the two Newbeam cases have one capture each and want D57's three.
+For a stiffness rule the check is `python tools/flowset.py ARCHIVE --inputs … [--set
+NAME=VALUE] [--out DIR] [--against DIR]`; for the stage control, `tools/rtrace.py` and
+`tools/tries.py` (step A-4); for where a view miss comes from, `tools/sources.py
+[--by-case]`. Two tools do not convert units and mislead on a record in US or kg-cm
+units: `tools/spacing.py` and `tools/bond.py`.
 
 ## 5. Decisions that are the owner's
 
