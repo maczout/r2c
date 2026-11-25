@@ -44,10 +44,17 @@ For the developer: what exists now and how to work on it. The owner reads
    after a stage kept at its first try and halves after a failed one); what differs is
    that r2c's small steps keep finding states where Response's tries fail and its
    response ends: the override again.
-4. **Interface parity**: `tools/parity.py`, `docs/parity.md`. Left besides the accepted
+4. **Priority 1 without shear** has not moved on the held-out set for two increments (23
+   of 27), while on the development set only two cases are outside: the circular column
+   (the override) and one view on the Liping sample under compression and moment (a spike
+   one node wide at the top of the cracked zone). The development set has no case like
+   whatever keeps the other held-out cases outside: more development cases without shear
+   are needed before anything else there (other sections under axial load, prestress,
+   the sample files as they come).
+5. **Interface parity**: `tools/parity.py`, `docs/parity.md`. Left besides the accepted
    refusals: four inputs on which Response gives up part-way and r2c solves (the owner has
    been asked). Not yet checked: the two programs run end to end on the same input.
-5. **Regression limits for the 52 wider cases**, and the parked fixtures.
+6. **Regression limits for the 52 wider cases**, and the parked fixtures.
 
 ## How to run things
 
@@ -136,6 +143,7 @@ negative.
 | `004b67e0`, `00426f10`, `0041c060`, `004357d0` | a table's integral by Simpson's rule; the concrete area within the depth that has stiffness; the profile rebuilt from a stage's node strains; the profile of the uncracked section |
 | `0043fa20`, `0043f570`, `0043faf0`, `0043e8d0`, `00440100`, `0043f0d0` | crack spacing over the depth: both tables; a layer's term; the longitudinal spacing at a height and its table; the transverse spacing at a height and its table |
 | `004440d0`, `00423110` | steel stress at a crack as left during iterations; the shear strain a stage reports |
+| `00417d50`, `004ac800` | stages moved up in the table of stages (330 places); a steel's material factor (the prestressing factor above a yield of 750 MPa) |
 | `00417290` | a secant stiffness of the section ("error in moment calculation"); not the shear driver it was taken for |
 | `004ac960` | the slopes of the compressive stress (and of the tension) that the node's stiffness `0046b940` is built from: closed forms, model by model |
 | `004156b0`, `004190a0` | a test of the pass routine under control of the shear strain (an extreme fibre near its cracking strain, from the twelfth pass); a stage put back to the one before after a failed try (strains, the stored depth range, the profile, the ruptured marks) |
