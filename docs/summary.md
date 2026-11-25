@@ -1,7 +1,7 @@
 # r2c: summary for the owner
 
 One page, kept current each increment (`docs/brief.md`, "Reporting"). Last updated
-2026-11-24, after increment 2. Everything else in `docs/` is reference.
+2026-11-25, after increment 3. Everything else in `docs/` is reference.
 
 ## Held-out totals
 
@@ -10,58 +10,61 @@ One page, kept current each increment (`docs/brief.md`, "Reporting"). Last updat
 
 Cases inside target on every check of the priority, of the cases that have such a check. One column per increment.
 
-| Area | Priority | baseline (2026-11-24) | increment 1 (2026-11-24) | increment 2 (2026-11-24) |
-|---|---|---:|---:|---:|
-| Moment and axial | 1: peak, rising branch, shape; stress-state views | 20 of 27 (74 %) | 23 of 27 (85 %) | 23 of 27 (85 %) |
-| Moment and axial | 2: endings without shear; shear-related views | 22 of 27 (81 %) | 26 of 27 (96 %) | 26 of 27 (96 %) |
-| Moment and axial | 3: cracking-related views | 20 of 27 (74 %) | 23 of 27 (85 %) | 23 of 27 (85 %) |
-| Shear | 1: peak, rising branch, shape; stress-state views | 17 of 28 (61 %) | 20 of 28 (71 %) | 20 of 28 (71 %) |
-| Shear | 2: endings without shear; shear-related views | 9 of 28 (32 %) | 10 of 28 (36 %) | 10 of 28 (36 %) |
-| Shear | 3: cracking-related views | 14 of 28 (50 %) | 17 of 28 (61 %) | 17 of 28 (61 %) |
-| Shear | 4: endings with shear | 8 of 28 (29 %) | 9 of 28 (32 %) | 9 of 28 (32 %) |
+| Area | Priority | baseline (2026-11-24) | increment 1 (2026-11-24) | increment 2 (2026-11-24) | increment 3 (2026-11-25) |
+|---|---|---:|---:|---:|---:|
+| Moment and axial | 1: peak, rising branch, shape; stress-state views | 20 of 27 (74 %) | 23 of 27 (85 %) | 23 of 27 (85 %) | 23 of 27 (85 %) |
+| Moment and axial | 2: endings without shear; shear-related views | 22 of 27 (81 %) | 26 of 27 (96 %) | 26 of 27 (96 %) | 26 of 27 (96 %) |
+| Moment and axial | 3: cracking-related views | 20 of 27 (74 %) | 23 of 27 (85 %) | 23 of 27 (85 %) | 23 of 27 (85 %) |
+| Shear | 1: peak, rising branch, shape; stress-state views | 17 of 28 (61 %) | 20 of 28 (71 %) | 20 of 28 (71 %) | 22 of 28 (79 %) |
+| Shear | 2: endings without shear; shear-related views | 9 of 28 (32 %) | 10 of 28 (36 %) | 10 of 28 (36 %) | 11 of 28 (39 %) |
+| Shear | 3: cracking-related views | 14 of 28 (50 %) | 17 of 28 (61 %) | 17 of 28 (61 %) | 19 of 28 (68 %) |
+| Shear | 4: endings with shear | 8 of 28 (29 %) | 9 of 28 (32 %) | 9 of 28 (32 %) | 9 of 28 (32 %) |
 
 Cases: moment and axial 27 (0 not solved by r2c, counted outside), shear 28 (0 not solved by r2c, counted outside). Threshold set by the owner, priority 1: 99 % without shear, 90 % with.
 <!-- heldout:end -->
 
-Measured with `python tools/heldout.py score` on the 55 frozen cases. **No area's total
-fell, and none rose**: nothing in this increment changed the calculation on a held-out
-case. Priority 1 stands at 85 % without shear and 71 % with, against 99 and 90. This is one
-increment without a gain; a second in a row would be the brief's plateau.
-Interface parity: 306 of 326 checks the same, `define` and `--report` left out; 15 of the
-20 differences are inputs outside the manual, refused by your decision (`docs/parity.md`).
+Measured with `python tools/heldout.py score` on the 55 frozen cases. **With shear every
+total rose or held** (priority 1 from 20 to 22 of 28, priority 2 from 10 to 11, priority 3
+from 17 to 19); **without shear nothing moved; no area's total fell.** Priority 1 stands
+at 85 % without shear and 79 % with, against 99 and 90.
+**Interface parity: not complete: 4 differences besides the 15 accepted refusals** (307 of
+326 checks the same, `docs/parity.md`). See the second question.
 
 ## What changed
 
-- **The results page** opens on "how accurate is r2c?": priority 1 on the held-out set by
-  area against the threshold, with its trend; the priority-by-area table; the control
-  curves of the development cases outside target, worst first. The rest is on a details
-  page. Your three answers are recorded in `docs/brief.md`.
-- **52 wider development cases**, like the held-out set and never the same (107 in all).
-  They show what the first 55 did not: on the development set priority 1 is now 48 of 51
-  without shear and 45 of 56 with.
-- **One cause found, not yet fixed:** on sections failing in flexure with some shear,
-  Response's solve gives up and its response ends; r2c carries on to a peak 6 to 11 %
-  higher. One case that r2c could not start (a constant moment above cracking) is fixed.
+- **Your three answers are recorded** in `docs/brief.md`; answer 3 was left with both
+  choices standing and you chose, when asked, to keep r2c carrying on (an override).
+- **Three rules corrected from the binary** (`docs/kernel.md`): a response with shear is
+  no longer stopped at 101 stages; under material factors a bar keeps its hardening slope
+  in the shear calculation; under a stepped axial strain Response's own solve is used.
+  On the development set priority 1 is now 49 of 51 without shear and 48 of 56 with.
+- **Tension stiffening turned off is now refused**, because r2x fails on it (Response
+  stops to ask a question). The model is in the manual and is built; say if you want it kept.
 
 ## Needed from the owner
 
-1. **Is interface parity complete once the only differences left are the ones you
-   accepted?** The inputs outside the manual still count as differences in the score, so
-   it cannot reach 100 %. Suggested: yes, complete when nothing else differs.
-2. **The budget for the next increment.** The lead on shear needs reading two routines of
-   the binary at one traced state; about three hours again is suggested.
+1. **The new override's cases are counted outside, as the circular column's are.** Three
+   of the eight development shear cases still outside priority 1 are this override, and
+   most of the parked I-girder ones. With them outside, 90 % with shear may be out of
+   reach. Compare such a case up to Response's last stage (a change to the measure, yours
+   to make), or leave them outside and read the threshold with that in mind?
+2. **Four inputs keep parity from "complete":** Response gives up part-way (twice with "No
+   closure on shear distribution", twice with more stages on its curves than in its list)
+   and r2c solves them. They are the override's kind. Accept them as known differences?
+3. **The budget for the next increment.** What is left with shear is the path through
+   stages that do not settle, not single rules; three hours again is suggested.
 
 ## Top known deviations
 
 - **With shear, r2c carries on where Response's solve gives up and its response ends**, to
-  a peak several per cent higher (sections failing in flexure, M/V of 2 to 4 m).
+  a peak several per cent higher. Your override since 2026-11-25; counted outside.
 - **With shear, where a load stage does not settle, the two programs try different
   states.** Shear-related views differ by several times the target near a flat peak.
 - **How a response with shear ends** differs on about two in three shear cases.
-- **Inputs r2x solves and r2c refuses** (your decision), and five that Response gives up on
+- **Inputs r2x solves and r2c refuses** (your decision), and four that Response gives up on
   part-way while r2c solves them.
 - **A fall of load at cracking on the edge of what the measure counts** (shear alone, and
   Newbeam in US units): 1.99 % of the peak in one program, 2.06 % in the other.
 
 The full list is `docs/deviations.md`. Results: https://maczout.github.io/r2c/ (this branch:
-`branches/dev-i2/`). How the work is done: `CLAUDE.md`.
+`branches/dev-i3/`). How the work is done: `CLAUDE.md`.
