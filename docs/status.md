@@ -7,54 +7,65 @@ For the developer: what exists now and how to work on it. The owner reads
 
 - **`r2c solve`** (`src/r2c/cli.py`): r2x's options, exit statuses and record format
   (r2x-raw 1, all views). Not there: `--report`, `define`, `setup`; `health` prints a
-  version line. An input with tension stiffening turned off is refused, as r2x fails on it. How far this is from r2x: `docs/parity.md`.
+  version line. An input with tension stiffening turned off is refused, as r2x fails on it. Parity with
+  r2x is complete except accepted refusals: `docs/parity.md`.
 - **The kernel** (`src/r2c`, numpy only): the MCFT node with the crack check, Response's
   layering, the solves without shear, shear by the longitudinal stiffness method with
   Response's stiffness rules and its load stage control. Each rule and its source:
   `docs/kernel.md`. Switches for rules that are written and off are listed there.
-- **The development set**: 107 fixtures in `tests/oracle`, each a capture cut to the stages
+- **The development set**: 155 fixtures in `tests/oracle`, each a capture cut to the stages
   the measure compares: 55 on Newbeam under varied loads, materials, settings and units, the
-  T-beam, the column and the I-girder; and 52 wider cases since increment 2
+  T-beam, the column and the I-girder; 52 wider cases since increment 2
   (`tools/scope_cases.py`, group W: Response's sample files under other loads; concrete and
-  steel strengths, shapes, reinforcement and loads on the four sections), chosen to be like
+  steel strengths, shapes, reinforcement and loads on the four sections); and 48 since
+  increment 4 (group X), of the kinds the held-out scorer reports outside target
+  (`tools/heldout.py score --kinds`), 44 of them without shear. All are chosen to be like
   the held-out set and never the same. 30 more in `tests/oracle/parked`, not run by
-  default. Results: `docs/verification-results.md` (generated). The wider cases have no
-  regression limits in `tests/test_oracle.py` yet.
+  default. Results: `docs/verification-results.md` (generated). Regression limits: the
+  first 54 cases' in `tests/test_oracle.py`, the others' generated into
+  `tests/oracle/limits.json` (`python tools/limits.py VERIFY_OUT --write`).
 - **The held-out set**: `heldout/` (the frozen manifest and the totals), built and scored by
   `tools/heldout.py`. See "The held-out rule" in `CLAUDE.md` before touching anything.
 - **Known deviations**: `docs/deviations.md`.
 
 ## Next
 
-1. **Accuracy on priority 1 with shear**, still the area furthest from its threshold. What
-   is outside on the development set now is of three kinds (`python tools/priority.py
-   docs/verification-results.json --views`): r2c carrying on where Response's solve gives
-   up, which is the owner's override since 2026-11-25 and is not chased; a fall of load at
-   cracking on the edge of what the measure counts (shear alone, the US-units cases); and
-   single stages that one program keeps and the other drops (the I-girder at M/V = 1 m,
-   elasto-plastic tension stiffening). The parked I-girder cases with the softening models
-   are mostly the first kind.
-2. **Priority 2 with shear** (the shear-related views at the peak) is the lowest total. On
-   most cases the two programs sit in different states near a flat peak; transverse bond is
-   the view most often outside, alone on six cases. Put into Response's state r2c gives its
-   views, so it is the path through the stages, not the rules.
-3. **Long shear responses are slow** now that they are not stopped at 101 stages: where
-   r2c creeps along a flat peak in small steps (the column under 3000 kN at M/V = 2 m,
-   171 stages) a case takes minutes. The step rule is Response's (the multiplier doubles
-   after a stage kept at its first try and halves after a failed one); what differs is
-   that r2c's small steps keep finding states where Response's tries fail and its
-   response ends: the override again.
-4. **Priority 1 without shear** has not moved on the held-out set for two increments (23
-   of 27), while on the development set only two cases are outside: the circular column
-   (the override) and one view on the Liping sample under compression and moment (a spike
-   one node wide at the top of the cracked zone). The development set has no case like
-   whatever keeps the other held-out cases outside: more development cases without shear
-   are needed before anything else there (other sections under axial load, prestress,
-   the sample files as they come).
-5. **Interface parity**: `tools/parity.py`, `docs/parity.md`. Left besides the accepted
-   refusals: four inputs on which Response gives up part-way and r2c solves (the owner has
-   been asked). Not yet checked: the two programs run end to end on the same input.
-6. **Regression limits for the 52 wider cases**, and the parked fixtures.
+1. **Priority 1 without shear** is the threshold still to be met (99 %). What is outside
+   on the development set (`python tools/priority.py docs/verification-results.json`): the
+   circular column (the override) and the prestressed I-girder under axial tension and
+   moment, where Response's tries run out at the strands' rupture and r2c goes on. What
+   brought cases inside in increment 4 was found by adding cases of new kinds and reading
+   the first view that differed: do more of that (prestressed sections under axial load,
+   sections with tapers, several transverse types, wide bar spacings, light steel).
+   `python tools/margins.py` lists the cases nearest the target; `python tools/stagesat.py`
+   the cases whose stages are not at Response's control values.
+2. **Where Response puts its stages without shear** (`docs/kernel.md`, "Closing in on first
+   cracking"): three things seen and not taken over. Closing in on the extreme fibre's
+   peak strain (Response's count of tries was not found: 14 fits some cases and is short
+   on others); closing in where the cracks close (the I-girder under moment); three small
+   first steps where the section is cracked from the start. And the end after a rupture
+   on Newbeam with very light steel, where Response's steps halve.
+3. **Priority 2 with shear** (the shear-related views at the peak) is the lowest total.
+   `python tools/sources.py` splits the misses: about four in five are the state the two
+   programs reach on a stage that does not settle, one in five are rules. Of the rules:
+   the stirrups' stress at a crack at nodes that have only just cracked (the transverse
+   strain there differs by millionths and the crack width with it); the Transverse Bond
+   chart at the stirrups' top end (a half layer whose top node has next to no shear strain
+   keeps its bond in Response at Newbeam M/V = 0.5 m and loses it at mid-depth under a
+   thermal gradient: the rule that tells the two apart was not found).
+4. **Stages that do not settle, with shear.** Up to the first difference r2c makes
+   Response's tries one for one; after it the paths part. The new case of increment 4
+   (Newbeam with closed stirrups under axial compression and shear alone): both programs
+   hover at the web-cracking load for ten passes and then drop to a cracked profile,
+   Response at its eleventh pass and r2c at its fifteenth; Response's solve then breaks
+   down and its response ends on a collapsed state. The owner has been asked whether such
+   a case is the override's kind.
+5. **Long shear responses are slow** (the column under 3000 kN at M/V = 2 m takes about
+   seven minutes).
+6. **Not yet checked on parity:** the two programs run end to end on the same input.
+7. **Newbeam under an axial tension of 300 kN** has no state under its initial load in
+   r2c ("no equilibrium under the initial loads"). Seen in passing; what Response does
+   was not looked at.
 
 ## How to run things
 
@@ -66,13 +77,19 @@ and the two folders of derived inputs in the development archive (`scope-inputs`
   shear), `pytest -m parked`. Inputs come from `R2C_RESPONSE_DIR`, `R2C_DEFINE_DIR`,
   `R2C_SCOPE_DIR`; cases whose input is missing are skipped.
 - Which development cases are outside a priority, and on what: `python tools/priority.py
-  RESULTS [--priority N] [--views]`.
+  RESULTS [--priority N] [--views]`. The ones nearest the target: `python tools/margins.py
+  RESULTS`. Whose stages are not at Response's control values: `python tools/stagesat.py
+  VERIFY_OUT [--list]`.
 - Development results: `python tools/verify.py tests/oracle --inputs FOLDERS --out OUT
   --jobs N`, then `python tools/report.py OUT`. `python tools/changes.py OLD NEW` lists the
   checks that changed side; `python tools/limits.py OUT` holds the regression limits to a
-  run without solving again.
+  run without solving again (`--write` adds generated limits for cases that have none);
+  `python tools/recompare.py OUT_COPY` compares a run's records again under the measure
+  as it is now.
 - Held-out totals: `python tools/heldout.py score ARCHIVE --inputs FOLDERS --jobs N
-  [--record LABEL]`, then `python tools/heldout.py summary`.
+  [--record LABEL] [--kinds]`, then `python tools/heldout.py summary`. `--kinds` also
+  prints the cases outside by section type and loading path, for choosing development
+  cases (owner, 2026-11-25).
 - A new development case: `python tools/capture.py ARCHIVE --response-dir DIR --add NAME
   INPUT --initial=N,M,V --increment=N,M,V` (needs r2x importable). Derived inputs:
   `tools/variants.py`. What Response does with an input: `tools/probe.py`.
