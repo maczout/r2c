@@ -37,8 +37,8 @@ parity: complete except accepted refusals** (15, and the 4 accepted inputs).
   the bond parameter of tension stiffening (tapers, wide bar spacings); the transverse
   crack spacing with cross ties; closing in on first cracking; the steel stress at a crack
   with the whole depth in tension; the end test on a stage set aside.
-- **48 development cases added** (155 now), of the kinds the scorer showed outside; they
-  found four of the six rules. Without shear the development set is 93 of 95 inside.
+- **57 development cases added** (164 now), of the kinds the scorer showed outside; they
+  found four of the six rules. Without shear the development set is 102 of 104 inside.
 
 ## Needed from the owner
 

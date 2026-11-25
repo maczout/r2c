@@ -13,13 +13,13 @@ For the developer: what exists now and how to work on it. The owner reads
   layering, the solves without shear, shear by the longitudinal stiffness method with
   Response's stiffness rules and its load stage control. Each rule and its source:
   `docs/kernel.md`. Switches for rules that are written and off are listed there.
-- **The development set**: 155 fixtures in `tests/oracle`, each a capture cut to the stages
+- **The development set**: 164 fixtures in `tests/oracle`, each a capture cut to the stages
   the measure compares: 55 on Newbeam under varied loads, materials, settings and units, the
   T-beam, the column and the I-girder; 52 wider cases since increment 2
   (`tools/scope_cases.py`, group W: Response's sample files under other loads; concrete and
-  steel strengths, shapes, reinforcement and loads on the four sections); and 48 since
+  steel strengths, shapes, reinforcement and loads on the four sections); and 57 since
   increment 4 (group X), of the kinds the held-out scorer reports outside target
-  (`tools/heldout.py score --kinds`), 44 of them without shear. All are chosen to be like
+  (`tools/heldout.py score --kinds`), 53 of them without shear. All are chosen to be like
   the held-out set and never the same. 30 more in `tests/oracle/parked`, not run by
   default. Results: `docs/verification-results.md` (generated). Regression limits: the
   first 54 cases' in `tests/test_oracle.py`, the others' generated into
@@ -39,12 +39,24 @@ For the developer: what exists now and how to work on it. The owner reads
    sections with tapers, several transverse types, wide bar spacings, light steel).
    `python tools/margins.py` lists the cases nearest the target; `python tools/stagesat.py`
    the cases whose stages are not at Response's control values.
-2. **Where Response puts its stages without shear** (`docs/kernel.md`, "Closing in on first
-   cracking"): three things seen and not taken over. Closing in on the extreme fibre's
-   peak strain (Response's count of tries was not found: 14 fits some cases and is short
-   on others); closing in where the cracks close (the I-girder under moment); three small
-   first steps where the section is cracked from the start. And the end after a rupture
-   on Newbeam with very light steel, where Response's steps halve.
+2. **Run the cases without shear on Response's own stage control.** Response has one
+   stage control for both (`docs/kernel.md`, "Response's own load stage control"); r2c
+   uses it with shear and keeps an earlier stepping of its own without
+   (`Flexure.advance`, `Flexure.run`). What is left to differ without shear is what that
+   control does and r2c's stepping does not: after a try that fails the multiplier is
+   halved and, under 0.2, the control variable changes (the end on Newbeam with very light
+   steel: Response's last steps are 0.787, 0.394 rad/km and then a step in the centroid's
+   strain; the prestressed I-girder under axial tension, where its steps halve to the
+   strands' rupture and the response ends); a stage is put in at 0.8 of the gap where the
+   cracks close and at 0.2 where something starts (the I-girder under moment); how often
+   it closes in on the extreme fibre's peak strain. Tried once, after the held-out score
+   and not kept: `Shear(analysis).run()` on Newbeam with 500 mm² of bottom steel under
+   moment runs, and ends as Response does (its last curvatures 88.11, 89.83, 90.68 rad/km
+   against Response's 88.24, 90.62), but with the base steps of a case with shear, so its
+   first stages are not Response's. The job is the base step and the first step of a case
+   without shear on that control [B `00419250`, `0041a870`], then `python
+   tools/stagesat.py` on every case without shear. Nine development cases around endings
+   at rupture were added for it.
 3. **Priority 2 with shear** (the shear-related views at the peak) is the lowest total.
    `python tools/sources.py` splits the misses: about four in five are the state the two
    programs reach on a stage that does not settle, one in five are rules. Of the rules:
