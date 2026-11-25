@@ -439,7 +439,7 @@ def entry_html(e: dict, data: dict, ref_dir: Path) -> str:
     out.append("<h4>The independent assessment</h4>")
     if ind:
         out.append(f"<p>{ind_chip(ind)} Written by a separate agent that was given only this "
-                   "entry's evidence file and docs/acceptance.md, and the developer's reason "
+                   "entry's evidence file and docs/measures.md, and the developer's reason "
                    "only after it had written its own. Shown as written "
                    f'(<a href="{esc(ind["path"])}">the file</a>).</p>'
                    f'<details{" open" if ind.get("verdict") == "contradicts" else ""}><summary>Read it</summary>'
@@ -493,7 +493,7 @@ def render(data: dict, ref_dir: Path) -> str:
 
     H.append("<h2>1. The verdict</h2>"
              '<p class="sub">Did the phase do what it set out to do? Rows: the load families. '
-             "Columns: the tiers of the exit criteria (docs/acceptance.md). A cell is <i>met</i> "
+             "Columns: the tiers of the exit criteria (docs/measures.md). A cell is <i>met</i> "
              "when every case is inside target on that tier; <i>met with accepted deviations</i> "
              "when every check outside has a decision of the owner that accepts it; <i>not "
              "met</i> when a check outside has none.</p>" + grid_html(data["grid"]))

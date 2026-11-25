@@ -3,7 +3,7 @@
 
     python tools/check.py [--strict]
 
-1. The acceptance tolerances in docs/acceptance.md parse.
+1. The acceptance tolerances in docs/measures.md parse.
 2. docs/verification-results.md is current: no file under src/r2c has changed since the
    commit its run was made at. If it is stale, it says so (an error with --strict).
 3. docs/verification-results.md has not been edited by hand: it still carries the generated
@@ -50,9 +50,9 @@ def main(argv=None) -> int:
     a = ap.parse_args(argv)
     bad = 0
 
-    acc_path = ROOT / "docs" / "acceptance.md"
+    acc_path = ROOT / "docs" / "measures.md"
     try:
-        acc = report.read_acceptance(acc_path)
+        acc = report.read_targets(acc_path)
         set_ = {g: {k: v for k, v in t.items()} for g, t in acc.items() if t}
         print(f"ok    acceptance: {'tolerances set for ' + ', '.join(set_) if set_ else 'no tolerances set yet'}")
     except Exception as e:  # noqa: BLE001
@@ -73,7 +73,7 @@ def main(argv=None) -> int:
         if not text.startswith(report.GENERATED):
             print("FAIL  verification results: the generated marker is gone (edited by hand?)")
             bad += 1
-        elif text != report.render(data["results"], run, acc, "docs/acceptance.md"):
+        elif text != report.render(data["results"], run, acc, "docs/measures.md"):
             print("FAIL  verification results: differ from what tools/report.py writes from "
                   "their JSON (edited by hand, or acceptance.md changed: rerun tools/report.py)")
             bad += 1

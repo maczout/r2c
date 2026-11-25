@@ -14,7 +14,7 @@ same (the threshold on stiffness that reads "cracking", or which of two points o
 is the largest), and the views would be compared in different states.
 
 Nothing is assessed here and no measure is changed: the differences are tools/compare.py's
-own (compare_views), the limit is views_pct of docs/acceptance.md.
+own (compare_views), the limit is views_pct of docs/measures.md.
 """
 
 from __future__ import annotations
@@ -50,7 +50,7 @@ def main(argv=None) -> int:
     ap.add_argument("--tier", nargs="*", choices=("must", "should", "could"))
     a = ap.parse_args(argv)
     ref, sub = record.read(a.reference), record.read(a.subject)
-    vacc = report.read_acceptance(ROOT / "docs" / "acceptance.md").get("views", {})
+    vacc = report.read_targets(ROOT / "docs" / "measures.md").get("views", {})
     limit = vacc.get("views_pct", 5.0)
     tier = {v: k for k in ("must", "should", "could") for v in vacc.get(k, [])}
     key = [k for k in cmp.control_keys(ref) if k in cmp.control_keys(sub)][-1]

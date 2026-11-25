@@ -12,12 +12,12 @@ import review  # noqa: E402
 
 def _data():
     run, results = review.load_results(ROOT / "docs" / "verification-results.json")
-    acc = report.read_acceptance(ROOT / "docs" / "acceptance.md")
+    acc = report.read_targets(ROOT / "docs" / "measures.md")
     return review.build(run, results, acc, review.load_causes(), review.load_measured())
 
 
 def test_sizes_are_multiples_of_the_target():
-    acc = report.read_acceptance(ROOT / "docs" / "acceptance.md")
+    acc = report.read_targets(ROOT / "docs" / "measures.md")
     _run, results = review.load_results(ROOT / "docs" / "verification-results.json")
     for d in review.all_checks(results, acc):
         if d["check"] == "shape":

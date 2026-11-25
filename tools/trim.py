@@ -6,7 +6,7 @@
 A record of every stage runs to megabytes; the comparisons in tests/ need the control charts
 and the peak. The header is kept, with detail-stages changed to the stages that remain.
 
-Neighbouring stages (owner, 2026-11-23, D54; docs/acceptance.md, "Where Response is
+Neighbouring stages (owner, 2026-11-23, D54; docs/measures.md, "Where Response is
 unstable"): the test for an unstable view needs Response's views at the stage just before and
 just after each compared stage. They are kept as sections neighbour/N/VIEW, not stage/N/VIEW,
 so that the stages of a fixture (Record.stages, detail-stages) stay the compared stages and

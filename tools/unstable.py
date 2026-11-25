@@ -5,7 +5,7 @@
                              [--list] [--tier must should could] [--readings]
     python tools/unstable.py --trace CAPTURE VIEW
 
-The owner's rule (2026-11-23, D54, narrowed to spikes by D56; docs/acceptance.md, "Where
+The owner's rule (2026-11-23, D54, narrowed to spikes by D56; docs/measures.md, "Where
 Response is unstable"): a view check is reported and not assessed where Response's views at
 the two neighbouring stages agree with each other within the views target and its own view
 at the stage lies farther than the target from the blend of the two. This tool answers four
@@ -30,7 +30,7 @@ questions:
   example D54 was written for).
 
 Nothing is assessed here that tools/report.py does not assess: the states are its
-stage_checks, the target is views_pct of docs/acceptance.md.
+stage_checks, the target is views_pct of docs/measures.md.
 """
 
 from __future__ import annotations
@@ -152,13 +152,13 @@ def main(argv=None) -> int:
     a = ap.parse_args(argv)
     if a.trace:
         return trace(a.trace[0], a.trace[1],
-                     report.views_limit(report.read_acceptance(ROOT / "docs" / "acceptance.md")))
+                     report.views_limit(report.read_targets(ROOT / "docs" / "measures.md")))
     if not a.verify_out:
         ap.error("VERIFY_OUT or --trace")
     results = json.loads((Path(a.verify_out) / "results.json").read_text())
     results = {n: r for n, r in results.items()
                if "control" in r and r["control"] and (not a.only or n in a.only)}
-    acc = report.read_acceptance(ROOT / "docs" / "acceptance.md")
+    acc = report.read_targets(ROOT / "docs" / "measures.md")
     lim = report.views_limit(acc)
     tiers = {"views": "must", "views_should": "should", "views_could": "could"}
 

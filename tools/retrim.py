@@ -4,12 +4,12 @@ feature stage of Response's curve.
 
     python tools/retrim.py ARCHIVE [--oracle tests/oracle] [--dry-run]
 
-The owner's targets (docs/acceptance.md, 2026-11-21) ask for the detail views to agree away
+The owner's targets (docs/measures.md, 2026-11-21) ask for the detail views to agree away
 from the peak too. Views are compared at the features of Response's control curve (cracking,
 falls of load, the peak, the last stage: tools/compare.py, feature_stages), so each fixture
 must hold those stages. The fixtures were cut to the peak only.
 
-Since the owner's rule on unstable views (2026-11-23, D54; docs/acceptance.md, "Where
+Since the owner's rule on unstable views (2026-11-23, D54; docs/measures.md, "Where
 Response is unstable") each fixture also holds Response's views at the stage just before and
 just after each compared stage, as neighbours (tools/trim.py says how, and which are
 needed). This tool adds them.

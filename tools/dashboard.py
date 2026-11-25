@@ -2,7 +2,7 @@
 """A one-page picture of r2c against Response-2000: how much is tested and how close it is.
 
     python tools/dashboard.py [RESULTS] [--curves VERIFY_OUT] [--reference tests/oracle]
-                              [--acceptance docs/acceptance.md] [--out dashboard.html]
+                              [--targets docs/measures.md] [--out dashboard.html]
 
 Answers, at a glance, for the owner's review: which sections and loadings the test set covers
 (and what it leaves out), how far r2c's peak and rising branch are from Response's in every
@@ -18,7 +18,7 @@ records (default: the oracle fixtures). A case whose r2c record was made at a di
 from its metrics is marked on its curve panel; a case without a record shows Response's alone.
 
 Like docs/verification-results.md, every number on the page is generated from a run; nothing
-is typed in. Tolerances are read from docs/acceptance.md and drawn only where the owner has
+is typed in. Tolerances are read from docs/measures.md and drawn only where the owner has
 set them: until then nothing is assessed. The page is one self-contained HTML file (no
 network). It is output, not source: it is not committed. CI builds it from the committed
 results on every push to main and publishes it with GitHub Pages
@@ -338,8 +338,8 @@ H += `<h1>r2c against Response-2000</h1>
 H += `<p class="note">r2c is an unofficial, work-in-progress clone of Response-2000's sectional analysis, not affiliated with Response-2000's authors. This page compares the two; it does not check designs.</p>`;
 if (D.stale) H += `<div class="warn">These results may be stale: ${esc(D.stale)}.</div>`;
 const accSet = Object.keys(D.acceptance).length;
-H += accSet ? `<p class="note">Tolerances from docs/acceptance.md are drawn in red where set.</p>`
- : `<div class="warn">No tolerances are set in docs/acceptance.md yet, so nothing here is assessed: the page shows differences, not verdicts.</div>`;
+H += accSet ? `<p class="note">Tolerances from docs/measures.md are drawn in red where set.</p>`
+ : `<div class="warn">No tolerances are set in docs/measures.md yet, so nothing here is assessed: the page shows differences, not verdicts.</div>`;
 if (probs.length) H += `<div class="warn">${probs.length} case(s) not run: ${probs.map(c=>esc(c.name)+" ("+esc(c.problem)+")").join("; ")}</div>`;
 
 // ---------- tiles
@@ -479,7 +479,7 @@ if ((D.tiers || []).length) {
  const lim = D.views_pct;
  H += `<h2>Where Response itself is unstable</h2>
 <p class="sub">A view check means something only where Response's own result is steady. At each compared stage, Response's view is set against the blend of its views at the stage before and the stage after, taken at the stage's place along the control curve and measured as r2c is measured against Response; the two neighbours' views are measured against each other the same way. Where the neighbours agree within the target (${f(lim,0)} %) and the stage departs from their blend by more than the target, Response's view spikes there: the check is shown here with Response's own departure beside r2c's difference, and counts neither inside nor outside. A step, where the neighbours differ, stays assessed. A check is one view at one stage of one case; the first and last stage of a curve have no two neighbours and are not tested. The last columns count the same checks with no such rule, and with the rule as first written, which left steps unassessed as well.</p>
-<div class="scroll"><table><tr><th>Tier</th><th>Checks</th><th>Inside</th><th>Outside</th><th>Unstable in Response, not assessed</th><th>No rule: inside</th><th>outside</th><th>As first written: inside</th><th>outside</th><th>unassessed</th></tr>
+<div class="scroll"><table><tr><th>Priority</th><th>Checks</th><th>Inside</th><th>Outside</th><th>Unstable in Response, not assessed</th><th>No rule: inside</th><th>outside</th><th>As first written: inside</th><th>outside</th><th>unassessed</th></tr>
 ${D.tiers.map(t => `<tr><td>${t.tier}</td><td class="num">${t.checks}</td><td class="num">${t.inside}</td><td class="num">${t.outside}</td><td class="num">${t.unstable}</td><td class="num">${t.plain_inside}</td><td class="num">${t.plain_outside}</td><td class="num">${t.first_inside}</td><td class="num">${t.first_outside}</td><td class="num">${t.first_unstable}</td></tr>`).join("")}</table></div>`;
  const pair = u => {
   let s = `<svg width="${CW}" height="18" role="img" aria-label="Response departs ${f(u.dep,1)} %, r2c differs ${u.pct==null?"missing":f(u.pct,1)+" %"}">`;
@@ -490,12 +490,12 @@ ${D.tiers.map(t => `<tr><td>${t.tier}</td><td class="num">${t.checks}</td><td cl
   return s + `</svg>`; };
  const list = tier => { const a = unst.filter(u => u.tier === tier); if (!a.length) return "";
   a.sort((p, q) => p.name.localeCompare(q.name) || p.stage - q.stage || q.dep - p.dep);
-  return `<details${tier === "Must" ? " open" : ""}><summary>${tier}: ${a.length} check${a.length === 1 ? "" : "s"} not assessed${tier === "Must" ? " (for the owner's review)" : ""}</summary>
+  return `<details${tier.startsWith("1") ? " open" : ""}><summary>${tier}: ${a.length} check${a.length === 1 ? "" : "s"} not assessed${tier.startsWith("1") ? "" : ""}</summary>
 <div class="scroll"><table><tr><th class="sticky">Case</th><th>Response's stage</th><th>View</th><th>Response's departure %</th><th>Its neighbours apart %</th><th>r2c's difference %</th><th></th><th></th></tr>
 <tr><td class="sticky"></td><td colspan="5"></td><td>${ax2}</td><td></td></tr>
 ${a.map(u => `<tr><td class="sticky">${esc(u.name)}</td><td>${u.stage}${u.feature ? " (" + esc(u.feature) + ")" : ""}</td><td>${esc(u.view.replaceAll("_"," "))}</td><td class="num">${f(u.dep,1)}</td><td class="num">${f(u.apart,1)}</td><td class="num">${u.pct == null ? "missing" : f(u.pct,1)}</td><td>${pair(u)}</td><td>${u.outside ? `<span style="color:var(--ink-2)">would be outside</span>` : ""}</td></tr>`).join("")}</table></div></details>`; };
  H += `<div class="legend"><span><span class="sw" style="background:var(--ref)"></span>Response's departure from the blend of its neighbours</span><span><span class="sw" style="background:var(--sub)"></span>r2c's difference from Response</span><span><span class="ln" style="border-color:var(--tol)"></span>target</span></div>`;
- H += unst.length ? ["Must","Should","Could"].map(list).join("") : `<p class="note">No check is unstable in this run.</p>`;
+ H += unst.length ? [...new Set(unst.map(u => u.tier))].sort().map(list).join("") : `<p class="note">No check is unstable in this run.</p>`;
 }
 const enders = cases.filter(c => (c.views_end || []).length);
 if (enders.length) H += `<h2>Detail views at the last stage of the shear cases</h2>
@@ -559,7 +559,7 @@ def main(argv=None) -> int:
                     help="a verify output folder, or a combined results JSON")
     ap.add_argument("--curves", help="verify output folder holding r2c's records")
     ap.add_argument("--reference", default=str(ROOT / "tests" / "oracle"))
-    ap.add_argument("--acceptance", default=str(ROOT / "docs" / "acceptance.md"))
+    ap.add_argument("--targets", default=str(ROOT / "docs" / "measures.md"))
     ap.add_argument("--notes", default=str(ROOT / "docs" / "verification.md"),
                     help="where the 'Not compared' list is read from")
     ap.add_argument("--out", default="dashboard.html")
@@ -567,7 +567,7 @@ def main(argv=None) -> int:
     res = Path(a.results)
     run, results = load_results(res)
     curves = Path(a.curves) if a.curves else (res if res.is_dir() else None)
-    acc = report.read_acceptance(Path(a.acceptance))
+    acc = report.read_targets(Path(a.targets))
     data = build(run, results, acc, curves, Path(a.reference), not_compared(Path(a.notes)))
     Path(a.out).write_text(render(data), encoding="utf-8")
     n = sum(1 for c in data["cases"] if c.get("curve", {}).get("sub"))

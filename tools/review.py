@@ -7,7 +7,7 @@
 Answers the question the owner's specification asks (docs/review.md): did the phase do what
 it set out to do, and what is outside target, worst first, one entry per cause? Built from
 the run of record (RESULTS: the combined JSON tools/report.py writes, or a verify output
-folder; default docs/verification-results.json), docs/acceptance.md and:
+folder; default docs/verification-results.json), docs/measures.md and:
 
 * docs/review/causes.toml: the developer's grouping of the deviations by cause, with the
   reason for each marked measured, read or inferred, the owner's decisions that accepted
@@ -547,14 +547,14 @@ def main(argv=None) -> int:
     ap.add_argument("results", nargs="?",
                     default=str(ROOT / "docs" / "verification-results.json"))
     ap.add_argument("--reference", default=str(ROOT / "tests" / "oracle"))
-    ap.add_argument("--acceptance", default=str(ROOT / "docs" / "acceptance.md"))
+    ap.add_argument("--targets", default=str(ROOT / "docs" / "measures.md"))
     ap.add_argument("--out", default="review.html")
     ap.add_argument("--list", action="store_true", help="print the entries, write no page")
     ap.add_argument("--summary", nargs="?", const=str(ROOT / "docs" / "summary.md"),
                     help="write the verdict and headings into the owner's summary")
     a = ap.parse_args(argv)
     run, results = load_results(Path(a.results))
-    acc = report.read_acceptance(Path(a.acceptance))
+    acc = report.read_targets(Path(a.targets))
     data = build(run, results, acc, load_causes(), load_measured())
     if a.list:
         print(listing(data))

@@ -5,7 +5,7 @@ Answers: "did this change put any check outside target that was inside, and whic
 bring inside?" The two folders are tools/verify.py outputs (before, after) on the same
 fixtures. A check is a case's peak, rising branch, post-peak branch or shape, or one detail
 view at one feature stage of Response's curve; inside and outside are decided as
-tools/report.py decides them (docs/acceptance.md, the printed-precision floor included).
+tools/report.py decides them (docs/measures.md, the printed-precision floor included).
 The views at the last stage of a shear case are not assessed (D40): those that changed
 side are listed on their own and do not count as gone outside or come inside. Nor is a view
 check where Response itself is unstable (D54, tools/report.py): it is named as such, counts
@@ -76,9 +76,9 @@ def main(argv=None) -> int:
     ap.add_argument("before")
     ap.add_argument("after")
     ap.add_argument("--view", help="list every stage of this view still outside")
-    ap.add_argument("--acceptance", default=str(ROOT / "docs" / "acceptance.md"))
+    ap.add_argument("--targets", default=str(ROOT / "docs" / "measures.md"))
     a = ap.parse_args(argv)
-    acc = report.read_acceptance(Path(a.acceptance))
+    acc = report.read_targets(Path(a.targets))
     before, after = load(Path(a.before)), load(Path(a.after))
     worse, better, still, ends, unst = [], [], [], [], []
     nb, na = Counter(), Counter()

@@ -7,7 +7,7 @@ Answers the question a development increment asks of a verify run (the owner's b
 increments C and S): which cases are inside target on the peak, the rising branch and the
 shape of the curve, the three checks that are chased, with the post-peak and the worst view
 beside them, which are reported. The checks, their values and their limits are
-tools/report.py's own (its assess function and docs/acceptance.md); nothing is measured
+tools/report.py's own (its assess function and docs/measures.md); nothing is measured
 here. A case r2c failed on or refused is listed with r2c's words.
 
 --new lists only the cases of increment S (tools/scope_cases.py); --outside only the cases
@@ -72,7 +72,7 @@ def counts(names, results: dict, acc: dict, rule=True) -> int:
         if not any(k in checks[n] for n in ran):
             continue
         out = [n for n in ran if k in checks[n] and checks[n][k][2] is False]
-        # a view tier counts only the cases it applies to (docs/acceptance.md, view tiers)
+        # a view tier counts only the cases it applies to (docs/measures.md, view tiers)
         of = ([n for n in ran if k in checks[n]] if k.startswith("views") and "must" in
               acc.get("views", {}) else names)
         inside = len([n for n in of if n in ran]) - len(out)
@@ -96,7 +96,7 @@ def main(argv=None) -> int:
                          "(before D56)")
     a = ap.parse_args(argv)
     results = json.loads((Path(a.verify_out) / "results.json").read_text())
-    acc = report.read_acceptance(ROOT / "docs" / "acceptance.md")
+    acc = report.read_targets(ROOT / "docs" / "measures.md")
     names = sorted(results)
     if a.only:
         names = [n for n in names if n in a.only]

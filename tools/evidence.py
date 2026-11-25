@@ -305,7 +305,7 @@ curves (load against curvature or shear strain) and, at each stage, detail chart
 the depth of the section ("views"). r2c is a clone of it. "Response" below is
 Response-2000's own result (the reference); "r2c" is the clone's.
 
-**The checks** (the targets are in `docs/acceptance.md`, given with this file). Each
+**The checks** (the targets are in `docs/measures.md`, given with this file). Each
 case is checked on its peak load, its rising branch, its post-peak branch, the shape of
 its curve (the order of its features: cracking, falls of load before the peak, the
 peak, how it ends), and on each detail view at the stages of Response's curve where a
@@ -406,7 +406,7 @@ def main(argv=None) -> int:
     out.mkdir(parents=True, exist_ok=True)
     a.inputs = [Path(p) for p in a.inputs]
     run, results = review.load_results(Path(a.verify_out))
-    acc = report.read_acceptance(ROOT / "docs" / "acceptance.md")
+    acc = report.read_targets(ROOT / "docs" / "measures.md")
     devs = [d for d in review.all_checks(results, acc) if not d["ok"]]
     target = review.REVIEW / "measured.json"
     if a.no_measure:

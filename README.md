@@ -91,7 +91,7 @@ file, a shape without an outline. Negative shear is refused, as in Response.
     docs/kernel.md         what the kernel does and where each rule comes from
     docs/verification.md   r2c against Response-2000: what the results mean
     docs/verification-results.md   the results, generated
-    docs/acceptance.md     what counts as agreement (tolerances)
+    docs/brief.md          the owner's brief; docs/measures.md: the tolerances
     docs/status.md         where the work stands, options for next steps
     docs/log/              one log per working session
     CLAUDE.md              how work on r2c is done (for people and coding agents)
