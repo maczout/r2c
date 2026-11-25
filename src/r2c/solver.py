@@ -1374,6 +1374,9 @@ class Flexure:
         fresh = depth != 0 or aside is not None or len(self.stages) < 2
         trial = self.solve(target, cur, aside=aside, fresh=fresh)
         kind = self.has_event(cur, trial)
+        # what happened on the way to this stage when it was tried: the end test asks for
+        # it, not for what lies between the stage and the one kept just before it
+        trial.tried_event = kind
         if kind == "rupture" and depth == 0:
             # steel ruptures within the step [B 00415e30, 00419ff0]: the stage is set aside
             # and one a fifth of the way there is tried, and so on while the step is more
@@ -1492,6 +1495,11 @@ class Flexure:
         """Less than a fifth of the peak load is left at a stage, the eleventh or later, at
         which nothing new has happened since the one before [B 00419990]."""
         if len(self.stages) < 11 or not (peak > 0 and st.lam < 0.2 * peak):
+            return False
+        # a stage that was set aside for an event and kept afterwards counts as one at
+        # which something new happened [O: Newbeam with light steel under negative moment,
+        # where Response goes one stage beyond the last stage set aside]
+        if getattr(st, "tried_event", ""):
             return False
         return self.has_event(self.stages[-2], st) == ""
 

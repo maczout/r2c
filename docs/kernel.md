@@ -852,6 +852,14 @@ r2c's 3.608) [O]. Not taken over: Response also closes in where the cracks close
 I-girder under moment, from its second stage) and takes three small first steps where
 the section is cracked from the start (the I-girder under axial tension) [O].
 
+*The end test on a stage that was set aside* [O], since 2026-11-25. "Nothing new has
+happened" in the end test below is asked of the stage as it was tried: a stage that was set
+aside for an event and kept afterwards counts as one at which something happened, whatever
+lies between it and the stage kept just before it. Seen on Newbeam with 800 mm² of bottom
+steel under negative moment: after the bars rupture three stages set aside are kept
+(−52.055, −52.972, −57.556 rad/km) and Response goes on to −63.312 before it ends; r2c
+ended at −57.556, and its last-stage views were 9 % off for being a stage short.
+
 *Bar rupture within a step, and the end after it* [B `00415e30`, `00419ff0`, `00418fd0`,
 `00419990`], since 2026-11-22. A stage in which the number of ruptured bars has changed is
 set aside (deleted, unlike the stage set aside at cracking or crushing, which is kept for
