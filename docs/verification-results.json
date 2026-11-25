@@ -1,14 +1,14 @@
 {
  "run": {
   "r2c_version": "0.1.0",
-  "commit": "9fa0690637e915fd952ead2660f127e85782b79b",
+  "commit": "3abdd4e0c0bda6c8b0bc298e0e4a85d69b6c7876",
   "dirty": false,
-  "started": "2026-11-24T21:04:50-07:00",
+  "started": "2026-11-25T06:25:54-07:00",
   "host": "Makertyre",
   "machine": "Linux x86_64, 32 cores",
   "python": "3.12.3",
   "numpy": "2.5.5",
-  "jobs": 32,
+  "jobs": 30,
   "inputs_dir": true,
   "reference_dir": "tests/oracle",
   "cases": [
@@ -134,7 +134,7 @@
     "peak-stage": "52"
    },
    "sub": {
-    "stage-count": "101",
+    "stage-count": "102",
     "peak-stage": "51"
    },
    "control": [
@@ -160,7 +160,7 @@
      "shape_same": true,
      "floor_pct": 0.21505834628536197,
      "rising_pct": 0.43472294273207335,
-     "post_peak_pct": 8.033707300742549
+     "post_peak_pct": 20.95764574059097
     },
     {
      "chart": "moment_phi",
@@ -184,7 +184,7 @@
      "shape_same": true,
      "floor_pct": 0.0036143045614150885,
      "rising_pct": 0.09880709558363628,
-     "post_peak_pct": 38.62862983953267
+     "post_peak_pct": 52.53102805760113
     }
    ],
    "missing_control": [],
@@ -1331,8 +1331,8 @@
      "ref_stage": 52
     }
    ],
-   "seconds": 275.2,
-   "run": "9fa0690637e9",
+   "seconds": 237.6,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      0.239,
@@ -1737,6 +1737,10 @@
     [
      77.352,
      90.348
+    ],
+    [
+     85.088,
+     84.822
     ]
    ]
   },
@@ -2982,8 +2986,8 @@
      "ref_stage": 12
     }
    ],
-   "seconds": 29.1,
-   "run": "9fa0690637e9",
+   "seconds": 24.7,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      0.233,
@@ -4547,8 +4551,8 @@
      "ref_stage": 28
     }
    ],
-   "seconds": 11.5,
-   "run": "9fa0690637e9",
+   "seconds": 7.0,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      -0.0,
@@ -5970,8 +5974,8 @@
      "ref_stage": 42
     }
    ],
-   "seconds": 213.3,
-   "run": "9fa0690637e9",
+   "seconds": 171.3,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      -0.0,
@@ -7342,8 +7346,8 @@
      "ref_stage": 40
     }
    ],
-   "seconds": 180.6,
-   "run": "9fa0690637e9",
+   "seconds": 150.1,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      -0.0,
@@ -8732,8 +8736,8 @@
      "ref_stage": 60
     }
    ],
-   "seconds": 10.9,
-   "run": "9fa0690637e9",
+   "seconds": 10.6,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      -0.0,
@@ -8993,7 +8997,7 @@
     "peak-stage": "47"
    },
    "sub": {
-    "stage-count": "101",
+    "stage-count": "171",
     "peak-stage": "46"
    },
    "control": [
@@ -10178,8 +10182,8 @@
      "ref_stage": 55
     }
    ],
-   "seconds": 378.6,
-   "run": "9fa0690637e9",
+   "seconds": 515.1,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      -0.0,
@@ -10584,6 +10588,286 @@
     [
      8.31,
      898.49
+    ],
+    [
+     8.309,
+     898.356
+    ],
+    [
+     8.309,
+     898.258
+    ],
+    [
+     8.308,
+     898.144
+    ],
+    [
+     8.306,
+     897.915
+    ],
+    [
+     8.305,
+     897.804
+    ],
+    [
+     8.307,
+     897.822
+    ],
+    [
+     8.306,
+     897.733
+    ],
+    [
+     8.305,
+     897.546
+    ],
+    [
+     8.303,
+     897.442
+    ],
+    [
+     8.306,
+     897.536
+    ],
+    [
+     8.305,
+     897.428
+    ],
+    [
+     8.303,
+     897.212
+    ],
+    [
+     8.301,
+     897.059
+    ],
+    [
+     8.302,
+     896.978
+    ],
+    [
+     8.308,
+     897.274
+    ],
+    [
+     8.31,
+     897.447
+    ],
+    [
+     8.309,
+     897.358
+    ],
+    [
+     8.307,
+     897.0
+    ],
+    [
+     8.306,
+     896.923
+    ],
+    [
+     8.301,
+     896.433
+    ],
+    [
+     8.3,
+     896.354
+    ],
+    [
+     8.306,
+     896.698
+    ],
+    [
+     8.305,
+     896.632
+    ],
+    [
+     8.3,
+     896.19
+    ],
+    [
+     8.3,
+     896.131
+    ],
+    [
+     8.306,
+     896.474
+    ],
+    [
+     8.304,
+     896.368
+    ],
+    [
+     8.302,
+     896.054
+    ],
+    [
+     8.301,
+     896.005
+    ],
+    [
+     8.304,
+     896.142
+    ],
+    [
+     8.303,
+     896.098
+    ],
+    [
+     8.301,
+     895.783
+    ],
+    [
+     8.3,
+     895.742
+    ],
+    [
+     8.306,
+     896.062
+    ],
+    [
+     8.305,
+     896.028
+    ],
+    [
+     8.302,
+     895.7
+    ],
+    [
+     8.302,
+     895.653
+    ],
+    [
+     8.299,
+     895.484
+    ],
+    [
+     8.301,
+     895.471
+    ],
+    [
+     8.3,
+     895.392
+    ],
+    [
+     8.3,
+     895.376
+    ],
+    [
+     8.298,
+     895.222
+    ],
+    [
+     8.3,
+     895.337
+    ],
+    [
+     8.301,
+     895.315
+    ],
+    [
+     8.3,
+     895.306
+    ],
+    [
+     8.298,
+     895.155
+    ],
+    [
+     8.3,
+     895.227
+    ],
+    [
+     8.3,
+     895.186
+    ],
+    [
+     8.3,
+     895.186
+    ],
+    [
+     8.298,
+     895.046
+    ],
+    [
+     8.3,
+     895.041
+    ],
+    [
+     8.3,
+     895.024
+    ],
+    [
+     8.3,
+     895.021
+    ],
+    [
+     8.297,
+     894.839
+    ],
+    [
+     8.299,
+     894.921
+    ],
+    [
+     8.302,
+     895.09
+    ],
+    [
+     8.302,
+     895.081
+    ],
+    [
+     8.3,
+     894.933
+    ],
+    [
+     8.301,
+     894.913
+    ],
+    [
+     8.3,
+     894.847
+    ],
+    [
+     8.3,
+     894.857
+    ],
+    [
+     8.298,
+     894.724
+    ],
+    [
+     8.301,
+     894.827
+    ],
+    [
+     8.301,
+     894.79
+    ],
+    [
+     8.301,
+     894.811
+    ],
+    [
+     8.299,
+     894.687
+    ],
+    [
+     8.302,
+     894.776
+    ],
+    [
+     8.302,
+     894.742
+    ],
+    [
+     8.302,
+     894.757
+    ],
+    [
+     8.3,
+     894.624
     ]
    ]
   },
@@ -11808,8 +12092,8 @@
      "ref_stage": 54
     }
    ],
-   "seconds": 10.6,
-   "run": "9fa0690637e9",
+   "seconds": 9.6,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      -0.0,
@@ -13263,8 +13547,8 @@
      "ref_stage": 44
     }
    ],
-   "seconds": 7.0,
-   "run": "9fa0690637e9",
+   "seconds": 6.4,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      -0.0,
@@ -14640,8 +14924,8 @@
      "ref_stage": 41
     }
    ],
-   "seconds": 2.0,
-   "run": "9fa0690637e9",
+   "seconds": 1.4,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      0.0,
@@ -16026,8 +16310,8 @@
      "ref_stage": 7
     }
    ],
-   "seconds": 13.1,
-   "run": "9fa0690637e9",
+   "seconds": 12.5,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      0.0,
@@ -17481,8 +17765,8 @@
      "ref_stage": 59
     }
    ],
-   "seconds": 10.9,
-   "run": "9fa0690637e9",
+   "seconds": 11.2,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      -0.0,
@@ -19229,8 +19513,8 @@
      "ref_stage": 48
     }
    ],
-   "seconds": 157.3,
-   "run": "9fa0690637e9",
+   "seconds": 136.2,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      -0.0,
@@ -20656,8 +20940,8 @@
      "ref_stage": 50
     }
    ],
-   "seconds": 5.7,
-   "run": "9fa0690637e9",
+   "seconds": 4.8,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      0.017,
@@ -20877,7 +21161,7 @@
     "peak-stage": "27"
    },
    "sub": {
-    "stage-count": "101",
+    "stage-count": "104",
     "peak-stage": "27"
    },
    "control": [
@@ -20903,7 +21187,7 @@
      "shape_same": false,
      "floor_pct": 0.06745456516263683,
      "rising_pct": 0.1417515063522438,
-     "post_peak_pct": 60.44275891154853
+     "post_peak_pct": 60.88113222938352
     },
     {
      "chart": "moment_phi",
@@ -21756,8 +22040,8 @@
      "ref_stage": 38
     }
    ],
-   "seconds": 260.6,
-   "run": "9fa0690637e9",
+   "seconds": 242.2,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      -0.665,
@@ -22162,6 +22446,18 @@
     [
      1.393,
      1123.907
+    ],
+    [
+     1.394,
+     1124.001
+    ],
+    [
+     1.394,
+     1123.968
+    ],
+    [
+     1.394,
+     1123.863
     ]
    ]
   },
@@ -23401,8 +23697,8 @@
      "ref_stage": 12
     }
    ],
-   "seconds": 10.5,
-   "run": "9fa0690637e9",
+   "seconds": 8.8,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      -0.432,
@@ -24844,8 +25140,8 @@
      "ref_stage": 39
     }
    ],
-   "seconds": 142.2,
-   "run": "9fa0690637e9",
+   "seconds": 119.9,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      -0.432,
@@ -25877,8 +26173,8 @@
      "ref_stage": 50
     }
    ],
-   "seconds": 163.9,
-   "run": "9fa0690637e9",
+   "seconds": 139.5,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      -0.769,
@@ -27320,8 +27616,8 @@
      "ref_stage": 32
     }
    ],
-   "seconds": 11.2,
-   "run": "9fa0690637e9",
+   "seconds": 9.0,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      -0.665,
@@ -28771,8 +29067,8 @@
      "ref_stage": 48
     }
    ],
-   "seconds": 180.1,
-   "run": "9fa0690637e9",
+   "seconds": 155.0,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      -0.665,
@@ -29880,8 +30176,8 @@
      "ref_stage": 14
     }
    ],
-   "seconds": 66.2,
-   "run": "9fa0690637e9",
+   "seconds": 56.7,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      -0.665,
@@ -31232,8 +31528,8 @@
      "ref_stage": 63
     }
    ],
-   "seconds": 10.3,
-   "run": "9fa0690637e9",
+   "seconds": 8.8,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      -0.556,
@@ -32378,8 +32674,8 @@
      "ref_stage": 31
     }
    ],
-   "seconds": 279.1,
-   "run": "9fa0690637e9",
+   "seconds": 244.4,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      -0.665,
@@ -32523,19 +32819,19 @@
     "peak-stage": "146"
    },
    "sub": {
-    "stage-count": "101",
-    "peak-stage": "100"
+    "stage-count": "172",
+    "peak-stage": "149"
    },
    "control": [
     {
      "chart": "shear_gxy",
      "ref_peak_load": 114.717,
-     "sub_peak_load": 98.003,
+     "sub_peak_load": 114.59,
      "ref_peak_x": 17.156,
-     "sub_peak_x": 4.974,
-     "peak_diff_pct": -14.569767340498792,
-     "curve_max_diff_pct": 72.48658164836407,
-     "curve_mean_diff_pct": 9.404337711839236,
+     "sub_peak_x": 17.825,
+     "peak_diff_pct": -0.11070721863367708,
+     "curve_max_diff_pct": 0.3696412233522918,
+     "curve_mean_diff_pct": 0.07947391094460839,
      "shape_ref": [
       "cracking",
       "peak",
@@ -32544,22 +32840,22 @@
      "shape_sub": [
       "cracking",
       "peak",
-      "ends at peak"
+      "ends standing still"
      ],
-     "shape_same": false,
+     "shape_same": true,
      "floor_pct": 0.011785357275673349,
-     "rising_pct": 72.47442048165388,
-     "post_peak_pct": 72.47250998918929
+     "rising_pct": 0.36964069476692213,
+     "post_peak_pct": 6.515550101463385
     },
     {
      "chart": "moment_phi",
      "ref_peak_load": 286.715,
-     "sub_peak_load": 245.007,
+     "sub_peak_load": 286.476,
      "ref_peak_x": 79.033,
-     "sub_peak_x": 27.848,
-     "peak_diff_pct": -14.546849659069103,
-     "curve_max_diff_pct": 66.37768944407637,
-     "curve_mean_diff_pct": 9.436368130466462,
+     "sub_peak_x": 80.259,
+     "peak_diff_pct": -0.08335803847024953,
+     "curve_max_diff_pct": 0.2345193010808694,
+     "curve_mean_diff_pct": 0.04925884224477007,
      "shape_ref": [
       "cracking",
       "peak",
@@ -32568,12 +32864,12 @@
      "shape_sub": [
       "cracking",
       "peak",
-      "ends at peak"
+      "ends standing still"
      ],
-     "shape_same": false,
+     "shape_same": true,
      "floor_pct": 0.002622902905060787,
-     "rising_pct": 66.32416701350793,
-     "post_peak_pct": 66.40322109710728
+     "rising_pct": 0.23451697575492852,
+     "post_peak_pct": 2.069351819904101
     }
    ],
    "missing_control": [],
@@ -32887,21 +33183,21 @@
     },
     {
      "ref_stage": 146,
-     "sub_stage": 100,
-     "matched_by": "feature",
+     "sub_stage": 145,
+     "matched_by": "same place",
      "feature": "peak",
      "ref_x": 79.033,
      "ref_y": 286.715,
-     "sub_x": 27.848,
-     "sub_y": 245.007,
+     "sub_x": 79.518,
+     "sub_y": 286.23,
      "place": 0.8781128012394137,
      "views": [
       {
        "view": "longitudinal_strain",
        "ref_max": 36.4181,
-       "max_diff": 23.862500000000004,
+       "max_diff": 0.1460324239712597,
        "floor": 0.0002,
-       "max_diff_pct": 65.5237368231731,
+       "max_diff_pct": 0.40098858526737996,
        "lines": [
         1,
         1
@@ -32913,9 +33209,9 @@
       {
        "view": "transverse_strain",
        "ref_max": 7.912,
-       "max_diff": 5.792417518867263,
+       "max_diff": 0.25510942864811414,
        "floor": 0.002,
-       "max_diff_pct": 73.21053486940424,
+       "max_diff_pct": 3.2243355491419887,
        "lines": [
         4,
         4
@@ -32927,9 +33223,9 @@
       {
        "view": "shear_strain",
        "ref_max": 32.9141,
-       "max_diff": 23.069008008124616,
+       "max_diff": 0.7702999999999992,
        "floor": 0.0002,
-       "max_diff_pct": 70.08852743391014,
+       "max_diff_pct": 2.340334385567277,
        "lines": [
         5,
         5
@@ -32941,9 +33237,9 @@
       {
        "view": "shear_stress",
        "ref_max": 3.4943,
-       "max_diff": 0.9637532506713589,
+       "max_diff": 0.039286588506231575,
        "floor": 0.0002,
-       "max_diff_pct": 27.58072434168099,
+       "max_diff_pct": 1.1243049682692263,
        "lines": [
         3,
         3
@@ -32955,9 +33251,9 @@
       {
        "view": "principal_compressive_stress",
        "ref_max": 65.2,
-       "max_diff": 14.3310040223982,
+       "max_diff": 0.32799989026481646,
        "floor": 0.002,
-       "max_diff_pct": 21.980067519015645,
+       "max_diff_pct": 0.5030673163570805,
        "lines": [
         3,
         3
@@ -32969,9 +33265,9 @@
       {
        "view": "shear_on_crack",
        "ref_max": 4.5617,
-       "max_diff": 0.4488259966724625,
+       "max_diff": 0.22711837654333464,
        "floor": 0.0002,
-       "max_diff_pct": 9.839007314651608,
+       "max_diff_pct": 4.978810016952773,
        "lines": [
         5,
         5
@@ -32983,9 +33279,9 @@
       {
        "view": "principal_tensile_stress",
        "ref_max": 2.5984,
-       "max_diff": 0.9243853155475805,
+       "max_diff": 0.2684937863647037,
        "floor": 0.0002,
-       "max_diff_pct": 35.57517378184962,
+       "max_diff_pct": 10.33304288657265,
        "lines": [
         3,
         3
@@ -32997,9 +33293,9 @@
       {
        "view": "principal_tensile_strain",
        "ref_max": 38.081,
-       "max_diff": 25.223000000000003,
+       "max_diff": 0.5557457903793726,
        "floor": 0.002,
-       "max_diff_pct": 66.23513037997952,
+       "max_diff_pct": 1.4593781423265473,
        "lines": [
         1,
         1
@@ -33011,9 +33307,9 @@
       {
        "view": "crack_widths",
        "ref_max": 4.6231,
-       "max_diff": 2.778525065436022,
+       "max_diff": 1.142770702236905,
        "floor": 0.0002,
-       "max_diff_pct": 60.100907733685666,
+       "max_diff_pct": 24.718710437518222,
        "lines": [
         1,
         1
@@ -33025,9 +33321,9 @@
       {
        "view": "average_angle",
        "ref_max": 90.0,
-       "max_diff": 5.486688718198329,
+       "max_diff": 1.0499999999999943,
        "floor": 0.002,
-       "max_diff_pct": 6.0963207979981435,
+       "max_diff_pct": 1.1666666666666603,
        "lines": [
         1,
         1
@@ -33039,9 +33335,9 @@
       {
        "view": "long_crack_spacing",
        "ref_max": 465.251,
-       "max_diff": 0.8112954763022655,
+       "max_diff": 0.0010318792107412522,
        "floor": 0.002,
-       "max_diff_pct": 0.17437801881183826,
+       "max_diff_pct": 0.00022178978889701522,
        "lines": [
         1,
         1
@@ -33067,9 +33363,9 @@
       {
        "view": "diagonal_spacing",
        "ref_max": 129.63,
-       "max_diff": 39.83892997670371,
+       "max_diff": 39.80896778537169,
        "floor": 0.002,
-       "max_diff_pct": 30.73280103116849,
+       "max_diff_pct": 30.709687406751286,
        "lines": [
         1,
         1
@@ -33081,9 +33377,9 @@
       {
        "view": "long_reinforcement_stress",
        "ref_max": 499.815,
-       "max_diff": 88.01900000000002,
+       "max_diff": 0.08800000000000217,
        "floor": 0.002,
-       "max_diff_pct": 17.61031581685224,
+       "max_diff_pct": 0.017606514410332258,
        "lines": [
         1,
         1
@@ -33095,9 +33391,9 @@
       {
        "view": "long_reinf_stress_at_crack",
        "ref_max": 521.639,
-       "max_diff": 82.61900000000001,
+       "max_diff": 0.47800000000004683,
        "floor": 0.002,
-       "max_diff_pct": 15.838347976282451,
+       "max_diff_pct": 0.09163425280702686,
        "lines": [
         1,
         1
@@ -33109,9 +33405,9 @@
       {
        "view": "long_average_bond",
        "ref_max": 0.82,
-       "max_diff": 0.19599999999999998,
+       "max_diff": 1.8207657603852566e-16,
        "floor": 0.002,
-       "max_diff_pct": 23.902439024390244,
+       "max_diff_pct": 2.220446049250313e-14,
        "lines": [
         1,
         1
@@ -33123,9 +33419,9 @@
       {
        "view": "stirrup_stress",
        "ref_max": 541.874,
-       "max_diff": 210.32858417935174,
+       "max_diff": 2.968878564996388,
        "floor": 0.002,
-       "max_diff_pct": 38.81503526269054,
+       "max_diff_pct": 0.5478909423586272,
        "lines": [
         1,
         1
@@ -33137,9 +33433,9 @@
       {
        "view": "stirrup_stress_at_crack",
        "ref_max": 541.648,
-       "max_diff": 135.85319273507108,
+       "max_diff": 2.503097975333086,
        "floor": 0.002,
-       "max_diff_pct": 25.081453773497007,
+       "max_diff_pct": 0.4621263210300945,
        "lines": [
         1,
         1
@@ -33151,9 +33447,9 @@
       {
        "view": "transverse_average_bond",
        "ref_max": 28.8368,
-       "max_diff": 11.609284170249257,
+       "max_diff": 0.4272000000000015,
        "floor": 0.0002,
-       "max_diff_pct": 40.25857297012587,
+       "max_diff_pct": 1.4814403817344557,
        "lines": [
         1,
         1
@@ -33179,9 +33475,9 @@
       {
        "view": "longitudinal_concrete_stress",
        "ref_max": 65.177,
-       "max_diff": 13.084202380672814,
+       "max_diff": 0.11485267015649461,
        "floor": 0.002,
-       "max_diff_pct": 20.074876690662062,
+       "max_diff_pct": 0.17621656436548874,
        "lines": [
         1,
         1
@@ -33194,20 +33490,20 @@
     },
     {
      "ref_stage": 147,
-     "sub_stage": 100,
-     "matched_by": "feature",
+     "sub_stage": 145,
+     "matched_by": "same place",
      "feature": "ends standing still",
      "ref_x": 79.1,
      "ref_y": 286.668,
-     "sub_x": 27.848,
-     "sub_y": 245.007,
+     "sub_x": 79.518,
+     "sub_y": 286.23,
      "views": [
       {
        "view": "longitudinal_strain",
        "ref_max": 36.4495,
-       "max_diff": 23.893900000000002,
+       "max_diff": 0.12542237584501964,
        "floor": 0.0002,
-       "max_diff_pct": 65.55343694700889,
+       "max_diff_pct": 0.3440990297398308,
        "lines": [
         1,
         1
@@ -33216,9 +33512,9 @@
       {
        "view": "transverse_strain",
        "ref_max": 7.912,
-       "max_diff": 5.792417518867263,
+       "max_diff": 0.257823358740115,
        "floor": 0.002,
-       "max_diff_pct": 73.21053486940424,
+       "max_diff_pct": 3.258636991154133,
        "lines": [
         4,
         4
@@ -33227,9 +33523,9 @@
       {
        "view": "shear_strain",
        "ref_max": 32.9163,
-       "max_diff": 23.071208008431455,
+       "max_diff": 0.7686999999999995,
        "floor": 0.0002,
-       "max_diff_pct": 70.09052660363241,
+       "max_diff_pct": 2.3353171528999295,
        "lines": [
         5,
         5
@@ -33238,9 +33534,9 @@
       {
        "view": "shear_stress",
        "ref_max": 3.491,
-       "max_diff": 0.9606563724455004,
+       "max_diff": 0.03489273832812227,
        "floor": 0.0002,
-       "max_diff_pct": 27.5180857188628,
+       "max_diff_pct": 0.999505537900953,
        "lines": [
         3,
         3
@@ -33249,9 +33545,9 @@
       {
        "view": "principal_compressive_stress",
        "ref_max": 65.2,
-       "max_diff": 14.336293191625883,
+       "max_diff": 0.32499989126849144,
        "floor": 0.002,
-       "max_diff_pct": 21.988179741757488,
+       "max_diff_pct": 0.4984660909025942,
        "lines": [
         3,
         3
@@ -33260,9 +33556,9 @@
       {
        "view": "shear_on_crack",
        "ref_max": 4.5614,
-       "max_diff": 0.4490697340545974,
+       "max_diff": 0.22675071056963247,
        "floor": 0.0002,
-       "max_diff_pct": 9.84499789657994,
+       "max_diff_pct": 4.971077094085861,
        "lines": [
         5,
         5
@@ -33271,9 +33567,9 @@
       {
        "view": "principal_tensile_stress",
        "ref_max": 2.5984,
-       "max_diff": 0.9244850683488619,
+       "max_diff": 0.2684937863647037,
        "floor": 0.0002,
-       "max_diff_pct": 35.57901279051963,
+       "max_diff_pct": 10.33304288657265,
        "lines": [
         3,
         3
@@ -33282,9 +33578,9 @@
       {
        "view": "principal_tensile_strain",
        "ref_max": 38.106,
-       "max_diff": 25.248,
+       "max_diff": 0.5407753768312037,
        "floor": 0.002,
-       "max_diff_pct": 66.25728231774524,
+       "max_diff_pct": 1.4191344586973276,
        "lines": [
         1,
         1
@@ -33293,9 +33589,9 @@
       {
        "view": "crack_widths",
        "ref_max": 4.6259,
-       "max_diff": 2.7822564610413343,
+       "max_diff": 1.1427043930633516,
        "floor": 0.0002,
-       "max_diff_pct": 60.14519252559144,
+       "max_diff_pct": 24.702315075192974,
        "lines": [
         1,
         1
@@ -33304,9 +33600,9 @@
       {
        "view": "average_angle",
        "ref_max": 90.0,
-       "max_diff": 5.503929615518401,
+       "max_diff": 1.1649999999999983,
        "floor": 0.002,
-       "max_diff_pct": 6.115477350576001,
+       "max_diff_pct": 1.2944444444444425,
        "lines": [
         1,
         1
@@ -33315,9 +33611,9 @@
       {
        "view": "long_crack_spacing",
        "ref_max": 465.251,
-       "max_diff": 0.8112954763022655,
+       "max_diff": 0.0010318792107412522,
        "floor": 0.002,
-       "max_diff_pct": 0.17437801881183826,
+       "max_diff_pct": 0.00022178978889701522,
        "lines": [
         1,
         1
@@ -33337,9 +33633,9 @@
       {
        "view": "diagonal_spacing",
        "ref_max": 129.682,
-       "max_diff": 39.83954688264887,
+       "max_diff": 39.811288113461174,
        "floor": 0.002,
-       "max_diff_pct": 30.72095347284039,
+       "max_diff_pct": 30.69916265438625,
        "lines": [
         1,
         1
@@ -33348,9 +33644,9 @@
       {
        "view": "long_reinforcement_stress",
        "ref_max": 499.918,
-       "max_diff": 88.122,
+       "max_diff": 0.16800000000000015,
        "floor": 0.002,
-       "max_diff_pct": 17.627290875703615,
+       "max_diff_pct": 0.03360551130385386,
        "lines": [
         1,
         1
@@ -33359,9 +33655,9 @@
       {
        "view": "long_reinf_stress_at_crack",
        "ref_max": 521.733,
-       "max_diff": 82.71299999999994,
+       "max_diff": 0.571999999999984,
        "floor": 0.002,
-       "max_diff_pct": 15.853511278757516,
+       "max_diff_pct": 0.10963462154013337,
        "lines": [
         1,
         1
@@ -33370,9 +33666,9 @@
       {
        "view": "long_average_bond",
        "ref_max": 0.82,
-       "max_diff": 0.19599999999999998,
+       "max_diff": 1.8207657603852566e-16,
        "floor": 0.002,
-       "max_diff_pct": 23.902439024390244,
+       "max_diff_pct": 2.220446049250313e-14,
        "lines": [
         1,
         1
@@ -33381,9 +33677,9 @@
       {
        "view": "stirrup_stress",
        "ref_max": 541.859,
-       "max_diff": 210.02521219621806,
+       "max_diff": 2.6595832250154743,
        "floor": 0.002,
-       "max_diff_pct": 38.760122503495936,
+       "max_diff_pct": 0.4908256991238447,
        "lines": [
         1,
         1
@@ -33392,9 +33688,9 @@
       {
        "view": "stirrup_stress_at_crack",
        "ref_max": 541.633,
-       "max_diff": 135.8461766473283,
+       "max_diff": 2.518866716865275,
        "floor": 0.002,
-       "max_diff_pct": 25.08085302175611,
+       "max_diff_pct": 0.4650504524032463,
        "lines": [
         1,
         1
@@ -33403,9 +33699,9 @@
       {
        "view": "transverse_average_bond",
        "ref_max": 28.8312,
-       "max_diff": 11.603692760220772,
+       "max_diff": 0.4218000000000006,
        "floor": 0.0002,
-       "max_diff_pct": 40.24699894635247,
+       "max_diff_pct": 1.4629984183800906,
        "lines": [
         1,
         1
@@ -33425,9 +33721,9 @@
       {
        "view": "longitudinal_concrete_stress",
        "ref_max": 65.179,
-       "max_diff": 13.086192271998602,
+       "max_diff": 0.11662041963142081,
        "floor": 0.002,
-       "max_diff_pct": 20.077313662373772,
+       "max_diff_pct": 0.1789233029525166,
        "lines": [
         1,
         1
@@ -33438,56 +33734,59 @@
    ],
    "views_at": {
     "ref_stage": 146,
-    "sub_stage": 100,
+    "sub_stage": 145,
     "ref_x": 79.033,
-    "sub_x": 27.848
+    "sub_x": 79.518
    },
    "views": [
     {
      "view": "longitudinal_strain",
-     "ref_max": 36.4495,
-     "max_diff": 23.893900000000002,
+     "ref_max": 36.4181,
+     "max_diff": 0.1460324239712597,
      "floor": 0.0002,
-     "max_diff_pct": 65.55343694700889,
+     "max_diff_pct": 0.40098858526737996,
      "lines": [
       1,
       1
      ],
-     "ref_stage": 147
+     "departure": 0.0011737851646763863,
+     "departure_pct": 0.003223081832046115,
+     "apart_pct": 0.6792960122909752,
+     "ref_stage": 146
     },
     {
      "view": "transverse_strain",
      "ref_max": 7.912,
-     "max_diff": 5.792417518867263,
+     "max_diff": 0.257823358740115,
      "floor": 0.002,
-     "max_diff_pct": 73.21053486940424,
+     "max_diff_pct": 3.258636991154133,
      "lines": [
       4,
       4
      ],
-     "departure": 0.008803405571493807,
-     "departure_pct": 0.11126650115639292,
-     "apart_pct": 1.1754297269969571,
-     "ref_stage": 146
+     "ref_stage": 147
     },
     {
      "view": "shear_strain",
-     "ref_max": 32.9163,
-     "max_diff": 23.071208008431455,
+     "ref_max": 32.9141,
+     "max_diff": 0.7702999999999992,
      "floor": 0.0002,
-     "max_diff_pct": 70.09052660363241,
+     "max_diff_pct": 2.340334385567277,
      "lines": [
       5,
       5
      ],
-     "ref_stage": 147
+     "departure": 0.01928871314149302,
+     "departure_pct": 0.05860319176733687,
+     "apart_pct": 0.5356009028961273,
+     "ref_stage": 146
     },
     {
      "view": "shear_stress",
      "ref_max": 3.4943,
-     "max_diff": 0.9637532506713589,
+     "max_diff": 0.039286588506231575,
      "floor": 0.0002,
-     "max_diff_pct": 27.58072434168099,
+     "max_diff_pct": 1.1243049682692263,
      "lines": [
       3,
       3
@@ -33500,69 +33799,84 @@
     {
      "view": "principal_compressive_stress",
      "ref_max": 65.2,
-     "max_diff": 14.336293191625883,
+     "max_diff": 0.32799989026481646,
      "floor": 0.002,
-     "max_diff_pct": 21.988179741757488,
+     "max_diff_pct": 0.5030673163570805,
      "lines": [
       3,
       3
      ],
-     "ref_stage": 147
+     "departure": 0.040549064425034385,
+     "departure_pct": 0.06219181660281347,
+     "apart_pct": 1.453987730061346,
+     "ref_stage": 146
     },
     {
      "view": "shear_on_crack",
-     "ref_max": 4.5614,
-     "max_diff": 0.4490697340545974,
+     "ref_max": 4.5617,
+     "max_diff": 0.22711837654333464,
      "floor": 0.0002,
-     "max_diff_pct": 9.84499789657994,
+     "max_diff_pct": 4.978810016952773,
      "lines": [
       5,
       5
      ],
-     "ref_stage": 147
+     "departure": 0.003835778704383348,
+     "departure_pct": 0.08408660596670864,
+     "apart_pct": 0.2756921181356303,
+     "ref_stage": 146
     },
     {
      "view": "principal_tensile_stress",
      "ref_max": 2.5984,
-     "max_diff": 0.9244850683488619,
+     "max_diff": 0.2684937863647037,
      "floor": 0.0002,
-     "max_diff_pct": 35.57901279051963,
+     "max_diff_pct": 10.33304288657265,
      "lines": [
       3,
       3
      ],
-     "ref_stage": 147
+     "departure": 0.002081780857814514,
+     "departure_pct": 0.08011779779150685,
+     "apart_pct": 6.607912561576357,
+     "ref_stage": 146
     },
     {
      "view": "principal_tensile_strain",
-     "ref_max": 38.106,
-     "max_diff": 25.248,
+     "ref_max": 38.081,
+     "max_diff": 0.5557457903793726,
      "floor": 0.002,
-     "max_diff_pct": 66.25728231774524,
+     "max_diff_pct": 1.4593781423265473,
      "lines": [
       1,
       1
      ],
-     "ref_stage": 147
+     "departure": 0.009180845323606666,
+     "departure_pct": 0.02410872961216004,
+     "apart_pct": 0.6508161444392146,
+     "ref_stage": 146
     },
     {
      "view": "crack_widths",
-     "ref_max": 4.6259,
-     "max_diff": 2.7822564610413343,
+     "ref_max": 4.6231,
+     "max_diff": 1.142770702236905,
      "floor": 0.0002,
-     "max_diff_pct": 60.14519252559144,
+     "max_diff_pct": 24.718710437518222,
      "lines": [
       1,
       1
      ],
-     "ref_stage": 147
+     "departure": 0.000759106203809716,
+     "departure_pct": 0.016419852562343795,
+     "apart_pct": 0.6528459326833658,
+     "ref_stage": 146
     },
     {
      "view": "average_angle",
      "ref_max": 90.0,
-     "max_diff": 5.503929615518401,
+     "max_diff": 1.1649999999999983,
      "floor": 0.002,
-     "max_diff_pct": 6.115477350576001,
+     "max_diff_pct": 1.2944444444444425,
      "lines": [
       1,
       1
@@ -33572,17 +33886,17 @@
     {
      "view": "long_crack_spacing",
      "ref_max": 465.251,
-     "max_diff": 0.8112954763022655,
+     "max_diff": 0.0940019331978072,
      "floor": 0.002,
-     "max_diff_pct": 0.17437801881183826,
+     "max_diff_pct": 0.020204563385743866,
      "lines": [
       1,
       1
      ],
-     "departure": 0.002347563181180763,
-     "departure_pct": 0.0005045799323764512,
-     "apart_pct": 0.005463262119391453,
-     "ref_stage": 146
+     "departure": 0.03829289203562473,
+     "departure_pct": 0.008230587797903654,
+     "apart_pct": 0.017307003924022565,
+     "ref_stage": 13
     },
     {
      "view": "transverse_crack_spacing",
@@ -33602,9 +33916,9 @@
     {
      "view": "diagonal_spacing",
      "ref_max": 129.63,
-     "max_diff": 39.83892997670371,
+     "max_diff": 39.80896778537169,
      "floor": 0.002,
-     "max_diff_pct": 30.73280103116849,
+     "max_diff_pct": 30.709687406751286,
      "lines": [
       1,
       1
@@ -33616,22 +33930,25 @@
     },
     {
      "view": "long_reinforcement_stress",
-     "ref_max": 499.918,
-     "max_diff": 88.122,
+     "ref_max": 27.723,
+     "max_diff": 0.043999999999997874,
      "floor": 0.002,
-     "max_diff_pct": 17.627290875703615,
+     "max_diff_pct": 0.15871298200049733,
      "lines": [
       1,
       1
      ],
-     "ref_stage": 147
+     "departure": 0.0739078441503124,
+     "departure_pct": 0.2665939622346514,
+     "apart_pct": 56.8470684706847,
+     "ref_stage": 13
     },
     {
      "view": "long_reinf_stress_at_crack",
      "ref_max": 521.733,
-     "max_diff": 82.71299999999994,
+     "max_diff": 0.571999999999984,
      "floor": 0.002,
-     "max_diff_pct": 15.853511278757516,
+     "max_diff_pct": 0.10963462154013337,
      "lines": [
       1,
       1
@@ -33641,9 +33958,9 @@
     {
      "view": "long_average_bond",
      "ref_max": 0.82,
-     "max_diff": 0.19599999999999998,
+     "max_diff": 1.8207657603852566e-16,
      "floor": 0.002,
-     "max_diff_pct": 23.902439024390244,
+     "max_diff_pct": 2.220446049250313e-14,
      "lines": [
       1,
       1
@@ -33655,48 +33972,48 @@
     },
     {
      "view": "stirrup_stress",
-     "ref_max": 541.874,
-     "max_diff": 210.32858417935174,
+     "ref_max": 0.669,
+     "max_diff": 0.013999999999999992,
      "floor": 0.002,
-     "max_diff_pct": 38.81503526269054,
+     "max_diff_pct": 2.0926756352765308,
      "lines": [
       1,
       1
      ],
-     "departure": 0.605857287851182,
-     "departure_pct": 0.1118077796408726,
-     "apart_pct": 0.3951783285556213,
-     "ref_stage": 146
+     "departure": 0.06572209301095948,
+     "departure_pct": 9.823930195958068,
+     "apart_pct": 98.60036240986386,
+     "ref_stage": 13
     },
     {
      "view": "stirrup_stress_at_crack",
-     "ref_max": 541.648,
-     "max_diff": 135.85319273507108,
+     "ref_max": 506.331,
+     "max_diff": 14.89086300913619,
      "floor": 0.002,
-     "max_diff_pct": 25.081453773497007,
+     "max_diff_pct": 2.940934489323425,
      "lines": [
       1,
       1
      ],
-     "departure": 0.5123405611843849,
-     "departure_pct": 0.09458920944679661,
-     "apart_pct": 0.34156851956819173,
-     "ref_stage": 146
+     "departure": 145.4118479274445,
+     "departure_pct": 28.718732988389906,
+     "apart_pct": 67.20750377061246,
+     "ref_stage": 13
     },
     {
      "view": "transverse_average_bond",
-     "ref_max": 28.8368,
-     "max_diff": 11.609284170249257,
+     "ref_max": 0.0381,
+     "max_diff": 0.0026000000000000055,
      "floor": 0.0002,
-     "max_diff_pct": 40.25857297012587,
+     "max_diff_pct": 6.824146981627311,
      "lines": [
       1,
       1
      ],
-     "departure": 0.024264568681144242,
-     "departure_pct": 0.08414445667044972,
-     "apart_pct": 0.2970908091957536,
-     "ref_stage": 146
+     "departure": 0.004804442513452101,
+     "departure_pct": 12.610085337144621,
+     "apart_pct": 97.85487204555066,
+     "ref_stage": 13
     },
     {
      "view": "shrinkage_thermal_strain",
@@ -33715,19 +34032,22 @@
     },
     {
      "view": "longitudinal_concrete_stress",
-     "ref_max": 65.179,
-     "max_diff": 13.086192271998602,
+     "ref_max": 3.91,
+     "max_diff": 0.02791438295845253,
      "floor": 0.002,
-     "max_diff_pct": 20.077313662373772,
+     "max_diff_pct": 0.7139228378120851,
      "lines": [
       1,
       1
      ],
-     "ref_stage": 147
+     "departure": 0.693839298878657,
+     "departure_pct": 17.74525061070734,
+     "apart_pct": 33.362050398449284,
+     "ref_stage": 13
     }
    ],
-   "seconds": 235.5,
-   "run": "9fa0690637e9",
+   "seconds": 338.3,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      -0.0,
@@ -34132,6 +34452,290 @@
     [
      27.848,
      245.007
+    ],
+    [
+     28.544,
+     245.688
+    ],
+    [
+     29.258,
+     246.407
+    ],
+    [
+     29.989,
+     247.159
+    ],
+    [
+     30.739,
+     247.907
+    ],
+    [
+     31.508,
+     248.672
+    ],
+    [
+     32.295,
+     249.455
+    ],
+    [
+     33.103,
+     250.254
+    ],
+    [
+     33.93,
+     251.074
+    ],
+    [
+     34.779,
+     251.913
+    ],
+    [
+     35.648,
+     252.771
+    ],
+    [
+     36.539,
+     253.653
+    ],
+    [
+     37.453,
+     254.567
+    ],
+    [
+     38.389,
+     255.481
+    ],
+    [
+     39.349,
+     256.434
+    ],
+    [
+     40.332,
+     257.392
+    ],
+    [
+     41.341,
+     258.384
+    ],
+    [
+     42.374,
+     259.366
+    ],
+    [
+     43.434,
+     260.395
+    ],
+    [
+     44.52,
+     261.394
+    ],
+    [
+     45.633,
+     262.413
+    ],
+    [
+     46.773,
+     263.45
+    ],
+    [
+     47.943,
+     264.521
+    ],
+    [
+     49.141,
+     265.608
+    ],
+    [
+     50.37,
+     266.69
+    ],
+    [
+     51.629,
+     267.789
+    ],
+    [
+     52.92,
+     268.873
+    ],
+    [
+     53.184,
+     269.096
+    ],
+    [
+     53.396,
+     269.274
+    ],
+    [
+     54.243,
+     269.97
+    ],
+    [
+     55.599,
+     271.154
+    ],
+    [
+     56.989,
+     272.289
+    ],
+    [
+     58.413,
+     273.422
+    ],
+    [
+     59.874,
+     274.546
+    ],
+    [
+     61.371,
+     275.685
+    ],
+    [
+     62.905,
+     276.775
+    ],
+    [
+     64.478,
+     277.885
+    ],
+    [
+     66.089,
+     278.994
+    ],
+    [
+     67.742,
+     280.088
+    ],
+    [
+     69.435,
+     281.138
+    ],
+    [
+     71.171,
+     282.158
+    ],
+    [
+     72.95,
+     283.137
+    ],
+    [
+     74.774,
+     284.112
+    ],
+    [
+     76.644,
+     285.002
+    ],
+    [
+     78.56,
+     285.852
+    ],
+    [
+     79.518,
+     286.23
+    ],
+    [
+     79.731,
+     286.2
+    ],
+    [
+     80.057,
+     286.376
+    ],
+    [
+     80.207,
+     286.452
+    ],
+    [
+     80.259,
+     286.476
+    ],
+    [
+     80.266,
+     286.476
+    ],
+    [
+     80.315,
+     286.415
+    ],
+    [
+     80.312,
+     286.324
+    ],
+    [
+     80.312,
+     286.301
+    ],
+    [
+     80.454,
+     286.422
+    ],
+    [
+     80.45,
+     286.329
+    ],
+    [
+     80.452,
+     286.355
+    ],
+    [
+     80.485,
+     286.413
+    ],
+    [
+     80.55,
+     286.43
+    ],
+    [
+     80.597,
+     286.453
+    ],
+    [
+     80.597,
+     286.45
+    ],
+    [
+     80.598,
+     286.461
+    ],
+    [
+     80.597,
+     286.432
+    ],
+    [
+     80.629,
+     286.454
+    ],
+    [
+     80.636,
+     286.452
+    ],
+    [
+     80.66,
+     286.461
+    ],
+    [
+     80.669,
+     286.46
+    ],
+    [
+     80.687,
+     286.466
+    ],
+    [
+     80.697,
+     286.468
+    ],
+    [
+     80.715,
+     286.47
+    ],
+    [
+     80.726,
+     286.473
+    ],
+    [
+     80.736,
+     286.476
     ]
    ]
   },
@@ -35371,8 +35975,8 @@
      "ref_stage": 61
     }
    ],
-   "seconds": 27.2,
-   "run": "9fa0690637e9",
+   "seconds": 22.8,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      0.0,
@@ -36833,8 +37437,8 @@
      "ref_stage": 59
     }
    ],
-   "seconds": 183.8,
-   "run": "9fa0690637e9",
+   "seconds": 160.9,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      -0.0,
@@ -38345,8 +38949,8 @@
      "ref_stage": 6
     }
    ],
-   "seconds": 174.4,
-   "run": "9fa0690637e9",
+   "seconds": 144.4,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      -0.0,
@@ -39730,8 +40334,8 @@
      "ref_stage": 51
     }
    ],
-   "seconds": 3.4,
-   "run": "9fa0690637e9",
+   "seconds": 3.8,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      -0.653,
@@ -41189,8 +41793,8 @@
      "ref_stage": 52
     }
    ],
-   "seconds": 4.7,
-   "run": "9fa0690637e9",
+   "seconds": 4.4,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      -0.495,
@@ -42644,8 +43248,8 @@
      "ref_stage": 47
     }
    ],
-   "seconds": 6.7,
-   "run": "9fa0690637e9",
+   "seconds": 6.2,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      0.429,
@@ -44048,8 +44652,8 @@
      "ref_stage": 48
     }
    ],
-   "seconds": 5.1,
-   "run": "9fa0690637e9",
+   "seconds": 4.0,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      -0.0,
@@ -45482,8 +46086,8 @@
      "ref_stage": 53
     }
    ],
-   "seconds": 5.2,
-   "run": "9fa0690637e9",
+   "seconds": 4.9,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      -0.0,
@@ -45715,7 +46319,7 @@
     "peak-stage": "30"
    },
    "sub": {
-    "stage-count": "39",
+    "stage-count": "42",
     "peak-stage": "30"
    },
    "control": [
@@ -45736,9 +46340,9 @@
      "shape_sub": [
       "cracking",
       "peak",
-      "ends falling"
+      "ends standing still"
      ],
-     "shape_same": true,
+     "shape_same": false,
      "floor_pct": 0.03675882118599583,
      "rising_pct": 0.14684346618375438,
      "post_peak_pct": 11.53161208019598
@@ -45760,9 +46364,9 @@
      "shape_sub": [
       "cracking",
       "peak",
-      "ends falling"
+      "ends standing still"
      ],
-     "shape_same": true,
+     "shape_same": false,
      "floor_pct": 0.04111194634865836,
      "rising_pct": 0.04510955966611126,
      "post_peak_pct": 6.434821571140324
@@ -46392,14 +46996,14 @@
      "ref_x": 0.824,
      "ref_y": 33.995,
      "sub_x": 4.764,
-     "sub_y": 159.449,
+     "sub_y": 159.445,
      "views": [
       {
        "view": "longitudinal_strain",
        "ref_max": 0.3687,
-       "max_diff": 0.13007200954985598,
+       "max_diff": 0.13006724507926268,
        "floor": 0.0002,
-       "max_diff_pct": 35.27854883370111,
+       "max_diff_pct": 35.277256598660884,
        "lines": [
         1,
         1
@@ -46463,9 +47067,9 @@
       {
        "view": "principal_tensile_stress",
        "ref_max": 1.7958,
-       "max_diff": 1.4977164016595335,
+       "max_diff": 1.4976170304186516,
        "floor": 0.0002,
-       "max_diff_pct": 83.40106925378848,
+       "max_diff_pct": 83.39553571771086,
        "lines": [
         3,
         3
@@ -46474,9 +47078,9 @@
       {
        "view": "principal_tensile_strain",
        "ref_max": 1157.628,
-       "max_diff": 1147.4187426843412,
+       "max_diff": 1147.423,
        "floor": 0.002,
-       "max_diff_pct": 99.11808825325072,
+       "max_diff_pct": 99.11845601523116,
        "lines": [
         1,
         1
@@ -46485,9 +47089,9 @@
       {
        "view": "crack_widths",
        "ref_max": 1031.991,
-       "max_diff": 1028.6853754704273,
+       "max_diff": 1028.6867019319216,
        "floor": 0.0002,
-       "max_diff_pct": 99.6796847521371,
+       "max_diff_pct": 99.67981328634858,
        "lines": [
         1,
         1
@@ -46529,9 +47133,9 @@
       {
        "view": "diagonal_spacing",
        "ref_max": 933.213,
-       "max_diff": 421.75594574420677,
+       "max_diff": 421.764875078851,
        "floor": 0.002,
-       "max_diff_pct": 45.193963837216884,
+       "max_diff_pct": 45.19492067500678,
        "lines": [
         1,
         1
@@ -46540,9 +47144,9 @@
       {
        "view": "long_reinforcement_stress",
        "ref_max": 53.732,
-       "max_diff": 4.772360284732713e-14,
+       "max_diff": 1.1930900711831782e-14,
        "floor": 0.002,
-       "max_diff_pct": 8.881784197001252e-14,
+       "max_diff_pct": 2.220446049250313e-14,
        "lines": [
         1,
         1
@@ -46562,9 +47166,9 @@
       {
        "view": "long_average_bond",
        "ref_max": 0.297,
-       "max_diff": 1.318944953254686e-16,
+       "max_diff": 1.6486811915683574e-17,
        "floor": 0.002,
-       "max_diff_pct": 4.440892098500626e-14,
+       "max_diff_pct": 5.551115123125783e-15,
        "lines": [
         1,
         1
@@ -46617,9 +47221,9 @@
       {
        "view": "longitudinal_concrete_stress",
        "ref_max": 2.289,
-       "max_diff": 0.7375190922878488,
+       "max_diff": 0.7374800801907049,
        "floor": 0.002,
-       "max_diff_pct": 32.220143830836555,
+       "max_diff_pct": 32.21843950155984,
        "lines": [
         1,
         1
@@ -46638,9 +47242,9 @@
     {
      "view": "longitudinal_strain",
      "ref_max": 0.3687,
-     "max_diff": 0.13007200954985598,
+     "max_diff": 0.13006724507926268,
      "floor": 0.0002,
-     "max_diff_pct": 35.27854883370111,
+     "max_diff_pct": 35.277256598660884,
      "lines": [
       1,
       1
@@ -46710,9 +47314,9 @@
     {
      "view": "principal_tensile_stress",
      "ref_max": 1.7958,
-     "max_diff": 1.4977164016595335,
+     "max_diff": 1.4976170304186516,
      "floor": 0.0002,
-     "max_diff_pct": 83.40106925378848,
+     "max_diff_pct": 83.39553571771086,
      "lines": [
       3,
       3
@@ -46722,9 +47326,9 @@
     {
      "view": "principal_tensile_strain",
      "ref_max": 1157.628,
-     "max_diff": 1147.4187426843412,
+     "max_diff": 1147.423,
      "floor": 0.002,
-     "max_diff_pct": 99.11808825325072,
+     "max_diff_pct": 99.11845601523116,
      "lines": [
       1,
       1
@@ -46734,9 +47338,9 @@
     {
      "view": "crack_widths",
      "ref_max": 1031.991,
-     "max_diff": 1028.6853754704273,
+     "max_diff": 1028.6867019319216,
      "floor": 0.0002,
-     "max_diff_pct": 99.6796847521371,
+     "max_diff_pct": 99.67981328634858,
      "lines": [
       1,
       1
@@ -46782,9 +47386,9 @@
     {
      "view": "diagonal_spacing",
      "ref_max": 933.213,
-     "max_diff": 421.75594574420677,
+     "max_diff": 421.764875078851,
      "floor": 0.002,
-     "max_diff_pct": 45.193963837216884,
+     "max_diff_pct": 45.19492067500678,
      "lines": [
       1,
       1
@@ -46824,9 +47428,9 @@
     {
      "view": "long_average_bond",
      "ref_max": 0.297,
-     "max_diff": 1.318944953254686e-16,
+     "max_diff": 1.6486811915683574e-17,
      "floor": 0.002,
-     "max_diff_pct": 4.440892098500626e-14,
+     "max_diff_pct": 5.551115123125783e-15,
      "lines": [
       1,
       1
@@ -46893,9 +47497,9 @@
     {
      "view": "longitudinal_concrete_stress",
      "ref_max": 2.289,
-     "max_diff": 0.7375190922878488,
+     "max_diff": 0.7374800801907049,
      "floor": 0.002,
-     "max_diff_pct": 32.220143830836555,
+     "max_diff_pct": 32.21843950155984,
      "lines": [
       1,
       1
@@ -46903,8 +47507,8 @@
      "ref_stage": 36
     }
    ],
-   "seconds": 142.0,
-   "run": "9fa0690637e9",
+   "seconds": 106.8,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      -0.0,
@@ -47032,35 +47636,47 @@
     ],
     [
      4.764,
-     159.449
+     159.445
     ],
     [
-     4.892,
-     158.024
+     4.806,
+     159.229
     ],
     [
-     4.957,
-     157.181
+     4.823,
+     159.065
     ],
     [
-     4.962,
-     157.186
+     4.859,
+     158.953
     ],
     [
-     4.966,
-     157.241
+     4.86,
+     158.919
     ],
     [
-     4.968,
-     157.285
+     4.866,
+     159.053
     ],
     [
-     4.968,
-     157.248
+     4.866,
+     159.038
     ],
     [
-     4.968,
-     157.266
+     4.866,
+     159.032
+    ],
+    [
+     4.866,
+     159.028
+    ],
+    [
+     4.863,
+     159.002
+    ],
+    [
+     4.865,
+     159.036
     ]
    ]
   },
@@ -48291,8 +48907,8 @@
      "ref_stage": 56
     }
    ],
-   "seconds": 5.4,
-   "run": "9fa0690637e9",
+   "seconds": 5.8,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      -0.0,
@@ -49751,8 +50367,8 @@
      "ref_stage": 56
     }
    ],
-   "seconds": 5.5,
-   "run": "9fa0690637e9",
+   "seconds": 5.1,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      -0.0,
@@ -51223,8 +51839,8 @@
      "ref_stage": 16
     }
    ],
-   "seconds": 5.6,
-   "run": "9fa0690637e9",
+   "seconds": 5.1,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      -0.0,
@@ -52709,8 +53325,8 @@
      "ref_stage": 62
     }
    ],
-   "seconds": 6.0,
-   "run": "9fa0690637e9",
+   "seconds": 5.5,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      -0.0,
@@ -52966,17 +53582,17 @@
     "peak-stage": "59"
    },
    "sub": {
-    "stage-count": "101",
-    "peak-stage": "100"
+    "stage-count": "110",
+    "peak-stage": "108"
    },
    "control": [
     {
      "chart": "shear_gxy",
      "ref_peak_load": 385.917,
-     "sub_peak_load": 389.564,
+     "sub_peak_load": 397.726,
      "ref_peak_x": 18.073,
-     "sub_peak_x": 20.759,
-     "peak_diff_pct": 0.9450218570314468,
+     "sub_peak_x": 26.806,
+     "peak_diff_pct": 3.0599844007908508,
      "curve_max_diff_pct": 0.8637782018672003,
      "curve_mean_diff_pct": 0.10993231652428403,
      "shape_ref": [
@@ -52987,20 +53603,20 @@
      "shape_sub": [
       "cracking",
       "peak",
-      "ends at peak"
+      "ends standing still"
      ],
-     "shape_same": false,
+     "shape_same": true,
      "floor_pct": 0.011076525216335762,
      "rising_pct": 2.462957444859346,
-     "post_peak_pct": 14.876131252598269
+     "post_peak_pct": 48.545609178513565
     },
     {
      "chart": "moment_phi",
      "ref_peak_load": 578.937,
-     "sub_peak_load": 584.346,
+     "sub_peak_load": 596.589,
      "ref_peak_x": 22.653,
-     "sub_peak_x": 25.219,
-     "peak_diff_pct": 0.9342985506194961,
+     "sub_peak_x": 30.727,
+     "peak_diff_pct": 3.049036423652322,
      "curve_max_diff_pct": 0.7467627190037631,
      "curve_mean_diff_pct": 0.09016667510186348,
      "shape_ref": [
@@ -53011,12 +53627,12 @@
      "shape_sub": [
       "cracking",
       "peak",
-      "ends at peak"
+      "ends standing still"
      ],
-     "shape_same": false,
+     "shape_same": true,
      "floor_pct": 0.008835608804704922,
      "rising_pct": 0.9560490697775923,
-     "post_peak_pct": 11.36588370406885
+     "post_peak_pct": 35.772256980878865
     }
    ],
    "missing_control": [],
@@ -54181,8 +54797,8 @@
      "ref_stage": 9
     }
    ],
-   "seconds": 229.4,
-   "run": "9fa0690637e9",
+   "seconds": 225.3,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      -0.0,
@@ -54587,6 +55203,42 @@
     [
      25.219,
      584.346
+    ],
+    [
+     25.85,
+     585.397
+    ],
+    [
+     26.496,
+     586.985
+    ],
+    [
+     27.158,
+     588.321
+    ],
+    [
+     27.837,
+     590.177
+    ],
+    [
+     28.533,
+     591.752
+    ],
+    [
+     29.246,
+     593.432
+    ],
+    [
+     29.978,
+     594.915
+    ],
+    [
+     30.727,
+     596.589
+    ],
+    [
+     30.718,
+     595.61
     ]
    ]
   },
@@ -55832,8 +56484,8 @@
      "ref_stage": 51
     }
    ],
-   "seconds": 5.3,
-   "run": "9fa0690637e9",
+   "seconds": 4.6,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      -0.0,
@@ -57252,8 +57904,8 @@
      "ref_stage": 41
     }
    ],
-   "seconds": 131.7,
-   "run": "9fa0690637e9",
+   "seconds": 103.8,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      -0.0,
@@ -58680,8 +59332,8 @@
      "ref_stage": 61
     }
    ],
-   "seconds": 5.7,
-   "run": "9fa0690637e9",
+   "seconds": 3.8,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      -0.0,
@@ -60117,8 +60769,8 @@
      "ref_stage": 47
     }
    ],
-   "seconds": 233.1,
-   "run": "9fa0690637e9",
+   "seconds": 198.2,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      -0.0,
@@ -61561,8 +62213,8 @@
      "ref_stage": 12
     }
    ],
-   "seconds": 5.7,
-   "run": "9fa0690637e9",
+   "seconds": 5.9,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      -0.0,
@@ -62998,8 +63650,8 @@
      "ref_stage": 31
     }
    ],
-   "seconds": 172.5,
-   "run": "9fa0690637e9",
+   "seconds": 147.9,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      -0.0,
@@ -64386,8 +65038,8 @@
      "ref_stage": 16
     }
    ],
-   "seconds": 5.7,
-   "run": "9fa0690637e9",
+   "seconds": 4.2,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      -0.0,
@@ -65825,8 +66477,8 @@
      "ref_stage": 39
     }
    ],
-   "seconds": 165.5,
-   "run": "9fa0690637e9",
+   "seconds": 135.6,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      -0.0,
@@ -67242,8 +67894,8 @@
      "ref_stage": 53
     }
    ],
-   "seconds": 4.7,
-   "run": "9fa0690637e9",
+   "seconds": 4.2,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      -0.0,
@@ -67475,19 +68127,19 @@
     "peak-stage": "134"
    },
    "sub": {
-    "stage-count": "101",
-    "peak-stage": "100"
+    "stage-count": "145",
+    "peak-stage": "143"
    },
    "control": [
     {
      "chart": "shear_gxy",
      "ref_peak_load": 92.43,
-     "sub_peak_load": 88.345,
+     "sub_peak_load": 94.219,
      "ref_peak_x": 19.073,
-     "sub_peak_x": 5.024,
-     "peak_diff_pct": -4.419560748674681,
-     "curve_max_diff_pct": 73.79156740149423,
-     "curve_mean_diff_pct": 8.694464263961775,
+     "sub_peak_x": 27.667,
+     "peak_diff_pct": 1.935518770961795,
+     "curve_max_diff_pct": 0.1988105342992689,
+     "curve_mean_diff_pct": 0.029676893550660555,
      "shape_ref": [
       "cracking",
       "fall",
@@ -67498,21 +68150,22 @@
       "cracking",
       "fall",
       "peak",
-      "ends at peak"
+      "ends falling"
      ],
-     "shape_same": true,
+     "shape_same": false,
      "floor_pct": 0.010706950958218697,
-     "rising_pct": 73.79156740149423
+     "rising_pct": 0.1988105342992689,
+     "post_peak_pct": 373.6634268692115
     },
     {
      "chart": "moment_phi",
      "ref_peak_load": -184.724,
-     "sub_peak_load": -176.69,
+     "sub_peak_load": -188.439,
      "ref_peak_x": -52.415,
-     "sub_peak_x": -24.991,
-     "peak_diff_pct": -4.3491912258287995,
-     "curve_max_diff_pct": 52.50135325907016,
-     "curve_mean_diff_pct": 6.549661816414522,
+     "sub_peak_x": -68.952,
+     "peak_diff_pct": 2.0111084645200425,
+     "curve_max_diff_pct": 0.09609426750552777,
+     "curve_mean_diff_pct": 0.011001057275196346,
      "shape_ref": [
       "fall",
       "cracking",
@@ -67523,11 +68176,12 @@
       "fall",
       "cracking",
       "peak",
-      "ends at peak"
+      "ends falling"
      ],
-     "shape_same": true,
+     "shape_same": false,
      "floor_pct": 0.003966334601695977,
-     "rising_pct": 52.50135325907016
+     "rising_pct": 0.09609426750552777,
+     "post_peak_pct": 44.50767760704715
     }
    ],
    "missing_control": [],
@@ -68148,20 +68802,20 @@
     },
     {
      "ref_stage": 134,
-     "sub_stage": 100,
-     "matched_by": "feature",
+     "sub_stage": 131,
+     "matched_by": "same place",
      "feature": "peak",
      "ref_x": -52.415,
      "ref_y": -184.724,
-     "sub_x": -24.991,
-     "sub_y": -176.69,
+     "sub_x": -52.421,
+     "sub_y": -184.626,
      "views": [
       {
        "view": "longitudinal_strain",
        "ref_max": 28.1809,
-       "max_diff": 14.836900000000002,
+       "max_diff": 0.002335671591289896,
        "floor": 0.0002,
-       "max_diff_pct": 52.64877984734342,
+       "max_diff_pct": 0.008288136969684771,
        "lines": [
         1,
         1
@@ -68170,9 +68824,9 @@
       {
        "view": "transverse_strain",
        "ref_max": 15.785,
-       "max_diff": 12.504,
+       "max_diff": 0.1424755810380223,
        "floor": 0.002,
-       "max_diff_pct": 79.21444409249287,
+       "max_diff_pct": 0.9026010835478131,
        "lines": [
         4,
         4
@@ -68181,9 +68835,9 @@
       {
        "view": "shear_strain",
        "ref_max": 39.4369,
-       "max_diff": 26.983700000000002,
+       "max_diff": 0.6007691535720119,
        "floor": 0.0002,
-       "max_diff_pct": 68.42246728317896,
+       "max_diff_pct": 1.5233680983343312,
        "lines": [
         5,
         5
@@ -68192,9 +68846,9 @@
       {
        "view": "shear_stress",
        "ref_max": 1.1103,
-       "max_diff": 0.20175232691098477,
+       "max_diff": 0.022100000000000054,
        "floor": 0.0002,
-       "max_diff_pct": 18.170974233178846,
+       "max_diff_pct": 1.9904530307124246,
        "lines": [
         3,
         3
@@ -68203,9 +68857,9 @@
       {
        "view": "principal_compressive_stress",
        "ref_max": 35.0,
-       "max_diff": 7.535644800468272,
+       "max_diff": 0.17689541858189173,
        "floor": 0.002,
-       "max_diff_pct": 21.530413715623634,
+       "max_diff_pct": 0.5054154816625478,
        "lines": [
         3,
         3
@@ -68214,9 +68868,9 @@
       {
        "view": "shear_on_crack",
        "ref_max": 3.1826,
-       "max_diff": 0.30036258993382564,
+       "max_diff": 0.01325198319921974,
        "floor": 0.0002,
-       "max_diff_pct": 9.437648147232629,
+       "max_diff_pct": 0.41638858792244515,
        "lines": [
         3,
         3
@@ -68225,9 +68879,9 @@
       {
        "view": "principal_tensile_stress",
        "ref_max": 2.1685,
-       "max_diff": 0.35384907761726203,
+       "max_diff": 0.006892018630714645,
        "floor": 0.0002,
-       "max_diff_pct": 16.31768861504552,
+       "max_diff_pct": 0.31782423936890225,
        "lines": [
         3,
         3
@@ -68236,9 +68890,9 @@
       {
        "view": "principal_tensile_strain",
        "ref_max": 40.319,
-       "max_diff": 25.410000000000004,
+       "max_diff": 0.26294555111620355,
        "floor": 0.002,
-       "max_diff_pct": 63.02239638879933,
+       "max_diff_pct": 0.652162878831825,
        "lines": [
         1,
         1
@@ -68247,9 +68901,9 @@
       {
        "view": "crack_widths",
        "ref_max": 15.0238,
-       "max_diff": 9.7146,
+       "max_diff": 0.12407192431034444,
        "floor": 0.0002,
-       "max_diff_pct": 64.6614039058028,
+       "max_diff_pct": 0.8258358358760396,
        "lines": [
         1,
         1
@@ -68258,9 +68912,9 @@
       {
        "view": "average_angle",
        "ref_max": 179.998,
-       "max_diff": 119.54239512993183,
+       "max_diff": 1.923835108271803,
        "floor": 0.002,
-       "max_diff_pct": 66.4131796630695,
+       "max_diff_pct": 1.0688091580305354,
        "lines": [
         1,
         1
@@ -68269,9 +68923,9 @@
       {
        "view": "long_crack_spacing",
        "ref_max": 543.268,
-       "max_diff": 1.570781652033728,
+       "max_diff": 0.0006592204411696074,
        "floor": 0.002,
-       "max_diff_pct": 0.2891356847879367,
+       "max_diff_pct": 0.00012134350655102223,
        "lines": [
         1,
         1
@@ -68280,9 +68934,9 @@
       {
        "view": "transverse_crack_spacing",
        "ref_max": 3000.0,
-       "max_diff": 17.238954818670003,
+       "max_diff": 0.004992052221233755,
        "floor": 0.002,
-       "max_diff_pct": 0.5746318272890001,
+       "max_diff_pct": 0.00016640174070779184,
        "lines": [
         1,
         1
@@ -68291,9 +68945,9 @@
       {
        "view": "diagonal_spacing",
        "ref_max": 487.103,
-       "max_diff": 14.2847310681405,
+       "max_diff": 2.135000000000021,
        "floor": 0.002,
-       "max_diff_pct": 2.9325894252633424,
+       "max_diff_pct": 0.4383056560932741,
        "lines": [
         1,
         1
@@ -68302,9 +68956,9 @@
       {
        "view": "long_reinforcement_stress",
        "ref_max": 469.861,
-       "max_diff": 49.673999999999964,
+       "max_diff": 5.2165050057340067e-14,
        "floor": 0.002,
-       "max_diff_pct": 10.57206280155194,
+       "max_diff_pct": 1.1102230246251565e-14,
        "lines": [
         1,
         1
@@ -68313,9 +68967,9 @@
       {
        "view": "long_reinf_stress_at_crack",
        "ref_max": 499.24,
-       "max_diff": 38.82400000000003,
+       "max_diff": 0.0529999999999871,
        "floor": 0.002,
-       "max_diff_pct": 7.7766204631039235,
+       "max_diff_pct": 0.010616136527519249,
        "lines": [
         1,
         1
@@ -68324,9 +68978,9 @@
       {
        "view": "long_average_bond",
        "ref_max": 3.039,
-       "max_diff": 0.7979999999999999,
+       "max_diff": 0.03400000000000026,
        "floor": 0.002,
-       "max_diff_pct": 26.258637709772948,
+       "max_diff_pct": 1.1187890753537433,
        "lines": [
         1,
         1
@@ -68335,9 +68989,9 @@
       {
        "view": "stirrup_stress",
        "ref_max": 436.001,
-       "max_diff": 61.42615115886561,
+       "max_diff": 4.678067826806867,
        "floor": 0.002,
-       "max_diff_pct": 14.088534466403885,
+       "max_diff_pct": 1.072948875531677,
        "lines": [
         1,
         1
@@ -68346,9 +69000,9 @@
       {
        "view": "stirrup_stress_at_crack",
        "ref_max": 491.425,
-       "max_diff": 76.65700000000005,
+       "max_diff": 1.1615730009806369,
        "floor": 0.002,
-       "max_diff_pct": 15.59892150379001,
+       "max_diff_pct": 0.2363683168297577,
        "lines": [
         1,
         1
@@ -68357,9 +69011,9 @@
       {
        "view": "transverse_average_bond",
        "ref_max": 65.5107,
-       "max_diff": 17.971300000000003,
+       "max_diff": 2.9067545829389547,
        "floor": 0.0002,
-       "max_diff_pct": 27.432617877690216,
+       "max_diff_pct": 4.437068422317202,
        "lines": [
         1,
         1
@@ -68379,9 +69033,9 @@
       {
        "view": "longitudinal_concrete_stress",
        "ref_max": 34.997,
-       "max_diff": 1.9005168483396953,
+       "max_diff": 0.060999999999999985,
        "floor": 0.002,
-       "max_diff_pct": 5.430513610708618,
+       "max_diff_pct": 0.1743006543418007,
        "lines": [
         1,
         1
@@ -68392,29 +69046,32 @@
    ],
    "views_at": {
     "ref_stage": 134,
-    "sub_stage": 100,
+    "sub_stage": 131,
     "ref_x": -52.415,
-    "sub_x": -24.991
+    "sub_x": -52.421
    },
    "views": [
     {
      "view": "longitudinal_strain",
-     "ref_max": 28.1809,
-     "max_diff": 14.836900000000002,
+     "ref_max": 0.1082,
+     "max_diff": 4.806550991853417e-05,
      "floor": 0.0002,
-     "max_diff_pct": 52.64877984734342,
+     "max_diff_pct": 0.044422837262970576,
      "lines": [
       1,
       1
      ],
-     "ref_stage": 134
+     "departure": 0.0013669540319683907,
+     "departure_pct": 1.2633586247397326,
+     "apart_pct": 9.115044247787619,
+     "ref_stage": 8
     },
     {
      "view": "transverse_strain",
      "ref_max": 15.785,
-     "max_diff": 12.504,
+     "max_diff": 0.1424755810380223,
      "floor": 0.002,
-     "max_diff_pct": 79.21444409249287,
+     "max_diff_pct": 0.9026010835478131,
      "lines": [
       4,
       4
@@ -68424,9 +69081,9 @@
     {
      "view": "shear_strain",
      "ref_max": 39.4369,
-     "max_diff": 26.983700000000002,
+     "max_diff": 0.6007691535720119,
      "floor": 0.0002,
-     "max_diff_pct": 68.42246728317896,
+     "max_diff_pct": 1.5233680983343312,
      "lines": [
       5,
       5
@@ -68436,9 +69093,9 @@
     {
      "view": "shear_stress",
      "ref_max": 1.1103,
-     "max_diff": 0.20175232691098477,
+     "max_diff": 0.022100000000000054,
      "floor": 0.0002,
-     "max_diff_pct": 18.170974233178846,
+     "max_diff_pct": 1.9904530307124246,
      "lines": [
       3,
       3
@@ -68448,9 +69105,9 @@
     {
      "view": "principal_compressive_stress",
      "ref_max": 35.0,
-     "max_diff": 7.535644800468272,
+     "max_diff": 0.17689541858189173,
      "floor": 0.002,
-     "max_diff_pct": 21.530413715623634,
+     "max_diff_pct": 0.5054154816625478,
      "lines": [
       3,
       3
@@ -68460,9 +69117,9 @@
     {
      "view": "shear_on_crack",
      "ref_max": 3.1826,
-     "max_diff": 0.30036258993382564,
+     "max_diff": 0.01325198319921974,
      "floor": 0.0002,
-     "max_diff_pct": 9.437648147232629,
+     "max_diff_pct": 0.41638858792244515,
      "lines": [
       3,
       3
@@ -68472,9 +69129,9 @@
     {
      "view": "principal_tensile_stress",
      "ref_max": 2.1685,
-     "max_diff": 0.35384907761726203,
+     "max_diff": 0.006892018630714645,
      "floor": 0.0002,
-     "max_diff_pct": 16.31768861504552,
+     "max_diff_pct": 0.31782423936890225,
      "lines": [
       3,
       3
@@ -68484,9 +69141,9 @@
     {
      "view": "principal_tensile_strain",
      "ref_max": 40.319,
-     "max_diff": 25.410000000000004,
+     "max_diff": 0.26294555111620355,
      "floor": 0.002,
-     "max_diff_pct": 63.02239638879933,
+     "max_diff_pct": 0.652162878831825,
      "lines": [
       1,
       1
@@ -68496,9 +69153,9 @@
     {
      "view": "crack_widths",
      "ref_max": 15.0238,
-     "max_diff": 9.7146,
+     "max_diff": 0.12407192431034444,
      "floor": 0.0002,
-     "max_diff_pct": 64.6614039058028,
+     "max_diff_pct": 0.8258358358760396,
      "lines": [
       1,
       1
@@ -68508,9 +69165,9 @@
     {
      "view": "average_angle",
      "ref_max": 179.998,
-     "max_diff": 119.54239512993183,
+     "max_diff": 1.923835108271803,
      "floor": 0.002,
-     "max_diff_pct": 66.4131796630695,
+     "max_diff_pct": 1.0688091580305354,
      "lines": [
       1,
       1
@@ -68520,9 +69177,9 @@
     {
      "view": "long_crack_spacing",
      "ref_max": 543.268,
-     "max_diff": 1.570781652033728,
+     "max_diff": 0.0006592204411696074,
      "floor": 0.002,
-     "max_diff_pct": 0.2891356847879367,
+     "max_diff_pct": 0.00012134350655102223,
      "lines": [
       1,
       1
@@ -68532,9 +69189,9 @@
     {
      "view": "transverse_crack_spacing",
      "ref_max": 3000.0,
-     "max_diff": 17.238954818670003,
+     "max_diff": 0.004992052221233755,
      "floor": 0.002,
-     "max_diff_pct": 0.5746318272890001,
+     "max_diff_pct": 0.00016640174070779184,
      "lines": [
       1,
       1
@@ -68544,9 +69201,9 @@
     {
      "view": "diagonal_spacing",
      "ref_max": 487.103,
-     "max_diff": 14.2847310681405,
+     "max_diff": 2.135000000000021,
      "floor": 0.002,
-     "max_diff_pct": 2.9325894252633424,
+     "max_diff_pct": 0.4383056560932741,
      "lines": [
       1,
       1
@@ -68555,34 +69212,40 @@
     },
     {
      "view": "long_reinforcement_stress",
-     "ref_max": 469.861,
-     "max_diff": 49.673999999999964,
+     "ref_max": 17.641,
+     "max_diff": 0.000999999999996912,
      "floor": 0.002,
-     "max_diff_pct": 10.57206280155194,
+     "max_diff_pct": 0.005668612890408209,
      "lines": [
       1,
       1
      ],
-     "ref_stage": 134
+     "departure": 0.0,
+     "departure_pct": 0.0,
+     "apart_pct": 10.370009737098352,
+     "ref_stage": 8
     },
     {
      "view": "long_reinf_stress_at_crack",
-     "ref_max": 499.24,
-     "max_diff": 38.82400000000003,
+     "ref_max": 18.255,
+     "max_diff": 0.009000000000000608,
      "floor": 0.002,
-     "max_diff_pct": 7.7766204631039235,
+     "max_diff_pct": 0.049301561216108514,
      "lines": [
       1,
       1
      ],
-     "ref_stage": 134
+     "departure": 0.0,
+     "departure_pct": 0.0,
+     "apart_pct": 100.0,
+     "ref_stage": 8
     },
     {
      "view": "long_average_bond",
      "ref_max": 3.039,
-     "max_diff": 0.7979999999999999,
+     "max_diff": 0.03400000000000026,
      "floor": 0.002,
-     "max_diff_pct": 26.258637709772948,
+     "max_diff_pct": 1.1187890753537433,
      "lines": [
       1,
       1
@@ -68592,9 +69255,9 @@
     {
      "view": "stirrup_stress",
      "ref_max": 436.001,
-     "max_diff": 61.42615115886561,
+     "max_diff": 4.678067826806867,
      "floor": 0.002,
-     "max_diff_pct": 14.088534466403885,
+     "max_diff_pct": 1.072948875531677,
      "lines": [
       1,
       1
@@ -68603,22 +69266,25 @@
     },
     {
      "view": "stirrup_stress_at_crack",
-     "ref_max": 491.425,
-     "max_diff": 76.65700000000005,
+     "ref_max": 91.534,
+     "max_diff": 0.3800000000000047,
      "floor": 0.002,
-     "max_diff_pct": 15.59892150379001,
+     "max_diff_pct": 0.41514628444075935,
      "lines": [
       1,
       1
      ],
-     "ref_stage": 134
+     "departure": 5.4200514317765425,
+     "departure_pct": 5.921353193104793,
+     "apart_pct": 100.0,
+     "ref_stage": 8
     },
     {
      "view": "transverse_average_bond",
      "ref_max": 65.5107,
-     "max_diff": 17.971300000000003,
+     "max_diff": 2.9067545829389547,
      "floor": 0.0002,
-     "max_diff_pct": 27.432617877690216,
+     "max_diff_pct": 4.437068422317202,
      "lines": [
       1,
       1
@@ -68643,9 +69309,9 @@
     {
      "view": "longitudinal_concrete_stress",
      "ref_max": 34.997,
-     "max_diff": 1.9005168483396953,
+     "max_diff": 0.060999999999999985,
      "floor": 0.002,
-     "max_diff_pct": 5.430513610708618,
+     "max_diff_pct": 0.1743006543418007,
      "lines": [
       1,
       1
@@ -68653,8 +69319,8 @@
      "ref_stage": 134
     }
    ],
-   "seconds": 182.2,
-   "run": "9fa0690637e9",
+   "seconds": 260.4,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      -0.0,
@@ -69059,6 +69725,182 @@
     [
      -24.991,
      -176.69
+    ],
+    [
+     -25.616,
+     -176.952
+    ],
+    [
+     -26.256,
+     -177.297
+    ],
+    [
+     -26.913,
+     -177.612
+    ],
+    [
+     -27.586,
+     -177.932
+    ],
+    [
+     -28.275,
+     -178.169
+    ],
+    [
+     -28.982,
+     -178.459
+    ],
+    [
+     -29.707,
+     -178.769
+    ],
+    [
+     -30.449,
+     -179.086
+    ],
+    [
+     -31.211,
+     -179.277
+    ],
+    [
+     -31.991,
+     -179.536
+    ],
+    [
+     -32.151,
+     -179.576
+    ],
+    [
+     -32.791,
+     -179.87
+    ],
+    [
+     -33.61,
+     -180.052
+    ],
+    [
+     -34.451,
+     -180.302
+    ],
+    [
+     -35.312,
+     -180.626
+    ],
+    [
+     -36.195,
+     -180.914
+    ],
+    [
+     -37.1,
+     -181.258
+    ],
+    [
+     -38.027,
+     -181.501
+    ],
+    [
+     -38.978,
+     -181.864
+    ],
+    [
+     -39.952,
+     -181.994
+    ],
+    [
+     -40.951,
+     -182.256
+    ],
+    [
+     -41.975,
+     -182.498
+    ],
+    [
+     -43.024,
+     -182.696
+    ],
+    [
+     -44.1,
+     -182.856
+    ],
+    [
+     -45.202,
+     -183.049
+    ],
+    [
+     -46.332,
+     -183.332
+    ],
+    [
+     -47.491,
+     -183.461
+    ],
+    [
+     -48.678,
+     -183.724
+    ],
+    [
+     -49.895,
+     -183.974
+    ],
+    [
+     -51.142,
+     -184.279
+    ],
+    [
+     -52.421,
+     -184.626
+    ],
+    [
+     -53.731,
+     -184.926
+    ],
+    [
+     -55.075,
+     -185.242
+    ],
+    [
+     -55.746,
+     -185.376
+    ],
+    [
+     -56.452,
+     -185.417
+    ],
+    [
+     -57.863,
+     -185.763
+    ],
+    [
+     -59.31,
+     -186.167
+    ],
+    [
+     -60.792,
+     -186.463
+    ],
+    [
+     -61.534,
+     -186.645
+    ],
+    [
+     -61.533,
+     -186.599
+    ],
+    [
+     -64.391,
+     -187.203
+    ],
+    [
+     -67.646,
+     -188.162
+    ],
+    [
+     -68.952,
+     -188.439
+    ],
+    [
+     -75.567,
+     -174.624
     ]
    ]
   },
@@ -70301,8 +71143,8 @@
      "ref_stage": 59
     }
    ],
-   "seconds": 6.5,
-   "run": "9fa0690637e9",
+   "seconds": 5.2,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      -0.0,
@@ -71757,8 +72599,8 @@
      "ref_stage": 37
     }
    ],
-   "seconds": 124.0,
-   "run": "9fa0690637e9",
+   "seconds": 100.2,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      -0.0,
@@ -73168,8 +74010,8 @@
      "ref_stage": 63
     }
    ],
-   "seconds": 6.0,
-   "run": "9fa0690637e9",
+   "seconds": 4.9,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      -0.0,
@@ -73441,19 +74283,19 @@
     "peak-stage": "90"
    },
    "sub": {
-    "stage-count": "101",
-    "peak-stage": "93"
+    "stage-count": "141",
+    "peak-stage": "136"
    },
    "control": [
     {
      "chart": "shear_gxy",
      "ref_peak_load": 156.199,
-     "sub_peak_load": 156.31,
+     "sub_peak_load": 162.514,
      "ref_peak_x": 13.762,
-     "sub_peak_x": 6.705,
-     "peak_diff_pct": 0.07106319502685035,
-     "curve_max_diff_pct": 35.59876548856624,
-     "curve_mean_diff_pct": 2.5615129838093544,
+     "sub_peak_x": 25.983,
+     "peak_diff_pct": 4.0429196089603625,
+     "curve_max_diff_pct": 0.5669863145185122,
+     "curve_mean_diff_pct": 0.07466971339807355,
      "shape_ref": [
       "cracking",
       "fall",
@@ -73469,16 +74311,16 @@
      ],
      "shape_same": false,
      "floor_pct": 0.014156431281437629,
-     "rising_pct": 34.53481245654403,
-     "post_peak_pct": 37.52315306466522
+     "rising_pct": 1.8242983213478188,
+     "post_peak_pct": 84.53661656136451
     },
     {
      "chart": "moment_phi",
      "ref_peak_load": 156.155,
-     "sub_peak_load": 156.31,
+     "sub_peak_load": 162.514,
      "ref_peak_x": 22.384,
-     "sub_peak_x": 19.969,
-     "peak_diff_pct": 0.09926035029297886,
+     "sub_peak_x": 50.396,
+     "peak_diff_pct": 4.0722359194390245,
      "curve_max_diff_pct": 0.3872995278652421,
      "curve_mean_diff_pct": 0.04124961866290146,
      "shape_ref": [
@@ -73496,7 +74338,7 @@
      "shape_same": true,
      "floor_pct": 0.006388696378941375,
      "rising_pct": 2.0044534730243084,
-     "post_peak_pct": 25.718840553603755
+     "post_peak_pct": 58.33373927421691
     }
    ],
    "missing_control": [],
@@ -74424,20 +75266,20 @@
     },
     {
      "ref_stage": 112,
-     "sub_stage": 100,
-     "matched_by": "feature",
+     "sub_stage": 112,
+     "matched_by": "same place",
      "feature": "ends standing still",
      "ref_x": 31.954,
      "ref_y": 156.119,
-     "sub_x": 23.736,
-     "sub_y": 155.84,
+     "sub_x": 31.923,
+     "sub_y": 156.231,
      "views": [
       {
        "view": "longitudinal_strain",
        "ref_max": 17.5329,
-       "max_diff": 4.630000000000001,
+       "max_diff": 0.01229999999999923,
        "floor": 0.0002,
-       "max_diff_pct": 26.40749676322799,
+       "max_diff_pct": 0.07015382509453215,
        "lines": [
         1,
         1
@@ -74446,9 +75288,9 @@
       {
        "view": "transverse_strain",
        "ref_max": 18.196,
-       "max_diff": 9.154000000000002,
+       "max_diff": 0.8580000000000011,
        "floor": 0.002,
-       "max_diff_pct": 50.30775994724116,
+       "max_diff_pct": 4.71532204880194,
        "lines": [
         4,
         4
@@ -74457,9 +75299,9 @@
       {
        "view": "shear_strain",
        "ref_max": 33.3315,
-       "max_diff": 13.1347,
+       "max_diff": 0.8063000000000002,
        "floor": 0.0002,
-       "max_diff_pct": 39.40626734470396,
+       "max_diff_pct": 2.419033046817576,
        "lines": [
         5,
         5
@@ -74468,9 +75310,9 @@
       {
        "view": "shear_stress",
        "ref_max": 2.5269,
-       "max_diff": 0.1613,
+       "max_diff": 0.032799999999999885,
        "floor": 0.0002,
-       "max_diff_pct": 6.383315524951521,
+       "max_diff_pct": 1.2980331631643471,
        "lines": [
         3,
         3
@@ -74479,9 +75321,9 @@
       {
        "view": "principal_compressive_stress",
        "ref_max": 35.0,
-       "max_diff": 3.1319999999999997,
+       "max_diff": 0.5620000000000008,
        "floor": 0.002,
-       "max_diff_pct": 8.948571428571428,
+       "max_diff_pct": 1.605714285714288,
        "lines": [
         3,
         3
@@ -74490,9 +75332,9 @@
       {
        "view": "shear_on_crack",
        "ref_max": 3.3019,
-       "max_diff": 0.3625938474802128,
+       "max_diff": 1.3295018314515767,
        "floor": 0.0002,
-       "max_diff_pct": 10.981369741064622,
+       "max_diff_pct": 40.26475155067012,
        "lines": [
         3,
         3
@@ -74501,9 +75343,9 @@
       {
        "view": "principal_tensile_stress",
        "ref_max": 2.2323,
-       "max_diff": 0.2144830565518072,
+       "max_diff": 0.02059999999999995,
        "floor": 0.0002,
-       "max_diff_pct": 9.608164518738842,
+       "max_diff_pct": 0.9228150338216168,
        "lines": [
         3,
         3
@@ -74512,9 +75354,9 @@
       {
        "view": "principal_tensile_strain",
        "ref_max": 33.38,
-       "max_diff": 13.165000000000001,
+       "max_diff": 0.8700000000000061,
        "floor": 0.002,
-       "max_diff_pct": 39.43978430197723,
+       "max_diff_pct": 2.6063511084481905,
        "lines": [
         1,
         1
@@ -74523,9 +75365,9 @@
       {
        "view": "crack_widths",
        "ref_max": 11.5582,
-       "max_diff": 4.3910099655654475,
+       "max_diff": 0.35994498185376494,
        "floor": 0.0002,
-       "max_diff_pct": 37.99043073805132,
+       "max_diff_pct": 3.1141958250745354,
        "lines": [
         1,
         1
@@ -74534,9 +75376,9 @@
       {
        "view": "average_angle",
        "ref_max": 91.0,
-       "max_diff": 5.550158904064354,
+       "max_diff": 0.9999999999999964,
        "floor": 0.002,
-       "max_diff_pct": 6.099075718752037,
+       "max_diff_pct": 1.098901098901095,
        "lines": [
         1,
         1
@@ -74545,9 +75387,9 @@
       {
        "view": "long_crack_spacing",
        "ref_max": 600.0,
-       "max_diff": 1.4368879306506712,
+       "max_diff": 0.0006417534677227978,
        "floor": 0.002,
-       "max_diff_pct": 0.2394813217751119,
+       "max_diff_pct": 0.00010695891128713295,
        "lines": [
         1,
         1
@@ -74556,9 +75398,9 @@
       {
        "view": "transverse_crack_spacing",
        "ref_max": 3000.0,
-       "max_diff": 0.0025382679558389244,
+       "max_diff": 0.0,
        "floor": 0.002,
-       "max_diff_pct": 8.460893186129748e-05,
+       "max_diff_pct": 0.0,
        "lines": [
         1,
         1
@@ -74567,9 +75409,9 @@
       {
        "view": "diagonal_spacing",
        "ref_max": 789.02,
-       "max_diff": 131.22830750975484,
+       "max_diff": 3.838604819498706,
        "floor": 0.002,
-       "max_diff_pct": 16.631810031400327,
+       "max_diff_pct": 0.48650285410999794,
        "lines": [
         1,
         1
@@ -74578,9 +75420,9 @@
       {
        "view": "long_reinforcement_stress",
        "ref_max": 434.853,
-       "max_diff": 40.20399999999999,
+       "max_diff": 0.040000000000011124,
        "floor": 0.002,
-       "max_diff_pct": 9.245423165989424,
+       "max_diff_pct": 0.009198510761110334,
        "lines": [
         1,
         1
@@ -74589,9 +75431,9 @@
       {
        "view": "long_reinf_stress_at_crack",
        "ref_max": 480.87,
-       "max_diff": 63.166000000000004,
+       "max_diff": 0.0,
        "floor": 0.002,
-       "max_diff_pct": 13.135774741614158,
+       "max_diff_pct": 0.0,
        "lines": [
         1,
         1
@@ -74600,9 +75442,9 @@
       {
        "view": "long_average_bond",
        "ref_max": 3.201,
-       "max_diff": 0.8149999999999998,
+       "max_diff": 0.09200000000000022,
        "floor": 0.002,
-       "max_diff_pct": 25.46079350203061,
+       "max_diff_pct": 2.874101843174015,
        "lines": [
         1,
         1
@@ -74611,9 +75453,9 @@
       {
        "view": "stirrup_stress",
        "ref_max": 445.256,
-       "max_diff": 36.57000000000001,
+       "max_diff": 18.027999999999995,
        "floor": 0.002,
-       "max_diff_pct": 8.213252600751032,
+       "max_diff_pct": 4.048906696372423,
        "lines": [
         1,
         1
@@ -74622,9 +75464,9 @@
       {
        "view": "stirrup_stress_at_crack",
        "ref_max": 533.724,
-       "max_diff": 61.71800000000007,
+       "max_diff": 4.926000000000072,
        "floor": 0.002,
-       "max_diff_pct": 11.563654622988672,
+       "max_diff_pct": 0.9229489399015355,
        "lines": [
         1,
         1
@@ -74633,9 +75475,9 @@
       {
        "view": "transverse_average_bond",
        "ref_max": 40.3836,
-       "max_diff": 1.7517176694468923,
+       "max_diff": 1.308559645945205,
        "floor": 0.0002,
-       "max_diff_pct": 4.337695672121585,
+       "max_diff_pct": 3.2403244038302796,
        "lines": [
         1,
         1
@@ -74655,9 +75497,9 @@
       {
        "view": "longitudinal_concrete_stress",
        "ref_max": 33.658,
-       "max_diff": 3.1320000000000023,
+       "max_diff": 0.07099154667937327,
        "floor": 0.002,
-       "max_diff_pct": 9.305365737714665,
+       "max_diff_pct": 0.21092027654457565,
        "lines": [
         1,
         1
@@ -74675,22 +75517,25 @@
    "views": [
     {
      "view": "longitudinal_strain",
-     "ref_max": 17.5329,
-     "max_diff": 4.630000000000001,
+     "ref_max": 12.1416,
+     "max_diff": 0.07579276496460988,
      "floor": 0.0002,
-     "max_diff_pct": 26.40749676322799,
+     "max_diff_pct": 0.6242403387083241,
      "lines": [
       1,
       1
      ],
-     "ref_stage": 112
+     "departure": 0.005942295031958865,
+     "departure_pct": 0.04894161421854504,
+     "apart_pct": 3.6047107848323767,
+     "ref_stage": 90
     },
     {
      "view": "transverse_strain",
      "ref_max": 18.196,
-     "max_diff": 9.154000000000002,
+     "max_diff": 0.8580000000000011,
      "floor": 0.002,
-     "max_diff_pct": 50.30775994724116,
+     "max_diff_pct": 4.71532204880194,
      "lines": [
       4,
       4
@@ -74700,9 +75545,9 @@
     {
      "view": "shear_strain",
      "ref_max": 33.3315,
-     "max_diff": 13.1347,
+     "max_diff": 0.8063000000000002,
      "floor": 0.0002,
-     "max_diff_pct": 39.40626734470396,
+     "max_diff_pct": 2.419033046817576,
      "lines": [
       5,
       5
@@ -74712,9 +75557,9 @@
     {
      "view": "shear_stress",
      "ref_max": 2.5269,
-     "max_diff": 0.1613,
+     "max_diff": 0.032799999999999885,
      "floor": 0.0002,
-     "max_diff_pct": 6.383315524951521,
+     "max_diff_pct": 1.2980331631643471,
      "lines": [
       3,
       3
@@ -74724,9 +75569,9 @@
     {
      "view": "principal_compressive_stress",
      "ref_max": 35.0,
-     "max_diff": 3.1319999999999997,
+     "max_diff": 0.5620000000000008,
      "floor": 0.002,
-     "max_diff_pct": 8.948571428571428,
+     "max_diff_pct": 1.605714285714288,
      "lines": [
       3,
       3
@@ -74735,25 +75580,22 @@
     },
     {
      "view": "shear_on_crack",
-     "ref_max": 3.293,
-     "max_diff": 0.8754021832580277,
+     "ref_max": 3.3019,
+     "max_diff": 1.3295018314515767,
      "floor": 0.0002,
-     "max_diff_pct": 26.583728613969864,
+     "max_diff_pct": 40.26475155067012,
      "lines": [
       3,
       3
      ],
-     "departure": 0.0302594973639884,
-     "departure_pct": 0.91890365514693,
-     "apart_pct": 1.6112492509811338,
-     "ref_stage": 90
+     "ref_stage": 112
     },
     {
      "view": "principal_tensile_stress",
      "ref_max": 2.2323,
-     "max_diff": 0.2144830565518072,
+     "max_diff": 0.02059999999999995,
      "floor": 0.0002,
-     "max_diff_pct": 9.608164518738842,
+     "max_diff_pct": 0.9228150338216168,
      "lines": [
       3,
       3
@@ -74763,9 +75605,9 @@
     {
      "view": "principal_tensile_strain",
      "ref_max": 33.38,
-     "max_diff": 13.165000000000001,
+     "max_diff": 0.8700000000000061,
      "floor": 0.002,
-     "max_diff_pct": 39.43978430197723,
+     "max_diff_pct": 2.6063511084481905,
      "lines": [
       1,
       1
@@ -74775,9 +75617,9 @@
     {
      "view": "crack_widths",
      "ref_max": 11.5582,
-     "max_diff": 4.3910099655654475,
+     "max_diff": 0.35994498185376494,
      "floor": 0.0002,
-     "max_diff_pct": 37.99043073805132,
+     "max_diff_pct": 3.1141958250745354,
      "lines": [
       1,
       1
@@ -74786,27 +75628,33 @@
     },
     {
      "view": "average_angle",
-     "ref_max": 91.0,
-     "max_diff": 5.550158904064354,
+     "ref_max": 91.051,
+     "max_diff": 1.0509999999999973,
      "floor": 0.002,
-     "max_diff_pct": 6.099075718752037,
+     "max_diff_pct": 1.1542981406025163,
      "lines": [
       1,
       1
      ],
-     "ref_stage": 112
+     "departure": 1.9940337248699878,
+     "departure_pct": 2.190018478512029,
+     "apart_pct": 1.4343129770499465,
+     "ref_stage": 90
     },
     {
      "view": "long_crack_spacing",
      "ref_max": 600.0,
-     "max_diff": 1.4368879306506712,
+     "max_diff": 0.0006714548791162373,
      "floor": 0.002,
-     "max_diff_pct": 0.2394813217751119,
+     "max_diff_pct": 0.00011190914651937288,
      "lines": [
       1,
       1
      ],
-     "ref_stage": 112
+     "departure": 0.00024094780050989436,
+     "departure_pct": 4.015796675164906e-05,
+     "apart_pct": 0.3741060422699602,
+     "ref_stage": 90
     },
     {
      "view": "transverse_crack_spacing",
@@ -74826,9 +75674,9 @@
     {
      "view": "diagonal_spacing",
      "ref_max": 789.02,
-     "max_diff": 131.22830750975484,
+     "max_diff": 3.838604819498706,
      "floor": 0.002,
-     "max_diff_pct": 16.631810031400327,
+     "max_diff_pct": 0.48650285410999794,
      "lines": [
       1,
       1
@@ -74838,9 +75686,9 @@
     {
      "view": "long_reinforcement_stress",
      "ref_max": 434.853,
-     "max_diff": 40.20399999999999,
+     "max_diff": 0.040000000000011124,
      "floor": 0.002,
-     "max_diff_pct": 9.245423165989424,
+     "max_diff_pct": 0.009198510761110334,
      "lines": [
       1,
       1
@@ -74849,22 +75697,25 @@
     },
     {
      "view": "long_reinf_stress_at_crack",
-     "ref_max": 480.87,
-     "max_diff": 63.166000000000004,
+     "ref_max": 55.061,
+     "max_diff": 0.01300000000000078,
      "floor": 0.002,
-     "max_diff_pct": 13.135774741614158,
+     "max_diff_pct": 0.023610177802801946,
      "lines": [
       1,
       1
      ],
-     "ref_stage": 112
+     "departure": 15.242192568780597,
+     "departure_pct": 27.682375127187296,
+     "apart_pct": 80.32517654787321,
+     "ref_stage": 11
     },
     {
      "view": "long_average_bond",
      "ref_max": 3.201,
-     "max_diff": 0.8149999999999998,
+     "max_diff": 0.09200000000000022,
      "floor": 0.002,
-     "max_diff_pct": 25.46079350203061,
+     "max_diff_pct": 2.874101843174015,
      "lines": [
       1,
       1
@@ -74874,9 +75725,9 @@
     {
      "view": "stirrup_stress",
      "ref_max": 445.256,
-     "max_diff": 36.57000000000001,
+     "max_diff": 18.027999999999995,
      "floor": 0.002,
-     "max_diff_pct": 8.213252600751032,
+     "max_diff_pct": 4.048906696372423,
      "lines": [
       1,
       1
@@ -74886,9 +75737,9 @@
     {
      "view": "stirrup_stress_at_crack",
      "ref_max": 533.724,
-     "max_diff": 61.71800000000007,
+     "max_diff": 4.926000000000072,
      "floor": 0.002,
-     "max_diff_pct": 11.563654622988672,
+     "max_diff_pct": 0.9229489399015355,
      "lines": [
       1,
       1
@@ -74898,9 +75749,9 @@
     {
      "view": "transverse_average_bond",
      "ref_max": 40.3836,
-     "max_diff": 1.7517176694468923,
+     "max_diff": 1.308559645945205,
      "floor": 0.0002,
-     "max_diff_pct": 4.337695672121585,
+     "max_diff_pct": 3.2403244038302796,
      "lines": [
       1,
       1
@@ -74924,19 +75775,22 @@
     },
     {
      "view": "longitudinal_concrete_stress",
-     "ref_max": 33.658,
-     "max_diff": 3.1320000000000023,
+     "ref_max": 3.141,
+     "max_diff": 0.01042496821964576,
      "floor": 0.002,
-     "max_diff_pct": 9.305365737714665,
+     "max_diff_pct": 0.3318996567859204,
      "lines": [
       1,
       1
      ],
-     "ref_stage": 112
+     "departure": 0.28720180503627024,
+     "departure_pct": 9.143642312520543,
+     "apart_pct": 28.530781169167106,
+     "ref_stage": 11
     }
    ],
-   "seconds": 213.5,
-   "run": "9fa0690637e9",
+   "seconds": 241.4,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      -0.0,
@@ -75341,6 +76195,166 @@
     [
      23.736,
      155.84
+    ],
+    [
+     24.33,
+     155.764
+    ],
+    [
+     24.938,
+     155.745
+    ],
+    [
+     25.561,
+     155.696
+    ],
+    [
+     26.2,
+     155.734
+    ],
+    [
+     26.855,
+     155.765
+    ],
+    [
+     27.527,
+     155.575
+    ],
+    [
+     28.215,
+     155.983
+    ],
+    [
+     28.92,
+     156.037
+    ],
+    [
+     29.643,
+     155.726
+    ],
+    [
+     30.385,
+     155.999
+    ],
+    [
+     31.144,
+     156.033
+    ],
+    [
+     31.923,
+     156.231
+    ],
+    [
+     32.721,
+     156.501
+    ],
+    [
+     33.539,
+     156.784
+    ],
+    [
+     34.377,
+     157.019
+    ],
+    [
+     35.237,
+     157.328
+    ],
+    [
+     36.118,
+     157.532
+    ],
+    [
+     37.021,
+     157.848
+    ],
+    [
+     37.946,
+     158.216
+    ],
+    [
+     38.895,
+     158.595
+    ],
+    [
+     39.867,
+     158.951
+    ],
+    [
+     40.864,
+     159.285
+    ],
+    [
+     41.885,
+     159.757
+    ],
+    [
+     42.933,
+     160.137
+    ],
+    [
+     43.147,
+     160.215
+    ],
+    [
+     43.319,
+     160.222
+    ],
+    [
+     43.456,
+     160.315
+    ],
+    [
+     43.566,
+     160.38
+    ],
+    [
+     44.006,
+     160.453
+    ],
+    [
+     45.106,
+     160.804
+    ],
+    [
+     46.234,
+     161.28
+    ],
+    [
+     47.389,
+     161.502
+    ],
+    [
+     48.574,
+     161.909
+    ],
+    [
+     49.789,
+     162.336
+    ],
+    [
+     50.396,
+     162.5
+    ],
+    [
+     50.396,
+     162.514
+    ],
+    [
+     50.395,
+     162.506
+    ],
+    [
+     50.394,
+     162.471
+    ],
+    [
+     50.398,
+     162.468
+    ],
+    [
+     50.548,
+     162.512
     ]
    ]
   },
@@ -76577,8 +77591,8 @@
      "ref_stage": 55
     }
    ],
-   "seconds": 23.2,
-   "run": "9fa0690637e9",
+   "seconds": 19.1,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      -0.0,
@@ -78759,8 +79773,8 @@
      "ref_stage": 55
     }
    ],
-   "seconds": 31.2,
-   "run": "9fa0690637e9",
+   "seconds": 25.1,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      -0.0,
@@ -81311,8 +82325,8 @@
      "ref_stage": 16
     }
    ],
-   "seconds": 5.5,
-   "run": "9fa0690637e9",
+   "seconds": 5.2,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      -0.0,
@@ -83081,8 +84095,8 @@
      "ref_stage": 55
     }
    ],
-   "seconds": 217.8,
-   "run": "9fa0690637e9",
+   "seconds": 194.3,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      -0.0,
@@ -84541,8 +85555,8 @@
      "ref_stage": 14
     }
    ],
-   "seconds": 146.5,
-   "run": "9fa0690637e9",
+   "seconds": 113.8,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      -0.999,
@@ -85982,8 +86996,8 @@
      "ref_stage": 86
     }
    ],
-   "seconds": 230.5,
-   "run": "9fa0690637e9",
+   "seconds": 199.3,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      -0.0,
@@ -87139,8 +88153,8 @@
      "ref_stage": 11
     }
    ],
-   "seconds": 196.0,
-   "run": "9fa0690637e9",
+   "seconds": 158.0,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      -0.0,
@@ -88954,8 +89968,8 @@
      "ref_stage": 54
     }
    ],
-   "seconds": 295.5,
-   "run": "9fa0690637e9",
+   "seconds": 272.9,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      0.005,
@@ -90506,8 +91520,8 @@
      "ref_stage": 16
     }
    ],
-   "seconds": 5.4,
-   "run": "9fa0690637e9",
+   "seconds": 4.9,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      -0.0,
@@ -91653,8 +92667,8 @@
      "ref_stage": 39
     }
    ],
-   "seconds": 179.4,
-   "run": "9fa0690637e9",
+   "seconds": 142.9,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      -0.0,
@@ -93053,8 +94067,8 @@
      "ref_stage": 129
     }
    ],
-   "seconds": 201.7,
-   "run": "9fa0690637e9",
+   "seconds": 166.9,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      -0.0,
@@ -94804,8 +95818,8 @@
      "ref_stage": 42
     }
    ],
-   "seconds": 119.7,
-   "run": "9fa0690637e9",
+   "seconds": 106.0,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      -0.0,
@@ -96231,8 +97245,8 @@
      "ref_stage": 16
     }
    ],
-   "seconds": 3.0,
-   "run": "9fa0690637e9",
+   "seconds": 2.0,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      0.174,
@@ -97614,8 +98628,8 @@
      "ref_stage": 52
     }
    ],
-   "seconds": 106.6,
-   "run": "9fa0690637e9",
+   "seconds": 73.2,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      0.042,
@@ -98667,8 +99681,8 @@
      "ref_stage": 38
     }
    ],
-   "seconds": 133.7,
-   "run": "9fa0690637e9",
+   "seconds": 87.1,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      -0.117,
@@ -100427,8 +101441,8 @@
      "ref_stage": 13
     }
    ],
-   "seconds": 6.8,
-   "run": "9fa0690637e9",
+   "seconds": 5.6,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      -0.0,
@@ -100684,19 +101698,19 @@
     "peak-stage": "22"
    },
    "sub": {
-    "stage-count": "30",
-    "peak-stage": "19"
+    "stage-count": "31",
+    "peak-stage": "20"
    },
    "control": [
     {
      "chart": "axial_ex",
      "ref_peak_load": -3377.987,
-     "sub_peak_load": -3377.02,
+     "sub_peak_load": -3377.987,
      "ref_peak_x": -1.134,
      "sub_peak_x": -1.134,
-     "peak_diff_pct": -0.028626516324666087,
-     "curve_max_diff_pct": 0.19371693264883558,
-     "curve_mean_diff_pct": 0.04220127824223558,
+     "peak_diff_pct": 0.0,
+     "curve_max_diff_pct": 0.04048225523959527,
+     "curve_mean_diff_pct": 0.0025392144365435796,
      "shape_ref": [
       "cracking",
       "peak",
@@ -100709,18 +101723,18 @@
      ],
      "shape_same": true,
      "floor_pct": 0.06800410601864675,
-     "rising_pct": 0.1924986899134672,
-     "post_peak_pct": 0.18064838328366162
+     "rising_pct": 0.02716281220997815,
+     "post_peak_pct": 0.00024045132480368173
     },
     {
      "chart": "moment_phi",
      "ref_peak_load": 337.535,
-     "sub_peak_load": 337.702,
+     "sub_peak_load": 337.535,
      "ref_peak_x": 4.891,
-     "sub_peak_x": 4.893,
-     "peak_diff_pct": 0.049476350600670495,
-     "curve_max_diff_pct": 0.19798346050719234,
-     "curve_mean_diff_pct": 0.07500122721264106,
+     "sub_peak_x": 4.891,
+     "peak_diff_pct": 0.0,
+     "curve_max_diff_pct": 0.03652549512509513,
+     "curve_mean_diff_pct": 0.002499784109143569,
      "shape_ref": [
       "cracking",
       "peak",
@@ -100733,29 +101747,29 @@
      ],
      "shape_same": true,
      "floor_pct": 0.010903428307787594,
-     "rising_pct": 0.3414361149203191,
-     "post_peak_pct": 0.2278034861756737
+     "rising_pct": 0.019949114163648515,
+     "post_peak_pct": 0.0040149289280096935
     }
    ],
    "missing_control": [],
    "views_stages": [
     {
      "ref_stage": 14,
-     "sub_stage": 13,
+     "sub_stage": 14,
      "matched_by": "same place",
      "feature": "cracking",
      "ref_x": 3.548,
      "ref_y": 321.279,
-     "sub_x": 3.568,
-     "sub_y": 322.697,
+     "sub_x": 3.548,
+     "sub_y": 321.279,
      "place": 0.959778148140271,
      "views": [
       {
        "view": "longitudinal_strain",
        "ref_max": 1.994,
-       "max_diff": 0.00407846312645245,
+       "max_diff": 2.4228284756802987e-06,
        "floor": 0.0002,
-       "max_diff_pct": 0.20453676662248998,
+       "max_diff_pct": 0.00012150594160884146,
        "lines": [
         1,
         1
@@ -100809,9 +101823,9 @@
       {
        "view": "principal_compressive_stress",
        "ref_max": 35.0,
-       "max_diff": 0.07122703823455459,
+       "max_diff": 4.9591931030451444e-05,
        "floor": 0.002,
-       "max_diff_pct": 0.20350582352729882,
+       "max_diff_pct": 0.00014169123151557556,
        "lines": [
         3,
         3
@@ -100837,9 +101851,9 @@
       {
        "view": "principal_tensile_stress",
        "ref_max": 1.89,
-       "max_diff": 0.005267536929391121,
+       "max_diff": 0.0,
        "floor": 0.0002,
-       "max_diff_pct": 0.27870565763974187,
+       "max_diff_pct": 0.0,
        "lines": [
         3,
         3
@@ -100851,9 +101865,9 @@
       {
        "view": "principal_tensile_strain",
        "ref_max": 0.135,
-       "max_diff": 0.0004200292937448547,
+       "max_diff": 0.0,
        "floor": 0.002,
-       "max_diff_pct": 0.31113281018137384,
+       "max_diff_pct": 0.0,
        "lines": [
         1,
         1
@@ -100865,9 +101879,9 @@
       {
        "view": "crack_widths",
        "ref_max": 0.0165,
-       "max_diff": 4.406066316019536e-05,
+       "max_diff": 0.0,
        "floor": 0.0002,
-       "max_diff_pct": 0.26703432218300216,
+       "max_diff_pct": 0.0,
        "lines": [
         1,
         1
@@ -100879,9 +101893,9 @@
       {
        "view": "average_angle",
        "ref_max": 90.0,
-       "max_diff": 0.24044994656668459,
+       "max_diff": 0.0,
        "floor": 0.002,
-       "max_diff_pct": 0.2671666072963162,
+       "max_diff_pct": 0.0,
        "lines": [
         1,
         1
@@ -100893,9 +101907,9 @@
       {
        "view": "long_crack_spacing",
        "ref_max": 600.0,
-       "max_diff": 0.012969104285996822,
+       "max_diff": 0.0005941441672178351,
        "floor": 0.002,
-       "max_diff_pct": 0.00216151738099947,
+       "max_diff_pct": 9.902402786963918e-05,
        "lines": [
         1,
         1
@@ -100907,9 +101921,9 @@
       {
        "view": "transverse_crack_spacing",
        "ref_max": 3000.0,
-       "max_diff": 9.163010411889081,
+       "max_diff": 0.004992054665491399,
        "floor": 0.002,
-       "max_diff_pct": 0.3054336803963027,
+       "max_diff_pct": 0.00016640182218304663,
        "lines": [
         1,
         1
@@ -100921,9 +101935,9 @@
       {
        "view": "diagonal_spacing",
        "ref_max": 258.787,
-       "max_diff": 0.6913924050012845,
+       "max_diff": 0.0,
        "floor": 0.002,
-       "max_diff_pct": 0.2671665906715888,
+       "max_diff_pct": 0.0,
        "lines": [
         1,
         1
@@ -100935,9 +101949,9 @@
       {
        "view": "long_reinforcement_stress",
        "ref_max": 355.474,
-       "max_diff": 0.9490000000000013,
+       "max_diff": 0.0,
        "floor": 0.002,
-       "max_diff_pct": 0.2669674856670253,
+       "max_diff_pct": 0.0,
        "lines": [
         1,
         1
@@ -101033,9 +102047,9 @@
       {
        "view": "longitudinal_concrete_stress",
        "ref_max": 34.991,
-       "max_diff": 0.09107699331839957,
+       "max_diff": 4.958271337685996e-05,
        "floor": 0.002,
-       "max_diff_pct": 0.2602869118298979,
+       "max_diff_pct": 0.0001417013328480465,
        "lines": [
         1,
         1
@@ -101048,21 +102062,21 @@
     },
     {
      "ref_stage": 22,
-     "sub_stage": 19,
+     "sub_stage": 20,
      "matched_by": "same place",
      "feature": "peak",
      "ref_x": 4.891,
      "ref_y": 337.535,
-     "sub_x": 4.893,
-     "sub_y": 337.702,
+     "sub_x": 4.891,
+     "sub_y": 337.535,
      "place": 0.4298306120287956,
      "views": [
       {
        "view": "longitudinal_strain",
        "ref_max": 2.6015,
-       "max_diff": 0.00039811304456607616,
+       "max_diff": 3.296865750908912e-06,
        "floor": 0.0002,
-       "max_diff_pct": 0.01530321139981073,
+       "max_diff_pct": 0.000126729415756637,
        "lines": [
         1,
         1
@@ -101116,9 +102130,9 @@
       {
        "view": "principal_compressive_stress",
        "ref_max": 35.0,
-       "max_diff": 0.005342044684743717,
+       "max_diff": 0.0,
        "floor": 0.002,
-       "max_diff_pct": 0.015262984813553478,
+       "max_diff_pct": 0.0,
        "lines": [
         3,
         3
@@ -101144,9 +102158,9 @@
       {
        "view": "principal_tensile_stress",
        "ref_max": 1.89,
-       "max_diff": 0.03199999999999985,
+       "max_diff": 3.149071332554799e-06,
        "floor": 0.0002,
-       "max_diff_pct": 1.693121693121685,
+       "max_diff_pct": 0.00016661753082300524,
        "lines": [
         3,
         3
@@ -101158,9 +102172,9 @@
       {
        "view": "principal_tensile_strain",
        "ref_max": 0.333,
-       "max_diff": 0.00011226786737765236,
+       "max_diff": 5.517121736990129e-07,
        "floor": 0.002,
-       "max_diff_pct": 0.03371407428758329,
+       "max_diff_pct": 0.00016567933144114502,
        "lines": [
         1,
         1
@@ -101172,9 +102186,9 @@
       {
        "view": "crack_widths",
        "ref_max": 0.0678,
-       "max_diff": 2.182511907794018e-05,
+       "max_diff": 1.1228184443096403e-07,
        "floor": 0.0002,
-       "max_diff_pct": 0.03219044111790587,
+       "max_diff_pct": 0.00016560744016366375,
        "lines": [
         1,
         1
@@ -101186,9 +102200,9 @@
       {
        "view": "average_angle",
        "ref_max": 90.0,
-       "max_diff": 0.05909998725771949,
+       "max_diff": 0.0,
        "floor": 0.002,
-       "max_diff_pct": 0.06566665250857721,
+       "max_diff_pct": 0.0,
        "lines": [
         1,
         1
@@ -101228,9 +102242,9 @@
       {
        "view": "diagonal_spacing",
        "ref_max": 258.787,
-       "max_diff": 0.16950541895708285,
+       "max_diff": 0.00039517696016958014,
        "floor": 0.002,
-       "max_diff_pct": 0.06549997447981655,
+       "max_diff_pct": 0.00015270355936332976,
        "lines": [
         1,
         1
@@ -101340,9 +102354,9 @@
       {
        "view": "longitudinal_concrete_stress",
        "ref_max": 34.975,
-       "max_diff": 0.03200000000000006,
+       "max_diff": 5.315082484475098e-05,
        "floor": 0.002,
-       "max_diff_pct": 0.09149392423159418,
+       "max_diff_pct": 0.00015196804816226155,
        "lines": [
         1,
         1
@@ -101355,20 +102369,20 @@
     },
     {
      "ref_stage": 32,
-     "sub_stage": 29,
+     "sub_stage": 30,
      "matched_by": "same place",
      "feature": "ends falling",
      "ref_x": 18.37,
      "ref_y": 136.433,
-     "sub_x": 18.379,
-     "sub_y": 136.615,
+     "sub_x": 18.37,
+     "sub_y": 136.433,
      "views": [
       {
        "view": "longitudinal_strain",
        "ref_max": 8.4525,
-       "max_diff": 0.001460077175820704,
+       "max_diff": 0.00010000000000005561,
        "floor": 0.0002,
-       "max_diff_pct": 0.01727390920817159,
+       "max_diff_pct": 0.0011830819284242013,
        "lines": [
         1,
         1
@@ -101410,9 +102424,9 @@
       {
        "view": "principal_compressive_stress",
        "ref_max": 35.0,
-       "max_diff": 0.004523334956152193,
+       "max_diff": 0.0009326571108113342,
        "floor": 0.002,
-       "max_diff_pct": 0.012923814160434838,
+       "max_diff_pct": 0.002664734602318098,
        "lines": [
         3,
         3
@@ -101432,9 +102446,9 @@
       {
        "view": "principal_tensile_stress",
        "ref_max": 1.89,
-       "max_diff": 0.0008069663881389856,
+       "max_diff": 0.00015360976239789763,
        "floor": 0.0002,
-       "max_diff_pct": 0.042696634293068025,
+       "max_diff_pct": 0.00812750065597342,
        "lines": [
         3,
         3
@@ -101443,9 +102457,9 @@
       {
        "view": "principal_tensile_strain",
        "ref_max": 2.57,
-       "max_diff": 0.0006801280934852909,
+       "max_diff": 4.1960805909875875e-06,
        "floor": 0.002,
-       "max_diff_pct": 0.026464128151178636,
+       "max_diff_pct": 0.00016327161832636528,
        "lines": [
         1,
         1
@@ -101454,9 +102468,9 @@
       {
        "view": "crack_widths",
        "ref_max": 0.6465,
-       "max_diff": 0.00018385125663562658,
+       "max_diff": 1.0540023897482592e-06,
        "floor": 0.0002,
-       "max_diff_pct": 0.028437936061195143,
+       "max_diff_pct": 0.00016303207884737188,
        "lines": [
         1,
         1
@@ -101465,9 +102479,9 @@
       {
        "view": "average_angle",
        "ref_max": 90.0,
-       "max_diff": 0.05024999216763169,
+       "max_diff": 0.0,
        "floor": 0.002,
-       "max_diff_pct": 0.05583332463070187,
+       "max_diff_pct": 0.0,
        "lines": [
         1,
         1
@@ -101509,9 +102523,9 @@
       {
        "view": "long_reinforcement_stress",
        "ref_max": 401.421,
-       "max_diff": 0.0,
+       "max_diff": 0.0020000000000096243,
        "floor": 0.002,
-       "max_diff_pct": 0.0,
+       "max_diff_pct": 0.0004982300377931459,
        "lines": [
         1,
         1
@@ -101520,9 +102534,9 @@
       {
        "view": "long_reinf_stress_at_crack",
        "ref_max": 300.638,
-       "max_diff": 6.675504593545156e-14,
+       "max_diff": 0.0,
        "floor": 0.002,
-       "max_diff_pct": 2.220446049250313e-14,
+       "max_diff_pct": 0.0,
        "lines": [
         1,
         1
@@ -101586,9 +102600,9 @@
       {
        "view": "longitudinal_concrete_stress",
        "ref_max": 34.959,
-       "max_diff": 0.01482791416143605,
+       "max_diff": 0.001000000000000026,
        "floor": 0.002,
-       "max_diff_pct": 0.04241515535752181,
+       "max_diff_pct": 0.002860493721216356,
        "lines": [
         1,
         1
@@ -101599,25 +102613,22 @@
    ],
    "views_at": {
     "ref_stage": 22,
-    "sub_stage": 19,
+    "sub_stage": 20,
     "ref_x": 4.891,
-    "sub_x": 4.893
+    "sub_x": 4.891
    },
    "views": [
     {
      "view": "longitudinal_strain",
-     "ref_max": 1.994,
-     "max_diff": 0.00407846312645245,
+     "ref_max": 8.4525,
+     "max_diff": 0.00010000000000005561,
      "floor": 0.0002,
-     "max_diff_pct": 0.20453676662248998,
+     "max_diff_pct": 0.0011830819284242013,
      "lines": [
       1,
       1
      ],
-     "departure": 0.0006282954063108898,
-     "departure_pct": 0.03150929821017502,
-     "apart_pct": 13.092269326683292,
-     "ref_stage": 14
+     "ref_stage": 32
     },
     {
      "view": "transverse_strain",
@@ -101667,17 +102678,14 @@
     {
      "view": "principal_compressive_stress",
      "ref_max": 35.0,
-     "max_diff": 0.07122703823455459,
+     "max_diff": 0.0009326571108113342,
      "floor": 0.002,
-     "max_diff_pct": 0.20350582352729882,
+     "max_diff_pct": 0.002664734602318098,
      "lines": [
       3,
       3
      ],
-     "departure": 0.030529710078782267,
-     "departure_pct": 0.08722774308223505,
-     "apart_pct": 5.588071422532983,
-     "ref_stage": 14
+     "ref_stage": 32
     },
     {
      "view": "shear_on_crack",
@@ -101697,54 +102705,51 @@
     {
      "view": "principal_tensile_stress",
      "ref_max": 1.89,
-     "max_diff": 0.03199999999999985,
+     "max_diff": 0.00015360976239789763,
      "floor": 0.0002,
-     "max_diff_pct": 1.693121693121685,
+     "max_diff_pct": 0.00812750065597342,
      "lines": [
       3,
       3
      ],
-     "departure": 0.24115393138340177,
-     "departure_pct": 12.759467268963057,
-     "apart_pct": 49.16881366903105,
-     "ref_stage": 22
+     "ref_stage": 32
     },
     {
      "view": "principal_tensile_strain",
-     "ref_max": 0.135,
-     "max_diff": 0.0004200292937448547,
+     "ref_max": 0.333,
+     "max_diff": 5.517121736990129e-07,
      "floor": 0.002,
-     "max_diff_pct": 0.31113281018137384,
+     "max_diff_pct": 0.00016567933144114502,
      "lines": [
       1,
       1
      ],
-     "departure": 0.00011483996038149612,
-     "departure_pct": 0.08506663731962674,
-     "apart_pct": 37.681159420289866,
-     "ref_stage": 14
+     "departure": 0.008419582388897971,
+     "departure_pct": 2.5284031197891803,
+     "apart_pct": 56.81818181818181,
+     "ref_stage": 22
     },
     {
      "view": "crack_widths",
-     "ref_max": 0.0165,
-     "max_diff": 4.406066316019536e-05,
+     "ref_max": 0.0678,
+     "max_diff": 1.1228184443096403e-07,
      "floor": 0.0002,
-     "max_diff_pct": 0.26703432218300216,
+     "max_diff_pct": 0.00016560744016366375,
      "lines": [
       1,
       1
      ],
-     "departure": 2.2018695861042343e-05,
-     "departure_pct": 0.13344664158207478,
-     "apart_pct": 77.32558139534883,
-     "ref_stage": 14
+     "departure": 0.0019598642220922165,
+     "departure_pct": 2.8906551948262784,
+     "apart_pct": 66.66666666666667,
+     "ref_stage": 22
     },
     {
      "view": "average_angle",
      "ref_max": 90.0,
-     "max_diff": 0.24044994656668459,
+     "max_diff": 0.0,
      "floor": 0.002,
-     "max_diff_pct": 0.2671666072963162,
+     "max_diff_pct": 0.0,
      "lines": [
       1,
       1
@@ -101757,24 +102762,21 @@
     {
      "view": "long_crack_spacing",
      "ref_max": 600.0,
-     "max_diff": 0.012969104285996822,
+     "max_diff": 0.0008692403784424356,
      "floor": 0.002,
-     "max_diff_pct": 0.00216151738099947,
+     "max_diff_pct": 0.0001448733964070726,
      "lines": [
       1,
       1
      ],
-     "departure": 0.012445752738681948,
-     "departure_pct": 0.002074292123113658,
-     "apart_pct": 0.0960485310531712,
-     "ref_stage": 14
+     "ref_stage": 32
     },
     {
      "view": "transverse_crack_spacing",
      "ref_max": 3000.0,
-     "max_diff": 9.163010411889081,
+     "max_diff": 0.004992054665491399,
      "floor": 0.002,
-     "max_diff_pct": 0.3054336803963027,
+     "max_diff_pct": 0.00016640182218304663,
      "lines": [
       1,
       1
@@ -101786,45 +102788,42 @@
     },
     {
      "view": "diagonal_spacing",
-     "ref_max": 258.787,
-     "max_diff": 0.6913924050012845,
+     "ref_max": 275.748,
+     "max_diff": 0.00044464086374726165,
      "floor": 0.002,
-     "max_diff_pct": 0.2671665906715888,
-     "lines": [
-      1,
-      1
-     ],
-     "departure": 2.6434969517931592,
-     "departure_pct": 1.0214952651381868,
-     "apart_pct": 2.2711660236255318,
-     "ref_stage": 14
-    },
-    {
-     "view": "long_reinforcement_stress",
-     "ref_max": 355.474,
-     "max_diff": 0.9490000000000013,
-     "floor": 0.002,
-     "max_diff_pct": 0.2669674856670253,
-     "lines": [
-      1,
-      1
-     ],
-     "departure": 0.1438337903417447,
-     "departure_pct": 0.04046253462749588,
-     "apart_pct": 12.903469501958575,
-     "ref_stage": 14
-    },
-    {
-     "view": "long_reinf_stress_at_crack",
-     "ref_max": 300.638,
-     "max_diff": 6.675504593545156e-14,
-     "floor": 0.002,
-     "max_diff_pct": 2.220446049250313e-14,
+     "max_diff_pct": 0.0001612489895655677,
      "lines": [
       1,
       1
      ],
      "ref_stage": 32
+    },
+    {
+     "view": "long_reinforcement_stress",
+     "ref_max": 401.421,
+     "max_diff": 0.0020000000000096243,
+     "floor": 0.002,
+     "max_diff_pct": 0.0004982300377931459,
+     "lines": [
+      1,
+      1
+     ],
+     "ref_stage": 32
+    },
+    {
+     "view": "long_reinf_stress_at_crack",
+     "ref_max": 0.0,
+     "max_diff": 0.0,
+     "floor": 0.002,
+     "max_diff_pct": 0.0,
+     "lines": [
+      1,
+      1
+     ],
+     "departure": 0.0,
+     "departure_pct": 0.0,
+     "apart_pct": 0.0,
+     "ref_stage": 14
     },
     {
      "view": "long_average_bond",
@@ -101903,22 +102902,19 @@
     },
     {
      "view": "longitudinal_concrete_stress",
-     "ref_max": 34.991,
-     "max_diff": 0.09107699331839957,
+     "ref_max": 34.959,
+     "max_diff": 0.001000000000000026,
      "floor": 0.002,
-     "max_diff_pct": 0.2602869118298979,
+     "max_diff_pct": 0.002860493721216356,
      "lines": [
       1,
       1
      ],
-     "departure": 0.07112812344445245,
-     "departure_pct": 0.20327548067918164,
-     "apart_pct": 5.588472841194393,
-     "ref_stage": 14
+     "ref_stage": 32
     }
    ],
-   "seconds": 2.8,
-   "run": "9fa0690637e9",
+   "seconds": 3.2,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      -0.0,
@@ -101926,119 +102922,123 @@
     ],
     [
      0.057,
-     6.977
+     6.93
     ],
     [
-     0.399,
-     48.816
+     0.397,
+     48.533
     ],
     [
-     0.743,
-     90.446
+     0.741,
+     90.168
     ],
     [
-     1.091,
-     131.462
+     1.086,
+     130.908
     ],
     [
-     1.446,
-     171.262
+     1.442,
+     170.749
     ],
     [
-     1.815,
-     209.078
+     1.807,
+     208.103
     ],
     [
-     2.203,
-     244.02
+     2.196,
+     243.191
     ],
     [
-     2.616,
-     275.144
+     2.61,
+     274.5
     ],
     [
-     2.702,
-     280.829
+     2.695,
+     280.114
     ],
     [
-     2.771,
-     285.237
+     2.758,
+     283.861
     ],
     [
-     2.828,
-     288.672
+     2.816,
+     287.458
     ],
     [
-     3.063,
-     301.602
+     2.864,
+     290.383
     ],
     [
-     3.568,
-     322.697
+     3.048,
+     300.247
     ],
     [
-     3.59,
-     323.417
+     3.548,
+     321.279
     ],
     [
-     3.607,
-     323.987
+     3.571,
+     322.143
     ],
     [
-     3.621,
-     324.438
+     3.591,
+     322.913
     ],
     [
-     3.677,
-     326.17
+     3.608,
+     323.56
     ],
     [
-     4.16,
-     336.256
+     3.666,
+     325.432
     ],
     [
-     4.893,
-     337.702
+     4.133,
+     334.994
     ],
     [
-     5.795,
-     328.461
+     4.891,
+     337.535
     ],
     [
-     6.987,
-     307.374
+     5.771,
+     327.983
     ],
     [
-     8.36,
-     279.809
+     6.967,
+     307.164
     ],
     [
-     9.799,
-     251.627
+     8.339,
+     279.631
     ],
     [
-     11.239,
-     225.938
+     9.76,
+     251.267
     ],
     [
-     12.659,
-     203.316
+     11.213,
+     225.637
     ],
     [
-     14.067,
-     183.491
+     12.641,
+     203.071
     ],
     [
-     15.479,
-     166.006
+     14.054,
+     183.287
     ],
     [
-     16.912,
-     150.473
+     15.469,
+     165.823
     ],
     [
-     18.379,
-     136.615
+     16.903,
+     150.295
+    ],
+    [
+     18.37,
+     136.433
     ]
    ]
   },
@@ -102929,8 +103929,8 @@
      "ref_stage": 41
     }
    ],
-   "seconds": 93.1,
-   "run": "9fa0690637e9",
+   "seconds": 75.2,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      -0.0,
@@ -104325,8 +105325,8 @@
      "ref_stage": 39
     }
    ],
-   "seconds": 88.5,
-   "run": "9fa0690637e9",
+   "seconds": 77.0,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      0.042,
@@ -104518,19 +105518,19 @@
     "peak-stage": "22"
    },
    "sub": {
-    "stage-count": "36",
-    "peak-stage": "23"
+    "stage-count": "35",
+    "peak-stage": "22"
    },
    "control": [
     {
      "chart": "axial_ex",
      "ref_peak_load": -5385.336,
-     "sub_peak_load": -5371.441,
+     "sub_peak_load": -5385.336,
      "ref_peak_x": -1.66,
      "sub_peak_x": -1.66,
-     "peak_diff_pct": -0.25801547015823034,
-     "curve_max_diff_pct": 0.2692834822687514,
-     "curve_mean_diff_pct": 0.0665468626837757,
+     "peak_diff_pct": 0.0,
+     "curve_max_diff_pct": 0.00020150167190119924,
+     "curve_mean_diff_pct": 9.74593544408917e-06,
      "shape_ref": [
       "cracking",
       "peak",
@@ -104543,8 +105543,8 @@
      ],
      "shape_same": true,
      "floor_pct": 0.05619557282234871,
-     "rising_pct": 0.2603110014024208,
-     "post_peak_pct": 0.36625861542968596
+     "rising_pct": 0.00011206052647949284,
+     "post_peak_pct": 3.0298775995509007e-05
     }
    ],
    "missing_control": [],
@@ -104557,15 +105557,15 @@
      "ref_x": -1.54,
      "ref_y": -5282.003,
      "sub_x": -1.54,
-     "sub_y": -5276.973,
+     "sub_y": -5282.003,
      "place": 0.5554994282829729,
      "views": [
       {
        "view": "longitudinal_strain",
        "ref_max": 1.9115,
-       "max_diff": 0.0083593432797954,
+       "max_diff": 0.0,
        "floor": 0.0002,
-       "max_diff_pct": 0.43731850796732413,
+       "max_diff_pct": 0.0,
        "lines": [
         1,
         1
@@ -104619,9 +105619,9 @@
       {
        "view": "principal_compressive_stress",
        "ref_max": 35.0,
-       "max_diff": 0.1445126710910032,
+       "max_diff": 0.0,
        "floor": 0.002,
-       "max_diff_pct": 0.4128933459742948,
+       "max_diff_pct": 0.0,
        "lines": [
         3,
         3
@@ -104647,9 +105647,9 @@
       {
        "view": "principal_tensile_stress",
        "ref_max": 0.4781,
-       "max_diff": 0.004705319177305039,
+       "max_diff": 0.0,
        "floor": 0.0002,
-       "max_diff_pct": 0.9841705035149632,
+       "max_diff_pct": 0.0,
        "lines": [
         3,
         3
@@ -104745,9 +105745,9 @@
       {
        "view": "long_reinforcement_stress",
        "ref_max": 367.171,
-       "max_diff": 1.4140000000000081,
+       "max_diff": 0.0,
        "floor": 0.002,
-       "max_diff_pct": 0.3851066669208647,
+       "max_diff_pct": 0.0,
        "lines": [
         1,
         1
@@ -104843,9 +105843,9 @@
       {
        "view": "longitudinal_concrete_stress",
        "ref_max": 34.888,
-       "max_diff": 0.1444572136716241,
+       "max_diff": 0.0,
        "floor": 0.002,
-       "max_diff_pct": 0.4140598878457467,
+       "max_diff_pct": 0.0,
        "lines": [
         1,
         1
@@ -104858,21 +105858,21 @@
     },
     {
      "ref_stage": 22,
-     "sub_stage": 23,
+     "sub_stage": 22,
      "matched_by": "same place",
      "feature": "peak",
      "ref_x": -1.66,
      "ref_y": -5385.336,
      "sub_x": -1.66,
-     "sub_y": -5371.441,
+     "sub_y": -5385.336,
      "place": 0.17152173294917955,
      "views": [
       {
        "view": "longitudinal_strain",
        "ref_max": 2.159,
-       "max_diff": 0.01569992593762372,
+       "max_diff": 0.0,
        "floor": 0.0002,
-       "max_diff_pct": 0.7271850827986903,
+       "max_diff_pct": 0.0,
        "lines": [
         1,
         1
@@ -104926,9 +105926,9 @@
       {
        "view": "principal_compressive_stress",
        "ref_max": 35.0,
-       "max_diff": 0.2705851268842872,
+       "max_diff": 0.0,
        "floor": 0.002,
-       "max_diff_pct": 0.7731003625265349,
+       "max_diff_pct": 0.0,
        "lines": [
         3,
         3
@@ -104954,9 +105954,9 @@
       {
        "view": "principal_tensile_stress",
        "ref_max": 0.4836,
-       "max_diff": 0.007427245977880289,
+       "max_diff": 0.0,
        "floor": 0.0002,
-       "max_diff_pct": 1.5358242303309118,
+       "max_diff_pct": 0.0,
        "lines": [
         3,
         3
@@ -105052,9 +106052,9 @@
       {
        "view": "long_reinforcement_stress",
        "ref_max": 400.0,
-       "max_diff": 2.7440000000000353,
+       "max_diff": 0.0,
        "floor": 0.002,
-       "max_diff_pct": 0.6860000000000087,
+       "max_diff_pct": 0.0,
        "lines": [
         1,
         1
@@ -105150,9 +106150,9 @@
       {
        "view": "longitudinal_concrete_stress",
        "ref_max": 34.999,
-       "max_diff": 0.27058356118745774,
+       "max_diff": 0.0,
        "floor": 0.002,
-       "max_diff_pct": 0.7731179781921133,
+       "max_diff_pct": 0.0,
        "lines": [
         1,
         1
@@ -105165,20 +106165,20 @@
     },
     {
      "ref_stage": 34,
-     "sub_stage": 35,
+     "sub_stage": 34,
      "matched_by": "same place",
      "feature": "ends falling",
      "ref_x": -3.559,
      "ref_y": -1832.405,
      "sub_x": -3.559,
-     "sub_y": -1828.337,
+     "sub_y": -1832.406,
      "views": [
       {
        "view": "longitudinal_strain",
        "ref_max": 8.6153,
-       "max_diff": 0.004211965499566489,
+       "max_diff": 6.484569192603263e-05,
        "floor": 0.0002,
-       "max_diff_pct": 0.04888936542623575,
+       "max_diff_pct": 0.0007526806022545081,
        "lines": [
         1,
         1
@@ -105220,9 +106220,9 @@
       {
        "view": "principal_compressive_stress",
        "ref_max": 35.0,
-       "max_diff": 0.017052564910177904,
+       "max_diff": 0.0001293506843327995,
        "floor": 0.002,
-       "max_diff_pct": 0.04872161402907973,
+       "max_diff_pct": 0.00036957338380799856,
        "lines": [
         3,
         3
@@ -105242,9 +106242,9 @@
       {
        "view": "principal_tensile_stress",
        "ref_max": 1.89,
-       "max_diff": 0.05003279551017023,
+       "max_diff": 9.999999999984576e-05,
        "floor": 0.0002,
-       "max_diff_pct": 2.647237857680965,
+       "max_diff_pct": 0.005291005290997131,
        "lines": [
         3,
         3
@@ -105253,9 +106253,9 @@
       {
        "view": "principal_tensile_strain",
        "ref_max": 1.497,
-       "max_diff": 0.0010234713247288547,
+       "max_diff": 2.469627555061137e-06,
        "floor": 0.002,
-       "max_diff_pct": 0.06836815796451934,
+       "max_diff_pct": 0.0001649717805652062,
        "lines": [
         1,
         1
@@ -105264,9 +106264,9 @@
       {
        "view": "crack_widths",
        "ref_max": 0.369,
-       "max_diff": 0.0003108439264051423,
+       "max_diff": 1.670813367041452e-07,
        "floor": 0.0002,
-       "max_diff_pct": 0.08423954645125808,
+       "max_diff_pct": 4.5279495041773766e-05,
        "lines": [
         1,
         1
@@ -105275,9 +106275,9 @@
       {
        "view": "average_angle",
        "ref_max": 90.0,
-       "max_diff": 0.050099992191013104,
+       "max_diff": 0.0,
        "floor": 0.002,
-       "max_diff_pct": 0.05566665799001456,
+       "max_diff_pct": 0.0,
        "lines": [
         1,
         1
@@ -105319,9 +106319,9 @@
       {
        "view": "long_reinforcement_stress",
        "ref_max": 402.514,
-       "max_diff": 0.0,
+       "max_diff": 0.0010000000000087383,
        "floor": 0.002,
-       "max_diff_pct": 0.0,
+       "max_diff_pct": 0.00024843856362977146,
        "lines": [
         1,
         1
@@ -105396,9 +106396,9 @@
       {
        "view": "longitudinal_concrete_stress",
        "ref_max": 35.0,
-       "max_diff": 0.06020833333333333,
+       "max_diff": 0.0009949462516929844,
        "floor": 0.002,
-       "max_diff_pct": 0.17202380952380952,
+       "max_diff_pct": 0.0028427035762656695,
        "lines": [
         1,
         1
@@ -105409,25 +106409,22 @@
    ],
    "views_at": {
     "ref_stage": 22,
-    "sub_stage": 23,
+    "sub_stage": 22,
     "ref_x": -1.66,
     "sub_x": -1.66
    },
    "views": [
     {
      "view": "longitudinal_strain",
-     "ref_max": 2.159,
-     "max_diff": 0.01569992593762372,
+     "ref_max": 8.6153,
+     "max_diff": 6.484569192603263e-05,
      "floor": 0.0002,
-     "max_diff_pct": 0.7271850827986903,
+     "max_diff_pct": 0.0007526806022545081,
      "lines": [
       1,
       1
      ],
-     "departure": 0.02832736583360125,
-     "departure_pct": 1.3120595569060332,
-     "apart_pct": 25.86357039187227,
-     "ref_stage": 22
+     "ref_stage": 34
     },
     {
      "view": "transverse_strain",
@@ -105477,17 +106474,14 @@
     {
      "view": "principal_compressive_stress",
      "ref_max": 35.0,
-     "max_diff": 0.2705851268842872,
+     "max_diff": 0.0001293506843327995,
      "floor": 0.002,
-     "max_diff_pct": 0.7731003625265349,
+     "max_diff_pct": 0.00036957338380799856,
      "lines": [
       3,
       3
      ],
-     "departure": 0.7343383419504865,
-     "departure_pct": 2.0981095484299614,
-     "apart_pct": 19.06,
-     "ref_stage": 22
+     "ref_stage": 34
     },
     {
      "view": "shear_on_crack",
@@ -105507,9 +106501,9 @@
     {
      "view": "principal_tensile_stress",
      "ref_max": 1.89,
-     "max_diff": 0.05003279551017023,
+     "max_diff": 9.999999999984576e-05,
      "floor": 0.0002,
-     "max_diff_pct": 2.647237857680965,
+     "max_diff_pct": 0.005291005290997131,
      "lines": [
       3,
       3
@@ -105519,9 +106513,9 @@
     {
      "view": "principal_tensile_strain",
      "ref_max": 1.497,
-     "max_diff": 0.0010234713247288547,
+     "max_diff": 2.469627555061137e-06,
      "floor": 0.002,
-     "max_diff_pct": 0.06836815796451934,
+     "max_diff_pct": 0.0001649717805652062,
      "lines": [
       1,
       1
@@ -105531,9 +106525,9 @@
     {
      "view": "crack_widths",
      "ref_max": 0.369,
-     "max_diff": 0.0003108439264051423,
+     "max_diff": 1.670813367041452e-07,
      "floor": 0.0002,
-     "max_diff_pct": 0.08423954645125808,
+     "max_diff_pct": 4.5279495041773766e-05,
      "lines": [
       1,
       1
@@ -105542,15 +106536,18 @@
     },
     {
      "view": "average_angle",
-     "ref_max": 90.0,
-     "max_diff": 0.050099992191013104,
+     "ref_max": 0.0,
+     "max_diff": 0.0,
      "floor": 0.002,
-     "max_diff_pct": 0.05566665799001456,
+     "max_diff_pct": 0.0,
      "lines": [
       1,
       1
      ],
-     "ref_stage": 34
+     "departure": 0.0,
+     "departure_pct": 0.0,
+     "apart_pct": 0.0,
+     "ref_stage": 16
     },
     {
      "view": "long_crack_spacing",
@@ -105593,18 +106590,15 @@
     },
     {
      "view": "long_reinforcement_stress",
-     "ref_max": 400.0,
-     "max_diff": 2.7440000000000353,
+     "ref_max": 402.514,
+     "max_diff": 0.0010000000000087383,
      "floor": 0.002,
-     "max_diff_pct": 0.6860000000000087,
+     "max_diff_pct": 0.00024843856362977146,
      "lines": [
       1,
       1
      ],
-     "departure": 7.417365924905983,
-     "departure_pct": 1.8543414812264958,
-     "apart_pct": 8.993548090127268,
-     "ref_stage": 22
+     "ref_stage": 34
     },
     {
      "view": "long_reinf_stress_at_crack",
@@ -105698,22 +106692,19 @@
     },
     {
      "view": "longitudinal_concrete_stress",
-     "ref_max": 34.999,
-     "max_diff": 0.27058356118745774,
+     "ref_max": 35.0,
+     "max_diff": 0.0009949462516929844,
      "floor": 0.002,
-     "max_diff_pct": 0.7731179781921133,
+     "max_diff_pct": 0.0028427035762656695,
      "lines": [
       1,
       1
      ],
-     "departure": 0.7343382545126834,
-     "departure_pct": 2.0981692463004182,
-     "apart_pct": 19.06,
-     "ref_stage": 22
+     "ref_stage": 34
     }
    ],
-   "seconds": 1.0,
-   "run": "9fa0690637e9",
+   "seconds": 1.4,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      0.0,
@@ -105725,139 +106716,135 @@
     ],
     [
      -0.118,
-     -505.792
+     -505.903
     ],
     [
      -0.22,
-     -938.631
+     -938.751
     ],
     [
      -0.321,
-     -1369.446
+     -1369.694
     ],
     [
      -0.423,
-     -1796.246
+     -1796.527
     ],
     [
      -0.524,
-     -2216.463
+     -2216.775
     ],
     [
      -0.625,
-     -2627.037
+     -2627.396
     ],
     [
      -0.727,
-     -3024.517
+     -3025.374
     ],
     [
      -0.828,
-     -3405.182
+     -3406.364
     ],
     [
      -0.93,
-     -3765.164
+     -3765.945
     ],
     [
      -1.031,
-     -4100.568
+     -4102.427
     ],
     [
      -1.134,
-     -4412.412
+     -4413.836
     ],
     [
      -1.247,
-     -4716.819
+     -4718.886
     ],
     [
      -1.372,
-     -4998.835
+     -5002.332
     ],
     [
      -1.509,
-     -5236.172
+     -5242.573
     ],
     [
      -1.54,
-     -5276.973
+     -5282.003
     ],
     [
      -1.564,
-     -5306.413
+     -5314.95
     ],
     [
      -1.583,
-     -5327.849
-    ],
-    [
-     -1.586,
-     -5331.101
-    ],
-    [
-     -1.589,
-     -5333.666
-    ],
-    [
-     -1.591,
-     -5335.696
+     -5337.405
     ],
     [
      -1.599,
-     -5343.535
+     -5352.928
+    ],
+    [
+     -1.601,
+     -5351.442
+    ],
+    [
+     -1.611,
+     -5363.67
     ],
     [
      -1.66,
-     -5371.441
+     -5385.336
     ],
     [
      -1.826,
-     -5079.183
+     -5109.444
     ],
     [
      -2.009,
-     -4406.853
+     -4427.996
     ],
     [
      -2.21,
-     -3779.311
+     -3793.742
     ],
     [
      -2.254,
-     -3664.06
+     -3680.305
     ],
     [
      -2.29,
-     -3577.115
+     -3589.413
     ],
     [
      -2.318,
-     -3510.541
+     -3525.167
     ],
     [
      -2.34,
-     -3457.715
+     -3471.054
     ],
     [
      -2.431,
-     -3251.442
+     -3264.346
     ],
     [
      -2.674,
-     -2775.611
+     -2788.146
     ],
     [
      -2.941,
-     -2401.241
+     -2408.017
     ],
     [
      -3.236,
-     -2086.171
+     -2091.625
     ],
     [
      -3.559,
-     -1828.337
+     -1832.406
     ]
    ]
   },
@@ -107061,8 +108048,8 @@
      "ref_stage": 29
     }
    ],
-   "seconds": 86.4,
-   "run": "9fa0690637e9",
+   "seconds": 63.8,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      -0.0,
@@ -108816,8 +109803,8 @@
      "ref_stage": 72
     }
    ],
-   "seconds": 5.7,
-   "run": "9fa0690637e9",
+   "seconds": 5.2,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      -0.017,
@@ -110315,8 +111302,8 @@
      "ref_stage": 46
     }
    ],
-   "seconds": 16.0,
-   "run": "9fa0690637e9",
+   "seconds": 14.2,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      0.169,
@@ -112061,8 +113048,8 @@
      "ref_stage": 8
     }
    ],
-   "seconds": 4.6,
-   "run": "9fa0690637e9",
+   "seconds": 3.1,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      -0.0,
@@ -113792,8 +114779,8 @@
      "ref_stage": 48
     }
    ],
-   "seconds": 108.9,
-   "run": "9fa0690637e9",
+   "seconds": 95.4,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      -0.0,
@@ -115324,8 +116311,8 @@
      "ref_stage": 40
     }
    ],
-   "seconds": 74.9,
-   "run": "9fa0690637e9",
+   "seconds": 67.6,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      -0.0,
@@ -116720,8 +117707,8 @@
      "ref_stage": 81
     }
    ],
-   "seconds": 147.3,
-   "run": "9fa0690637e9",
+   "seconds": 145.0,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      -0.0,
@@ -118181,8 +119168,8 @@
      "ref_stage": 73
     }
    ],
-   "seconds": 119.6,
-   "run": "9fa0690637e9",
+   "seconds": 108.0,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      -0.047,
@@ -119218,8 +120205,8 @@
      "ref_stage": 58
     }
    ],
-   "seconds": 112.1,
-   "run": "9fa0690637e9",
+   "seconds": 101.5,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      -0.0,
@@ -120703,8 +121690,8 @@
      "ref_stage": 42
     }
    ],
-   "seconds": 91.8,
-   "run": "9fa0690637e9",
+   "seconds": 88.3,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      -0.0,
@@ -120883,12 +121870,12 @@
     {
      "chart": "axial_ex",
      "ref_peak_load": 353.034,
-     "sub_peak_load": 352.282,
+     "sub_peak_load": 353.041,
      "ref_peak_x": 1.247,
      "sub_peak_x": 1.247,
-     "peak_diff_pct": -0.21301064486706933,
-     "curve_max_diff_pct": 0.48062926455488497,
-     "curve_mean_diff_pct": 0.07301739999320321,
+     "peak_diff_pct": 0.0019828118538171968,
+     "curve_max_diff_pct": 0.0036749766705587903,
+     "curve_mean_diff_pct": 0.0013653234014559883,
      "shape_ref": [
       "cracking",
       "fall",
@@ -120896,36 +121883,36 @@
       "ends standing still"
      ],
      "shape_sub": [
-      "fall",
       "cracking",
+      "fall",
       "peak",
       "ends standing still"
      ],
-     "shape_same": false,
+     "shape_same": true,
      "floor_pct": 0.1310628233405606,
-     "rising_pct": 0.47840144719632893,
-     "post_peak_pct": 0.22451929442272953
+     "rising_pct": 0.0036713173312582486,
+     "post_peak_pct": 0.1345204807507419
     }
    ],
    "missing_control": [],
    "views_stages": [
     {
      "ref_stage": 12,
-     "sub_stage": 11,
+     "sub_stage": 12,
      "matched_by": "same place",
      "feature": "cracking",
      "ref_x": 0.065,
      "ref_y": 276.201,
-     "sub_x": 0.064,
-     "sub_y": 274.528,
+     "sub_x": 0.065,
+     "sub_y": 276.201,
      "place": 0.039828194998199985,
      "views": [
       {
        "view": "longitudinal_strain",
        "ref_max": 0.0716,
-       "max_diff": 0.0005029201627137258,
+       "max_diff": 0.0,
        "floor": 0.0002,
-       "max_diff_pct": 0.7024024618906785,
+       "max_diff_pct": 0.0,
        "lines": [
         1,
         1
@@ -121007,9 +121994,9 @@
       {
        "view": "principal_tensile_stress",
        "ref_max": 1.89,
-       "max_diff": 0.08817160366568834,
+       "max_diff": 4.62739672756042e-05,
        "floor": 0.0002,
-       "max_diff_pct": 4.6651642151157855,
+       "max_diff_pct": 0.002448358056910275,
        "lines": [
         3,
         3
@@ -121021,9 +122008,9 @@
       {
        "view": "principal_tensile_strain",
        "ref_max": 0.072,
-       "max_diff": 0.0010000000000000044,
+       "max_diff": 0.0,
        "floor": 0.002,
-       "max_diff_pct": 1.388888888888895,
+       "max_diff_pct": 0.0,
        "lines": [
         1,
         1
@@ -121035,9 +122022,9 @@
       {
        "view": "crack_widths",
        "ref_max": 0.0002,
-       "max_diff": 0.0002,
+       "max_diff": 0.0,
        "floor": 0.0002,
-       "max_diff_pct": 100.0,
+       "max_diff_pct": 0.0,
        "lines": [
         1,
         1
@@ -121063,9 +122050,9 @@
       {
        "view": "long_crack_spacing",
        "ref_max": 600.0,
-       "max_diff": 2.197218468327043,
+       "max_diff": 0.0,
        "floor": 0.002,
-       "max_diff_pct": 0.36620307805450714,
+       "max_diff_pct": 0.0,
        "lines": [
         1,
         1
@@ -121077,9 +122064,9 @@
       {
        "view": "transverse_crack_spacing",
        "ref_max": 3000.0,
-       "max_diff": 33.07963732951552,
+       "max_diff": 0.0,
        "floor": 0.002,
-       "max_diff_pct": 1.1026545776505174,
+       "max_diff_pct": 0.0,
        "lines": [
         1,
         1
@@ -121091,9 +122078,9 @@
       {
        "view": "diagonal_spacing",
        "ref_max": 600.0,
-       "max_diff": 600.0,
+       "max_diff": 0.0,
        "floor": 0.002,
-       "max_diff_pct": 100.0,
+       "max_diff_pct": 0.0,
        "lines": [
         1,
         1
@@ -121105,9 +122092,9 @@
       {
        "view": "long_reinforcement_stress",
        "ref_max": 14.031,
-       "max_diff": 0.09100000000000058,
+       "max_diff": 0.0,
        "floor": 0.002,
-       "max_diff_pct": 0.6485638942341998,
+       "max_diff_pct": 0.0,
        "lines": [
         1,
         1
@@ -121203,9 +122190,9 @@
       {
        "view": "longitudinal_concrete_stress",
        "ref_max": 1.89,
-       "max_diff": 0.08828561749110468,
+       "max_diff": 0.0,
        "floor": 0.002,
-       "max_diff_pct": 4.6711966926510415,
+       "max_diff_pct": 0.0,
        "lines": [
         1,
         1
@@ -121224,15 +122211,15 @@
      "ref_x": 0.066,
      "ref_y": 235.772,
      "sub_x": 0.066,
-     "sub_y": 235.092,
+     "sub_y": 235.791,
      "place": 0.6526078884500631,
      "views": [
       {
        "view": "longitudinal_strain",
        "ref_max": 0.0926,
-       "max_diff": 0.00035318777056978737,
+       "max_diff": 8.092808081683022e-05,
        "floor": 0.0002,
-       "max_diff_pct": 0.3814122792330317,
+       "max_diff_pct": 0.0873953356553242,
        "lines": [
         1,
         1
@@ -121314,9 +122301,9 @@
       {
        "view": "principal_tensile_stress",
        "ref_max": 1.89,
-       "max_diff": 0.009599893066130767,
+       "max_diff": 0.00029999999999995693,
        "floor": 0.0002,
-       "max_diff_pct": 0.5079308500598291,
+       "max_diff_pct": 0.015873015873013596,
        "lines": [
         3,
         3
@@ -121328,9 +122315,9 @@
       {
        "view": "principal_tensile_strain",
        "ref_max": 0.093,
-       "max_diff": 0.0008933347602608026,
+       "max_diff": 0.0,
        "floor": 0.002,
-       "max_diff_pct": 0.960575011033121,
+       "max_diff_pct": 0.0,
        "lines": [
         1,
         1
@@ -121342,9 +122329,9 @@
       {
        "view": "crack_widths",
        "ref_max": 0.0129,
-       "max_diff": 0.00010352042293683095,
+       "max_diff": 9.999999999999874e-05,
        "floor": 0.0002,
-       "max_diff_pct": 0.8024838987351237,
+       "max_diff_pct": 0.7751937984496026,
        "lines": [
         1,
         1
@@ -121398,9 +122385,9 @@
       {
        "view": "diagonal_spacing",
        "ref_max": 600.0,
-       "max_diff": 0.6699998955684309,
+       "max_diff": 0.0,
        "floor": 0.002,
-       "max_diff_pct": 0.11166664926140515,
+       "max_diff_pct": 0.0,
        "lines": [
         1,
         1
@@ -121412,9 +122399,9 @@
       {
        "view": "long_reinforcement_stress",
        "ref_max": 17.459,
-       "max_diff": 0.0720000000000006,
+       "max_diff": 0.0019999999999997476,
        "floor": 0.002,
-       "max_diff_pct": 0.41239475342230714,
+       "max_diff_pct": 0.011455409817284767,
        "lines": [
         1,
         1
@@ -121426,9 +122413,9 @@
       {
        "view": "long_reinf_stress_at_crack",
        "ref_max": 37.336,
-       "max_diff": 4.145128684740484e-15,
+       "max_diff": 0.008999999999999864,
        "floor": 0.002,
-       "max_diff_pct": 1.1102230246251565e-14,
+       "max_diff_pct": 0.024105421041353825,
        "lines": [
         1,
         1
@@ -121510,9 +122497,9 @@
       {
        "view": "longitudinal_concrete_stress",
        "ref_max": 1.889,
-       "max_diff": 0.00957524617585869,
+       "max_diff": 0.0009999999999999638,
        "floor": 0.002,
-       "max_diff_pct": 0.506894980193684,
+       "max_diff_pct": 0.052938062466911795,
        "lines": [
         1,
         1
@@ -121531,15 +122518,15 @@
      "ref_x": 1.247,
      "ref_y": 353.034,
      "sub_x": 1.247,
-     "sub_y": 352.282,
+     "sub_y": 353.041,
      "place": 0.47345436569197685,
      "views": [
       {
        "view": "longitudinal_strain",
        "ref_max": 2.4236,
-       "max_diff": 0.0027147386145242643,
+       "max_diff": 7.114357185905353e-05,
        "floor": 0.0002,
-       "max_diff_pct": 0.11201265120169435,
+       "max_diff_pct": 0.002935450233497835,
        "lines": [
         1,
         1
@@ -121621,9 +122608,9 @@
       {
        "view": "principal_tensile_stress",
        "ref_max": 1.89,
-       "max_diff": 0.0037758585359337384,
+       "max_diff": 9.999668052723757e-05,
        "floor": 0.0002,
-       "max_diff_pct": 0.199780874917129,
+       "max_diff_pct": 0.005290829657525798,
        "lines": [
         3,
         3
@@ -121635,9 +122622,9 @@
       {
        "view": "principal_tensile_strain",
        "ref_max": 2.424,
-       "max_diff": 0.00314715562847266,
+       "max_diff": 0.0,
        "floor": 0.002,
-       "max_diff_pct": 0.12983315298979622,
+       "max_diff_pct": 0.0,
        "lines": [
         1,
         1
@@ -121649,9 +122636,9 @@
       {
        "view": "crack_widths",
        "ref_max": 1.4114,
-       "max_diff": 0.001536610713953306,
+       "max_diff": 8.369048432760334e-05,
        "floor": 0.0002,
-       "max_diff_pct": 0.10887138401256242,
+       "max_diff_pct": 0.005929607788550612,
        "lines": [
         1,
         1
@@ -121705,9 +122692,9 @@
       {
        "view": "diagonal_spacing",
        "ref_max": 600.0,
-       "max_diff": 2.318000862812612,
+       "max_diff": 0.0,
        "floor": 0.002,
-       "max_diff_pct": 0.3863334771354353,
+       "max_diff_pct": 0.0,
        "lines": [
         1,
         1
@@ -121719,9 +122706,9 @@
       {
        "view": "long_reinforcement_stress",
        "ref_max": 400.0,
-       "max_diff": 0.5929999999999991,
+       "max_diff": 0.0010000000000065512,
        "floor": 0.002,
-       "max_diff_pct": 0.14824999999999977,
+       "max_diff_pct": 0.0002500000000016378,
        "lines": [
         1,
         1
@@ -121733,9 +122720,9 @@
       {
        "view": "long_reinf_stress_at_crack",
        "ref_max": 400.0,
-       "max_diff": 0.5640000000000089,
+       "max_diff": 0.0,
        "floor": 0.002,
-       "max_diff_pct": 0.14100000000000223,
+       "max_diff_pct": 0.0,
        "lines": [
         1,
         1
@@ -121817,9 +122804,9 @@
       {
        "view": "longitudinal_concrete_stress",
        "ref_max": 1.873,
-       "max_diff": 0.0037506543843435834,
+       "max_diff": 0.0009994606927220435,
        "floor": 0.002,
-       "max_diff_pct": 0.20024849889714808,
+       "max_diff_pct": 0.053361489200322666,
        "lines": [
         1,
         1
@@ -122083,18 +123070,15 @@
    "views": [
     {
      "view": "longitudinal_strain",
-     "ref_max": 0.0716,
-     "max_diff": 0.0005029201627137258,
+     "ref_max": 3.0519,
+     "max_diff": 0.0031803800959077162,
      "floor": 0.0002,
-     "max_diff_pct": 0.7024024618906785,
+     "max_diff_pct": 0.10420983963785564,
      "lines": [
       1,
       1
      ],
-     "departure": 0.0009663039275630846,
-     "departure_pct": 1.3495864910098947,
-     "apart_pct": 23.326133909287265,
-     "ref_stage": 12
+     "ref_stage": 30
     },
     {
      "view": "transverse_strain",
@@ -122174,47 +123158,41 @@
     {
      "view": "principal_tensile_stress",
      "ref_max": 1.89,
-     "max_diff": 0.08817160366568834,
+     "max_diff": 0.009200000000000078,
      "floor": 0.0002,
-     "max_diff_pct": 4.6651642151157855,
+     "max_diff_pct": 0.4867724867724909,
      "lines": [
       3,
       3
      ],
-     "departure": 0.06722656904781975,
-     "departure_pct": 3.5569613252814682,
-     "apart_pct": 25.59696126406711,
-     "ref_stage": 12
+     "ref_stage": 30
     },
     {
      "view": "principal_tensile_strain",
-     "ref_max": 0.072,
-     "max_diff": 0.0010000000000000044,
+     "ref_max": 3.052,
+     "max_diff": 0.0035284008549153014,
      "floor": 0.002,
-     "max_diff_pct": 1.388888888888895,
+     "max_diff_pct": 0.11560946444676609,
      "lines": [
       1,
       1
      ],
-     "departure": 0.0015888627322564268,
-     "departure_pct": 2.2067537948005933,
-     "apart_pct": 24.19876054475518,
-     "ref_stage": 12
+     "ref_stage": 30
     },
     {
      "view": "crack_widths",
-     "ref_max": 0.0002,
-     "max_diff": 0.0002,
+     "ref_max": 0.0129,
+     "max_diff": 9.999999999999874e-05,
      "floor": 0.0002,
-     "max_diff_pct": 100.0,
+     "max_diff_pct": 0.7751937984496026,
      "lines": [
       1,
       1
      ],
-     "departure": 7.613278864999253e-05,
-     "departure_pct": 38.06639432499626,
-     "apart_pct": 100.0,
-     "ref_stage": 12
+     "departure": 0.007063320509795978,
+     "departure_pct": 54.75442255655796,
+     "apart_pct": 99.76359338061465,
+     "ref_stage": 13
     },
     {
      "view": "average_angle",
@@ -122234,9 +123212,9 @@
     {
      "view": "long_crack_spacing",
      "ref_max": 600.0,
-     "max_diff": 2.197218468327043,
+     "max_diff": 0.0,
      "floor": 0.002,
-     "max_diff_pct": 0.36620307805450714,
+     "max_diff_pct": 0.0,
      "lines": [
       1,
       1
@@ -122249,9 +123227,9 @@
     {
      "view": "transverse_crack_spacing",
      "ref_max": 3000.0,
-     "max_diff": 33.07963732951552,
+     "max_diff": 0.0,
      "floor": 0.002,
-     "max_diff_pct": 1.1026545776505174,
+     "max_diff_pct": 0.0,
      "lines": [
       1,
       1
@@ -122264,9 +123242,9 @@
     {
      "view": "diagonal_spacing",
      "ref_max": 600.0,
-     "max_diff": 600.0,
+     "max_diff": 0.0,
      "floor": 0.002,
-     "max_diff_pct": 100.0,
+     "max_diff_pct": 0.0,
      "lines": [
       1,
       1
@@ -122278,33 +123256,33 @@
     },
     {
      "view": "long_reinforcement_stress",
-     "ref_max": 14.031,
-     "max_diff": 0.09100000000000058,
+     "ref_max": 17.459,
+     "max_diff": 0.0019999999999997476,
      "floor": 0.002,
-     "max_diff_pct": 0.6485638942341998,
+     "max_diff_pct": 0.011455409817284767,
      "lines": [
       1,
       1
      ],
-     "departure": 0.17546935548027826,
-     "departure_pct": 1.250583390209381,
-     "apart_pct": 20.224526032418797,
-     "ref_stage": 12
+     "departure": 1.9383383786930608e-15,
+     "departure_pct": 1.1102230246251565e-14,
+     "apart_pct": 63.681308725700816,
+     "ref_stage": 13
     },
     {
      "view": "long_reinf_stress_at_crack",
-     "ref_max": 400.0,
-     "max_diff": 0.5640000000000089,
+     "ref_max": 37.336,
+     "max_diff": 0.008999999999999864,
      "floor": 0.002,
-     "max_diff_pct": 0.14100000000000223,
+     "max_diff_pct": 0.024105421041353825,
      "lines": [
       1,
       1
      ],
-     "departure": 0.608569529506453,
-     "departure_pct": 0.15214238237661326,
-     "apart_pct": 0.10425000000000019,
-     "ref_stage": 25
+     "departure": 0.0,
+     "departure_pct": 0.0,
+     "apart_pct": 100.0,
+     "ref_stage": 13
     },
     {
      "view": "long_average_bond",
@@ -122383,22 +123361,19 @@
     },
     {
      "view": "longitudinal_concrete_stress",
-     "ref_max": 1.89,
-     "max_diff": 0.08828561749110468,
+     "ref_max": 1.872,
+     "max_diff": 0.009000000000000176,
      "floor": 0.002,
-     "max_diff_pct": 4.6711966926510415,
+     "max_diff_pct": 0.48076923076924016,
      "lines": [
       1,
       1
      ],
-     "departure": 0.06735674035029772,
-     "departure_pct": 3.5638486957829487,
-     "apart_pct": 25.662900559855206,
-     "ref_stage": 12
+     "ref_stage": 30
     }
    ],
-   "seconds": 2.1,
-   "run": "9fa0690637e9",
+   "seconds": 8.2,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      0.0,
@@ -122410,107 +123385,107 @@
     ],
     [
      0.037,
-     158.973
+     159.017
     ],
     [
      0.053,
-     228.343
+     228.384
     ],
     [
      0.056,
-     239.442
+     239.485
     ],
     [
      0.058,
-     248.321
+     248.361
     ],
     [
      0.06,
-     255.425
+     255.459
     ],
     [
      0.061,
-     261.108
+     261.137
     ],
     [
      0.062,
-     265.654
+     265.678
     ],
     [
      0.063,
-     269.291
+     269.31
     ],
     [
      0.064,
-     272.2
+     272.216
     ],
     [
      0.064,
-     274.528
+     274.541
     ],
     [
      0.065,
-     239.091
+     276.201
     ],
     [
      0.066,
-     235.092
+     235.791
     ],
     [
      0.118,
-     217.534
+     217.935
     ],
     [
      0.22,
-     219.346
+     219.767
     ],
     [
      0.321,
-     228.104
+     228.454
     ],
     [
      0.423,
-     239.965
+     240.271
     ],
     [
      0.524,
-     253.598
+     254.093
     ],
     [
      0.625,
-     268.384
+     268.817
     ],
     [
      0.727,
-     283.974
+     284.417
     ],
     [
      0.828,
-     300.146
+     300.553
     ],
     [
      0.93,
-     316.748
+     317.142
     ],
     [
      1.031,
-     333.689
+     334.283
     ],
     [
      1.134,
-     351.294
+     351.902
     ],
     [
      1.247,
-     352.282
+     353.041
     ],
     [
      1.372,
-     348.98
+     349.786
     ],
     [
      1.509,
-     346.096
+     346.861
     ],
     [
      1.528,
@@ -123745,8 +124720,8 @@
      "ref_stage": 57
     }
    ],
-   "seconds": 18.0,
-   "run": "9fa0690637e9",
+   "seconds": 13.8,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      -0.45,
@@ -125529,8 +126504,8 @@
      "ref_stage": 36
     }
    ],
-   "seconds": 76.1,
-   "run": "9fa0690637e9",
+   "seconds": 68.6,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      -0.0,
@@ -126901,8 +127876,8 @@
      "ref_stage": 38
     }
    ],
-   "seconds": 86.7,
-   "run": "9fa0690637e9",
+   "seconds": 79.3,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      -0.0,
@@ -128254,8 +129229,8 @@
      "ref_stage": 38
     }
    ],
-   "seconds": 73.5,
-   "run": "9fa0690637e9",
+   "seconds": 63.3,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      -0.0,
@@ -129651,8 +130626,8 @@
      "ref_stage": 30
     }
    ],
-   "seconds": 70.9,
-   "run": "9fa0690637e9",
+   "seconds": 61.9,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      -0.0,
@@ -131022,8 +131997,8 @@
      "ref_stage": 39
     }
    ],
-   "seconds": 70.4,
-   "run": "9fa0690637e9",
+   "seconds": 64.1,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      -0.0,
@@ -132391,8 +133366,8 @@
      "ref_stage": 33
     }
    ],
-   "seconds": 80.7,
-   "run": "9fa0690637e9",
+   "seconds": 73.1,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      -0.0,
@@ -133745,8 +134720,8 @@
      "ref_stage": 56
     }
    ],
-   "seconds": 105.0,
-   "run": "9fa0690637e9",
+   "seconds": 94.4,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      -0.0,
@@ -135187,8 +136162,8 @@
      "ref_stage": 59
     }
    ],
-   "seconds": 4.6,
-   "run": "9fa0690637e9",
+   "seconds": 3.3,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      -0.0,
@@ -136655,8 +137630,8 @@
      "ref_stage": 52
     }
    ],
-   "seconds": 98.7,
-   "run": "9fa0690637e9",
+   "seconds": 91.3,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      -0.0,
@@ -138113,8 +139088,8 @@
      "ref_stage": 16
     }
    ],
-   "seconds": 4.6,
-   "run": "9fa0690637e9",
+   "seconds": 2.8,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      -0.0,
@@ -139557,8 +140532,8 @@
      "ref_stage": 69
     }
    ],
-   "seconds": 66.2,
-   "run": "9fa0690637e9",
+   "seconds": 63.2,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      -0.0,
@@ -141049,8 +142024,8 @@
      "ref_stage": 10
     }
    ],
-   "seconds": 74.8,
-   "run": "9fa0690637e9",
+   "seconds": 70.6,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      0.0,
@@ -141798,7 +142773,7 @@
     }
    ],
    "seconds": 0.0,
-   "run": "9fa0690637e9",
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      -0.0,
@@ -143016,8 +143991,8 @@
      "ref_stage": 54
     }
    ],
-   "seconds": 76.8,
-   "run": "9fa0690637e9",
+   "seconds": 73.9,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      -0.0,
@@ -144137,8 +145112,8 @@
      "ref_stage": 15
     }
    ],
-   "seconds": 5.0,
-   "run": "9fa0690637e9",
+   "seconds": 3.7,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      0.0,
@@ -144438,19 +145413,19 @@
     "peak-stage": "38"
    },
    "sub": {
-    "stage-count": "44",
-    "peak-stage": "41"
+    "stage-count": "68",
+    "peak-stage": "36"
    },
    "control": [
     {
      "chart": "shear_gxy",
      "ref_peak_load": 696.588,
-     "sub_peak_load": 630.973,
+     "sub_peak_load": 696.038,
      "ref_peak_x": 2.913,
-     "sub_peak_x": 3.119,
-     "peak_diff_pct": -9.41948468822317,
-     "curve_max_diff_pct": 11.265265176656088,
-     "curve_mean_diff_pct": 0.5900340810978776,
+     "sub_peak_x": 2.908,
+     "peak_diff_pct": -0.07895628405886328,
+     "curve_max_diff_pct": 0.12041876183833751,
+     "curve_mean_diff_pct": 0.014400099150159522,
      "shape_ref": [
       "cracking",
       "peak",
@@ -144459,22 +145434,22 @@
      "shape_sub": [
       "cracking",
       "peak",
-      "ends standing still"
+      "ends falling"
      ],
-     "shape_same": false,
+     "shape_same": true,
      "floor_pct": 0.02268012559586545,
-     "rising_pct": 9.987995548486527,
-     "post_peak_pct": 64.79680626382864
+     "rising_pct": 0.08978899214946746,
+     "post_peak_pct": 169.09021855734852
     },
     {
      "chart": "moment_phi",
      "ref_peak_load": 1391.823,
-     "sub_peak_load": 1261.947,
+     "sub_peak_load": 1392.077,
      "ref_peak_x": 3.768,
-     "sub_peak_x": 2.602,
-     "peak_diff_pct": -9.33135894434854,
-     "curve_max_diff_pct": 32.19555514377092,
-     "curve_mean_diff_pct": 2.13310572133718,
+     "sub_peak_x": 3.114,
+     "peak_diff_pct": 0.018249446948347986,
+     "curve_max_diff_pct": 0.06334647094784071,
+     "curve_mean_diff_pct": 0.005572243793942628,
      "shape_ref": [
       "cracking",
       "peak",
@@ -144483,12 +145458,12 @@
      "shape_sub": [
       "cracking",
       "peak",
-      "ends standing still"
+      "ends falling"
      ],
-     "shape_same": false,
+     "shape_same": true,
      "floor_pct": 0.021070865039793427,
-     "rising_pct": 15.38746685346181,
-     "post_peak_pct": 72.86373494411298
+     "rising_pct": 0.10713675861863468,
+     "post_peak_pct": 118.13672950652223
     }
    ],
    "missing_control": [],
@@ -144802,21 +145777,21 @@
     },
     {
      "ref_stage": 38,
-     "sub_stage": 41,
-     "matched_by": "feature",
+     "sub_stage": 38,
+     "matched_by": "same place",
      "feature": "peak",
      "ref_x": 3.768,
      "ref_y": 1391.823,
-     "sub_x": 2.602,
-     "sub_y": 1261.947,
+     "sub_x": 3.768,
+     "sub_y": 1392.023,
      "place": 0.47558165489165494,
      "views": [
       {
        "view": "longitudinal_strain",
        "ref_max": 3.9314,
-       "max_diff": 1.3203000000000003,
+       "max_diff": 6.556847040100009e-05,
        "floor": 0.0002,
-       "max_diff_pct": 33.58345627511829,
+       "max_diff_pct": 0.0016678147835631095,
        "lines": [
         1,
         1
@@ -144828,9 +145803,9 @@
       {
        "view": "transverse_strain",
        "ref_max": 4.534,
-       "max_diff": 2.4460383746783974,
+       "max_diff": 0.15780342447505566,
        "floor": 0.002,
-       "max_diff_pct": 53.94879520684599,
+       "max_diff_pct": 3.4804460625287974,
        "lines": [
         4,
         4
@@ -144842,9 +145817,9 @@
       {
        "view": "shear_strain",
        "ref_max": 5.3818,
-       "max_diff": 1.8406800478708831,
+       "max_diff": 0.15907503812334112,
        "floor": 0.0002,
-       "max_diff_pct": 34.20194076091425,
+       "max_diff_pct": 2.955796167143727,
        "lines": [
         5,
         5
@@ -144856,9 +145831,9 @@
       {
        "view": "shear_stress",
        "ref_max": 3.4297,
-       "max_diff": 1.1942606047836566,
+       "max_diff": 0.0059999999999999784,
        "floor": 0.0002,
-       "max_diff_pct": 34.82113901459768,
+       "max_diff_pct": 0.17494241478846484,
        "lines": [
         3,
         3
@@ -144870,9 +145845,9 @@
       {
        "view": "principal_compressive_stress",
        "ref_max": 26.0,
-       "max_diff": 6.597017241406545,
+       "max_diff": 0.868502558148858,
        "floor": 0.002,
-       "max_diff_pct": 25.37314323617902,
+       "max_diff_pct": 3.3403944544186848,
        "lines": [
         3,
         3
@@ -144884,12 +145859,12 @@
       {
        "view": "shear_on_crack",
        "ref_max": 2.3773,
-       "max_diff": 2.3773,
+       "max_diff": 0.36180907884497115,
        "floor": 0.0002,
-       "max_diff_pct": 100.0,
+       "max_diff_pct": 15.219327760273048,
        "lines": [
         5,
-        3
+        5
        ],
        "departure": 0.7977453753196745,
        "departure_pct": 33.55678186681002,
@@ -144898,9 +145873,9 @@
       {
        "view": "principal_tensile_stress",
        "ref_max": 1.2688,
-       "max_diff": 0.3599464214134963,
+       "max_diff": 0.04639880929498839,
        "floor": 0.0002,
-       "max_diff_pct": 28.369043301820327,
+       "max_diff_pct": 3.6569048939934103,
        "lines": [
         3,
         3
@@ -144912,9 +145887,9 @@
       {
        "view": "principal_tensile_strain",
        "ref_max": 5.823,
-       "max_diff": 2.465800053794521,
+       "max_diff": 0.18065489867424192,
        "floor": 0.002,
-       "max_diff_pct": 42.34587075037817,
+       "max_diff_pct": 3.1024368654343446,
        "lines": [
         1,
         1
@@ -144926,9 +145901,9 @@
       {
        "view": "crack_widths",
        "ref_max": 3.3056,
-       "max_diff": 1.4053864039841335,
+       "max_diff": 0.11583634079014937,
        "floor": 0.0002,
-       "max_diff_pct": 42.51531957841643,
+       "max_diff_pct": 3.5042455466526308,
        "lines": [
         1,
         1
@@ -144940,9 +145915,9 @@
       {
        "view": "average_angle",
        "ref_max": 90.0,
-       "max_diff": 11.093299833951704,
+       "max_diff": 3.3161796009941504,
        "floor": 0.002,
-       "max_diff_pct": 12.325888704390783,
+       "max_diff_pct": 3.6846440011046115,
        "lines": [
         1,
         1
@@ -144954,9 +145929,9 @@
       {
        "view": "long_crack_spacing",
        "ref_max": 1006.379,
-       "max_diff": 4.69701875668649,
+       "max_diff": 0.0007625503230346677,
        "floor": 0.002,
-       "max_diff_pct": 0.4667246391952227,
+       "max_diff_pct": 7.577168472659581e-05,
        "lines": [
         1,
         1
@@ -144968,9 +145943,9 @@
       {
        "view": "transverse_crack_spacing",
        "ref_max": 6000.0,
-       "max_diff": 32.41757636136869,
+       "max_diff": 4.469515140244262,
        "floor": 0.002,
-       "max_diff_pct": 0.5402929393561448,
+       "max_diff_pct": 0.07449191900407102,
        "lines": [
         1,
         1
@@ -144982,9 +145957,9 @@
       {
        "view": "diagonal_spacing",
        "ref_max": 899.874,
-       "max_diff": 354.4473159670265,
+       "max_diff": 35.747206213733065,
        "floor": 0.002,
-       "max_diff_pct": 39.388549504378005,
+       "max_diff_pct": 3.9724679470384814,
        "lines": [
         1,
         1
@@ -144996,9 +145971,9 @@
       {
        "view": "long_reinforcement_stress",
        "ref_max": 382.5,
-       "max_diff": 0.8749999999999969,
+       "max_diff": 0.0,
        "floor": 0.002,
-       "max_diff_pct": 0.2287581699346397,
+       "max_diff_pct": 0.0,
        "lines": [
         1,
         1
@@ -145024,9 +145999,9 @@
       {
        "view": "long_average_bond",
        "ref_max": 0.389,
-       "max_diff": 0.16500000000000004,
+       "max_diff": 0.0,
        "floor": 0.002,
-       "max_diff_pct": 42.41645244215939,
+       "max_diff_pct": 0.0,
        "lines": [
         1,
         1
@@ -145038,9 +146013,9 @@
       {
        "view": "stirrup_stress",
        "ref_max": 357.0,
-       "max_diff": 86.23581020535701,
+       "max_diff": 22.816243724626446,
        "floor": 0.002,
-       "max_diff_pct": 24.155689133153224,
+       "max_diff_pct": 6.391104684769313,
        "lines": [
         1,
         1
@@ -145052,9 +146027,9 @@
       {
        "view": "stirrup_stress_at_crack",
        "ref_max": 357.0,
-       "max_diff": 42.57306679970794,
+       "max_diff": 12.684530944457796,
        "floor": 0.002,
-       "max_diff_pct": 11.925228795436398,
+       "max_diff_pct": 3.5530899004083465,
        "lines": [
         1,
         1
@@ -145066,9 +146041,9 @@
       {
        "view": "transverse_average_bond",
        "ref_max": 38.259,
-       "max_diff": 28.090788431007503,
+       "max_diff": 14.135700000000002,
        "floor": 0.0002,
-       "max_diff_pct": 73.42269382630886,
+       "max_diff_pct": 36.94738492903631,
        "lines": [
         1,
         1
@@ -145094,9 +146069,9 @@
       {
        "view": "longitudinal_concrete_stress",
        "ref_max": 10.621,
-       "max_diff": 2.42633020761004,
+       "max_diff": 0.3787667852330593,
        "floor": 0.002,
-       "max_diff_pct": 22.84464935137972,
+       "max_diff_pct": 3.566206432850572,
        "lines": [
         1,
         1
@@ -145109,20 +146084,20 @@
     },
     {
      "ref_stage": 49,
-     "sub_stage": 42,
-     "matched_by": "feature",
+     "sub_stage": 48,
+     "matched_by": "same place",
      "feature": "ends falling",
      "ref_x": 9.492,
      "ref_y": 1358.136,
-     "sub_x": 2.607,
-     "sub_y": 1261.877,
+     "sub_x": 9.774,
+     "sub_y": 1358.072,
      "views": [
       {
        "view": "longitudinal_strain",
        "ref_max": 10.4374,
-       "max_diff": 7.8206999999999995,
+       "max_diff": 0.20862424645628053,
        "floor": 0.0002,
-       "max_diff_pct": 74.92958016364229,
+       "max_diff_pct": 1.9988143259459303,
        "lines": [
         1,
         1
@@ -145131,9 +146106,9 @@
       {
        "view": "transverse_strain",
        "ref_max": 7.261,
-       "max_diff": 4.673112141483481,
+       "max_diff": 0.5587210861443076,
        "floor": 0.002,
-       "max_diff_pct": 64.35907094730038,
+       "max_diff_pct": 7.694822836307775,
        "lines": [
         4,
         4
@@ -145142,9 +146117,9 @@
       {
        "view": "shear_strain",
        "ref_max": 15.6079,
-       "max_diff": 10.0476,
+       "max_diff": 0.833060831526071,
        "floor": 0.0002,
-       "max_diff_pct": 64.3750921007951,
+       "max_diff_pct": 5.337430605821866,
        "lines": [
         5,
         5
@@ -145153,9 +146128,9 @@
       {
        "view": "shear_stress",
        "ref_max": 2.7133,
-       "max_diff": 0.4786383756779666,
+       "max_diff": 0.020499904690604524,
        "floor": 0.0002,
-       "max_diff_pct": 17.64045168901215,
+       "max_diff_pct": 0.7555340246417471,
        "lines": [
         3,
         3
@@ -145164,9 +146139,9 @@
       {
        "view": "principal_compressive_stress",
        "ref_max": 26.0,
-       "max_diff": 8.922486290492301,
+       "max_diff": 1.6708564907170813,
        "floor": 0.002,
-       "max_diff_pct": 34.31725496343193,
+       "max_diff_pct": 6.426371118142621,
        "lines": [
         3,
         3
@@ -145175,9 +146150,9 @@
       {
        "view": "shear_on_crack",
        "ref_max": 1.671,
-       "max_diff": 0.3748696209277236,
+       "max_diff": 0.35904800532580444,
        "floor": 0.0002,
-       "max_diff_pct": 22.433849247619605,
+       "max_diff_pct": 21.487014082932642,
        "lines": [
         3,
         3
@@ -145186,9 +146161,9 @@
       {
        "view": "principal_tensile_stress",
        "ref_max": 1.3934,
-       "max_diff": 0.3652648532958237,
+       "max_diff": 0.11438397789417741,
        "floor": 0.0002,
-       "max_diff_pct": 26.21392660369052,
+       "max_diff_pct": 8.20898362955199,
        "lines": [
         3,
         3
@@ -145197,9 +146172,9 @@
       {
        "view": "principal_tensile_strain",
        "ref_max": 15.557,
-       "max_diff": 10.23,
+       "max_diff": 0.9614536152936557,
        "floor": 0.002,
-       "max_diff_pct": 65.75817959760879,
+       "max_diff_pct": 6.180199365518131,
        "lines": [
         1,
         1
@@ -145208,9 +146183,9 @@
       {
        "view": "crack_widths",
        "ref_max": 7.1924,
-       "max_diff": 4.990457660875964,
+       "max_diff": 0.5447815140798463,
        "floor": 0.0002,
-       "max_diff_pct": 69.38515183910745,
+       "max_diff_pct": 7.574405123183448,
        "lines": [
         1,
         1
@@ -145219,9 +146194,9 @@
       {
        "view": "average_angle",
        "ref_max": 90.0,
-       "max_diff": 7.251211253916397,
+       "max_diff": 7.446586933767395,
        "floor": 0.002,
-       "max_diff_pct": 8.056901393240441,
+       "max_diff_pct": 8.273985481963772,
        "lines": [
         1,
         1
@@ -145230,9 +146205,9 @@
       {
        "view": "long_crack_spacing",
        "ref_max": 1006.379,
-       "max_diff": 1.635161478568891,
+       "max_diff": 0.0006879671741316013,
        "floor": 0.002,
-       "max_diff_pct": 0.16247968991492182,
+       "max_diff_pct": 6.836064485960074e-05,
        "lines": [
         1,
         1
@@ -145241,9 +146216,9 @@
       {
        "view": "transverse_crack_spacing",
        "ref_max": 6000.0,
-       "max_diff": 41.18973883332019,
+       "max_diff": 4.469515140244262,
        "floor": 0.002,
-       "max_diff_pct": 0.6864956472220032,
+       "max_diff_pct": 0.07449191900407102,
        "lines": [
         1,
         1
@@ -145252,9 +146227,9 @@
       {
        "view": "diagonal_spacing",
        "ref_max": 803.195,
-       "max_diff": 280.23187518944553,
+       "max_diff": 24.844022540720538,
        "floor": 0.002,
-       "max_diff_pct": 34.88964388342127,
+       "max_diff_pct": 3.0931495515684904,
        "lines": [
         1,
         1
@@ -145263,9 +146238,9 @@
       {
        "view": "long_reinforcement_stress",
        "ref_max": 382.5,
-       "max_diff": 0.03400000000001041,
+       "max_diff": 0.9049999999999929,
        "floor": 0.002,
-       "max_diff_pct": 0.00888888888889161,
+       "max_diff_pct": 0.23660130718954062,
        "lines": [
         1,
         1
@@ -145285,9 +146260,9 @@
       {
        "view": "long_average_bond",
        "ref_max": 0.74,
-       "max_diff": 0.03687666666666667,
+       "max_diff": 0.004,
        "floor": 0.002,
-       "max_diff_pct": 4.983333333333333,
+       "max_diff_pct": 0.5405405405405406,
        "lines": [
         1,
         1
@@ -145296,9 +146271,9 @@
       {
        "view": "stirrup_stress",
        "ref_max": 357.0,
-       "max_diff": 98.05123184370964,
+       "max_diff": 27.62360023112174,
        "floor": 0.002,
-       "max_diff_pct": 27.465331048658165,
+       "max_diff_pct": 7.737703145972475,
        "lines": [
         1,
         1
@@ -145307,9 +146282,9 @@
       {
        "view": "stirrup_stress_at_crack",
        "ref_max": 357.0,
-       "max_diff": 52.033309333599554,
+       "max_diff": 1.409174986152671,
        "floor": 0.002,
-       "max_diff_pct": 14.575156676078306,
+       "max_diff_pct": 0.3947268868774989,
        "lines": [
         1,
         1
@@ -145318,9 +146293,9 @@
       {
        "view": "transverse_average_bond",
        "ref_max": 25.4866,
-       "max_diff": 15.886782406680876,
+       "max_diff": 8.390238814175673,
        "floor": 0.0002,
-       "max_diff_pct": 62.33386331123365,
+       "max_diff_pct": 32.92019655103338,
        "lines": [
         1,
         1
@@ -145340,9 +146315,9 @@
       {
        "view": "longitudinal_concrete_stress",
        "ref_max": 16.632,
-       "max_diff": 7.403000000000002,
+       "max_diff": 1.1770002040140009,
        "floor": 0.002,
-       "max_diff_pct": 44.51058201058202,
+       "max_diff_pct": 7.076720803354982,
        "lines": [
         1,
         1
@@ -145353,17 +146328,17 @@
    ],
    "views_at": {
     "ref_stage": 38,
-    "sub_stage": 41,
+    "sub_stage": 38,
     "ref_x": 3.768,
-    "sub_x": 2.602
+    "sub_x": 3.768
    },
    "views": [
     {
      "view": "longitudinal_strain",
      "ref_max": 10.4374,
-     "max_diff": 7.8206999999999995,
+     "max_diff": 0.20862424645628053,
      "floor": 0.0002,
-     "max_diff_pct": 74.92958016364229,
+     "max_diff_pct": 1.9988143259459303,
      "lines": [
       1,
       1
@@ -145372,22 +146347,25 @@
     },
     {
      "view": "transverse_strain",
-     "ref_max": 7.261,
-     "max_diff": 4.673112141483481,
+     "ref_max": 0.007,
+     "max_diff": 0.0010000000000000005,
      "floor": 0.002,
-     "max_diff_pct": 64.35907094730038,
+     "max_diff_pct": 14.285714285714292,
      "lines": [
       4,
       4
      ],
-     "ref_stage": 49
+     "departure": 0.0010271862215566867,
+     "departure_pct": 14.674088879381237,
+     "apart_pct": 100.00000000000001,
+     "ref_stage": 13
     },
     {
      "view": "shear_strain",
      "ref_max": 15.6079,
-     "max_diff": 10.0476,
+     "max_diff": 0.833060831526071,
      "floor": 0.0002,
-     "max_diff_pct": 64.3750921007951,
+     "max_diff_pct": 5.337430605821866,
      "lines": [
       5,
       5
@@ -145396,25 +146374,25 @@
     },
     {
      "view": "shear_stress",
-     "ref_max": 3.4297,
-     "max_diff": 1.1942606047836566,
+     "ref_max": 0.4891,
+     "max_diff": 0.008017581578231871,
      "floor": 0.0002,
-     "max_diff_pct": 34.82113901459768,
+     "max_diff_pct": 1.6392520094524374,
      "lines": [
       3,
       3
      ],
-     "departure": 0.2645901136300436,
-     "departure_pct": 7.714672234599049,
-     "apart_pct": 3.134116348084832,
-     "ref_stage": 38
+     "departure": 0.0578470392492443,
+     "departure_pct": 11.82724171933026,
+     "apart_pct": 24.82898083620366,
+     "ref_stage": 13
     },
     {
      "view": "principal_compressive_stress",
      "ref_max": 26.0,
-     "max_diff": 8.922486290492301,
+     "max_diff": 1.6708564907170813,
      "floor": 0.002,
-     "max_diff_pct": 34.31725496343193,
+     "max_diff_pct": 6.426371118142621,
      "lines": [
       3,
       3
@@ -145423,40 +146401,34 @@
     },
     {
      "view": "shear_on_crack",
-     "ref_max": 2.3773,
-     "max_diff": 2.3773,
+     "ref_max": 1.671,
+     "max_diff": 0.35904800532580444,
      "floor": 0.0002,
-     "max_diff_pct": 100.0,
-     "lines": [
-      5,
-      3
-     ],
-     "departure": 0.7977453753196745,
-     "departure_pct": 33.55678186681002,
-     "apart_pct": 5.231524591551678,
-     "ref_stage": 38
-    },
-    {
-     "view": "principal_tensile_stress",
-     "ref_max": 1.2688,
-     "max_diff": 0.3599464214134963,
-     "floor": 0.0002,
-     "max_diff_pct": 28.369043301820327,
+     "max_diff_pct": 21.487014082932642,
      "lines": [
       3,
       3
      ],
-     "departure": 0.13826221166862915,
-     "departure_pct": 10.897084778422853,
-     "apart_pct": 7.348178438186733,
-     "ref_stage": 38
+     "ref_stage": 49
+    },
+    {
+     "view": "principal_tensile_stress",
+     "ref_max": 1.3934,
+     "max_diff": 0.11438397789417741,
+     "floor": 0.0002,
+     "max_diff_pct": 8.20898362955199,
+     "lines": [
+      3,
+      3
+     ],
+     "ref_stage": 49
     },
     {
      "view": "principal_tensile_strain",
      "ref_max": 15.557,
-     "max_diff": 10.23,
+     "max_diff": 0.9614536152936557,
      "floor": 0.002,
-     "max_diff_pct": 65.75817959760879,
+     "max_diff_pct": 6.180199365518131,
      "lines": [
       1,
       1
@@ -145466,9 +146438,9 @@
     {
      "view": "crack_widths",
      "ref_max": 7.1924,
-     "max_diff": 4.990457660875964,
+     "max_diff": 0.5447815140798463,
      "floor": 0.0002,
-     "max_diff_pct": 69.38515183910745,
+     "max_diff_pct": 7.574405123183448,
      "lines": [
       1,
       1
@@ -145478,17 +146450,14 @@
     {
      "view": "average_angle",
      "ref_max": 90.0,
-     "max_diff": 11.093299833951704,
+     "max_diff": 7.446586933767395,
      "floor": 0.002,
-     "max_diff_pct": 12.325888704390783,
+     "max_diff_pct": 8.273985481963772,
      "lines": [
       1,
       1
      ],
-     "departure": 4.041059437882353,
-     "departure_pct": 4.490066042091503,
-     "apart_pct": 1.7565797833724557,
-     "ref_stage": 38
+     "ref_stage": 49
     },
     {
      "view": "long_crack_spacing",
@@ -145508,21 +146477,24 @@
     {
      "view": "transverse_crack_spacing",
      "ref_max": 6000.0,
-     "max_diff": 41.18973883332019,
+     "max_diff": 4.469515140244262,
      "floor": 0.002,
-     "max_diff_pct": 0.6864956472220032,
+     "max_diff_pct": 0.07449191900407102,
      "lines": [
       1,
       1
      ],
-     "ref_stage": 49
+     "departure": 0.0,
+     "departure_pct": 0.0,
+     "apart_pct": 0.684937608721272,
+     "ref_stage": 38
     },
     {
      "view": "diagonal_spacing",
      "ref_max": 899.874,
-     "max_diff": 354.4473159670265,
+     "max_diff": 35.747206213733065,
      "floor": 0.002,
-     "max_diff_pct": 39.388549504378005,
+     "max_diff_pct": 3.9724679470384814,
      "lines": [
       1,
       1
@@ -145535,17 +146507,14 @@
     {
      "view": "long_reinforcement_stress",
      "ref_max": 382.5,
-     "max_diff": 0.8749999999999969,
+     "max_diff": 0.9049999999999929,
      "floor": 0.002,
-     "max_diff_pct": 0.2287581699346397,
+     "max_diff_pct": 0.23660130718954062,
      "lines": [
       1,
       1
      ],
-     "departure": 0.4365177286552801,
-     "departure_pct": 0.11412228200138042,
-     "apart_pct": 0.28888888888888853,
-     "ref_stage": 38
+     "ref_stage": 49
     },
     {
      "view": "long_reinf_stress_at_crack",
@@ -145564,25 +146533,22 @@
     },
     {
      "view": "long_average_bond",
-     "ref_max": 0.389,
-     "max_diff": 0.16500000000000004,
+     "ref_max": 0.74,
+     "max_diff": 0.004,
      "floor": 0.002,
-     "max_diff_pct": 42.41645244215939,
+     "max_diff_pct": 0.5405405405405406,
      "lines": [
       1,
       1
      ],
-     "departure": 0.0032186129565329688,
-     "departure_pct": 0.8274069296999919,
-     "apart_pct": 15.876777251184835,
-     "ref_stage": 38
+     "ref_stage": 49
     },
     {
      "view": "stirrup_stress",
      "ref_max": 357.0,
-     "max_diff": 98.05123184370964,
+     "max_diff": 27.62360023112174,
      "floor": 0.002,
-     "max_diff_pct": 27.465331048658165,
+     "max_diff_pct": 7.737703145972475,
      "lines": [
       1,
       1
@@ -145592,21 +146558,24 @@
     {
      "view": "stirrup_stress_at_crack",
      "ref_max": 357.0,
-     "max_diff": 52.033309333599554,
+     "max_diff": 12.684530944457796,
      "floor": 0.002,
-     "max_diff_pct": 14.575156676078306,
+     "max_diff_pct": 3.5530899004083465,
      "lines": [
       1,
       1
      ],
-     "ref_stage": 49
+     "departure": 8.162753991146547,
+     "departure_pct": 2.286485711805755,
+     "apart_pct": 5.794553918677769,
+     "ref_stage": 38
     },
     {
      "view": "transverse_average_bond",
      "ref_max": 38.259,
-     "max_diff": 28.090788431007503,
+     "max_diff": 14.135700000000002,
      "floor": 0.0002,
-     "max_diff_pct": 73.42269382630886,
+     "max_diff_pct": 36.94738492903631,
      "lines": [
       1,
       1
@@ -145634,9 +146603,9 @@
     {
      "view": "longitudinal_concrete_stress",
      "ref_max": 16.632,
-     "max_diff": 7.403000000000002,
+     "max_diff": 1.1770002040140009,
      "floor": 0.002,
-     "max_diff_pct": 44.51058201058202,
+     "max_diff_pct": 7.076720803354982,
      "lines": [
       1,
       1
@@ -145644,8 +146613,8 @@
      "ref_stage": 49
     }
    ],
-   "seconds": 53.8,
-   "run": "9fa0690637e9",
+   "seconds": 83.8,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      -0.0,
@@ -145785,43 +146754,139 @@
     ],
     [
      2.574,
-     1260.654
+     1260.456
     ],
     [
-     2.585,
-     1261.649
+     2.831,
+     1390.319
     ],
     [
-     2.597,
-     1261.436
+     3.114,
+     1392.077
     ],
     [
-     2.6,
-     1261.699
+     3.426,
+     1391.558
     ],
     [
-     2.601,
-     1261.829
+     3.768,
+     1392.023
     ],
     [
-     2.602,
-     1261.899
+     4.145,
+     1391.143
     ],
     [
-     2.602,
-     1261.933
+     4.56,
+     1387.34
     ],
     [
-     2.602,
-     1261.947
+     5.016,
+     1381.594
     ],
     [
-     2.607,
-     1261.877
+     5.517,
+     1380.535
     ],
     [
-     2.607,
-     1261.842
+     6.069,
+     1377.907
+    ],
+    [
+     6.676,
+     1375.873
+    ],
+    [
+     7.344,
+     1370.654
+    ],
+    [
+     8.078,
+     1365.115
+    ],
+    [
+     8.886,
+     1361.669
+    ],
+    [
+     9.774,
+     1358.072
+    ],
+    [
+     10.752,
+     1352.481
+    ],
+    [
+     11.827,
+     1349.343
+    ],
+    [
+     13.009,
+     1346.226
+    ],
+    [
+     14.31,
+     1341.624
+    ],
+    [
+     15.741,
+     1339.069
+    ],
+    [
+     17.316,
+     1336.013
+    ],
+    [
+     19.047,
+     1332.071
+    ],
+    [
+     19.389,
+     1331.243
+    ],
+    [
+     19.913,
+     1329.166
+    ],
+    [
+     20.324,
+     1331.117
+    ],
+    [
+     20.387,
+     1329.787
+    ],
+    [
+     20.507,
+     1331.546
+    ],
+    [
+     20.704,
+     1330.901
+    ],
+    [
+     20.703,
+     1330.852
+    ],
+    [
+     20.703,
+     1330.833
+    ],
+    [
+     20.703,
+     1330.818
+    ],
+    [
+     20.703,
+     1330.804
+    ],
+    [
+     20.702,
+     1331.218
+    ],
+    [
+     20.702,
+     1331.209
     ]
    ]
   },
@@ -147058,8 +148123,8 @@
      "ref_stage": 14
     }
    ],
-   "seconds": 4.5,
-   "run": "9fa0690637e9",
+   "seconds": 4.4,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      -0.0,
@@ -148590,8 +149655,8 @@
      "ref_stage": 12
     }
    ],
-   "seconds": 5.4,
-   "run": "9fa0690637e9",
+   "seconds": 5.6,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      -0.0,
@@ -150087,8 +151152,8 @@
      "ref_stage": 12
     }
    ],
-   "seconds": 5.2,
-   "run": "9fa0690637e9",
+   "seconds": 4.9,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      -0.0,
@@ -151229,8 +152294,8 @@
      "ref_stage": 55
     }
    ],
-   "seconds": 89.3,
-   "run": "9fa0690637e9",
+   "seconds": 95.4,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      -0.0,
@@ -152763,8 +153828,8 @@
      "ref_stage": 66
     }
    ],
-   "seconds": 4.5,
-   "run": "9fa0690637e9",
+   "seconds": 4.7,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      0.012,
@@ -154584,8 +155649,8 @@
      "ref_stage": 19
     }
    ],
-   "seconds": 5.9,
-   "run": "9fa0690637e9",
+   "seconds": 6.1,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      -0.0,
@@ -156391,8 +157456,8 @@
      "ref_stage": 12
     }
    ],
-   "seconds": 56.7,
-   "run": "9fa0690637e9",
+   "seconds": 58.5,
+   "run": "3abdd4e0c0bd",
    "sub_curve": [
     [
      -0.0,
