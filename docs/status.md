@@ -12,29 +12,35 @@ For the developer: what exists now and how to work on it. The owner reads
   layering, the solves without shear, shear by the longitudinal stiffness method with
   Response's stiffness rules and its load stage control. Each rule and its source:
   `docs/kernel.md`. Switches for rules that are written and off are listed there.
-- **The development set**: 55 fixtures in `tests/oracle` (Newbeam under varied loads,
-  materials, settings, units; the T-beam, the column and the I-girder), each a capture cut
-  to the stages the measure compares. 30 more in `tests/oracle/parked`, not run by default:
-  they are development cases too. Results: `docs/verification-results.md` (generated).
+- **The development set**: 107 fixtures in `tests/oracle`, each a capture cut to the stages
+  the measure compares: 55 on Newbeam under varied loads, materials, settings and units, the
+  T-beam, the column and the I-girder; and 52 wider cases since increment 2
+  (`tools/scope_cases.py`, group W: Response's sample files under other loads; concrete and
+  steel strengths, shapes, reinforcement and loads on the four sections), chosen to be like
+  the held-out set and never the same. 30 more in `tests/oracle/parked`, not run by
+  default. Results: `docs/verification-results.md` (generated). The wider cases have no
+  regression limits in `tests/test_oracle.py` yet.
 - **The held-out set**: `heldout/` (the frozen manifest and the totals), built and scored by
   `tools/heldout.py`. See "The held-out rule" in `CLAUDE.md` before touching anything.
 - **Known deviations**: `docs/deviations.md`.
 
 ## Next
 
-1. **Interface parity** (the brief: "before anything else"). `tools/parity.py` scores it in
-   three parts and writes `docs/parity.md`: 240 of 265 checks the same (measured,
-   2026-11-24). What is left: `define` and `--report`, and the inputs r2x solves that r2c
-   refuses; both wait on the owner's answer in `docs/summary.md`. Not yet checked at all:
-   the two programs run end to end on the same input (file names written, progress lines
-   on stderr, exit status of a failed solve), and the record's format on more than the
-   development set's loads and units. The six sample-file fixtures in
-   `tests/oracle/parked` are read now and have no regression limit yet.
-2. **Accuracy, by the brief's priorities**, on the development set. The largest known item
-   is the first shear entry of `docs/deviations.md`; one approach is on record and untried:
-   hold r2c's tries one for one to the running program's (`tools/rtrace.py`,
-   `tools/tries.py`).
-3. **The parked fixtures** could join the default set; nothing holds them back but run time.
+1. **Accuracy on priority 1 with shear**, the area furthest from its threshold. The lead
+   is in `docs/kernel.md`, "Seen in increment 2": at one traced state Response's stiffness
+   differs from r2c's copy of it, its solve runs away and its response ends, while r2c
+   carries on to a higher peak. Read `00427cd0` and `0046b940` again at that state (the
+   Marshall sample at M/V = 3 m, try 58; logs with `tools/rtrace.py --steps`). Then the
+   other wider cases outside on priority 1: `python tools/priority.py
+   docs/verification-results.json --views` lists them.
+2. **Priority 1 without shear** needs every held-out case. On the development set three
+   are outside: the override, axial tension (Response's solve for a stepped axial strain is
+   half built), and one view on the Liping sample under compression and moment.
+3. **Interface parity**: `tools/parity.py`, `docs/parity.md`. `define` and `--report` are
+   left out of the score and inputs outside the manual stay refused (owner, 2026-11-24).
+   What is left besides those: five inputs on which Response gives up part-way and r2c
+   solves. Not yet checked: the two programs run end to end on the same input.
+4. **Regression limits for the 52 wider cases**, and the parked fixtures.
 
 ## How to run things
 
@@ -45,6 +51,8 @@ and the two folders of derived inputs in the development archive (`scope-inputs`
 - Tests: `pytest` (fast; the cases without shear), `pytest -m "slow and not parked"` (with
   shear), `pytest -m parked`. Inputs come from `R2C_RESPONSE_DIR`, `R2C_DEFINE_DIR`,
   `R2C_SCOPE_DIR`; cases whose input is missing are skipped.
+- Which development cases are outside a priority, and on what: `python tools/priority.py
+  RESULTS [--priority N] [--views]`.
 - Development results: `python tools/verify.py tests/oracle --inputs FOLDERS --out OUT
   --jobs N`, then `python tools/report.py OUT`. `python tools/changes.py OLD NEW` lists the
   checks that changed side; `python tools/limits.py OUT` holds the regression limits to a

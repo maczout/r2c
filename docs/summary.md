@@ -1,7 +1,7 @@
 # r2c: summary for the owner
 
 One page, kept current each increment (`docs/brief.md`, "Reporting"). Last updated
-2026-11-24, after increment 1. Everything else in `docs/` is reference.
+2026-11-24, after increment 2. Everything else in `docs/` is reference.
 
 ## Held-out totals
 
@@ -10,56 +10,58 @@ One page, kept current each increment (`docs/brief.md`, "Reporting"). Last updat
 
 Cases inside target on every check of the priority, of the cases that have such a check. One column per increment.
 
-| Area | Priority | baseline (2026-11-24) | increment 1 (2026-11-24) |
-|---|---|---:|---:|
-| Moment and axial | 1: peak, rising branch, shape; stress-state views | 20 of 27 (74 %) | 23 of 27 (85 %) |
-| Moment and axial | 2: endings without shear; shear-related views | 22 of 27 (81 %) | 26 of 27 (96 %) |
-| Moment and axial | 3: cracking-related views | 20 of 27 (74 %) | 23 of 27 (85 %) |
-| Shear | 1: peak, rising branch, shape; stress-state views | 17 of 28 (61 %) | 20 of 28 (71 %) |
-| Shear | 2: endings without shear; shear-related views | 9 of 28 (32 %) | 10 of 28 (36 %) |
-| Shear | 3: cracking-related views | 14 of 28 (50 %) | 17 of 28 (61 %) |
-| Shear | 4: endings with shear | 8 of 28 (29 %) | 9 of 28 (32 %) |
+| Area | Priority | baseline (2026-11-24) | increment 1 (2026-11-24) | increment 2 (2026-11-24) |
+|---|---|---:|---:|---:|
+| Moment and axial | 1: peak, rising branch, shape; stress-state views | 20 of 27 (74 %) | 23 of 27 (85 %) | 23 of 27 (85 %) |
+| Moment and axial | 2: endings without shear; shear-related views | 22 of 27 (81 %) | 26 of 27 (96 %) | 26 of 27 (96 %) |
+| Moment and axial | 3: cracking-related views | 20 of 27 (74 %) | 23 of 27 (85 %) | 23 of 27 (85 %) |
+| Shear | 1: peak, rising branch, shape; stress-state views | 17 of 28 (61 %) | 20 of 28 (71 %) | 20 of 28 (71 %) |
+| Shear | 2: endings without shear; shear-related views | 9 of 28 (32 %) | 10 of 28 (36 %) | 10 of 28 (36 %) |
+| Shear | 3: cracking-related views | 14 of 28 (50 %) | 17 of 28 (61 %) | 17 of 28 (61 %) |
+| Shear | 4: endings with shear | 8 of 28 (29 %) | 9 of 28 (32 %) | 9 of 28 (32 %) |
 
 Cases: moment and axial 27 (0 not solved by r2c, counted outside), shear 28 (0 not solved by r2c, counted outside). Threshold set by the owner, priority 1: 99 % without shear, 90 % with.
 <!-- heldout:end -->
 
-Measured with `python tools/heldout.py score` on the 55 frozen cases. "baseline" is r2c
-as it stood before this increment. The gain is from reading Response's sample files, which
-r2c refused before (8 cases); nothing in the calculation changed. **No area's total fell.**
-Priority 1 stands at 85 % without shear and 71 % with, against 99 and 90 proposed.
-Interface parity: 240 of 265 checks the same as r2x (233 before; `docs/parity.md`).
+Measured with `python tools/heldout.py score` on the 55 frozen cases. **No area's total
+fell, and none rose**: nothing in this increment changed the calculation on a held-out
+case. Priority 1 stands at 85 % without shear and 71 % with, against 99 and 90. This is one
+increment without a gain; a second in a row would be the brief's plateau.
+Interface parity: 306 of 326 checks the same, `define` and `--report` left out; 15 of the
+20 differences are inputs outside the manual, refused by your decision (`docs/parity.md`).
 
 ## What changed
 
-- **Governance.** The brief is `docs/brief.md`; `CLAUDE.md`, the checks and the tests follow
-  it. The earlier record is closed in `docs/history.md`, the pending decisions accepted as
-  suggested. Logs archived, status cut, review machinery removed, unused tools in an attic.
-- **The held-out set is built and frozen**: 55 cases (27 moment and axial, 28 shear), with a
-  totals-only scorer. The rule was kept (`docs/log/2026-11-24-05.md`).
-- **Interface parity: the check is built and four gaps are closed** (several sections in
-  one file, the horizontal tie, a unit label, one control chart). It is not complete.
+- **The results page** opens on "how accurate is r2c?": priority 1 on the held-out set by
+  area against the threshold, with its trend; the priority-by-area table; the control
+  curves of the development cases outside target, worst first. The rest is on a details
+  page. Your three answers are recorded in `docs/brief.md`.
+- **52 wider development cases**, like the held-out set and never the same (107 in all).
+  They show what the first 55 did not: on the development set priority 1 is now 48 of 51
+  without shear and 45 of 56 with.
+- **One cause found, not yet fixed:** on sections failing in flexure with some shear,
+  Response's solve gives up and its response ends; r2c carries on to a peak 6 to 11 %
+  higher. One case that r2c could not start (a constant moment above cracking) is fixed.
 
 ## Needed from the owner
 
-1. **Does "the same command line" include r2x's `define` and `--report`?** Both drive or
-   photograph Response's own windows; r2c has none. Suggested: no. They stay refused and
-   are left out of the parity score.
-2. **Where Response solves what its manual does not document, which rule wins?** Three
-   softening models, a segmental steel curve, long-term effects, draped tendons. Scope
-   says refuse; parity says solve. Suggested: refuse, and list them as known differences.
-3. **The solution threshold** (99 % and 90 % on priority 1 are proposed, yours to set), and
-   the budget for the next increment.
+1. **Is interface parity complete once the only differences left are the ones you
+   accepted?** The inputs outside the manual still count as differences in the score, so
+   it cannot reach 100 %. Suggested: yes, complete when nothing else differs.
+2. **The budget for the next increment.** The lead on shear needs reading two routines of
+   the binary at one traced state; about three hours again is suggested.
 
 ## Top known deviations
 
+- **With shear, r2c carries on where Response's solve gives up and its response ends**, to
+  a peak several per cent higher (sections failing in flexure, M/V of 2 to 4 m).
 - **With shear, where a load stage does not settle, the two programs try different
   states.** Shear-related views differ by several times the target near a flat peak.
 - **How a response with shear ends** differs on about two in three shear cases.
-- **Inputs r2x solves and r2c refuses** (item 2 above), and four that Response gives up on
+- **Inputs r2x solves and r2c refuses** (your decision), and five that Response gives up on
   part-way while r2c solves them.
 - **A fall of load at cracking on the edge of what the measure counts** (shear alone, and
   Newbeam in US units): 1.99 % of the peak in one program, 2.06 % in the other.
-- **The circular column under axial load alone, after its peak:** the owner's override.
 
-The full list is `docs/deviations.md`. Development results, case by case:
-https://maczout.github.io/r2c/. How the work is done: `CLAUDE.md`.
+The full list is `docs/deviations.md`. Results: https://maczout.github.io/r2c/ (this branch:
+`branches/dev-i2/`). How the work is done: `CLAUDE.md`.
