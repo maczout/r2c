@@ -5,10 +5,13 @@ in plain language. The developer keeps this list; the most important are first, 
 five are copied to `docs/summary.md`. An entry leaves when the deviation is gone. Sizes are
 measured on the development results (`docs/verification-results.md`) unless marked.
 
-- **Inputs that r2x solves and r2c refuses.** Files that hold several sections, which is
-  how Response's own sample files come (Response opens the first), and the horizontal tie
-  as a stirrup pattern. r2c stops with "out of scope". This is an interface gap, not an
-  accuracy one, and it is the first thing the interface parity work has to close.
+- **Inputs that r2x solves and r2c refuses** (`docs/parity.md`): three compression softening
+  models the manual does not list, a segmental curve for reinforcing steel, long-term
+  effects, draped tendons, and `units="roman"` in a file. Whether these are to be solved
+  is with the owner (`docs/summary.md`). The other way round, four inputs on which Response
+  gives up part-way through its solve are solved by r2c; r2c cannot know to stop.
+- **`define` and `--report` of r2x are not in r2c.** Both work through Response's own
+  windows.
 - **With shear, where a load stage does not settle, the two programs try different
   states.** Near a flat peak Response and r2c each keep a state that the other does not
   reach, so the shear-related views there differ by up to several times the target while
@@ -23,6 +26,9 @@ measured on the development results (`docs/verification-results.md`) unless mark
 - **The I-girder with shear keeps a stage that Response drops.** At one stage the cracks at
   the top close; Response fails at that try every time and r2c does not, so the shapes
   differ at that point.
+- **The horizontal tie with stirrups in the same section:** r2c draws the stirrups' bond as
+  if the ties were not there. Inferred, not measured; with ties alone the chart is zero in
+  both programs.
 - **Elasto-plastic tension stiffening, with shear:** r2c keeps a stage that Response
   refuses and carries on past Response's last stage.
 - **Axial tension:** r2c has one rising point fewer before the fall at cracking, and the

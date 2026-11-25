@@ -7,7 +7,7 @@ For the developer: what exists now and how to work on it. The owner reads
 
 - **`r2c solve`** (`src/r2c/cli.py`): r2x's options, exit statuses and record format
   (r2x-raw 1, all views). Not there: `--report`, `define`, `setup`; `health` prints a
-  version line. How far this is from r2x has not been measured yet (see "Next").
+  version line. How far this is from r2x: `docs/parity.md`.
 - **The kernel** (`src/r2c`, numpy only): the MCFT node with the crack check, Response's
   layering, the solves without shear, shear by the longitudinal stiffness method with
   Response's stiffness rules and its load stage control. Each rule and its source:
@@ -22,14 +22,14 @@ For the developer: what exists now and how to work on it. The owner reads
 
 ## Next
 
-1. **Interface parity** (the brief: "before anything else"). Not started. To build:
-   `tools/parity.py`, which sets r2c beside r2x on (a) the command line: every option and
-   value r2x's worker takes; (b) the record: header keys, sections and number formats, on
-   the development captures; (c) refusals: the inputs and option values each refuses, with
-   exit status. Known gaps to close: files with several sections (Response opens the
-   first; r2c refuses), the horizontal tie, `--report`, `define`. The candidates of the
-   held-out build that Response did not solve are listed in `heldout/manifest.json`
-   ("not_captured"): they are refusals to match.
+1. **Interface parity** (the brief: "before anything else"). `tools/parity.py` scores it in
+   three parts and writes `docs/parity.md`: 240 of 265 checks the same (measured,
+   2026-11-24). What is left: `define` and `--report`, and the inputs r2x solves that r2c
+   refuses; both wait on the owner's answer in `docs/summary.md`. Not yet checked at all:
+   the two programs run end to end on the same input (file names written, progress lines
+   on stderr, exit status of a failed solve), and the record's format on more than the
+   development set's loads and units. The six sample-file fixtures in
+   `tests/oracle/parked` are read now and have no regression limit yet.
 2. **Accuracy, by the brief's priorities**, on the development set. The largest known item
    is the first shear entry of `docs/deviations.md`; one approach is on record and untried:
    hold r2c's tries one for one to the running program's (`tools/rtrace.py`,
