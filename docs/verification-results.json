@@ -1,9 +1,9 @@
 {
  "run": {
   "r2c_version": "0.1.0",
-  "commit": "ce141191f3559597d1e2fa59324b5ae403d166d2",
-  "dirty": true,
-  "started": "2026-11-25T09:24:53-07:00",
+  "commit": "f0c3a06b0fe6b5f3dcc2309cfae0750fb0e715d6",
+  "dirty": false,
+  "started": "2026-11-25T09:33:25-07:00",
   "host": "Makertyre",
   "machine": "Linux x86_64, 32 cores",
   "python": "3.12.3",
@@ -1385,8 +1385,8 @@
      "ref_stage": 52
     }
    ],
-   "seconds": 176.4,
-   "run": "ce141191f355+dirty",
+   "seconds": 178.8,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      0.239,
@@ -3040,8 +3040,8 @@
      "ref_stage": 12
     }
    ],
-   "seconds": 15.1,
-   "run": "ce141191f355+dirty",
+   "seconds": 15.3,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      0.233,
@@ -4594,8 +4594,8 @@
      "ref_stage": 100
     }
    ],
-   "seconds": 23.4,
-   "run": "ce141191f355+dirty",
+   "seconds": 23.6,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      0.239,
@@ -6181,8 +6181,8 @@
      "ref_stage": 6
     }
    ],
-   "seconds": 9.9,
-   "run": "ce141191f355+dirty",
+   "seconds": 10.6,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      0.241,
@@ -7674,8 +7674,8 @@
      "ref_stage": 52
     }
    ],
-   "seconds": 4.9,
-   "run": "ce141191f355+dirty",
+   "seconds": 5.1,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -9094,8 +9094,8 @@
      "ref_stage": 42
     }
    ],
-   "seconds": 152.6,
-   "run": "ce141191f355+dirty",
+   "seconds": 155.2,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -10483,8 +10483,8 @@
      "ref_stage": 40
     }
    ],
-   "seconds": 101.5,
-   "run": "ce141191f355+dirty",
+   "seconds": 101.4,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -11888,8 +11888,8 @@
      "ref_stage": 17
     }
    ],
-   "seconds": 5.6,
-   "run": "ce141191f355+dirty",
+   "seconds": 5.8,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -13373,8 +13373,8 @@
      "ref_stage": 48
     }
    ],
-   "seconds": 4.4,
-   "run": "ce141191f355+dirty",
+   "seconds": 5.2,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -14774,8 +14774,8 @@
      "ref_stage": 55
     }
    ],
-   "seconds": 419.9,
-   "run": "ce141191f355+dirty",
+   "seconds": 422.5,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -16638,8 +16638,8 @@
      "ref_stage": 45
     }
    ],
-   "seconds": 4.8,
-   "run": "ce141191f355+dirty",
+   "seconds": 5.6,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -18114,8 +18114,8 @@
      "ref_stage": 36
     }
    ],
-   "seconds": 3.5,
-   "run": "ce141191f355+dirty",
+   "seconds": 3.0,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -19487,8 +19487,8 @@
      "ref_stage": 41
     }
    ],
-   "seconds": 0.5,
-   "run": "ce141191f355+dirty",
+   "seconds": 1.2,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      0.0,
@@ -20883,8 +20883,8 @@
      "ref_stage": 9
     }
    ],
-   "seconds": 7.7,
-   "run": "ce141191f355+dirty",
+   "seconds": 7.1,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      0.0,
@@ -22394,8 +22394,8 @@
      "ref_stage": 7
     }
    ],
-   "seconds": 6.3,
-   "run": "ce141191f355+dirty",
+   "seconds": 5.8,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      0.0,
@@ -23870,8 +23870,8 @@
      "ref_stage": 12
     }
    ],
-   "seconds": 7.1,
-   "run": "ce141191f355+dirty",
+   "seconds": 7.2,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      0.0,
@@ -25375,8 +25375,8 @@
      "ref_stage": 65
     }
    ],
-   "seconds": 6.7,
-   "run": "ce141191f355+dirty",
+   "seconds": 6.3,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      0.0,
@@ -26884,8 +26884,8 @@
      "ref_stage": 44
     }
    ],
-   "seconds": 4.9,
-   "run": "ce141191f355+dirty",
+   "seconds": 5.0,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      0.008,
@@ -28345,8 +28345,8 @@
      "ref_stage": 50
     }
    ],
-   "seconds": 6.0,
-   "run": "ce141191f355+dirty",
+   "seconds": 6.3,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -30093,8 +30093,8 @@
      "ref_stage": 48
     }
    ],
-   "seconds": 82.2,
-   "run": "ce141191f355+dirty",
+   "seconds": 85.2,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -31550,8 +31550,8 @@
      "ref_stage": 9
     }
    ],
-   "seconds": 2.3,
-   "run": "ce141191f355+dirty",
+   "seconds": 2.4,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      0.017,
@@ -33303,8 +33303,8 @@
      "ref_stage": 68
     }
    ],
-   "seconds": 4.3,
-   "run": "ce141191f355+dirty",
+   "seconds": 4.5,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -34832,8 +34832,8 @@
      "ref_stage": 37
     }
    ],
-   "seconds": 2.5,
-   "run": "ce141191f355+dirty",
+   "seconds": 2.6,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.008,
@@ -35946,8 +35946,8 @@
      "ref_stage": 38
     }
    ],
-   "seconds": 198.9,
-   "run": "ce141191f355+dirty",
+   "seconds": 200.9,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.665,
@@ -37657,7 +37657,7 @@
     }
    ],
    "seconds": 5.2,
-   "run": "ce141191f355+dirty",
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.432,
@@ -39087,8 +39087,8 @@
      "ref_stage": 39
     }
    ],
-   "seconds": 101.6,
-   "run": "ce141191f355+dirty",
+   "seconds": 103.3,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.432,
@@ -40516,8 +40516,8 @@
      "ref_stage": 30
     }
    ],
-   "seconds": 5.0,
-   "run": "ce141191f355+dirty",
+   "seconds": 4.9,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.769,
@@ -41645,8 +41645,8 @@
      "ref_stage": 50
     }
    ],
-   "seconds": 87.0,
-   "run": "ce141191f355+dirty",
+   "seconds": 88.6,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.769,
@@ -43106,8 +43106,8 @@
      "ref_stage": 63
     }
    ],
-   "seconds": 5.3,
-   "run": "ce141191f355+dirty",
+   "seconds": 5.4,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.665,
@@ -44549,8 +44549,8 @@
      "ref_stage": 48
     }
    ],
-   "seconds": 95.5,
-   "run": "ce141191f355+dirty",
+   "seconds": 95.6,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.665,
@@ -45658,8 +45658,8 @@
      "ref_stage": 14
     }
    ],
-   "seconds": 30.0,
-   "run": "ce141191f355+dirty",
+   "seconds": 30.6,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.665,
@@ -47020,7 +47020,7 @@
     }
    ],
    "seconds": 4.6,
-   "run": "ce141191f355+dirty",
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.556,
@@ -48161,8 +48161,8 @@
      "ref_stage": 31
     }
    ],
-   "seconds": 52.0,
-   "run": "ce141191f355+dirty",
+   "seconds": 54.0,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.665,
@@ -49524,8 +49524,8 @@
      "ref_stage": 55
     }
    ],
-   "seconds": 9.3,
-   "run": "ce141191f355+dirty",
+   "seconds": 9.4,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -7.284,
@@ -51105,8 +51105,8 @@
      "ref_stage": 146
     }
    ],
-   "seconds": 256.6,
-   "run": "ce141191f355+dirty",
+   "seconds": 256.0,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -53023,8 +53023,8 @@
      "ref_stage": 61
     }
    ],
-   "seconds": 13.3,
-   "run": "ce141191f355+dirty",
+   "seconds": 13.6,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      0.0,
@@ -54209,7 +54209,7 @@
     }
    ],
    "seconds": 11.2,
-   "run": "ce141191f355+dirty",
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -55410,8 +55410,8 @@
      "ref_stage": 7
     }
    ],
-   "seconds": 15.5,
-   "run": "ce141191f355+dirty",
+   "seconds": 16.0,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -56920,8 +56920,8 @@
      "ref_stage": 59
     }
    ],
-   "seconds": 98.7,
-   "run": "ce141191f355+dirty",
+   "seconds": 99.0,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -58432,8 +58432,8 @@
      "ref_stage": 6
     }
    ],
-   "seconds": 84.4,
-   "run": "ce141191f355+dirty",
+   "seconds": 87.1,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -59824,7 +59824,7 @@
     }
    ],
    "seconds": 3.0,
-   "run": "ce141191f355+dirty",
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -61289,7 +61289,7 @@
     }
    ],
    "seconds": 1.8,
-   "run": "ce141191f355+dirty",
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.653,
@@ -62745,8 +62745,8 @@
      "ref_stage": 14
     }
    ],
-   "seconds": 2.3,
-   "run": "ce141191f355+dirty",
+   "seconds": 2.1,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.495,
@@ -64189,7 +64189,7 @@
     }
    ],
    "seconds": 3.1,
-   "run": "ce141191f355+dirty",
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      0.429,
@@ -65595,8 +65595,8 @@
      "ref_stage": 48
     }
    ],
-   "seconds": 2.5,
-   "run": "ce141191f355+dirty",
+   "seconds": 2.4,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -67036,7 +67036,7 @@
     }
    ],
    "seconds": 2.5,
-   "run": "ce141191f355+dirty",
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      0.027,
@@ -68806,7 +68806,7 @@
     }
    ],
    "seconds": 3.0,
-   "run": "ce141191f355+dirty",
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -70288,7 +70288,7 @@
     }
    ],
    "seconds": 2.6,
-   "run": "ce141191f355+dirty",
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -71708,8 +71708,8 @@
      "ref_stage": 36
     }
    ],
-   "seconds": 69.1,
-   "run": "ce141191f355+dirty",
+   "seconds": 69.5,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -73109,7 +73109,7 @@
     }
    ],
    "seconds": 3.0,
-   "run": "ce141191f355+dirty",
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -74569,7 +74569,7 @@
     }
    ],
    "seconds": 3.0,
-   "run": "ce141191f355+dirty",
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -76049,8 +76049,8 @@
      "ref_stage": 56
     }
    ],
-   "seconds": 2.8,
-   "run": "ce141191f355+dirty",
+   "seconds": 2.9,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -77536,7 +77536,7 @@
     }
    ],
    "seconds": 2.7,
-   "run": "ce141191f355+dirty",
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -79011,8 +79011,8 @@
      "ref_stage": 9
     }
    ],
-   "seconds": 149.5,
-   "run": "ce141191f355+dirty",
+   "seconds": 151.5,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -80696,7 +80696,7 @@
     }
    ],
    "seconds": 2.4,
-   "run": "ce141191f355+dirty",
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      0.031,
@@ -82474,8 +82474,8 @@
      "ref_stage": 12
     }
    ],
-   "seconds": 3.1,
-   "run": "ce141191f355+dirty",
+   "seconds": 2.9,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -83893,7 +83893,7 @@
     }
    ],
    "seconds": 3.0,
-   "run": "ce141191f355+dirty",
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -85353,8 +85353,8 @@
      "ref_stage": 15
     }
    ],
-   "seconds": 2.5,
-   "run": "ce141191f355+dirty",
+   "seconds": 2.4,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -86773,8 +86773,8 @@
      "ref_stage": 41
     }
    ],
-   "seconds": 60.3,
-   "run": "ce141191f355+dirty",
+   "seconds": 62.0,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -88222,8 +88222,8 @@
      "ref_stage": 20
     }
    ],
-   "seconds": 2.6,
-   "run": "ce141191f355+dirty",
+   "seconds": 2.7,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -89712,8 +89712,8 @@
      "ref_stage": 11
     }
    ],
-   "seconds": 2.9,
-   "run": "ce141191f355+dirty",
+   "seconds": 3.1,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -91210,8 +91210,8 @@
      "ref_stage": 14
     }
    ],
-   "seconds": 2.7,
-   "run": "ce141191f355+dirty",
+   "seconds": 2.9,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -92649,8 +92649,8 @@
      "ref_stage": 47
     }
    ],
-   "seconds": 85.1,
-   "run": "ce141191f355+dirty",
+   "seconds": 85.6,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -94059,8 +94059,8 @@
      "ref_stage": 14
     }
    ],
-   "seconds": 2.7,
-   "run": "ce141191f355+dirty",
+   "seconds": 2.8,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -95549,7 +95549,7 @@
     }
    ],
    "seconds": 2.6,
-   "run": "ce141191f355+dirty",
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -97320,8 +97320,8 @@
      "ref_stage": 9
     }
    ],
-   "seconds": 3.8,
-   "run": "ce141191f355+dirty",
+   "seconds": 3.9,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -98821,7 +98821,7 @@
     }
    ],
    "seconds": 3.5,
-   "run": "ce141191f355+dirty",
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -100257,8 +100257,8 @@
      "ref_stage": 31
     }
    ],
-   "seconds": 89.2,
-   "run": "ce141191f355+dirty",
+   "seconds": 91.3,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -101654,8 +101654,8 @@
      "ref_stage": 48
     }
    ],
-   "seconds": 2.6,
-   "run": "ce141191f355+dirty",
+   "seconds": 2.8,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -103107,8 +103107,8 @@
      "ref_stage": 60
     }
    ],
-   "seconds": 3.0,
-   "run": "ce141191f355+dirty",
+   "seconds": 3.2,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -104609,7 +104609,7 @@
     }
    ],
    "seconds": 2.9,
-   "run": "ce141191f355+dirty",
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -106427,8 +106427,8 @@
      "ref_stage": 13
     }
    ],
-   "seconds": 3.8,
-   "run": "ce141191f355+dirty",
+   "seconds": 3.9,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -107925,7 +107925,7 @@
     }
    ],
    "seconds": 2.7,
-   "run": "ce141191f355+dirty",
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -109363,8 +109363,8 @@
      "ref_stage": 39
     }
    ],
-   "seconds": 87.5,
-   "run": "ce141191f355+dirty",
+   "seconds": 88.4,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -110799,7 +110799,7 @@
     }
    ],
    "seconds": 2.5,
-   "run": "ce141191f355+dirty",
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -112247,8 +112247,8 @@
      "ref_stage": 65
     }
    ],
-   "seconds": 3.1,
-   "run": "ce141191f355+dirty",
+   "seconds": 3.2,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -113721,8 +113721,8 @@
      "ref_stage": 134
     }
    ],
-   "seconds": 187.2,
-   "run": "ce141191f355+dirty",
+   "seconds": 188.6,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -115556,8 +115556,8 @@
      "ref_stage": 53
     }
    ],
-   "seconds": 2.6,
-   "run": "ce141191f355+dirty",
+   "seconds": 2.7,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -116701,7 +116701,7 @@
     }
    ],
    "seconds": 3.3,
-   "run": "ce141191f355+dirty",
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -118206,8 +118206,8 @@
      "ref_stage": 56
     }
    ],
-   "seconds": 2.9,
-   "run": "ce141191f355+dirty",
+   "seconds": 3.1,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -119662,8 +119662,8 @@
      "ref_stage": 37
     }
    ],
-   "seconds": 61.1,
-   "run": "ce141191f355+dirty",
+   "seconds": 61.7,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -121387,8 +121387,8 @@
      "ref_stage": 11
     }
    ],
-   "seconds": 4.1,
-   "run": "ce141191f355+dirty",
+   "seconds": 4.3,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -123191,8 +123191,8 @@
      "ref_stage": 15
     }
    ],
-   "seconds": 6.6,
-   "run": "ce141191f355+dirty",
+   "seconds": 6.9,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -125033,8 +125033,8 @@
      "ref_stage": 72
     }
    ],
-   "seconds": 5.8,
-   "run": "ce141191f355+dirty",
+   "seconds": 6.2,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -126612,8 +126612,8 @@
      "ref_stage": 60
     }
    ],
-   "seconds": 2.8,
-   "run": "ce141191f355+dirty",
+   "seconds": 2.9,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      0.005,
@@ -128417,8 +128417,8 @@
      "ref_stage": 64
     }
    ],
-   "seconds": 3.0,
-   "run": "ce141191f355+dirty",
+   "seconds": 3.1,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -129926,8 +129926,8 @@
      "ref_stage": 14
     }
    ],
-   "seconds": 3.1,
-   "run": "ce141191f355+dirty",
+   "seconds": 3.2,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -131715,8 +131715,8 @@
      "ref_stage": 11
     }
    ],
-   "seconds": 175.5,
-   "run": "ce141191f355+dirty",
+   "seconds": 177.4,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -134136,8 +134136,8 @@
      "ref_stage": 13
     }
    ],
-   "seconds": 4.7,
-   "run": "ce141191f355+dirty",
+   "seconds": 4.8,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -135705,8 +135705,8 @@
      "ref_stage": 224
     }
    ],
-   "seconds": 11.2,
-   "run": "ce141191f355+dirty",
+   "seconds": 11.6,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -137902,8 +137902,8 @@
      "ref_stage": 323
     }
    ],
-   "seconds": 14.1,
-   "run": "ce141191f355+dirty",
+   "seconds": 15.1,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -140463,8 +140463,8 @@
      "ref_stage": 56
     }
    ],
-   "seconds": 2.9,
-   "run": "ce141191f355+dirty",
+   "seconds": 3.1,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -142230,8 +142230,8 @@
      "ref_stage": 55
     }
    ],
-   "seconds": 123.7,
-   "run": "ce141191f355+dirty",
+   "seconds": 126.6,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -143656,8 +143656,8 @@
      "ref_stage": 14
     }
    ],
-   "seconds": 85.3,
-   "run": "ce141191f355+dirty",
+   "seconds": 85.6,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.999,
@@ -145105,8 +145105,8 @@
      "ref_stage": 86
     }
    ],
-   "seconds": 115.1,
-   "run": "ce141191f355+dirty",
+   "seconds": 114.3,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -146270,8 +146270,8 @@
      "ref_stage": 11
     }
    ],
-   "seconds": 104.8,
-   "run": "ce141191f355+dirty",
+   "seconds": 105.8,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -148082,8 +148082,8 @@
      "ref_stage": 54
     }
    ],
-   "seconds": 101.5,
-   "run": "ce141191f355+dirty",
+   "seconds": 103.0,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      0.005,
@@ -149548,7 +149548,7 @@
     }
    ],
    "seconds": 2.7,
-   "run": "ce141191f355+dirty",
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -150691,8 +150691,8 @@
      "ref_stage": 39
     }
    ],
-   "seconds": 95.0,
-   "run": "ce141191f355+dirty",
+   "seconds": 94.5,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -152125,7 +152125,7 @@
     }
    ],
    "seconds": 2.0,
-   "run": "ce141191f355+dirty",
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      0.089,
@@ -153536,8 +153536,8 @@
      "ref_stage": 129
     }
    ],
-   "seconds": 117.9,
-   "run": "ce141191f355+dirty",
+   "seconds": 118.2,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -155287,8 +155287,8 @@
      "ref_stage": 42
     }
    ],
-   "seconds": 67.1,
-   "run": "ce141191f355+dirty",
+   "seconds": 67.0,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -156361,8 +156361,8 @@
      "ref_stage": 42
     }
    ],
-   "seconds": 54.6,
-   "run": "ce141191f355+dirty",
+   "seconds": 55.3,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.234,
@@ -157832,8 +157832,8 @@
      "ref_stage": 16
     }
    ],
-   "seconds": 1.4,
-   "run": "ce141191f355+dirty",
+   "seconds": 1.3,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      0.174,
@@ -158915,8 +158915,8 @@
      "ref_stage": 44
     }
    ],
-   "seconds": 123.8,
-   "run": "ce141191f355+dirty",
+   "seconds": 125.3,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.07,
@@ -160298,8 +160298,8 @@
      "ref_stage": 52
     }
    ],
-   "seconds": 54.9,
-   "run": "ce141191f355+dirty",
+   "seconds": 54.8,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      0.042,
@@ -161351,8 +161351,8 @@
      "ref_stage": 38
     }
    ],
-   "seconds": 70.3,
-   "run": "ce141191f355+dirty",
+   "seconds": 71.1,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.117,
@@ -163111,8 +163111,8 @@
      "ref_stage": 13
     }
    ],
-   "seconds": 3.5,
-   "run": "ce141191f355+dirty",
+   "seconds": 3.6,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -164590,7 +164590,7 @@
     }
    ],
    "seconds": 2.0,
-   "run": "ce141191f355+dirty",
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -165605,8 +165605,8 @@
      "ref_stage": 41
     }
    ],
-   "seconds": 63.2,
-   "run": "ce141191f355+dirty",
+   "seconds": 64.4,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -166998,8 +166998,8 @@
      "ref_stage": 39
     }
    ],
-   "seconds": 62.2,
-   "run": "ce141191f355+dirty",
+   "seconds": 63.2,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      0.042,
@@ -168380,7 +168380,7 @@
     }
    ],
    "seconds": 1.3,
-   "run": "ce141191f355+dirty",
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      0.0,
@@ -169724,8 +169724,8 @@
      "ref_stage": 29
     }
    ],
-   "seconds": 50.9,
-   "run": "ce141191f355+dirty",
+   "seconds": 52.0,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -171481,7 +171481,7 @@
     }
    ],
    "seconds": 3.1,
-   "run": "ce141191f355+dirty",
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.017,
@@ -172986,7 +172986,7 @@
     }
    ],
    "seconds": 10.0,
-   "run": "ce141191f355+dirty",
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      0.169,
@@ -174421,7 +174421,7 @@
     }
    ],
    "seconds": 2.6,
-   "run": "ce141191f355+dirty",
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -176206,7 +176206,7 @@
     }
    ],
    "seconds": 4.3,
-   "run": "ce141191f355+dirty",
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -178005,7 +178005,7 @@
     }
    ],
    "seconds": 2.4,
-   "run": "ce141191f355+dirty",
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -179732,8 +179732,8 @@
      "ref_stage": 48
     }
    ],
-   "seconds": 94.9,
-   "run": "ce141191f355+dirty",
+   "seconds": 96.4,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -181633,8 +181633,8 @@
      "ref_stage": 13
     }
    ],
-   "seconds": 2.4,
-   "run": "ce141191f355+dirty",
+   "seconds": 2.5,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      0.032,
@@ -183430,8 +183430,8 @@
      "ref_stage": 6
     }
    ],
-   "seconds": 4.0,
-   "run": "ce141191f355+dirty",
+   "seconds": 4.2,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -185212,7 +185212,7 @@
     }
    ],
    "seconds": 3.2,
-   "run": "ce141191f355+dirty",
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -187057,8 +187057,8 @@
      "ref_stage": 17
     }
    ],
-   "seconds": 3.8,
-   "run": "ce141191f355+dirty",
+   "seconds": 3.9,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -188537,8 +188537,8 @@
      "ref_stage": 40
     }
    ],
-   "seconds": 57.1,
-   "run": "ce141191f355+dirty",
+   "seconds": 58.6,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -189937,8 +189937,8 @@
      "ref_stage": 81
     }
    ],
-   "seconds": 128.9,
-   "run": "ce141191f355+dirty",
+   "seconds": 129.9,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -191398,8 +191398,8 @@
      "ref_stage": 73
     }
    ],
-   "seconds": 96.7,
-   "run": "ce141191f355+dirty",
+   "seconds": 97.5,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.047,
@@ -192430,8 +192430,8 @@
      "ref_stage": 36
     }
    ],
-   "seconds": 105.9,
-   "run": "ce141191f355+dirty",
+   "seconds": 106.9,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.094,
@@ -193547,8 +193547,8 @@
      "ref_stage": 58
     }
    ],
-   "seconds": 89.1,
-   "run": "ce141191f355+dirty",
+   "seconds": 89.6,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -195040,8 +195040,8 @@
      "ref_stage": 37
     }
    ],
-   "seconds": 163.4,
-   "run": "ce141191f355+dirty",
+   "seconds": 170.1,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.07,
@@ -196777,8 +196777,8 @@
      "ref_stage": 42
     }
    ],
-   "seconds": 77.6,
-   "run": "ce141191f355+dirty",
+   "seconds": 78.5,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -198460,7 +198460,7 @@
     }
    ],
    "seconds": 6.5,
-   "run": "ce141191f355+dirty",
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      0.0,
@@ -199813,8 +199813,8 @@
      "ref_stage": 57
     }
    ],
-   "seconds": 11.3,
-   "run": "ce141191f355+dirty",
+   "seconds": 11.6,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.45,
@@ -201597,8 +201597,8 @@
      "ref_stage": 36
     }
    ],
-   "seconds": 58.8,
-   "run": "ce141191f355+dirty",
+   "seconds": 60.0,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -202994,7 +202994,7 @@
     }
    ],
    "seconds": 2.8,
-   "run": "ce141191f355+dirty",
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -204445,8 +204445,8 @@
      "ref_stage": 38
     }
    ],
-   "seconds": 72.0,
-   "run": "ce141191f355+dirty",
+   "seconds": 73.1,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -205838,7 +205838,7 @@
     }
    ],
    "seconds": 2.6,
-   "run": "ce141191f355+dirty",
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -207286,8 +207286,8 @@
      "ref_stage": 38
     }
    ],
-   "seconds": 55.9,
-   "run": "ce141191f355+dirty",
+   "seconds": 56.9,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -208699,7 +208699,7 @@
     }
    ],
    "seconds": 3.0,
-   "run": "ce141191f355+dirty",
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -210179,8 +210179,8 @@
      "ref_stage": 30
     }
    ],
-   "seconds": 55.1,
-   "run": "ce141191f355+dirty",
+   "seconds": 55.8,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -211580,8 +211580,8 @@
      "ref_stage": 64
     }
    ],
-   "seconds": 3.4,
-   "run": "ce141191f355+dirty",
+   "seconds": 3.5,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -213051,8 +213051,8 @@
      "ref_stage": 39
     }
    ],
-   "seconds": 56.8,
-   "run": "ce141191f355+dirty",
+   "seconds": 57.3,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -214439,8 +214439,8 @@
      "ref_stage": 59
     }
    ],
-   "seconds": 3.1,
-   "run": "ce141191f355+dirty",
+   "seconds": 3.0,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -215886,8 +215886,8 @@
      "ref_stage": 33
     }
    ],
-   "seconds": 67.9,
-   "run": "ce141191f355+dirty",
+   "seconds": 68.9,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -217251,8 +217251,8 @@
      "ref_stage": 56
     }
    ],
-   "seconds": 92.7,
-   "run": "ce141191f355+dirty",
+   "seconds": 91.3,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -218709,8 +218709,8 @@
      "ref_stage": 4
     }
    ],
-   "seconds": 2.8,
-   "run": "ce141191f355+dirty",
+   "seconds": 2.9,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -220174,8 +220174,8 @@
      "ref_stage": 52
     }
    ],
-   "seconds": 87.5,
-   "run": "ce141191f355+dirty",
+   "seconds": 89.6,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -221627,7 +221627,7 @@
     }
    ],
    "seconds": 3.0,
-   "run": "ce141191f355+dirty",
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -223074,8 +223074,8 @@
      "ref_stage": 69
     }
    ],
-   "seconds": 59.8,
-   "run": "ce141191f355+dirty",
+   "seconds": 60.3,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -224570,8 +224570,8 @@
      "ref_stage": 10
     }
    ],
-   "seconds": 68.3,
-   "run": "ce141191f355+dirty",
+   "seconds": 68.6,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      0.0,
@@ -225319,7 +225319,7 @@
     }
    ],
    "seconds": 0.0,
-   "run": "ce141191f355+dirty",
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -226538,7 +226538,7 @@
     }
    ],
    "seconds": 72.6,
-   "run": "ce141191f355+dirty",
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -227669,8 +227669,8 @@
      "ref_stage": 15
     }
    ],
-   "seconds": 3.5,
-   "run": "ce141191f355+dirty",
+   "seconds": 3.3,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      0.0,
@@ -228893,8 +228893,8 @@
      "ref_stage": 67
     }
    ],
-   "seconds": 3.4,
-   "run": "ce141191f355+dirty",
+   "seconds": 3.5,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -230113,8 +230113,8 @@
      "ref_stage": 69
     }
    ],
-   "seconds": 3.5,
-   "run": "ce141191f355+dirty",
+   "seconds": 3.6,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -231614,8 +231614,8 @@
      "ref_stage": 49
     }
    ],
-   "seconds": 82.3,
-   "run": "ce141191f355+dirty",
+   "seconds": 83.3,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -233130,8 +233130,8 @@
      "ref_stage": 14
     }
    ],
-   "seconds": 4.2,
-   "run": "ce141191f355+dirty",
+   "seconds": 4.3,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -234977,7 +234977,7 @@
     }
    ],
    "seconds": 5.3,
-   "run": "ce141191f355+dirty",
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -236494,8 +236494,8 @@
      "ref_stage": 12
     }
    ],
-   "seconds": 4.7,
-   "run": "ce141191f355+dirty",
+   "seconds": 4.8,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -237986,7 +237986,7 @@
     }
    ],
    "seconds": 4.8,
-   "run": "ce141191f355+dirty",
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -239131,8 +239131,8 @@
      "ref_stage": 55
     }
    ],
-   "seconds": 106.3,
-   "run": "ce141191f355+dirty",
+   "seconds": 107.0,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -240673,8 +240673,8 @@
      "ref_stage": 66
     }
    ],
-   "seconds": 4.2,
-   "run": "ce141191f355+dirty",
+   "seconds": 4.3,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      0.012,
@@ -242494,8 +242494,8 @@
      "ref_stage": 19
     }
    ],
-   "seconds": 5.3,
-   "run": "ce141191f355+dirty",
+   "seconds": 5.4,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -244313,8 +244313,8 @@
      "ref_stage": 12
     }
    ],
-   "seconds": 58.2,
-   "run": "ce141191f355+dirty",
+   "seconds": 57.9,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.0,
@@ -245759,8 +245759,8 @@
      "ref_stage": 15
     }
    ],
-   "seconds": 4.8,
-   "run": "ce141191f355+dirty",
+   "seconds": 4.6,
+   "run": "f0c3a06b0fe6",
    "sub_curve": [
     [
      -0.006,
