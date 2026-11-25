@@ -20,7 +20,7 @@ Cases inside target on every check of the priority, of the cases that have such 
 | Shear | 3: cracking-related views | 14 of 28 (50 %) | 17 of 28 (61 %) |
 | Shear | 4: endings with shear | 8 of 28 (29 %) | 9 of 28 (32 %) |
 
-Cases: moment and axial 27 (0 not solved by r2c, counted outside), shear 28 (0 not solved by r2c, counted outside). Threshold proposed in the brief, priority 1: 99 % without shear, 90 % with.
+Cases: moment and axial 27 (0 not solved by r2c, counted outside), shear 28 (0 not solved by r2c, counted outside). Threshold set by the owner, priority 1: 99 % without shear, 90 % with.
 <!-- heldout:end -->
 
 Measured with `python tools/heldout.py score` on the 55 frozen cases. "baseline" is r2c
