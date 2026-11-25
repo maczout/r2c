@@ -309,6 +309,34 @@ def test_settings_from_a_file_shear(case, oracle_dir, scope_dirs):
     _scope(case, oracle_dir, scope_dirs, SETTINGS_FILE_SLOW[case])
 
 
+# The wider development cases: their limits are generated from a verify run
+# (python tools/limits.py VERIFY_OUT --write, tests/oracle/limits.json). All are marked
+# slow, with shear or without: there are too many for the default run, and a verify run
+# is held to the same limits without solving again (python tools/limits.py VERIFY_OUT).
+def _generated():
+    import json
+    p = Path(__file__).parent / "oracle" / "limits.json"
+    return json.loads(p.read_text()) if p.exists() else {}
+
+
+GENERATED = _generated()
+
+
+@pytest.mark.slow
+@pytest.mark.parametrize("case", sorted(GENERATED))
+def test_wider_cases(case, oracle_dir):
+    import os
+    ref = record.read(oracle_dir / f"{case}.r2x.txt")
+    dirs = [Path(d) for d in (os.environ.get(k) for k in
+                              ("R2C_RESPONSE_DIR", "R2C_DEFINE_DIR", "R2C_SCOPE_DIR")) if d]
+    path = None
+    if ref.header["input-name"].lower() not in verify.BUILT_IN:
+        path = verify.find_input(ref.header["input-name"], ref.header.get("input-sha256"), dirs)
+        if path is None:
+            pytest.skip(f"{ref.header['input-name']} is not under the folders of inputs")
+    _check(ref, _solve(ref, path), *GENERATED[case])
+
+
 def test_same_charts_as_the_oracle(oracle_dir):
     """The record has the sections r2x's has: same control charts, same charts per stage."""
     ref = record.read(oracle_dir / "newbeam-m.r2x.txt")
