@@ -20,7 +20,9 @@ Group A: the case exercises a kernel path no earlier case reaches. Group B: a co
 of paths that are each reached already. Group W (increment 2): wider cases of the kinds the
 held-out set draws on (Response's sample files under other loads; materials, shapes,
 reinforcement and loads on the four sections), none of them a held-out case, so that what
-keeps the held-out totals down has a development case like it.
+keeps the held-out totals down has a development case like it. Group X (increment 4): more
+of the kinds the held-out scorer reports outside target (its --kinds), again none of them a
+held-out case.
 """
 
 from __future__ import annotations
@@ -149,6 +151,31 @@ CASES = [
     case("W", "igirder-dep5-m", "igirder-dep5", "0,1,0"),
     case("W", "igirder-dep5-m2v", "igirder-dep5", "0,2,1"),
     case("W", "igirder-fc45-m3v", "igirder-fc45", "0,3,1"),
+    # increment 4: more of the kinds the held-out scorer shows outside (tools/heldout.py
+    # score --kinds), none of them a held-out case
+    case("X", "cm4-negm", "cm4", "0,-1,0"),
+    case("X", "liping-negm", "liping", "0,-1,0"),
+    case("X", "dmn1n-negm", "dmn1n", "0,-1,0"),
+    case("X", "se100-negm", "se100", "0,-1,0"),
+    case("X", "column-ntens150-m", "column", "0,1,0", initial="150,0,0"),
+    case("X", "column-ntens600-m", "column", "0,1,0", initial="600,0,0"),
+    case("X", "column-ntens900-m", "column", "0,1,0", initial="900,0,0"),
+    *[case("X", f"newbeam-tstiff{n}-m", f"newbeam-tstiff{n}", "0,1,0") for n in (1, 2, 3, 4, 6)],
+    case("X", "newbeam-fc50-tstiff2-m", "newbeam-fc50-tstiff2", "0,1,0"),
+    case("X", "newbeam-fc30-m", "newbeam-fc30", "0,1,0"),
+    case("X", "newbeam-fc65-m", "newbeam-fc65", "0,1,0"),
+    case("X", "newbeam-fy300-m", "newbeam-fy300", "0,1,0"),
+    case("X", "newbeam-fy450-m", "newbeam-fy450", "0,1,0"),
+    case("X", "newbeam-light400-m", "newbeam-light400", "0,1,0"),
+    case("X", "newbeam-light500-m", "newbeam-light500", "0,1,0"),
+    case("X", "newbeam-heavy3500-m", "newbeam-heavy3500", "0,1,0"),
+    case("X", "newbeam-slab300-m", "newbeam-slab300", "0,1,0"),
+    case("X", "newbeam-slab150-m", "newbeam-slab150", "0,1,0"),
+    case("X", "newbeam-slab200-negm", "newbeam-slab200", "0,-1,0"),
+    case("X", "newbeam-n300-v", "newbeam", "0,0,1", initial="-300,0,0"),
+    case("X", "newbeam-n1000-v", "newbeam", "0,0,1", initial="-1000,0,0"),
+    case("X", "newbeam-st150-n400-v", "newbeam-st150", "0,0,1", initial="-400,0,0"),
+    case("X", "newbeam-st2leg200-n300-v", "newbeam-st2leg200", "0,0,1", initial="-300,0,0"),
 ]
 
 
@@ -179,7 +206,7 @@ def main(argv=None) -> int:
     ap.add_argument("--inputs", nargs="*", default=[], help="folders with the present inputs")
     ap.add_argument("--fixtures", default=str(ROOT / "tests" / "oracle"))
     ap.add_argument("--only", nargs="*", help="case names (default: all without a fixture)")
-    ap.add_argument("--group", choices=("A", "B", "W"), help="only this group")
+    ap.add_argument("--group", choices=("A", "B", "W", "X"), help="only this group")
     ap.add_argument("--jobs", type=int, default=1, help="captures at once (default: 1)")
     ap.add_argument("--list", action="store_true", help="list the cases and stop")
     a = ap.parse_args(argv)

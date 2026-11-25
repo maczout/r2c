@@ -388,6 +388,37 @@ VARIANTS["newbeam-mid400"] = Variant(
     [(_TOP_END, _TOP_END + "\t\t<longreinfx\t" + attr("z", "250.00") + T4
       + attr("type", "Steel 1") + T4 + attr("num", "2") + T4 + attr("A", "400.0") + T4
       + attr("bartitle", "15M") + T4 + attr("name", "mid") + "\t/>\r\n")])
+# Increment 4: more of the kinds the held-out scorer shows outside without shear (rectangular
+# beams and slab strips under moment, light reinforcement among them), values of their own.
+VARIANTS["newbeam-fc30"] = Variant("newbeam", "Newbeam with 30 MPa concrete",
+                                   [_sub("fcp", "35.0", "30.0")])
+VARIANTS["newbeam-fc65"] = Variant("newbeam", "Newbeam with 65 MPa concrete",
+                                   [_sub("fcp", "35.0", "65.0")])
+VARIANTS["newbeam-fy300"] = Variant("newbeam", "Newbeam with 300 MPa steel throughout",
+                                    [_sub("fy", "400.0", "300.0", 2)])
+VARIANTS["newbeam-fy450"] = Variant("newbeam", "Newbeam with 450 MPa steel throughout",
+                                    [_sub("fy", "400.0", "450.0", 2)])
+VARIANTS["newbeam-light400"] = Variant("newbeam", "Newbeam with 400 mm2 bottom steel",
+                                       [_sub("A", "1500.0", "400.0")])
+VARIANTS["newbeam-light500"] = Variant("newbeam", "Newbeam with 500 mm2 bottom steel",
+                                       [_sub("A", "1500.0", "500.0")])
+VARIANTS["newbeam-heavy3500"] = Variant(
+    "newbeam", "Newbeam with 3500 mm2 bottom, 1200 mm2 top",
+    [_sub("A", "1500.0", "3500.0"), _sub("A", "300.0", "1200.0")])
+VARIANTS["newbeam-fc50-tstiff2"] = Variant(
+    "newbeam", "Newbeam with 50 MPa concrete, tension stiffening model 2",
+    [(attr("fcp", "35.0") + "\r\n\t\t\t\t" + attr("maxagg", "19.0"),
+      attr("fcp", "50.0") + T4 + attr("maxagg", "19.0") + T4 + attr("t_stiff", "2"))])
+VARIANTS["newbeam-slab300"] = Variant(
+    "newbeam", "a slab strip, 1000 x 300 mm, no stirrups",
+    [(_OUTLINE, "300.0\t1000.0\r\n\t\t\t\t\t0.0\t1000.0"), _sub("par1", "250.0", "1000.0"),
+     _sub("par2", "600.0", "300.0"), _sub("z", "538.95", "250.00"), _sub("A", "300.0", "600.0"),
+     _sub("z", "63.90", "50.00"), (_STIRRUPS, "")])
+VARIANTS["newbeam-slab150"] = Variant(
+    "newbeam", "a slab strip, 1200 x 150 mm, no stirrups",
+    [(_OUTLINE, "150.0\t1200.0\r\n\t\t\t\t\t0.0\t1200.0"), _sub("par1", "250.0", "1200.0"),
+     _sub("par2", "600.0", "150.0"), _sub("z", "538.95", "115.00"), _sub("A", "300.0", "300.0"),
+     _sub("z", "63.90", "35.00"), (_STIRRUPS, "")])
 VARIANTS["tbeam-fc30"] = Variant("tbeam", "the T-beam with 30 MPa concrete, stirrups at 200 mm",
                                  [_sub("fcp", "40.0", "30.0"), _sub("space", "300.0", "200.0")])
 VARIANTS["column-fc35"] = Variant("column", "the column with 35 MPa concrete, hoops at 150 mm",
