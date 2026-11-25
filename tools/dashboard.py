@@ -165,6 +165,13 @@ def stale(run: dict) -> str:
     return "the kernel has changed since the run (" + ", ".join(p.stdout.split()) + ")"
 
 
+def heldout_runs() -> list[dict]:
+    """The recorded totals of the held-out set (heldout/totals.json): totals only, by area
+    and priority; the last five runs. Nothing per case exists in the repository."""
+    p = ROOT / "heldout" / "totals.json"
+    return json.loads(p.read_text())["runs"][-5:] if p.exists() else []
+
+
 def build(run: dict, results: dict, acc: dict, curves_dir: Path | None, ref_dir: Path,
           gaps: list[str]) -> dict:
     cases = []
@@ -256,6 +263,7 @@ def build(run: dict, results: dict, acc: dict, curves_dir: Path | None, ref_dir:
     return {"run": run, "cases": cases, "gaps": gaps, "stale": stale(run),
             "acceptance": {g: t for g, t in acc.items() if t},
             "views_pct": report.views_limit(acc),
+            "heldout": heldout_runs(),
             "tiers": [dict(n, tier=report.TIERS[t])
                       for t, n in report.tier_counts(ran, acc).items() if n["checks"]]}
 
@@ -353,6 +361,20 @@ H += `<div class="tiles">
 for (const g of ["flexure","shear"]) { const a = by(g); if (!a.length) continue; const [lo, hi] = range(a);
  H += `<div class="tile"><div class="k">Peak, r2c vs Response · ${G[g].toLowerCase()}</div><div class="v">${sg(lo,1)} to ${sg(hi,1)} %</div><div class="d">lowest / highest across ${a.length} cases</div></div>`; }
 H += `</div>`;
+
+// ---------- the held-out totals
+if ((D.heldout || []).length) {
+ const runs = D.heldout, areas = {"moment-axial": "Moment and axial", "shear": "Shear"};
+ const pn = {1: "1: peak, rising branch, shape; stress-state views", 2: "2: endings without shear; shear-related views", 3: "3: cracking-related views", 4: "4: endings with shear"};
+ const cellT = v => v ? (v[1] ? `${v[0]} of ${v[1]} (${Math.round(100*v[0]/v[1])} %)` : "none") : "";
+ H += `<h2>Held-out totals</h2>
+<p class="sub">What r2c is judged on: cases the developer has not tuned against, frozen, scored in totals only. Cases inside target on every check of the priority; one column per recorded scoring. Nothing per case is published. Everything below this table is the development set.</p>
+<div class="scroll"><table><tr><th>Area</th><th>Priority</th>${runs.map(r => `<th>${esc(r.label)} (${esc(r.date)})</th>`).join("")}</tr>`;
+ for (const t in areas) for (const p of [1,2,3,4]) { if (!runs.some(r => r.totals[t][p])) continue;
+  H += `<tr><td>${areas[t]}</td><td>${pn[p]}</td>${runs.map(r => `<td class="num">${cellT(r.totals[t][p])}</td>`).join("")}</tr>`; }
+ const L = runs[runs.length-1];
+ H += `</table></div><p class="note">${Object.keys(areas).map(t => `${areas[t]}: ${L.cases[t]} cases, ${L.unsolved[t]} not solved by r2c and counted outside`).join(" · ")}.</p>`;
+}
 
 // ---------- coverage
 H += `<h2>What is tested</h2><p class="sub">Each chip is a case: section down, loading path across. Chip text is what sets it apart. Hover or tap for details.</p>`;

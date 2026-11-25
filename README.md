@@ -85,15 +85,19 @@ file, a shape without an outline. Negative shear is refused, as in Response.
     tools/diagnose.py      r2c at Response's strain states, and along its control values
     tools/decompile.py     a routine of Response's binary, from a Ghidra project kept elsewhere
     tools/capture.py       rebuild the archive of full oracle captures with r2x
-    tools/check.py         checks before pushing: results current, docs as generated
-    tests/oracle/          records captured from Response-2000 with r2x: the phase A set
-    tests/oracle/parked/   the cases parked until phase B; not run by default
+    tools/check.py         checks before pushing: the record follows the brief
+    tools/heldout.py       the held-out set: its recipe, its capture, its totals-only scorer
+    tests/oracle/          the development set: records captured from Response-2000 with r2x
+    tests/oracle/parked/   more development cases, not run by default
+    heldout/               the held-out set: the frozen manifest and the totals
     docs/kernel.md         what the kernel does and where each rule comes from
-    docs/verification.md   r2c against Response-2000: what the results mean
     docs/verification-results.md   the results, generated
-    docs/brief.md          the owner's brief; docs/measures.md: the tolerances
-    docs/status.md         where the work stands, options for next steps
-    docs/log/              one log per working session
+    docs/brief.md          the owner's brief: the goal, the priorities, the rules
+    docs/summary.md        one page: held-out totals, what changed, known deviations
+    docs/measures.md       how a result is judged: the tolerances and the checks
+    docs/deviations.md     known deviations, in plain language
+    docs/status.md         where the work stands, for the developer
+    docs/log/              one log per increment
     CLAUDE.md              how work on r2c is done (for people and coding agents)
 
 ## Tests
