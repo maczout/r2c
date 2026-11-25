@@ -50,7 +50,8 @@ measured on the development results (`docs/verification-results.md`) unless mark
   follow it: it closes in further on the extreme fibre reaching its peak strain on some
   cases; it closes in where the cracks close on the I-girder under moment; it takes three
   small first steps where the section is cracked from the start. The curves agree; the
-  stages are not the same ones.
+  stages are not the same ones. The first two are written and switched off
+  (`docs/kernel.md`), to be turned on at the start of the next increment.
 - **A fall of load at cracking that sits on the edge of what the measure counts.** Under
   shear alone, and on Newbeam in US units, both programs show the fall; in one it is just
   under 2 % of the peak and in the other just over, so the shapes read as different (1.99

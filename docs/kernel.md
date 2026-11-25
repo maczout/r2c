@@ -857,9 +857,19 @@ Response's control values go from 41 to 96 (first 40: 90 to 97; first 25: 96 to 
 no check changes side [measured, 2026-11-25, `python tools/stagesat.py`]. It was measured
 after the held-out set had been scored for increment 4 and is left off so that the kernel
 is the one that was scored: with it off r2c's records of those 104 cases are byte for byte
-the run of record's. Turning it on is the first thing for the next increment. Not taken over: Response also closes in where the cracks close (the
-I-girder under moment, from its second stage) and takes three small first steps where
-the section is cracked from the start (the I-girder under axial tension) [O].
+the run of record's. Turning it on is the first thing for the next increment. **Also written and off**
+(`Flexure.cracks_closing`): the cracks closing between two stages (the stage before
+cracked, this one not) is an event in the binary too [B `00415e30`, event code 2], closed
+in on with a stage at 0.8 of the gap and not 0.2 [B `0041a870`], while the gap is more
+than 0.02 of the way come. On the I-girder under moment, whose top is cracked by the
+prestress and closes as the moment grows, Response's stages are −0.631, −0.549, −0.533,
+−0.530, −0.530, −0.529, −0.503, −0.471, −0.431 rad/km; r2c went from −0.631 to −0.431, and
+with the switch on has Response's nine, and all 66 stages of the case [measured]. With
+both switches on, of the 104 cases without shear the first 25 stages are at Response's
+control values on 100, the first 40 on 99 and the first 60 on 98 (96, 90 and 41 with
+both off), and no check changes side on the development set [measured, 2026-11-25]. Off
+for the same reason; with both off r2c's records are byte for byte the run of record's. Not taken over: Response takes three small first steps where the section is cracked
+from the start (the I-girder under axial tension) [O].
 
 *The end test on a stage that was set aside* [O], since 2026-11-25. "Nothing new has
 happened" in the end test below is asked of the stage as it was tried: a stage that was set

@@ -39,12 +39,14 @@ For the developer: what exists now and how to work on it. The owner reads
    sections with tapers, several transverse types, wide bar spacings, light steel).
    `python tools/margins.py` lists the cases nearest the target; `python tools/stagesat.py`
    the cases whose stages are not at Response's control values.
-2. **Turn on `Flexure.crush_by_share`** (`docs/kernel.md`, "Closing in on first
-   cracking"; `--set`-style: set the class attribute, run `python tools/verify.py`, then
-   `python tools/stagesat.py`): the binary's share for closing in on the extreme fibre's
-   peak strain. Measured with it on: first 60 stages at Response's control values on 96 of
-   104 cases without shear, against 41. Written after the held-out score of increment 4
-   and left off for that reason alone.
+2. **Turn on the two switches that are written and off**, `Flexure.crush_by_share` and
+   `Flexure.cracks_closing` (`docs/kernel.md`, "Closing in on first cracking"): the
+   binary's share for closing in on the extreme fibre's peak strain, and the closing of
+   cracks as an event with a stage at 0.8 of the gap. Set the two class attributes to
+   True, run `python tools/verify.py`, then `python tools/stagesat.py`. Measured with
+   both on, on the 104 cases without shear: first 60 stages at Response's control values
+   on 98 cases against 41, no check changing side. They were written after the held-out
+   score of increment 4 and are off for that reason alone.
 3. **Run the cases without shear on Response's own stage control.** Response has one
    stage control for both (`docs/kernel.md`, "Response's own load stage control"); r2c
    uses it with shear and keeps an earlier stepping of its own without
@@ -53,9 +55,9 @@ For the developer: what exists now and how to work on it. The owner reads
    halved and, under 0.2, the control variable changes (the end on Newbeam with very light
    steel: Response's last steps are 0.787, 0.394 rad/km and then a step in the centroid's
    strain; the prestressed I-girder under axial tension, where its steps halve to the
-   strands' rupture and the response ends); a stage is put in at 0.8 of the gap where the
-   cracks close and at 0.2 where something starts (the I-girder under moment); how often
-   it closes in on the extreme fibre's peak strain. Tried once, after the held-out score
+   strands' rupture and the response ends); three small first steps where the section is cracked from the start (the I-girder under
+   axial tension); what More Detail puts in at the start (Newbeam with More Detail at its
+   most). Tried once, after the held-out score
    and not kept: `Shear(analysis).run()` on Newbeam with 500 mm² of bottom steel under
    moment runs, and ends as Response does (its last curvatures 88.11, 89.83, 90.68 rad/km
    against Response's 88.24, 90.62), but with the base steps of a case with shear, so its

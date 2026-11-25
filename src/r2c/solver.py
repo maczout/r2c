@@ -1349,6 +1349,8 @@ class Flexure:
         cb, kb, gb = self._marks(b)
         if cb and not ca:
             return "crack"
+        if ca and not cb and self.cracks_closing:
+            return "uncrack"
         if kb and not ka:
             return "crush"
         if gb > ga:
@@ -1370,6 +1372,10 @@ class Flexure:
     # with no count of tries [B 00419ff0]. Measured after the held-out score of increment 4
     # and left off so that the kernel stays the one that was scored.
     crush_by_share = False
+    # Written and off: the cracks closing between two stages is an event too, closed in on
+    # with a stage at 0.8 of the gap [B 00415e30, 0041a870, 00419ff0; O: the I-girder
+    # under moment]
+    cracks_closing = False
 
     def advance(self, cur: Stage, target: float, depth: int,
                 aside: Stage | None = None) -> Stage:
@@ -1401,7 +1407,7 @@ class Flexure:
                     break
             self.accept(trial)
             return trial
-        by_share = kind == "crack" or (kind == "crush" and self.crush_by_share)
+        by_share = kind in ("crack", "uncrack") or (kind == "crush" and self.crush_by_share)
         if by_share or (kind == "crush" and depth < 2):
             # cracking: the stage is set aside and one a fifth of the way to it is tried,
             # again and again, each one that shows the cracking set aside in its turn,
@@ -1409,10 +1415,12 @@ class Flexure:
             # way come from the first stage [B 00415e30, 00419ff0; O: docs/kernel.md,
             # "Closing in on first cracking"]. The extreme fibre at its peak strain: as
             # before, 14 tries, 3 on a stage that was itself put in between [O]
-            share = 0.02 if kind == "crack" else 0.005
+            share = 0.005 if kind == "crush" else 0.02
+            # where the cracks close the stage put in is at 0.8 of the gap [B 0041a870]
+            part = 0.8 if kind == "uncrack" else 0.2
             for _ in range(100 if by_share else 14 if depth == 0 else 3):
-                t1 = cur.control + 0.2 * (target - cur.control)
-                if self.crush_by_share:
+                t1 = cur.control + part * (target - cur.control)
+                if self.crush_by_share or kind == "uncrack":
                     # as the binary has it: the step to the stage set aside against the way
                     # that stage has come from the first one [B 00419ff0]
                     travel = abs(target - self.stages[0].control)

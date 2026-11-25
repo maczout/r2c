@@ -141,3 +141,19 @@ def test_the_crushing_share_is_written_and_off(oracle_dir):
         solver.Flexure.crush_by_share = False
     got = compare._curve(record.decode(res.record_bytes(stages.ALL)), "moment_phi")[:22, 0]
     assert np.allclose(got, want, atol=2e-3)
+
+
+def test_closing_in_where_the_cracks_close_is_written_and_off():
+    # [B 00415e30, 0041a870]: the cracks closing between two stages is an event, closed in
+    # on with a stage at 0.8 of the gap. Off, as the crushing share is, and for the same
+    # reason. With it off the closing of cracks is no event at all
+    from r2c import solver
+    assert solver.Flexure.cracks_closing is False
+    su = run.setup(None, increment=(0.0, 1.0, 0.0))
+    drv = su.driver()
+    kept = drv.run(30)
+    cracked = next(s for s in kept if drv._marks(s)[0])
+    assert drv.has_event(cracked, kept[0]) == ""
+    drv.cracks_closing = True
+    assert drv.has_event(cracked, kept[0]) == "uncrack"
+    assert drv.has_event(kept[0], cracked) == "crack"
