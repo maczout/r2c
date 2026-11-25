@@ -137,6 +137,12 @@ def main(argv=None) -> int:
                         f"Preview of branch <b>{html.escape(name)}</b> at {commit} ({date}), "
                         "not merged into main. " + other +
                         '<a href="../../">main</a> · <a href="../">all branches</a>'))
+            # the details page (tools/dashboard.py writes it beside the front page)
+            if (dest / "details.html").exists():
+                inject(dest / "details.html", banner(
+                    "Results of <b>main</b>, in detail." if name == MAIN else
+                    f"Preview of branch <b>{html.escape(name)}</b> at {commit} ({date}), "
+                    "not merged into main, in detail."))
             print(f"{name}: built")
     idx = out / "branches" / "index.html"
     idx.parent.mkdir(parents=True, exist_ok=True)

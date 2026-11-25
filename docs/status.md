@@ -60,7 +60,8 @@ and the two folders of derived inputs in the development archive (`scope-inputs`
   and `tools/rtrace.py` (Response's own tries, read from the running program).
 - The binary: `tools/decompile.py` shows a routine from a Ghidra project kept outside the
   repository (needs `GHIDRA_HOME`; one call at a time). Its output is never committed.
-- Results pages: `tools/dashboard.py` (one page from the committed JSON), `tools/site.py`
+- Results pages: `tools/dashboard.py` (the front page, "how accurate is r2c?", and
+  `details.html`, from the committed JSON and `heldout/totals.json`), `tools/site.py`
   (every branch; run by CI).
 - `tools/attic/`: scripts no longer in use.
 
