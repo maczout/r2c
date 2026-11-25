@@ -10,7 +10,7 @@ run, on the bottom control chart: the control value and load at Response's peak,
 control value r2c's response reaches and its largest load. A response **ends early** when
 r2c's last stage is short of the control value at Response's peak (by more than 2 % of
 it) and its largest load is under Response's peak by more than the tolerance of
-docs/acceptance.md on a peak (5 %). With several runs, one column per run.
+docs/measures.md on a peak (5 %). With several runs, one column per run.
 
 Nothing is solved and nothing is assessed here: the parked cases are not set members.
 """

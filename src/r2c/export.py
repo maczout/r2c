@@ -42,6 +42,11 @@ def chart(title: str, xt: str, yt: str, lines, dx: int, dy: int = 3) -> bytes:
 
 # -- control charts ---------------------------------------------------------------------------
 def control_keys(incr) -> list[str]:
+    """The control charts Response shows for a load increment (N, M, V), as r2x captures
+    them: with shear, shear against shear strain and then moment against curvature (M
+    increasing), axial load (N increasing, no M) or shear against axial strain; without
+    shear, moment against axial strain and against curvature, the first of them replaced by
+    axial load against axial strain when N increases with M; axial load alone otherwise."""
     n, m, v = incr
     if v != 0.0:
         if m != 0.0:
@@ -49,6 +54,8 @@ def control_keys(incr) -> list[str]:
         if n != 0.0:
             return ["shear_gxy", "axial_ex"]
         return ["shear_gxy", "shear_ex"]
+    if m != 0.0 and n != 0.0:
+        return ["axial_ex", "moment_phi"]
     if m != 0.0 or n == 0.0:
         return ["moment_ex", "moment_phi"]
     return ["axial_ex"]
@@ -166,7 +173,8 @@ def bond_chart(sec, d):
     down, value in MPa)."""
     zz = np.linspace(sec.ztop, sec.zbot, 41)
     vals = np.zeros(41)
-    if sec.stirrups and len(d.z) >= 3:
+    # a horizontal tie (pattern 7) shows no bond: with ties alone the chart is zero
+    if any(s.pattern != 7 for s in sec.stirrups) and len(d.z) >= 3:
         zt, vt = bond_table(sec, d)
         zt, vt = zt[::-1], vt[::-1]
         for j, zq in enumerate(zz):

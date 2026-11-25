@@ -31,7 +31,7 @@ def test_unstable_checks_are_shown_and_left_out_of_the_cells():
     # owner, 2026-11-23 (D54, D56): shown with Response's departure beside r2c's difference
     import report
     run, results = dashboard.load_results(ROOT / "docs" / "verification-results.json")
-    acc = report.read_acceptance(ROOT / "docs" / "acceptance.md")
+    acc = report.read_targets(ROOT / "docs" / "measures.md")
     data = dashboard.build(run, results, acc, None, ROOT / "tests" / "oracle", [])
     lim = data["views_pct"]
     for t in data["tiers"]:

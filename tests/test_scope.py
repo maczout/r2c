@@ -97,24 +97,25 @@ def test_draped_tendons_are_refused():
     inputs.parse(beam(extra=layer.format('drape="0.0"')))
 
 
-def test_several_sections_in_one_file_are_refused():
-    # the manual has one cross section to a file; Response's sample inputs carry several (D23)
+def test_of_several_sections_in_one_file_the_first_is_read():
+    # Response's sample inputs carry several sections; Response opens the first (r2x solves it)
     one = beam().decode()
     section = one[one.index("<r3g_beam"):one.index("</r3g_beam>") + len("</r3g_beam>")]
-    two = one.replace(section, section + "\n" + section).encode()
-    with pytest.raises(OutOfScope, match="several sections"):
-        inputs.parse(two)
-    inputs.parse(one.encode())
+    other = section.replace('fcp="35.0"', 'fcp="80.0"')
+    assert other != section
+    two = one.replace(section, section + "\n" + other).encode()
+    assert inputs.parse(two).concretes[0].fcp == inputs.parse(one.encode()).concretes[0].fcp == 35.0
+    swapped = one.replace(section, other + "\n" + section).encode()
+    assert inputs.parse(swapped).concretes[0].fcp == 80.0
 
 
-def test_the_horizontal_tie_is_refused():
-    # stirrup pattern 7 is not in the manual's list of patterns (D23)
+def test_the_horizontal_tie_is_read_as_a_stirrup():
+    # Response solves stirrup pattern 7 as it solves a stirrup, and draws no transverse bond
     one = beam()
     assert b'pattern="5"' in one
-    with pytest.raises(OutOfScope, match="horizontal tie"):
-        inputs.parse(one.replace(b'pattern="5"', b'pattern="7"'))
-    for pattern in (1, 2, 3, 4, 6):
-        inputs.parse(one.replace(b'pattern="5"', f'pattern="{pattern}"'.encode()))
+    for pattern in (1, 2, 3, 4, 6, 7):
+        s = inputs.parse(one.replace(b'pattern="5"', f'pattern="{pattern}"'.encode()))
+        assert s.trans[0].pattern == pattern
 
 
 def test_out_of_scope_by_design_is_still_refused():

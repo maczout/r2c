@@ -9,7 +9,7 @@ subject at the same control value (within 0.2 % of the largest control value on 
 control chart) and how many stages the subject has up to its own peak. The checks of
 tools/compare.py measure the distance between two curves, which does not change when a
 stage is added on the curve or left out; this counts the stages themselves. Nothing is
-assessed: there is no target on stage counts (docs/acceptance.md).
+assessed: there is no target on stage counts (docs/measures.md).
 """
 
 from __future__ import annotations

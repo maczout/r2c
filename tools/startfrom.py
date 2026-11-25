@@ -272,7 +272,7 @@ def main(argv=None) -> int:
             print(f"{s:5d} {curve[s, 1]:9.2f} {e0 * 1e3:9.4f} {phi * 1e6:11.4f} "
                   f"{gam * 1e3:9.4f} " + ("" if err is None else f"{100 * err:15.2f}"))
         return 0
-    acc = report.read_acceptance(ROOT / "docs" / "acceptance.md")
+    acc = report.read_targets(ROOT / "docs" / "measures.md")
     limit = acc.get("views", {}).get("views_pct", 5.0)
     peak_pct = 5.0
     an = su.analysis

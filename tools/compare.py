@@ -27,7 +27,7 @@ What is compared:
 * with --views, where the reference holds the views of the stages just before and after a
   detail stage: how far the reference's own view at that stage lies from the blend of its
   two neighbours' views, and how far the two neighbours' views lie from each other, by the
-  same measure (owner, 2026-11-23, D54 and D56; docs/acceptance.md, "Where Response is
+  same measure (owner, 2026-11-23, D54 and D56; docs/measures.md, "Where Response is
   unstable"; see departure and apart).
 
 No pass or fail is decided here: the numbers are for an engineer to judge.
@@ -288,11 +288,11 @@ def _segment_stage(sub, key, rs, a, b, x, y, xs, ys):
 
 def same_place_limit(ref) -> float:
     """How near two stages must be to count as "at the same place" (D42): the target on the
-    curves of docs/acceptance.md (curve_pct of the case's group), as a fraction. 0.05 where
+    curves of docs/measures.md (curve_pct of the case's group), as a fraction. 0.05 where
     the file sets none."""
     import report
     try:
-        acc = report.read_acceptance(Path(__file__).resolve().parents[1] / "docs" / "acceptance.md")
+        acc = report.read_targets(Path(__file__).resolve().parents[1] / "docs" / "measures.md")
         pct = acc.get(report.group(ref.header), {}).get("curve_pct")
     except (OSError, SystemExit, KeyError, ValueError):
         pct = None
@@ -385,7 +385,7 @@ def lines_distance(la, lb, scale=None):
 
 # -- where the reference is unstable (owner, 2026-11-23, D54, narrowed to spikes by D56) --------
 #
-# docs/acceptance.md, "Where Response is unstable": a view at a stage is unstable when its
+# docs/measures.md, "Where Response is unstable": a view at a stage is unstable when its
 # two neighbours agree with each other within the views target AND Response's own view at
 # the stage lies farther than the views target from the blend of its two neighbours' views,
 # taken at that stage's place along the control curve, each with the same distance measure

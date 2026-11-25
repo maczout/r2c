@@ -23,3 +23,6 @@ Thumbs.db
 
 # tools/dashboard.py output
 dashboard.html
+
+# local agent state
+.claude/

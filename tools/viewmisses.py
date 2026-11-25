@@ -11,9 +11,9 @@ that a difference in the state reached can be told from a difference in a view's
 (tools/diagnose.py states --views puts r2c in Response's own state to settle it).
 
 Nothing is measured here: the differences are tools/compare.py's, as tools/verify.py stored
-them, the limit is views_pct of docs/acceptance.md, and a difference within the printed
+them, the limit is views_pct of docs/measures.md, and a difference within the printed
 precision counts as none, as in tools/report.py. --shear lists only cases with shear;
---tier only views of those tiers of docs/acceptance.md. The last stage of a shear case is
+--tier only views of those tiers of docs/measures.md. The last stage of a shear case is
 listed as "not assessed" and left out of the total (owner, 2026-11-22, D40); --no-endings
 leaves the last stage out of the listing altogether, for cases without shear too. A view
 where Response itself is unstable at the stage (owner, 2026-11-23, D54) is listed with
@@ -49,7 +49,7 @@ def main(argv=None) -> int:
     ap.add_argument("--no-endings", action="store_true", help="leave out the last stage")
     a = ap.parse_args(argv)
     results = json.loads((Path(a.verify_out) / "results.json").read_text())
-    vacc = report.read_acceptance(ROOT / "docs" / "acceptance.md").get("views", {})
+    vacc = report.read_targets(ROOT / "docs" / "measures.md").get("views", {})
     limit = vacc.get("views_pct", 5.0)
     tier = {v: k for k in ("must", "should", "could") for v in vacc.get(k, [])}
     total = 0

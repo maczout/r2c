@@ -1,29 +1,26 @@
-# YYYY-MM-DD-NN: one line on what the session was for
+# YYYY-MM-DD-NN: one line on what the increment was for
 
-Who: the developer (person or agent), with the owner / unattended.
-Branch at the end: `branch`.
+Who: the developer (person or agent), with the owner / unattended. Budget: as the owner set
+it. Branch at the end: `branch`.
 
 ## Goal
 
-What the session set out to do, and what it was asked by whom.
+What the increment set out to do, and how it was planned to fit the budget.
 
 ## Done
 
-What changed, briefly. Point at files and commits rather than repeating them.
+What changed, briefly. Point at files rather than repeating them.
 
 ## Tried and dropped
 
-What was tried and did not work, and why. This is the section a later session needs most.
+What was tried and did not work, and why. Deviations accepted, with the reason. This is the
+section a later increment needs most.
 
-## Decisions
+## Held-out rule
 
-Each decision, who made it (the owner, or the developer where acceptance.md was silent), and
-why.
-
-## Questions for the owner
-
-The numbers (D…) of the decisions this session added to or answered in `docs/summary.md`.
-The questions themselves go there, not here. "None" if none.
+**Kept** or **Not kept**, as the first word. Then what was done with the held-out set in
+this increment (scored once at the end; nothing per case opened), and anything that came
+close to the line.
 
 ## Evidence
 

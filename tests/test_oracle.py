@@ -75,9 +75,10 @@ SETTINGS_FILE_SLOW = {
     "newbeam-usfile-mv": (1.4, 4.3),
     "newbeam-kgcmfile-mv": (0.1, 0.2),
 }
-# Response's sample inputs that hold several sections in one file, and Liping LB1 with its
-# horizontal ties besides: refused since 2026-11-22 (D23). Their fixtures are kept (D19).
-REFUSED_SAMPLES = ("marshall-m", "marshall-nonly", "marshall-asis", "cm4-asis", "liping-asis",
+# Response's sample inputs: each holds several sections, of which Response opens the first,
+# and Liping LB1 has horizontal ties besides. r2c reads them as r2x does; no regression
+# limit is set on them yet.
+SAMPLES = ("marshall-m", "marshall-nonly", "marshall-asis", "cm4-asis", "liping-asis",
                    "se100-asis")
 # Step A-1 of the development set (owner, 2026-11-22, D41): the Quick Define sections
 # (T-beam, circular column, I-girder with strands). Their inputs are r2x's, found by SHA-256
@@ -194,11 +195,14 @@ def test_built_in_section(case, parked_dir):
 
 
 @pytest.mark.parked
-@pytest.mark.parametrize("case", REFUSED_SAMPLES)
-def test_response_samples_are_refused(case, parked_dir, response_dir):
+@pytest.mark.parametrize("case", SAMPLES)
+def test_response_samples_are_read(case, parked_dir, response_dir):
     ref = record.read(parked_dir / f"{case}.r2x.txt")
-    with pytest.raises(inputs.OutOfScope, match="several sections"):
-        _solve(ref, response_dir / ref.header["input-name"])
+    opt = verify.options(ref.header)
+    su = run.setup(response_dir / ref.header["input-name"], initial=opt["initial"],
+                   increment=opt["increment"])
+    assert su.units.name == "si"
+    assert len(inputs.read(response_dir / ref.header["input-name"]).concretes) >= 1
 
 
 @pytest.mark.slow

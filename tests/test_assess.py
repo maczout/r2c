@@ -137,5 +137,5 @@ def test_a_departure_within_the_printed_precision_is_not_unstable():
 def test_the_report_shows_response_departure_beside_r2c_difference():
     r, _rows = unstable_case()
     text = "\n".join(report.unstable_sections({"x": r}, ACC))
-    assert "| Must | x | 0 (cracking) | a: 20.0 / 1.0 / 9.0 (outside) |" in text
-    assert "| Must | 2 | 1 | 0 | 1 | 1 | 1 | 1 | 0 | 1 |" in text
+    assert "| 1: stress state, without shear | x | 0 (cracking) | a: 20.0 / 1.0 / 9.0 (outside) |" in text
+    assert "| 1: stress state, without shear | 2 | 1 | 0 | 1 | 1 | 1 | 1 | 0 | 1 |" in text
