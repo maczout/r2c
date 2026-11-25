@@ -429,7 +429,7 @@ class Analysis:
         # [B 004a9d90, 004ff8f0]
         sh = sec.shrinkage(zf)
         ex = self.strain(e0, phi, zf) - sh
-        m = sec.tab(sec.t_m, zf)
+        m = sec.bond_m(zf)
         ft = np.interp(zf, sec.tz, self.t_ft)
         smx = sec.smx_at(zf)
         smt = sec.smt_at(zf)

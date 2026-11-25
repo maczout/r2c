@@ -192,6 +192,31 @@ class Section:
                 a += (bu + bd) / 2 * (u - d)
         return a
 
+    def bond_area(self, za: float, zb: float) -> float:
+        """The concrete area between two heights as Response-2000 takes it for the bond
+        parameter of the longitudinal bars [B 004fd7c0]: each part of the outline has one
+        width there, the width at its upper end. A part wholly within the range counts at
+        that width; a part the range ends in counts from the cut to the part's other end at
+        the mean of that width and the width at the cut; a range within one part counts as
+        it is. So a taper is not taken as a trapezoid: one that narrows upward counts for
+        less than its area, one that widens upward for more."""
+        lo, hi = min(za, zb), max(za, zb)
+        a = 0.0
+        for z1, z2, b1, b2, _ in self.segs:
+            def at(z):
+                return b2 + (b1 - b2) * (z - z2) / (z1 - z2)
+            if hi < z1:
+                if z2 < lo:
+                    a += 0.5 * (hi - lo) * (at(hi) + at(lo))
+                elif z2 <= hi:
+                    a += 0.5 * (hi - z2) * (at(hi) + b1)
+            elif z2 < lo:
+                if lo <= z1:
+                    a += 0.5 * (z1 - lo) * (at(lo) + b1)
+            else:
+                a += (z1 - z2) * b1
+        return a
+
     def breaks(self) -> list[float]:
         """Heights where the outline or the concrete type changes."""
         out = {self.ztop, self.zbot}
@@ -238,19 +263,20 @@ class Section:
         for l in self.layers:
             up = min(l.z + 7.5 * l.db, self.ztop)
             dn = max(l.z - 7.5 * l.db, self.zbot)
-            ac = max(self.area_between(dn, up), 1e-6)
-            perim = l.db * math.pi * l.num / ac
+            # Response's small numbers are in metres: 1e-6 m2 on the area, 1e-4 m on the
+            # spacing, and 1e-4 m2 on the stirrups' width times spacing below [B 004fec60,
+            # 004ff1a0]
+            perim = l.db * math.pi * l.num / (self.bond_area(dn, up) + 1.0)
             sbar = float(self.smx_at(l.z))
-            kk = perim * 2.5 / (sbar + 1e-4)
+            kk = perim * 2.5 / (sbar + 0.1)
             tent = np.minimum((l.z + sbar - self.tz) * kk, (self.tz - (l.z - sbar)) * kk)
             tl += np.maximum(tent, 0.0)
         self.t_mlong = 3.6 / (tl + 1e-7)
         tt = np.zeros(NTAB)
         for s in self.stirrups:
             inside = (self.tz >= s.bot - 1e-9) & (self.tz <= s.top + 1e-9)
-            tt += np.where(inside, s.db * math.pi * s.legs / (bw * s.space + 1e-4), 0.0)
+            tt += np.where(inside, s.db * math.pi * s.legs / (bw * s.space + 100.0), 0.0)
         self.t_mtrans = 3.6 / (tt + 1e-7)
-        self.t_m = np.minimum(self.t_mlong, self.t_mtrans)
         # stirrup ratio by depth
         rv = np.zeros(NTAB)
         for s in self.stirrups:
@@ -423,6 +449,11 @@ class Section:
 
     def tab(self, table: np.ndarray, z):
         return np.interp(z, self.tz, table)
+
+    def bond_m(self, z):
+        """The bond parameter M at heights z: each of the two tables read at the height,
+        and the lesser of the two readings [B 004a94d0, 004ff850]."""
+        return np.minimum(self.tab(self.t_mlong, z), self.tab(self.t_mtrans, z))
 
     def cracking_table(self, n0, m0, dn, dm):
         """Cracking strength by depth. In flexure the extreme fibre cracks at a size-dependent

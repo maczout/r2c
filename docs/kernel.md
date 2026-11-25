@@ -314,8 +314,11 @@ stage is not Response's node for node: it hangs on a profile value of millionths
 Tables over the depth [B]:
 
 * longitudinal and transverse crack spacing: "Crack spacing over the depth", below;
-* the bond parameter M (100 stations): from the bars' perimeters within 7.5 db, falling to
-  nothing one crack spacing away; M = 3.6·b·s/(π·db·legs) for stirrups; the lesser governs;
+* the bond parameter M (100 stations), two tables: for the bars [`004fec60`], each layer's
+  perimeter over the concrete area within 7.5 db of it, times 2.5, falling to nothing one
+  crack spacing away; for the stirrups [`004ff1a0`], M = 3.6·(b·s + 1e-4 m²)/(π·db·legs).
+  Each table is read at the node's height and the lesser of the two readings governs
+  [`004a94d0`, `004ff850`]; see "The concrete area in the bond parameter" below;
 * the steel ratio for the strain concentration of stirrups at a crack (100 stations).
 
 ### Crack spacing over the depth [B `0043f570`, `0043faf0`, `0043e8d0`, `00440100`, `0043f0d0`], read 2026-11-22
@@ -394,6 +397,36 @@ at the peak of the I-girder with shear (2.5 to 49.8 %, and that case's Should vi
 it) and of M/V = 2 m (3.7 to 22.5 %), a spike at the end of the stirrups in a stage of
 r2c's own that has not converged; two views of M/V = 0.5 m by a point; the post-peak of V
 alone (3.7 to 6.9 %).
+
+### The concrete area in the bond parameter [B `004fd7c0`, `004fec60`], read 2026-11-25
+
+The area of concrete within 7.5 db of a layer is summed over the parts of the outline by a
+routine that only the bond parameter uses, and it gives each part one width: the width at
+the part's upper end.
+
+* A part wholly within the range: its height times that width.
+* A part in which the range ends, from the part's bottom up to the cut: the height times
+  the mean of that width and the width at the cut.
+* A part in which the range starts, from the cut up to the part's top: the same mean, which
+  is the true trapezoid.
+* A range within one part: the true trapezoid.
+
+On a part of constant width this is the area. On a taper it is not: one that narrows upward
+counts for less than its area, one that widens upward for more. The small numbers the
+routines add are in metres: 1e-6 m² to the area, 1e-4 m to the crack spacing the tent is
+built on, 1e-4 m² to the stirrups' width times spacing (r2c had 1e-4 mm and 1e-4 mm², which
+is nothing), and 1e-4 per metre to the sum.
+
+Found on the Liping sample (flanges with tapers, a web of 75 mm, stirrups at 125 mm): from
+Response's charts of principal tensile stress and strain the bond parameter can be worked
+back, M = (ft/f1 − 1)²/ε1 where the crack check does not govern. Before, Response's M was
+0.90 of r2c's around the bottom bars and 1.10 around the top ones, and 1.011 in the web;
+with the rule the ratio is 1.0000 at every node read, top, bottom and web, and on the
+I-girder under moment (no tapers) 1.000 ± 0.001 [measured, the captures of liping-n300-m,
+liping-negm and igirder-dep5-m]. The view that showed it: principal tensile stress at the
+peak of liping-n300-m, 13.3 % off before, 0.0 % with the rule. Until 2026-11-25 r2c also took
+the lesser of the two tables station by station and read the result between stations; at
+the edge of a layer's tent that differs by one station's worth (2 % at one node).
 
 ### At a step in width [O]
 

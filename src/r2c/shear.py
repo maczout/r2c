@@ -142,7 +142,7 @@ class Shear(Flexure):
         es, fs = an.steel(e0, phi)
         f1cx = an.crack_check(e0, phi, es, fs)
         out, ex, g, smx, smt, ey = an.eval_nodes(e0, phi, gam, z, f1cx)
-        m = sec.tab(sec.t_m, zf)
+        m = sec.bond_m(zf)
         ft = np.interp(zf, sec.tz, an.t_ft)
         idx = an.law_index(zf, z)
         n_ = len(zf)
