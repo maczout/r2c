@@ -10,20 +10,19 @@ measured on the development results (`docs/verification-results.md`) unless mark
   effects, draped tendons, and `units="roman"` in a file. The owner's decision (2026-11-24,
   `docs/brief.md`): refuse them; they may be revisited after the threshold. The other way
   round, four inputs on which Response gives up part-way through its solve are solved by
-  r2c; r2c cannot know to stop.
+  r2c: on two Response puts up "No closure on shear distribution" and r2x stops at the
+  message; on two r2x finds more stages on Response's control curves than in its list.
+  r2c cannot know either before solving.
 - **`define` and `--report` of r2x are not in r2c.** Both work through Response's own
   windows. The owner's decision (2026-11-24): not part of the command line that is
   compared.
 - **With shear, r2c carries on where Response's solve gives up and its response ends.**
   On sections that fail in flexure with some shear (M/V of 2 to 4 m: the T-beam, the
-  Marshall sample, Newbeam with stronger concrete) the two curves are the same up to
-  Response's last stage; r2c then finds further states and reaches a peak several per cent
-  higher. Response's stiffness at that state differs from r2c's; the term has not been
-  found (`docs/kernel.md`, "Seen in increment 2").
-- **Other shear cases of the wider set outside on the peak or the rising branch**, not yet
-  looked into beyond their traces: the Liping sample at M/V = 2.5 m and the T-beam with
-  CSA factors at 2 m (r2c's peak lower), Newbeam with heavy steel under negative moment
-  (the rising branch).
+  Marshall sample, Newbeam with stronger concrete; several of the parked I-girder cases)
+  the two curves are the same up to Response's last stage; r2c then finds further states
+  and reaches a peak several per cent higher. This is the owner's override (2026-11-25,
+  `docs/brief.md`): r2c keeps carrying on. It is not chased; its checks are outside target
+  and are counted as such.
 - **The Liping sample under axial compression and moment:** the principal tensile stress at
   the peak differs by more than twice the target. Not looked into.
 - **With shear, where a load stage does not settle, the two programs try different
@@ -45,11 +44,10 @@ measured on the development results (`docs/verification-results.md`) unless mark
   both programs.
 - **Elasto-plastic tension stiffening, with shear:** r2c keeps a stage that Response
   refuses and carries on past Response's last stage.
-- **Axial tension:** r2c has one rising point fewer before the fall at cracking, and the
-  diagonal crack spacing chart at cracking is compared across that fall.
 - **The circular column under axial load alone, after its peak.** r2c keeps its uniform
   post-peak response. This is the owner's override (`docs/brief.md`), not a defect; its
-  checks are counted outside.
+  checks are counted outside. The same holds for any section that stays uniform under
+  axial load alone: r2c does not leave the uniform state there, and Response does.
 - **Shear on the crack**, three places: a limit line that one program draws and the other
   does not on a flat peak; where the web of the I-girder cracks with one softening model;
   the top of the cracked zone with Tamai tension stiffening. The last two are outside in

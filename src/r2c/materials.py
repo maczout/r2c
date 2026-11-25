@@ -379,7 +379,9 @@ class SteelLaw:
         """Slope of the loading curve at strain e, as Response's shear flow calculation takes
         it [B 004ae630]: no account of unloading; nothing on the yield plateau; on the
         hardening branch the slope's magnitude, also past the strain at peak stress; nothing
-        once ruptured. Without the material factor."""
+        once ruptured. Without the material factor. With material factors in effect the
+        stress is capped at fy [B 004aea40] and this slope is not: the routine has no such
+        test, so a bar past its plateau keeps the hardening slope."""
         e = np.asarray(e, dtype=float)
         a = np.abs(e)
         if self.prestress:
@@ -387,11 +389,10 @@ class SteelLaw:
             with np.errstate(invalid="ignore"):
                 t = (np.abs(self.raw(a + d)) - np.abs(self.raw(a))) / d
             return np.where(np.isnan(t), 0.0, t)
-        hard = 0.0 if self.factored else 1.0
         t = np.where(a < self.fy / self.E, self.E,
                      np.where(a < self.esh, 0.0,
                               np.where(a < self.rupture,
-                                       hard * 2.0 * abs(self.curv) * np.abs(a - self.eu), 0.0)))
+                                       2.0 * abs(self.curv) * np.abs(a - self.eu), 0.0)))
         return t
 
     def crack_strain(self, e, prestrain, rho, strand: bool):
