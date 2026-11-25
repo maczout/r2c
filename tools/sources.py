@@ -1,7 +1,7 @@
 """Where does each view miss of a shear case come from: the state reached, or a rule?
 
     python tools/sources.py VERIFY_OUT --archive ARCHIVE --inputs DIR [DIR ...]
-                            [--only NAME ...] [--jobs N] [--flat PCT]
+                            [--only NAME ...] [--jobs N] [--flat PCT] [--by-case]
 
 Answers the question step A-4 starts with (owner, 2026-11-24, D64): of the view checks
 outside target on the cases with shear, how many trace to the state the two programs
@@ -23,6 +23,9 @@ feature), r2c's stage and its distance in load, and how flat Response's curve is
 the spread of its load over the stage and the two before it, or the two after it,
 whichever is smaller, as a share of its peak. "flat" is a spread under --flat (1 % if
 not given: this tool's own threshold, for sorting only).
+
+--by-case prints one line a case instead: how many of its misses are of each kind and of
+each tier (the table of step A-6: which misses fall under the named limitation, D66).
 
 Nothing is assessed and no target is read but the views target. The capture in ARCHIVE
 must be the one the fixture was cut from (same number of stages); a case whose capture
@@ -153,6 +156,8 @@ def main(argv=None) -> int:
     ap.add_argument("--inputs", nargs="+", default=[])
     ap.add_argument("--only", nargs="*")
     ap.add_argument("--jobs", type=int, default=1)
+    ap.add_argument("--by-case", action="store_true",
+                    help="one line a case: its misses by kind and by tier")
     ap.add_argument("--flat", type=float, default=1.0,
                     help="a spread of load under this (%% of the peak) is called flat")
     a = ap.parse_args(argv)
@@ -172,8 +177,9 @@ def main(argv=None) -> int:
             skipped.append((name, note))
             continue
         last = None
+        mine = {}
         for r in rows:
-            if r["stage"] != last:
+            if r["stage"] != last and not a.by_case:
                 last = r["stage"]
                 print(f"{name}: {r['feature']}, Response's stage {r['stage']} against r2c's "
                       f"{r['sub_stage']} ({r['matched'] or 'matched by feature'}; load "
@@ -186,9 +192,18 @@ def main(argv=None) -> int:
             else:
                 what = "not the state"
             count[what] += 1
+            if a.by_case:
+                last = r["stage"]
+                for key in (what, tier.get(r["view"], "-")):
+                    mine[key] = mine.get(key, 0) + 1
+                continue
             own = "" if r["own"] is None else f"{r['own']:6.1f} % in Response's state"
             print(f"    {r['view']:30s} ({tier.get(r['view'], '-'):6s}) {r['pct']:6.1f} %  "
                   f"{own:32s} {what}")
+        if a.by_case and mine:
+            kinds = "; ".join(f"{mine[k]} {k}" for k in count if k in mine)
+            tiers = ", ".join(f"{mine[k]} {k}" for k in ("must", "should", "could") if k in mine)
+            print(f"{name}: {kinds} ({tiers})")
     for name, note in skipped:
         print(f"{name}: skipped ({note})")
     total = sum(count.values())
