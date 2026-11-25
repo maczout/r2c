@@ -25,7 +25,9 @@ from r2c.solver import Analysis, Flexure, SolveError, Stage
 from r2c.units import FILE_UNITS, Units
 
 CSA = (0.65, 0.85, 0.90)
-MAX_STAGES = 101          # Response stops adding load stages at 101 (0 to 100)
+MAX_STAGES = 101          # without shear Response stops adding load stages at 101 (0 to 100)
+STAGE_SLOTS = 330         # with shear only the count of solves ends it; the program's table of
+                          # stages has 330 places (docs/kernel.md, "How many stages")
 MORE_DETAIL_LIMIT = 327   # and refines no further than 327
 
 
@@ -129,6 +131,11 @@ class Setup:
             return Shear(self.analysis, on_stage=on_stage)
         return Flexure(self.analysis, on_stage=on_stage)
 
+    @property
+    def max_stages(self) -> int:
+        """The most load stages a response may have."""
+        return STAGE_SLOTS if self.analysis.shear else MAX_STAGES
+
 
 def setup(path: str | Path | None = None, *, units: str | None = None,
           factors: str | None = None, initial=None, increment=None,
@@ -182,7 +189,7 @@ def solve(path: str | Path | None = None, *, units: str | None = None,
 
     driver = su.driver(on_stage=tick)
     try:
-        stages = driver.run(MAX_STAGES)
+        stages = driver.run(su.max_stages)
     except SolveError as e:
         raise Failed(str(e)) from None
     if not stages:

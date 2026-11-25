@@ -768,7 +768,15 @@ now [O, one run of the parked cases, 2026-11-22; not looked into].
 
 The control variable's value at the initial stage is the curvature or the centroid's strain
 there. More Detail adds a stage between every two up to the peak, among the stages found in
-the first control variable, to at most 327 stages. A response has at most 101 stages [O].
+the first control variable, to at most 327 stages.
+
+**How many stages.** Without shear a response has at most 101 stages [O: every capture
+without shear stops there or sooner]. With shear there is no such limit: Response's
+captures run to 148 stages (the Liping sample at M/V = 2.5 m; 113 to 139 on four more
+development cases) [O], and the stage control has none; what ends a long response there is
+the count of solves, 327 [B `00418860`], in a table of stages with 330 places [B
+`00417d50`]. Until 2026-11-25 r2c stopped every response at 101 stages, and so ended five
+shear cases well before Response does.
 
 ## The stage solve without shear [B], read 2026-11-22
 
