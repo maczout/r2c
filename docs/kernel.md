@@ -271,6 +271,21 @@ its own face value: where r2c had a sloping limit from 0.76 MPa at the face, Res
 a flat 0.83 MPa (Newbeam with CSA factors under M, last stage: the limit line of the
 Principal Tensile Stress chart 11.3 % off before, 0.0 % with the rule).
 
+### Steel stress at a crack with the whole depth in tension [B `00442e50`; O], 2026-11-25
+
+The bars' stress at a crack comes from an extra curvature about the axis of the tension
+zone: the moment about that axis of the concrete tension the cracks do not carry is taken
+by the bars in tension (`Analysis.steel_at_crack`). With the whole depth in tension the
+axis is far outside the section, the whole depth is on its tension side whichever way the
+section bends, and the extra curvature comes to the same extra strain in every bar. Until
+2026-11-25 r2c took the tension side from the sign of the curvature and so, bending one of
+the two ways, found no concrete on it: the bars showed their average stress at the crack,
+and a bar under its cracking strain showed nothing. Seen on the Liping sample under axial
+tension, then moment, at the stage after cracking: Response's four layers carry 8.49 and
+8.45 MPa more at the crack than on average, top and bottom alike (24.97, 24.73, 18.57,
+18.57 MPa); r2c had 16.48, 16.29, 0 and 0, and with the rule 24.97, 24.73, 18.57, 18.57
+[measured, the fixture liping-ntens200-m].
+
 ### A node with next to no shear strain [B `004a8b20`, `004a7b60`], read 2026-11-23 (step A-2)
 
 Before Response solves a node's transverse strain (`004a8b20`) it tests the

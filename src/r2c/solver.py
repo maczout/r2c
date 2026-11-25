@@ -794,7 +794,13 @@ class Analysis:
         fl = ft / (1.0 + 250.0 * out.w)
         g = np.maximum(out.f1 - fl, 0.0) + out.vci / out.tan
         cr = out.e1 > out.ecr
-        side = (z >= zref) if phi <= 0 else (z <= zref)
+        if abs(zref) >= FAR:
+            # all in tension: the axis is far outside and the whole depth is on its
+            # tension side, whichever way the section bends [O: the Liping sample under
+            # axial tension, then moment; Response's bars all carry the same extra stress]
+            side = np.ones(len(z), dtype=bool)
+        else:
+            side = (z >= zref) if phi <= 0 else (z <= zref)
         ok = cr & side
         d = np.abs(zref - z)
         k = ok[:-1] & ok[1:]

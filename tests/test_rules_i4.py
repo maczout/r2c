@@ -102,3 +102,19 @@ def test_first_cracking_is_closed_in_on_until_two_per_cent_of_the_way_is_left():
     # the try before it was still worth making: more than 2 % was left then
     before = abs(kept[k].control - kept[k - 2].control)
     assert before >= 0.02 * abs(kept[k - 2].control - kept[0].control)
+
+
+def test_all_in_tension_every_bar_carries_the_extra_stress_at_a_crack_whichever_way_it_bends():
+    # a cracked state with the whole depth in tension: the concrete's tension is taken at
+    # the cracks by all the bars alike, bending one way or the other [O: the Liping sample
+    # under axial tension, then moment]
+    su = run.setup(None, increment=(0.0, 1.0, 0.0))
+    sec, an = su.section, su.analysis
+    for phi in (2.0e-7, -2.0e-7, 0.0):
+        d = an.detail(0.25e-3, phi, 0.0)
+        assert float(np.min(d.ex)) > 0.0 and d.out.cracked.all()
+        extra = [(d.fscr[i] - d.fs[i]) / (l.steel.E * l.steel.phi)
+                 for i, l in enumerate(sec.layers)]
+        assert min(extra) > 0.0
+        # the same extra strain in every bar: the axis is far outside
+        assert max(extra) == pytest.approx(min(extra), rel=0.02)
