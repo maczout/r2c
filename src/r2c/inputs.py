@@ -249,6 +249,14 @@ def parse(data: bytes) -> SectionInput:
         if not 0 <= c.t_stiff <= 7 or not 0 <= c.c_soft <= 18 or not 0 <= c.c_mod <= 4:
             raise InputError(f"concrete {c.name!r}: c_mod={c.c_mod}, c_soft={c.c_soft}, "
                              f"t_stiff={c.t_stiff} are not all models of Response-2000")
+        if c.t_stiff == 0:
+            # Response stops before solving to ask "Do you wish to leave tension off?" and
+            # r2x fails on the question, whatever the loads (measured 2026-11-25 under
+            # moment alone and under moment with shear). Refused so that r2c refuses what
+            # r2x refuses (docs/brief.md, interface parity); the model itself is built.
+            raise OutOfScope(f"concrete {c.name!r}: tension stiffening is turned off; "
+                             "Response-2000 stops to ask whether to leave it off and r2x "
+                             "fails there, so r2c refuses the input as r2x does")
         if c.c_soft in UNDOCUMENTED_SOFTENING:
             raise OutOfScope(f"concrete {c.name!r}: compression softening model {c.c_soft} is "
                              "not in Response-2000's manual and is not implemented")

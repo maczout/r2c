@@ -126,6 +126,17 @@ from the text above, it governs.
    differences. They may be revisited after the threshold.
 3. Solution threshold on priority 1: 99 % without shear, 90 % with.
 
+**2026-11-25**, in answer to the questions of the summary after increment 2:
+
+1. Interface parity is complete when the only differences left are the inputs refused by
+   the owner's decision. Report it that way: "complete except accepted refusals", with
+   the count.
+2. Budget: about three hours of work.
+3. Where Response's solve gives up and ends a shear response early while r2c carries on:
+   keep r2c carrying on, as an owner's override like the circular column. (The message
+   left both choices standing, "clone Response's ending / keep r2c carrying on"; asked
+   the same day, the owner chose this one.)
+
 ## First increment
 
 This increment changes how the work is governed, with the owner's approval.
