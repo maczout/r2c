@@ -39,7 +39,13 @@ For the developer: what exists now and how to work on it. The owner reads
    sections with tapers, several transverse types, wide bar spacings, light steel).
    `python tools/margins.py` lists the cases nearest the target; `python tools/stagesat.py`
    the cases whose stages are not at Response's control values.
-2. **Run the cases without shear on Response's own stage control.** Response has one
+2. **Turn on `Flexure.crush_by_share`** (`docs/kernel.md`, "Closing in on first
+   cracking"; `--set`-style: set the class attribute, run `python tools/verify.py`, then
+   `python tools/stagesat.py`): the binary's share for closing in on the extreme fibre's
+   peak strain. Measured with it on: first 60 stages at Response's control values on 96 of
+   104 cases without shear, against 41. Written after the held-out score of increment 4
+   and left off for that reason alone.
+3. **Run the cases without shear on Response's own stage control.** Response has one
    stage control for both (`docs/kernel.md`, "Response's own load stage control"); r2c
    uses it with shear and keeps an earlier stepping of its own without
    (`Flexure.advance`, `Flexure.run`). What is left to differ without shear is what that
@@ -57,7 +63,7 @@ For the developer: what exists now and how to work on it. The owner reads
    without shear on that control [B `00419250`, `0041a870`], then `python
    tools/stagesat.py` on every case without shear. Nine development cases around endings
    at rupture were added for it.
-3. **Priority 2 with shear** (the shear-related views at the peak) is the lowest total.
+4. **Priority 2 with shear** (the shear-related views at the peak) is the lowest total.
    `python tools/sources.py` splits the misses: about four in five are the state the two
    programs reach on a stage that does not settle, one in five are rules. Of the rules:
    the stirrups' stress at a crack at nodes that have only just cracked (the transverse
@@ -65,17 +71,17 @@ For the developer: what exists now and how to work on it. The owner reads
    chart at the stirrups' top end (a half layer whose top node has next to no shear strain
    keeps its bond in Response at Newbeam M/V = 0.5 m and loses it at mid-depth under a
    thermal gradient: the rule that tells the two apart was not found).
-4. **Stages that do not settle, with shear.** Up to the first difference r2c makes
+5. **Stages that do not settle, with shear.** Up to the first difference r2c makes
    Response's tries one for one; after it the paths part. The new case of increment 4
    (Newbeam with closed stirrups under axial compression and shear alone): both programs
    hover at the web-cracking load for ten passes and then drop to a cracked profile,
    Response at its eleventh pass and r2c at its fifteenth; Response's solve then breaks
    down and its response ends on a collapsed state. The owner has been asked whether such
    a case is the override's kind.
-5. **Long shear responses are slow** (the column under 3000 kN at M/V = 2 m takes about
+6. **Long shear responses are slow** (the column under 3000 kN at M/V = 2 m takes about
    seven minutes).
-6. **Not yet checked on parity:** the two programs run end to end on the same input.
-7. **Newbeam under an axial tension of 300 kN** has no state under its initial load in
+7. **Not yet checked on parity:** the two programs run end to end on the same input.
+8. **Newbeam under an axial tension of 300 kN** has no state under its initial load in
    r2c ("no equilibrium under the initial loads"). Seen in passing; what Response does
    was not looked at.
 

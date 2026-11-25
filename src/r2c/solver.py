@@ -1365,6 +1365,12 @@ class Flexure:
         if self.on_stage:
             self.on_stage(len(self.stages))
 
+    # Written and off (docs/kernel.md, "Closing in on first cracking"): close in on the
+    # extreme fibre reaching its peak strain by the binary's share, 0.5 % of the way come,
+    # with no count of tries [B 00419ff0]. Measured after the held-out score of increment 4
+    # and left off so that the kernel stays the one that was scored.
+    crush_by_share = False
+
     def advance(self, cur: Stage, target: float, depth: int,
                 aside: Stage | None = None) -> Stage:
         """Accept a stage at the target, approaching it in geometric steps when something
@@ -1395,18 +1401,27 @@ class Flexure:
                     break
             self.accept(trial)
             return trial
-        if kind == "crack" or (kind == "crush" and depth < 2):
+        by_share = kind == "crack" or (kind == "crush" and self.crush_by_share)
+        if by_share or (kind == "crush" and depth < 2):
             # cracking: the stage is set aside and one a fifth of the way to it is tried,
             # again and again, each one that shows the cracking set aside in its turn,
             # while what is left to the nearest stage set aside is more than 2 % of the
             # way come from the first stage [B 00415e30, 00419ff0; O: docs/kernel.md,
             # "Closing in on first cracking"]. The extreme fibre at its peak strain: as
             # before, 14 tries, 3 on a stage that was itself put in between [O]
-            for _ in range(100 if kind == "crack" else 14 if depth == 0 else 3):
+            share = 0.02 if kind == "crack" else 0.005
+            for _ in range(100 if by_share else 14 if depth == 0 else 3):
                 t1 = cur.control + 0.2 * (target - cur.control)
-                travel = abs(cur.control - self.stages[0].control)
-                if kind == "crack" and abs(target - cur.control) < 0.02 * travel:
-                    break
+                if self.crush_by_share:
+                    # as the binary has it: the step to the stage set aside against the way
+                    # that stage has come from the first one [B 00419ff0]
+                    travel = abs(target - self.stages[0].control)
+                    if abs(target - cur.control) <= share * travel:
+                        break
+                else:
+                    travel = abs(cur.control - self.stages[0].control)
+                    if kind == "crack" and abs(target - cur.control) < 0.02 * travel:
+                        break
                 try:
                     sub = self.advance(cur, t1, depth + 1, aside=trial)
                 except SolveError:

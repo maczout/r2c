@@ -2,6 +2,10 @@
 
 import numpy as np
 import pytest
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
 
 from r2c import run
 
@@ -118,3 +122,22 @@ def test_all_in_tension_every_bar_carries_the_extra_stress_at_a_crack_whichever_
         assert min(extra) > 0.0
         # the same extra strain in every bar: the axis is far outside
         assert max(extra) == pytest.approx(min(extra), rel=0.02)
+
+
+def test_the_crushing_share_is_written_and_off(oracle_dir):
+    # [B 00419ff0]: 0.5 % of the way come, no count of tries. Off, so that the kernel is the
+    # one the held-out set was scored on in increment 4; with it on Newbeam under axial load
+    # and moment has Response's stages around the extreme fibre's peak strain
+    import compare
+    import verify
+    from r2c import record, solver, stages
+    assert solver.Flexure.crush_by_share is False
+    ref = record.read(oracle_dir / "newbeam-nm.r2x.txt")
+    want = compare._curve(ref, "moment_phi")[:22, 0]
+    solver.Flexure.crush_by_share = True
+    try:
+        res = run.solve(None, **verify.options(ref.header))
+    finally:
+        solver.Flexure.crush_by_share = False
+    got = compare._curve(record.decode(res.record_bytes(stages.ALL)), "moment_phi")[:22, 0]
+    assert np.allclose(got, want, atol=2e-3)
