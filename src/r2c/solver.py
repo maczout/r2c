@@ -1321,6 +1321,15 @@ class Flexure:
                 slope, at0 = 0.0, float(np.average(e, weights=w))
             # strain(z) = e0 - phi (z - zc)
             yield np.array([at0, -slope])
+        # A moment above the cracking moment: from the unstrained section the residual
+        # cannot be brought down across the fall of force at cracking. Start from cracked
+        # planes instead: a strain difference over the depth of 0.25 to 8 mm/m, bending
+        # either way, the centroid in a little tension [O: r2c's own; Response's first
+        # stage under such a moment is a cracked state, e.g. Newbeam under 50 kNm]
+        if self.an.m0 != 0.0:
+            for k in (0.25e-3, 0.5e-3, 1e-3, 2e-3, 4e-3, 8e-3):
+                for sgn in (1.0, -1.0):
+                    yield np.array([0.15 * k, sgn * k / sec.h])
 
     # -- events ---------------------------------------------------------------------------------
     def _marks(self, st: Stage):

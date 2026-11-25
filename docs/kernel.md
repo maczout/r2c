@@ -687,6 +687,13 @@ that fits the section's own strains: the shrinkage profile, then the strains at 
 prestrained bars carry nothing [T 7-3: with shrinkage the first estimate is "a linear fit to
 those profiles"; the second plane and the cut-back are r2c's own].
 
+Under a constant moment, if no state is found from those, the search starts again from
+cracked planes: a strain difference over the depth of 0.25, 0.5, 1, 2, 4 and 8 mm/m, bending
+either way, with the centroid at 0.15 of that difference in tension [O: r2c's own, since
+increment 2. A moment above the cracking moment has no way from the unstrained section
+that brings the residual down across the fall of force at cracking: Newbeam under a
+constant 50 kNm was not solved; Response's first stage there is a cracked state].
+
 ## Load stages
 
 **With shear: Response's own load stage control [B]**, taken over 2026-11-21 in place of
