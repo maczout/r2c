@@ -1,0 +1,347 @@
+{
+ "checks": {
+  "column-interlock-mv|view|principal_tensile_stress|37": {
+   "own": 0.92,
+   "spread": 0.72
+  },
+  "column-interlock-mv|view|transverse_average_bond|37": {
+   "own": 4.92,
+   "spread": 0.72
+  },
+  "column-mv|view|average_angle|36": {
+   "own": 0.19,
+   "spread": 0.88
+  },
+  "column-mv|view|crack_widths|36": {
+   "own": 0.42,
+   "spread": 0.88
+  },
+  "column-mv|view|diagonal_spacing|36": {
+   "own": 0.27,
+   "spread": 0.88
+  },
+  "column-mv|view|principal_compressive_stress|36": {
+   "own": 0.44,
+   "spread": 0.88
+  },
+  "column-mv|view|principal_tensile_strain|36": {
+   "own": 0.32,
+   "spread": 0.88
+  },
+  "column-mv|view|principal_tensile_stress|36": {
+   "own": 0.88,
+   "spread": 0.88
+  },
+  "column-mv|view|shear_on_crack|36": {
+   "own": 1.51,
+   "spread": 0.88
+  },
+  "column-mv|view|shear_strain|36": {
+   "own": 0.06,
+   "spread": 0.88
+  },
+  "column-mv|view|stirrup_stress|36": {
+   "own": 1.61,
+   "spread": 0.88
+  },
+  "column-mv|view|transverse_average_bond|36": {
+   "own": 12.5,
+   "spread": 0.88
+  },
+  "column-mv|view|transverse_strain|36": {
+   "own": 0.38,
+   "spread": 0.88
+  },
+  "column-nonly|view|average_angle|41": {
+   "own": 0.0,
+   "spread": 1.65
+  },
+  "column-nonly|view|crack_widths|41": {
+   "own": 0.0,
+   "spread": 1.65
+  },
+  "column-nonly|view|diagonal_spacing|41": {
+   "own": 0.0,
+   "spread": 1.65
+  },
+  "column-nonly|view|long_reinf_stress_at_crack|41": {
+   "own": 0.37,
+   "spread": 1.65
+  },
+  "column-nonly|view|long_reinforcement_stress|41": {
+   "own": 0.0,
+   "spread": 1.65
+  },
+  "column-nonly|view|longitudinal_concrete_stress|41": {
+   "own": 0.04,
+   "spread": 1.65
+  },
+  "column-nonly|view|longitudinal_strain|41": {
+   "own": 0.0,
+   "spread": 1.65
+  },
+  "column-nonly|view|principal_compressive_stress|41": {
+   "own": 0.0,
+   "spread": 1.65
+  },
+  "column-nonly|view|principal_tensile_strain|41": {
+   "own": 0.0,
+   "spread": 1.65
+  },
+  "column-nonly|view|principal_tensile_stress|41": {
+   "own": 0.59,
+   "spread": 1.65
+  },
+  "igirder-csoft3-m2v|view|shear_on_crack|27": {
+   "own": 13.56,
+   "spread": 0.68
+  },
+  "igirder-mv|view|transverse_average_bond|12": {
+   "own": 0.0,
+   "spread": 29.48
+  },
+  "newbeam-csa-mv|view|shear_stress|30": {
+   "own": 0.12,
+   "spread": 0.92
+  },
+  "newbeam-csa-mv|view|transverse_average_bond|30": {
+   "own": 0.01,
+   "spread": 0.92
+  },
+  "newbeam-m05v|view|principal_tensile_strain|51": {
+   "own": 0.56,
+   "spread": 0.57
+  },
+  "newbeam-m05v|view|principal_tensile_stress|51": {
+   "own": 1.68,
+   "spread": 0.57
+  },
+  "newbeam-m05v|view|shear_strain|51": {
+   "own": 0.58,
+   "spread": 0.57
+  },
+  "newbeam-m05v|view|stirrup_stress|41": {
+   "own": 0.5,
+   "spread": 6.15
+  },
+  "newbeam-m05v|view|stirrup_stress|51": {
+   "own": 1.45,
+   "spread": 0.57
+  },
+  "newbeam-m05v|view|transverse_average_bond|41": {
+   "own": 3.6,
+   "spread": 6.15
+  },
+  "newbeam-m05v|view|transverse_average_bond|51": {
+   "own": 13.28,
+   "spread": 0.57
+  },
+  "newbeam-m0neg-mv|view|transverse_average_bond|43": {
+   "own": 3.78,
+   "spread": 0.1
+  },
+  "newbeam-m2v|view|transverse_average_bond|86": {
+   "own": 3.63,
+   "spread": 0.02
+  },
+  "newbeam-nmv-incr|view|transverse_average_bond|36": {
+   "own": 0.48,
+   "spread": 5.7
+  },
+  "newbeam-shrink-m|view|transverse_average_bond|46": {
+   "own": 6.07,
+   "spread": 7.52
+  },
+  "newbeam-tension|view|diagonal_spacing|12": {
+   "own": 0.0,
+   "spread": 1.13
+  },
+  "newbeam-tsfactor-mv|view|shear_on_crack|36": {
+   "own": 0.68,
+   "spread": 0.08
+  },
+  "newbeam-tsfactor-mv|view|transverse_average_bond|11": {
+   "own": 0.38,
+   "spread": 3.53
+  },
+  "newbeam-tsfactor-mv|view|transverse_average_bond|12": {
+   "own": 0.0,
+   "spread": 3.53
+  },
+  "newbeam-tstiff4-mv|view|shear_on_crack|38": {
+   "own": 18.44,
+   "spread": 0.05
+  },
+  "newbeam-tstiff6-mv|view|transverse_average_bond|30": {
+   "own": 0.6,
+   "spread": 8.06
+  },
+  "newbeam-us-mv|view|crack_widths|56": {
+   "own": 0.84,
+   "spread": 0.21
+  },
+  "newbeam-us-mv|view|long_reinf_stress_at_crack|56": {
+   "own": 0.0,
+   "spread": 0.21
+  },
+  "newbeam-us-mv|view|longitudinal_concrete_stress|56": {
+   "own": 1.94,
+   "spread": 0.21
+  },
+  "newbeam-us-mv|view|principal_tensile_strain|56": {
+   "own": 0.38,
+   "spread": 0.21
+  },
+  "newbeam-us-mv|view|principal_tensile_stress|12": {
+   "own": 0.14,
+   "spread": 2.87
+  },
+  "newbeam-us-mv|view|shear_strain|56": {
+   "own": 0.09,
+   "spread": 0.21
+  },
+  "newbeam-us-mv|view|shear_stress|12": {
+   "own": 0.71,
+   "spread": 2.87
+  },
+  "newbeam-us-mv|view|shear_stress|56": {
+   "own": 1.47,
+   "spread": 0.21
+  },
+  "newbeam-us-mv|view|stirrup_stress|30": {
+   "own": 2.4,
+   "spread": 6.43
+  },
+  "newbeam-us-mv|view|stirrup_stress|56": {
+   "own": 1.17,
+   "spread": 0.21
+  },
+  "newbeam-us-mv|view|transverse_average_bond|30": {
+   "own": 6.63,
+   "spread": 6.43
+  },
+  "newbeam-us-mv|view|transverse_average_bond|56": {
+   "own": 17.98,
+   "spread": 0.21
+  },
+  "newbeam-us-mv|view|transverse_strain|56": {
+   "own": 0.45,
+   "spread": 0.21
+  },
+  "newbeam-usfile-mv|view|crack_widths|52": {
+   "own": 0.32,
+   "spread": 0.16
+  },
+  "newbeam-usfile-mv|view|longitudinal_concrete_stress|52": {
+   "own": 0.74,
+   "spread": 0.16
+  },
+  "newbeam-usfile-mv|view|principal_tensile_strain|52": {
+   "own": 0.19,
+   "spread": 0.16
+  },
+  "newbeam-usfile-mv|view|principal_tensile_stress|52": {
+   "own": 0.76,
+   "spread": 0.16
+  },
+  "newbeam-usfile-mv|view|shear_on_crack|52": {
+   "own": 2.82,
+   "spread": 0.16
+  },
+  "newbeam-usfile-mv|view|shear_strain|52": {
+   "own": 0.01,
+   "spread": 0.16
+  },
+  "newbeam-usfile-mv|view|shear_stress|52": {
+   "own": 1.19,
+   "spread": 0.16
+  },
+  "newbeam-usfile-mv|view|stirrup_stress|31": {
+   "own": 0.53,
+   "spread": 2.05
+  },
+  "newbeam-usfile-mv|view|stirrup_stress|52": {
+   "own": 0.9,
+   "spread": 0.16
+  },
+  "newbeam-usfile-mv|view|transverse_average_bond|12": {
+   "own": 2.96,
+   "spread": 2.87
+  },
+  "newbeam-usfile-mv|view|transverse_average_bond|31": {
+   "own": 3.98,
+   "spread": 2.05
+  },
+  "newbeam-usfile-mv|view|transverse_average_bond|52": {
+   "own": 10.36,
+   "spread": 0.16
+  },
+  "newbeam-usfile-mv|view|transverse_strain|52": {
+   "own": 0.23,
+   "spread": 0.16
+  },
+  "newbeam-vonly|view|crack_widths|10": {
+   "own": 0.0,
+   "spread": 2.15
+  },
+  "newbeam-vonly|view|diagonal_spacing|10": {
+   "own": 0.01,
+   "spread": 2.15
+  },
+  "newbeam-vonly|view|long_reinf_stress_at_crack|10": {
+   "own": 0.0,
+   "spread": 2.15
+  },
+  "newbeam-vonly|view|long_reinforcement_stress|10": {
+   "own": 1.17,
+   "spread": 2.15
+  },
+  "newbeam-vonly|view|longitudinal_concrete_stress|10": {
+   "own": 0.0,
+   "spread": 2.15
+  },
+  "newbeam-vonly|view|longitudinal_strain|10": {
+   "own": 0.0,
+   "spread": 2.15
+  },
+  "newbeam-vonly|view|principal_tensile_strain|10": {
+   "own": 0.0,
+   "spread": 2.15
+  },
+  "newbeam-vonly|view|principal_tensile_stress|10": {
+   "own": 0.03,
+   "spread": 2.15
+  },
+  "newbeam-vonly|view|shear_on_crack|10": {
+   "own": 0.07,
+   "spread": 2.15
+  },
+  "newbeam-vonly|view|shear_strain|10": {
+   "own": 0.0,
+   "spread": 2.15
+  },
+  "newbeam-vonly|view|stirrup_stress_at_crack|10": {
+   "own": 0.0,
+   "spread": 2.15
+  },
+  "newbeam-vonly|view|stirrup_stress|10": {
+   "own": 0.43,
+   "spread": 2.15
+  },
+  "newbeam-vonly|view|transverse_average_bond|10": {
+   "own": 0.25,
+   "spread": 2.15
+  },
+  "newbeam-vonly|view|transverse_strain|10": {
+   "own": 0.0,
+   "spread": 2.15
+  },
+  "newbeam-zero|view|long_average_bond|1": {
+   "own": null,
+   "spread": 0.0
+  }
+ },
+ "made_by": "tools/evidence.py",
+ "run": "a81d80115f04",
+ "skipped": {}
+}
