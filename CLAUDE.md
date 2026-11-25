@@ -94,7 +94,7 @@ before changing the kernel; `docs/measures.md` before judging a result). Run
    FOLDERS --record LABEL`. It appends the totals to `heldout/totals.json`.
 2. Write `docs/log/YYYY-MM-DD-NN.md` from `docs/log/TEMPLATE.md`. Short. What matters most:
    what was tried and dropped, and whether the held-out rule was kept.
-3. Bring `docs/summary.md` up to date (`python tools/summary.py` writes its totals block). It
+3. Bring `docs/summary.md` up to date (`python tools/heldout.py summary` writes its totals block). It
    is one page at most: the held-out totals and their trend; what changed, in three lines
    or fewer; what is needed from the owner, three items at most; the top five known
    deviations.
