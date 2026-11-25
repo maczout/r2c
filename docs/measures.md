@@ -96,11 +96,33 @@ and stays there (cracking, for one), stays assessed.
 - **Without both neighbours** (the first or last stage) a view is not tested and stays
   assessed.
 
-## The override
+## The overrides
 
-For the circular column under axial load alone, r2c keeps its uniform post-peak response
+**The circular column under axial load alone.** r2c keeps its uniform post-peak response
 (`docs/brief.md`). The checks on that case that follow from it are outside target and are
 counted as such; the override says they are not chased, not that they pass.
+
+**With shear, where Response's solve gives up and r2c carries on** (owner, 2026-11-25):
+r2c keeps carrying on, and such a case is compared up to Response's last stage. The owner's
+decision is the comparison; how such a case is told from the two records is the developer's
+reading, the same for the development and the held-out set (`tools/compare.py`,
+`carried_on`). It is such a case when all of these hold:
+
+- the case has shear;
+- Response's last stage carries at least 0.8 of its peak load, so its response was not
+  ended by its own test on a load that has fallen;
+- r2c's curve passes Response's last stage at the same place (within `curve_pct`, as the
+  curves are measured);
+- r2c has stages beyond that point, and its own last stage is not at the same place as
+  Response's: if r2c ends where Response ends, it has not carried on.
+
+r2c's curve is then cut at its point nearest Response's last stage, and peak, rising
+branch, ending and shape are measured on the cut curve. The views are compared with r2c's
+stages up to the first one at or past that point. Where Response's last stage is its
+peak, nothing is left after the peak on either curve and the ending counts as the same.
+What the records cannot show: whether
+Response ended on one of its strain limits rather than by giving up. r2c has the same
+limits, so in the same state it would end there too.
 
 ## The regression limits
 

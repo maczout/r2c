@@ -204,3 +204,40 @@ def test_neighbours_apart_is_measured_both_ways_and_floored():
     assert compare.apart(_record([3.0, 9.0, 3.002]), 1, "v") == 0.0
     assert compare.apart(_record([3.0, 9.0, 3.01]), 1, "v") > 0.0
     assert compare.apart(_record([3.0, 9.0, 3.0], near=None), 1, "v") is None
+
+
+# -- compared up to the reference's last stage (owner, 2026-11-25) ------------------------------
+
+def _curve_record(points, shear=True):
+    from r2c import record
+    head = {"peak-stage": "0", "initial": "0,0,0", "increment": "0,1,1" if shear else "0,1,0"}
+    return record.decode(record.encode(head, [("control/c", _chart(points))]))
+
+
+RISE = [(0, 0), (1, 50), (2, 80), (3, 100)]
+
+
+def test_a_subject_that_carries_on_is_compared_up_to_the_references_last_stage():
+    ref = _curve_record(RISE)
+    sub = _curve_record(RISE[:3] + [(4, 120), (5, 130), (6, 131)])
+    res = compare.compare(ref, sub)
+    assert res["upto"]["sub_position"] == pytest.approx(2.5)
+    c = res["control"][0]
+    assert c["peak_diff_pct"] == pytest.approx(0.0)
+    assert c["post_peak_pct"] == 0.0 and c["rising_pct"] < 0.01
+    assert c["shape_same"]
+
+
+def test_no_cut_without_shear_nor_after_a_fall_of_load_nor_when_both_end_together():
+    carried = RISE[:3] + [(4, 120), (5, 130)]
+    # without shear: the override is about shear responses
+    assert "upto" not in compare.compare(_curve_record(RISE, False), _curve_record(carried, False))
+    # the reference ended on a load that had fallen under 0.8 of its peak
+    fell = RISE + [(4, 70)]
+    assert "upto" not in compare.compare(_curve_record(fell), _curve_record(fell + [(5, 60)]))
+    # the subject ends at the same place as the reference
+    near = RISE + [(3.05, 100.5)]
+    assert "upto" not in compare.compare(_curve_record(RISE), _curve_record(near))
+    # the subject never passes the reference's last stage
+    off = [(0, 0), (1, 30), (2, 50), (3, 60), (6, 90)]
+    assert "upto" not in compare.compare(_curve_record(RISE), _curve_record(off))

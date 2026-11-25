@@ -30,6 +30,10 @@ What is compared:
   same measure (owner, 2026-11-23, D54 and D56; docs/measures.md, "Where Response is
   unstable"; see departure and apart).
 
+* where Response's solve gives up on a case with shear and the subject carries on (the
+  owner's override of 2026-11-25), the subject is compared up to the reference's last stage
+  (owner, 2026-11-25; docs/measures.md, "The overrides"; see carried_on).
+
 No pass or fail is decided here: the numbers are for an engineer to judge.
 """
 
@@ -159,8 +163,67 @@ def _rising(c):
     return c[: ip + 1], ip
 
 
-def compare_control(ref, sub, key):
+# -- compared up to the reference's last stage (owner, 2026-11-25) ------------------------------
+#
+# docs/brief.md, "Owner's decisions since": where Response's solve gives up and ends a shear
+# response early while r2c carries on, r2c keeps carrying on (an override), and such a case
+# is compared up to Response's last stage. The owner's words do not say how such a case is
+# told from the two records; the reading below is the developer's (docs/measures.md).
+GAVE_UP_LOAD = 0.8   # Response's own end test on the load: under this x the largest so far
+
+
+def carried_on(ref, sub, key, limit):
+    """Where along the subject's curve the reference's last stage lies, if this is a case
+    where the reference's solve gave up and the subject carried on; else None. A position
+    along the subject's curve of control chart key: stage index plus the fraction of the
+    way to the next stage.
+
+    It is such a case when all of these hold:
+    * the case has shear (the override is about shear responses);
+    * the reference's last stage carries at least GAVE_UP_LOAD of its peak load: its
+      response was not ended by Response's end test on a load that has fallen (under 0.8 of
+      the largest so far with a failure in the section, docs/kernel.md, "The end of the
+      response"), so its tries ran out;
+    * the subject's curve passes the reference's last stage at the same place: within the
+      target on the curves (limit, a fraction), load scaled by the reference's peak and
+      control value by its largest value, as the curves are measured;
+    * the subject has stages beyond that point, and its own last stage is not at the same
+      place as the reference's (beyond the target, or the printed precision where that is
+      coarser): a subject that ends where the reference ends has not carried on."""
+    import report
+    if report.group(ref.header) != "shear":
+        return None
     a, b = _curve(ref, key), _curve(sub, key)
+    if len(a) < 2 or len(b) < 2:
+        return None
+    pk = float(np.max(np.abs(a[:, 1])))
+    xs = float(np.max(np.abs(a[:, 0])))
+    if pk <= 0 or xs <= 0 or abs(a[-1, 1]) < GAVE_UP_LOAD * pk:
+        return None
+    d, pos = project(a[-1:], b, xs, pk)
+    if d[0] > limit or pos[0] >= len(b) - 1 - 1e-9:
+        return None
+    rx, ry = resolution(ref.control(key))
+    floor = FLOOR_DIGITS * float(np.hypot(rx / xs, ry / pk))
+    if np.hypot((b[-1, 0] - a[-1, 0]) / xs, (b[-1, 1] - a[-1, 1]) / pk) <= max(limit, floor):
+        return None
+    return float(pos[0])
+
+
+def cut(c, upto):
+    """A curve up to a position along it (carried_on): its stages before the position and
+    the point at the position itself. upto None: the whole curve."""
+    if upto is None:
+        return c
+    i = int(np.floor(upto))
+    f = upto - i
+    if f <= 1e-9 or i + 1 >= len(c):
+        return c[: i + 1]
+    return np.vstack([c[: i + 1], c[i] + f * (c[i + 1] - c[i])])
+
+
+def compare_control(ref, sub, key, upto=None):
+    a, b = _curve(ref, key), cut(_curve(sub, key), upto)
     ra, ia = _rising(a)
     rb, ib = _rising(b)
     out = {
@@ -190,6 +253,9 @@ def compare_control(ref, sub, key):
         out["floor_pct"] = 100.0 * FLOOR_DIGITS * float(np.hypot(rx / xw, ry / pk))
         if rise is not None:
             out["rising_pct"] = 100.0 * rise
+        if post is None and upto is not None:
+            # cut at the reference's last stage, which is its peak: both end there
+            post = 0.0
         if post is not None:
             out["post_peak_pct"] = 100.0 * post
     return out
@@ -604,9 +670,15 @@ def compare(ref, sub, views=False):
                                                 "increment", "more-detail", "stage-count",
                                                 "peak-stage")},
         "sub": {k: sub.header.get(k) for k in ("stage-count", "peak-stage")},
-        "control": [compare_control(ref, sub, k) for k in keys],
         "missing_control": [k for k in control_keys(ref) if k not in keys],
     }
+    # the override (owner, 2026-11-25): where the reference's solve gave up and the subject
+    # carried on, the subject is compared up to the reference's last stage
+    upto = carried_on(ref, sub, keys[-1], same_place_limit(ref)) if keys else None
+    out["control"] = [compare_control(ref, sub, k, upto) for k in keys]
+    if upto is not None:
+        out["upto"] = {"sub_position": upto,
+                       "sub_stages": len(_curve(sub, keys[-1]))}
     if views and keys:
         key = keys[-1]
         a = _curve(ref, key)
@@ -615,6 +687,9 @@ def compare(ref, sub, views=False):
         feats = feature_stages(ref, key)
         rp = int(ref.header.get("peak-stage", "0"))
         b = _curve(sub, key)
+        if upto is not None:
+            # the views: the subject's stages up to the first one at or past that point
+            b = b[: int(np.ceil(upto - 1e-9)) + 1]
         limit = same_place_limit(ref)
         worst: dict[str, dict] = {}
         out["views_stages"] = []
@@ -654,7 +729,9 @@ def render(res) -> str:
         f"input {r['input-name']}  units {r['units']}  factors {r['factors']}  "
         f"initial {r['initial']}  increment {r['increment']}  more-detail {r['more-detail']}",
         f"stages: reference {r['stage-count']} (peak at {r['peak-stage']}), "
-        f"subject {s['stage-count']} (peak at {s['peak-stage']})",
+        f"subject {s['stage-count']} (peak at {s['peak-stage']})"
+        + (f"; compared up to the reference's last stage (subject's stage "
+           f"{res['upto']['sub_position']:.2f})" if "upto" in res else ""),
         "",
         f"{'control chart':<14}{'ref peak':>11}{'sub peak':>11}{'diff %':>8}"
         f"{'ref x':>10}{'sub x':>10}{'curve max %':>13}{'mean %':>8}{'rising %':>10}"
