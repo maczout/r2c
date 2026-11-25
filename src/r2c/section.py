@@ -112,6 +112,14 @@ class Section:
                                          min(t.disttop, t.distbot), t.db,
                                          steels[t.type.lower()], t.dep,
                                          _is_strand(t.bartitle), t.pattern, legs))
+        # Response's own count of transverse reinforcement types: every one in the input,
+        # a cross tie with no vertical leg among them. The transverse crack spacing takes
+        # its mean diameter and spacing over this count [B 00440100; O: the Liping sample]
+        self.n_trans = max(len(inp.trans), 1)
+        # the ends of every type, the ties' too: each puts points in the transverse crack
+        # spacing table one of its own diameters above and below [O: the Liping sample]
+        self.trans_ends = [(max(t.disttop, t.distbot), min(t.disttop, t.distbot), t.db)
+                           for t in inp.trans if t.area > 0 and t.space > 0]
         self.smx_user = inp.smx
         self.smt_user = inp.smt
         # shrinkage and thermal strain of the concrete: (elevation, strain) from the bottom up
@@ -371,7 +379,7 @@ class Section:
         b = self.width_side(z, upper)
         if not (b > 0 and z > self.zbot and self.stirrups):
             return big
-        n = len(self.stirrups)
+        n = self.n_trans
         rho = db = space = 0.0
         for st in self.stirrups:
             if not (st.bot <= z <= st.top and st.space > 0):
@@ -419,12 +427,12 @@ class Section:
                     # a step: its lower side, just under the step where the section widens
                     z = zt - 0.1 if self.segs[k - 1][3] <= wt else zt
                     pts.append((z, self._trans_spacing(z, False)))
-                for st in self.stirrups:
-                    if zb < st.top < zt:
-                        for z in (min(st.top + st.db, zt), min(st.top - st.db, zt)):
+                for top, bot, db in self.trans_ends:
+                    if zb < top < zt:
+                        for z in (min(top + db, zt), min(top - db, zt)):
                             pts.append((z, self._trans_spacing(z, True)))
-                    if zb < st.bot < zt:
-                        for z in (max(st.bot + st.db, zb), max(st.bot - st.db, zb)):
+                    if zb < bot < zt:
+                        for z in (max(bot + db, zb), max(bot - db, zb)):
                             pts.append((z, self._trans_spacing(z, True)))
                 z = zb
                 if k < last:

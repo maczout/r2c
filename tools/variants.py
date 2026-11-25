@@ -419,6 +419,10 @@ VARIANTS["newbeam-slab150"] = Variant(
     [(_OUTLINE, "150.0\t1200.0\r\n\t\t\t\t\t0.0\t1200.0"), _sub("par1", "250.0", "1200.0"),
      _sub("par2", "600.0", "150.0"), _sub("z", "538.95", "115.00"), _sub("A", "300.0", "300.0"),
      _sub("z", "63.90", "35.00"), (_STIRRUPS, "")])
+VARIANTS["newbeam-fc45-cmod1"] = Variant(
+    "newbeam", "Newbeam with 45 MPa concrete, parabolic base curve",
+    [(attr("fcp", "35.0") + "\r\n\t\t\t\t" + attr("maxagg", "19.0"),
+      attr("fcp", "45.0") + T4 + attr("maxagg", "19.0") + T4 + attr("c_mod", "1"))])
 VARIANTS["tbeam-fc30"] = Variant("tbeam", "the T-beam with 30 MPa concrete, stirrups at 200 mm",
                                  [_sub("fcp", "40.0", "30.0"), _sub("space", "300.0", "200.0")])
 VARIANTS["column-fc35"] = Variant("column", "the column with 35 MPa concrete, hoops at 150 mm",

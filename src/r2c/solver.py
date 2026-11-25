@@ -532,7 +532,7 @@ class Analysis:
             yld += rho * st.steel.fy * st.steel.phi
             capt += rho * cap
             rho_t += rho
-            a_n += np.where(inside, st.area / len(sec.stirrups), 0.0)
+            a_n += np.where(inside, st.area / sec.n_trans, 0.0)
             a_s += np.where(inside, st.area / (st.space + 1e-4), 0.0)
         eff = np.clip(0.5 * (3.0 - a_n / (a_s + 1e-9) / sec.h), 0.0, 1.0)
         res = eff * (np.maximum(yld, capt) - tot)

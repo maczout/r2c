@@ -243,7 +243,7 @@ class Shear(Flexure):
             if not rho.any():
                 continue
             ks += rho * fac * st.steel.tangent(ey * fac + st.prestrain) * st.steel.phi
-            a_n += np.where(rho > 0, st.area / len(sec.stirrups), 0.0)
+            a_n += np.where(rho > 0, st.area / sec.n_trans, 0.0)
             a_s += np.where(rho > 0, st.area / (st.space + 1e-4), 0.0)
         eff = np.clip(0.5 * (3.0 - a_n / (a_s + 1e-9) / sec.h), 0.0, 1.0)
         Et = E + eff * ks

@@ -362,6 +362,17 @@ the angle whose sine is the height above the hoop's middle over its half height 
 0.1 mm). Five times the depth where no stirrup reaches, at the bottom face and where
 there is no width; no less than the aggregate size held between 2 and 25 mm.
 
+*The number of types is Response's own count of transverse reinforcement: every type in
+the input, a cross tie with no vertical leg among them* [O, 2026-11-25: the Liping sample,
+which has two ties and one stirrup]. There db and sv are a third of the stirrup's own, and
+the spacing in the 75 mm web is 83.9 mm where r2c, counting the stirrup alone, had 233.4
+(418.2 against 773.9 in the flanges). Each type's ends, the ties' too, put points in the
+table one of its own diameters above and below. With both, r2c's table is Response's chart
+within 0.03 % at all 89 points of it [measured, the capture of liping-negm]. The same
+count now divides the stirrups' area where their spacing is set against the depth (the
+stirrups' share in the transverse stiffness), which matters only where a spacing exceeds
+the depth [inferred: the same count; not checked on a case].
+
 *The points* [`0043f0d0`], for each part of the outline from the top down: its top (the
 first part), or where the width steps from the part above, the lower side of the step,
 0.1 mm under it if the section widens there; one stirrup diameter above and below the

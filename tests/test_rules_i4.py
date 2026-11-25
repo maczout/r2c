@@ -69,3 +69,19 @@ def test_the_tent_of_the_bond_parameter_reaches_as_far_as_the_spacing_table_says
     share = (reach - (mid - bot.z)) / (reach + 0.1)
     at_bar, at_mid = (3.6 / float(np.interp(z, sec.tz, sec.t_mlong)) for z in (bot.z, mid))
     assert at_mid / at_bar == pytest.approx(share, rel=0.02)
+
+
+def test_the_transverse_spacing_takes_its_means_over_every_transverse_type():
+    # a cross tie has no vertical leg and is no stirrup, but it counts as a type
+    # [B 00440100; O: the Liping sample]
+    su = run.setup(None, increment=(0.0, 1.0, 1.0))
+    sec = su.section
+    mid = 0.5 * (sec.stirrups[0].top + sec.stirrups[0].bot)
+    one = sec._trans_spacing(mid, True)
+    st = sec.stirrups[0]
+    b = float(sec.width(np.array([mid]))[0])
+    rho = st.area / st.space / b
+    assert one == pytest.approx(np.hypot(b - 100.0, st.space) + 0.1 * st.db / rho)
+    sec.n_trans = 3
+    assert sec._trans_spacing(mid, True) == pytest.approx(
+        np.hypot(b - 100.0, st.space / 3) + 0.1 * (st.db / 3) / rho)
