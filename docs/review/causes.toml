@@ -1,0 +1,524 @@
+# The causes of the deviations outside target, for the end-of-phase review (docs/review.md).
+#
+# The developer's file. tools/review.py groups the deviations of the run of record by it and
+# builds the "Review" page; tools/evidence.py gathers each cause's evidence. Nothing here
+# changes a target, a measure or a decision.
+#
+# A cause has:
+#   id, name            a slug and a plain name (the entry's heading)
+#   match               which checks belong to it. The first match in the file takes a check.
+#                         cases     case names
+#                         checks    "peak", "rising", "post-peak", "shape", "view"
+#                         views     view names (for "view"); left out: any view
+#                         features  features of Response's curve the stage is at; left out: any
+#                         own_state "inside" or "outside": r2c's difference on the view when it
+#                                   is put into Response's own state at that stage, as measured
+#                                   by tools/evidence.py (docs/review/measured.json)
+#                         accepted  the owner's decisions that accepted these checks
+#                         pending   decisions put to the owner and not answered
+#   reason              the developer's reason, in parts, each marked by what it rests on:
+#                         basis = "measured" (a diagnostic, named in `tool`),
+#                                 "read" (a rule of the binary, with its `address`),
+#                                 "inferred" (an explanation not tested)
+#   rule                rules claimed: the binary's address and the heading in docs/kernel.md
+#   diagnostic          commands tools/evidence.py runs for the evidence file. Placeholders:
+#                         {verify} {archive} {repeats} {fixture:CASE} {capture:CASE}
+#                         {record:CASE} {input:CASE} {trace:CASE}
+#   ask, suggestion     what the owner is asked now, and the developer's suggestion
+#   disagreement        where the independent assessment contradicts a part of the reason
+#                       (the developer's account of it; the assessment itself is beside
+#                       the page, as written), and `after`, the developer's answer. The
+#                       reason above is left as the assessor saw it.
+#   decision            the number of that question in docs/summary.md
+#
+# A deviation that no cause matches is shown on the page as "not classified", one entry a
+# case, and is never folded into another cause.
+
+# A git ref (a tag) of the run of record at the last review held. Empty: there has been none,
+# and "what changed" is counted from the step before the last.
+last_review = ""
+
+# ------------------------------------------------------------------ causes on their own
+
+[[cause]]
+id = "c2-column"
+name = "The circular column under axial load alone, after its peak"
+decision = "D78"
+ask = "Keep the owner's override (C2), or clone what Response does after the peak?"
+suggestion = "Keep the override. It is the owner's ruling that Response looks wrong here; nothing new was learnt in phase A."
+[[cause.match]]
+cases = ["column-nonly"]
+checks = ["post-peak", "view"]
+accepted = ["C2", "D12"]
+[[cause.reason]]
+basis = "measured"
+tool = "tools/curves.py, tools/viewmisses.py"
+text = "Up to the peak the two curves and every view agree. After it Response leaves the uniform state: its load falls by about a quarter in one step and its views show a curved section under no moment. r2c stays on the uniform state. Every check outside is at that last stage."
+[[cause.reason]]
+basis = "measured"
+tool = "tools/evidence.py (r2c in Response's own state)"
+text = "Put into Response's own state at that last stage, r2c gives Response's views (within 0.6 % on all ten). So r2c's rules are not what differs: it is which state each program is in after the peak."
+[[cause.reason]]
+basis = "inferred"
+text = "What makes Response leave the uniform state on this section was not found. On the two rectangular sections under axial load alone it keeps the uniform state to the end, as r2c does. Not cloned by the owner's override; so the difference is by decision, and its origin in the program is unknown."
+[[cause.diagnostic]]
+run = "python tools/curves.py {fixture:column-nonly} {record:column-nonly} --last 6"
+[[cause.diagnostic]]
+run = "python tools/curves.py {fixture:newbeam-nonly} {record:newbeam-nonly} --last 4"
+
+[[cause]]
+id = "vonly-fall"
+name = "Shear alone: a fall of load at cracking that r2c's curve does not show"
+decision = "D79"
+ask = "Keep accepted (D32, D49), take it up again, or change how the measure reads a fall of load and matches the stage?"
+suggestion = "Keep accepted for phase A, and put the measure's reading of stages across cracking on the list for the review of targets that opens phase B (the pattern the owner noted under D49)."
+[[cause.match]]
+cases = ["newbeam-vonly"]
+checks = ["shape"]
+accepted = ["D32"]
+[[cause.match]]
+cases = ["newbeam-vonly"]
+checks = ["view"]
+features = ["fall"]
+accepted = ["D32", "D49"]
+[[cause.reason]]
+basis = "measured"
+tool = "tools/curves.py"
+text = "Response's curve falls after cracking by more than the 2 % of the peak from which the measure counts a fall; r2c's curve has no fall the measure counts there. That is the shape."
+[[cause.reason]]
+basis = "measured"
+tool = "tools/sources.py (r2c in Response's own state)"
+text = "The 14 views outside are all at Response's one stage after that fall, and every one is inside when r2c is put into Response's own state at it. The measure matches that stage to a stage of r2c's at the same load on the other side of cracking, so cracked views are set against uncracked ones."
+[[cause.reason]]
+basis = "inferred"
+text = "Why r2c's fall at cracking is shallower than Response's was not read. It changed with each change to the shear calculation (1.9 % of the peak, then 1.2 %), which points at the state right after cracking, not at a rule of the stage control."
+[[cause.diagnostic]]
+run = "python tools/curves.py {fixture:newbeam-vonly} {record:newbeam-vonly}"
+[[cause.diagnostic]]
+run = "python tools/tries.py {trace:newbeam-vonly} {fixture:newbeam-vonly} --context 6"
+
+[[cause]]
+id = "tension-solve"
+name = "Axial tension: one rising point fewer before the fall at cracking"
+decision = "D80"
+ask = "Keep accepted (D36), or finish Response's solve for a stepped axial strain in phase B?"
+suggestion = "Keep accepted for phase A; carry the half-built solve into phase B as D36 already says."
+[[cause.match]]
+cases = ["newbeam-tension"]
+checks = ["shape"]
+accepted = ["D36"]
+[[cause.reason]]
+basis = "measured"
+tool = "tools/curves.py, tools/branch.py"
+text = "Response's curve has one more rising point before the fall at cracking than r2c's, and the measure reads the order of cracking and the fall from that point. Peak and rising branch are inside."
+[[cause.reason]]
+basis = "read"
+address = "004276a0"
+text = "Under a stepped axial strain Response uses its general solve, with half steps and a wide tolerance, so its states just before cracking are not balanced; that is where the extra point comes from. Written in r2c and switched off (owner, D36): with it on the shape is Response's, and two Must views at the peak of two cases go outside."
+[[cause.rule]]
+address = "004276a0"
+kernel = "The general solve, under a stepped axial strain"
+[[cause.diagnostic]]
+run = "python tools/curves.py {fixture:newbeam-tension} {record:newbeam-tension}"
+[[cause.diagnostic]]
+run = "python tools/branch.py {fixture:newbeam-tension} --stage 11 --points 8"
+
+[[cause]]
+id = "tension-diagonal-spacing"
+name = "Axial tension: the Diagonal Spacing chart at cracking"
+decision = "D81"
+ask = "Accept as it is, or one bounded look (one approach)?"
+suggestion = "Take up with the tension shape in phase B: the evidence gathered for this review says it is the stage compared, not the chart's rule."
+[[cause.match]]
+cases = ["newbeam-tension"]
+checks = ["view"]
+views = ["diagonal_spacing"]
+pending = ["D76"]
+[[cause.reason]]
+basis = "measured"
+tool = "tools/evidence.py (r2c in Response's own state), tools/viewlines.py"
+text = "Not looked at in phase A; measured for this review. In Response's own state at that stage r2c's chart is Response's (0.0 %). The measure sets Response's stage 12, where the top face has just cracked (the chart shows a spacing over the top 15 mm), against r2c's stage 11, which is not cracked (the chart is empty). So it is the stage compared, not the chart's rule."
+[[cause.reason]]
+basis = "inferred"
+text = "That it goes with the entry on tension's shape (r2c's stage just before cracking sits where Response's first cracked stage does). Not measured with Response's solve for a stepped axial strain switched on."
+[[cause.diagnostic]]
+run = "python tools/viewlines.py {fixture:newbeam-tension} {record:newbeam-tension} diagonal_spacing --feature cracking --raw"
+[[cause.diagnostic]]
+run = "python tools/viewlines.py {fixture:newbeam-tension} {record:newbeam-tension} crack_widths --feature cracking --raw"
+
+[[cause]]
+id = "zero-long-bond"
+name = "No load: the Longitudinal Average Bond chart"
+decision = "D82"
+ask = "Accept as it is, or one bounded look (one approach)?"
+suggestion = "Accept for phase A. A section under no load has one stage and a bond chart of next to nothing; a bounded look in phase B if the owner wants the Could tier closed."
+[[cause.match]]
+cases = ["newbeam-zero"]
+checks = ["view"]
+views = ["long_average_bond"]
+pending = ["D76"]
+[[cause.reason]]
+basis = "measured"
+tool = "tools/viewlines.py"
+text = "Not looked at in phase A; measured for this review. Response's record of this case has a second stage, and its bond chart there shows 1.8 and 1.6 MPa over the two layers of bars while its steel stress chart is zero. r2c's one stage has a bond chart of zero."
+[[cause.reason]]
+basis = "inferred"
+text = "Nothing is claimed about why Response shows a bond stress with no steel stress under no load. Not read, not tested."
+[[cause.diagnostic]]
+run = "python tools/viewlines.py {fixture:newbeam-zero} {record:newbeam-zero} long_average_bond --stage 1 --raw"
+[[cause.diagnostic]]
+run = "python tools/viewlines.py {fixture:newbeam-zero} {record:newbeam-zero} long_reinforcement_stress --stage 1 --raw"
+
+[[cause]]
+id = "shrink-bond-tolerance"
+name = "Shrinkage: transverse bond at the last stage, where the stirrups are in uniform compression"
+decision = "D83"
+ask = "Accept as a known deviation (D75), or leave transverse bond unassessed on cases without shear?"
+suggestion = "Accept as a known deviation, as suggested under D75."
+disagreement = "The assessor says Response's stirrup stresses do not differ \"a little from point to point\": one unbroken block of five nodes at the top end of the stirrups is 0.62 MPa off and the rest agree within 0.03, which looks systematic, not like where an iteration stops. It also says the tolerance could be tested without copying the iteration."
+after = "Accepted as a fair reading of the same chart. The developer's inferred part is weaker than it was written; the test the assessor names (the routine's exit test at Response's own transverse strain at those nodes) has not been made."
+[[cause.match]]
+cases = ["newbeam-shrink-m"]
+checks = ["view"]
+views = ["transverse_average_bond"]
+pending = ["D75"]
+[[cause.reason]]
+basis = "measured"
+tool = "tools/viewlines.py on stirrup_stress and transverse_average_bond"
+text = "Where the concrete is in compression r2c's stirrup stress is the same at every point; Response's differs a little from point to point. The bond chart is made from the difference between neighbouring points, so Response's shows a few hundredths of a MPa there and r2c's shows none."
+[[cause.reason]]
+basis = "inferred"
+text = "That Response's point-to-point differences are where its own solve for the transverse strain stops (a tolerance), and not a rule r2c lacks. Not tested: it would mean copying that iteration step for step."
+[[cause.rule]]
+address = "004a8b20"
+kernel = "What the concrete's offset does"
+[[cause.diagnostic]]
+run = "python tools/viewlines.py {fixture:newbeam-shrink-m} {record:newbeam-shrink-m} stirrup_stress --feature ends"
+[[cause.diagnostic]]
+run = "python tools/viewlines.py {fixture:newbeam-shrink-m} {record:newbeam-shrink-m} transverse_average_bond --feature ends --raw"
+[[cause.diagnostic]]
+run = "python tools/bond.py {capture:newbeam-shrink-m} {input:newbeam-shrink-m} --stages 46"
+
+[[cause]]
+id = "igirder-dropped-stage"
+name = "The I-girder with shear: a stage where the top cracks close, which Response does not keep"
+decision = "D84"
+ask = "Keep accepted (D48, D50, D63), make it part of the named limitation, or take it up again?"
+suggestion = "Keep accepted, as its own item beside the named limitation: Response does not repeat itself on this case, so there is no single response to clone."
+disagreement = "The assessor supports the mechanism and questions one part: if no capture has a stage where the top cracks close, Response fails at that try every time, which points to a repeatable rule of its solve and not to something outside the input."
+after = "A fair point. What does not repeat is the other event on this girder (the web cracking); at the closing of the top cracks every capture is the same. The inferred part should say: a rule of Response's solve not yet read."
+[[cause.match]]
+cases = ["igirder-mv"]
+checks = ["shape"]
+accepted = ["D48", "D50", "D63"]
+[[cause.reason]]
+basis = "measured"
+tool = "tools/curves.py"
+text = "The top of this girder is cracked under no load. Where the cracks close r2c puts stages in between, with the top still cracked, and the load falls back from them by a little over the 2 % the measure counts. Response's curve goes straight through. Before and after it the curves agree."
+[[cause.reason]]
+basis = "read"
+address = "00415e30"
+text = "By the stage control as read, Response closes in on such an event with stages put in between, and drops one whose solve fails. So it must have tried a stage there and had it fail; r2c solves the same stage."
+[[cause.reason]]
+basis = "measured"
+tool = "tools/repeat.py"
+text = "Response does not repeat itself on this case: five captures gave 15 stages twice and 25 three times, the ten more being stages put in while closing in on the other event (the web cracking). r2c has those ten. At the closing of the top cracks no capture has a stage."
+[[cause.reason]]
+basis = "inferred"
+text = "Why Response's stage fails there was not read to its cause (the node states at the dropped stage were seen in the running program, not explained). Taken to be something not set by the input alone."
+[[cause.rule]]
+address = "00415e30"
+kernel = "**A stage put in between**"
+[[cause.diagnostic]]
+run = "python tools/curves.py {fixture:igirder-mv} {record:igirder-mv}"
+[[cause.diagnostic]]
+run = "python tools/repeat.py {archive} {repeats} --only igirder-mv"
+[[cause.diagnostic]]
+run = "python tools/tries.py {trace:igirder-mv} {fixture:igirder-mv} {input:igirder-mv} --context 6"
+
+[[cause]]
+id = "tstiff6-carries-on"
+name = "Elasto-plastic tension stiffening: r2c carries on after Response's last stage"
+decision = "D85"
+ask = "Keep accepted (D69) as a shape, or count it with how a shear response ends (the Won't tier)?"
+suggestion = "Keep accepted. Whether it is a shape or an ending is the owner's reading; the measure is not changed for it."
+disagreement = "The assessor contradicts the description: the two programs part two stages before Response's last, where both reach the same unsettled state and r2c keeps the stage that Response refuses; Response then has two more stages. It also says the mark \"read\" on the second part is wrong: that the behaviour came with the slopes rule is a comparison of two runs, which is measured."
+after = "Accepted on both points. The split is a try kept by one program and refused by the other (the kind the named limitation describes), not r2c running on after Response has ended; and the second part is measured (the run of record of step A-5 against the first run of step A-6), not read."
+[[cause.match]]
+cases = ["newbeam-tstiff6-mv"]
+checks = ["shape"]
+accepted = ["D69"]
+[[cause.reason]]
+basis = "measured"
+tool = "tools/curves.py"
+text = "Both curves reach the same top and fall by the same amount. Response's response ends one stage later, below its top. r2c recovers past its first top, and the measure reads r2c's peak after the fall where Response's is before it."
+[[cause.reason]]
+basis = "read"
+address = "004ac960"
+text = "The fall and recovery came with the program's own slopes of the compressive stress (on since D69): before it r2c stood still at the first top."
+[[cause.reason]]
+basis = "inferred"
+text = "Why Response stops at that stage and r2c does not: taken to be how a shear response ends (a Won't), not looked into."
+[[cause.rule]]
+address = "004ac960"
+kernel = "The slopes of the compressive stress"
+[[cause.diagnostic]]
+run = "python tools/curves.py {fixture:newbeam-tstiff6-mv} {record:newbeam-tstiff6-mv} --last 8"
+[[cause.diagnostic]]
+run = "python tools/tries.py {trace:newbeam-tstiff6-mv} {fixture:newbeam-tstiff6-mv} {input:newbeam-tstiff6-mv} --context 6"
+
+[[cause]]
+id = "limit-line-drawn"
+name = "Shear on Crack: a limit line that one program draws and the other does not"
+decision = "D86"
+ask = "Keep accepted (D61, D38's kind), or take up the rule for drawing the line?"
+suggestion = "Keep accepted: the rule is the program's; which side of it a state falls on follows from the state on a flat peak."
+disagreement = "The assessor says the reason leaves out a second difference that is enough by itself: the limit line both programs draw starts 7.7 mm lower in r2c, so the check would be far outside with the drawing rule made identical. And the chart's largest value is the limit line (2.07 MPa), not 0.15 MPa."
+after = "Accepted. The entry is a difference of state on a flat peak that shows twice on this chart; the name and the question point too much at the drawing rule. The developer agrees with the assessor's suggestion to count it under the named limitation."
+[[cause.match]]
+cases = ["newbeam-tsfactor-mv"]
+checks = ["view"]
+views = ["shear_on_crack"]
+accepted = ["D61"]
+[[cause.reason]]
+basis = "read"
+address = "00480590"
+text = "Response draws the limit of the shear on a crack on one side only when that side's largest value is over a fiftieth of the other's. r2c has the rule."
+[[cause.reason]]
+basis = "measured"
+tool = "tools/sources.py, tools/startfrom.py, tools/viewlines.py"
+text = "The chart is 0.15 MPa at most. In r2c's state at the peak the ratio falls on the other side of the fiftieth, so r2c draws a line Response does not, and a line missing counts as 100 %. In Response's own state r2c draws what Response draws. The top of the curve is flat over six stages."
+[[cause.reason]]
+basis = "inferred"
+text = "That the small difference of state is the named limitation (a flat peak reached by other tries) and nothing else."
+[[cause.rule]]
+address = "00480590"
+kernel = "*Shear on Crack*"
+[[cause.diagnostic]]
+run = "python tools/viewlines.py {fixture:newbeam-tsfactor-mv} {record:newbeam-tsfactor-mv} shear_on_crack --feature peak --raw"
+[[cause.diagnostic]]
+run = "python tools/startfrom.py {capture:newbeam-tsfactor-mv} {input:newbeam-tsfactor-mv} --stage 36"
+[[cause.diagnostic]]
+run = "python tools/curves.py {fixture:newbeam-tsfactor-mv} {record:newbeam-tsfactor-mv} --last 10"
+
+[[cause]]
+id = "bond-small-chart"
+name = "Tension stiffening factor 0.5: transverse bond around cracking, on a chart of about 0.1 MPa"
+decision = "D87"
+ask = "Keep accepted (D61), or leave a bond chart this small unassessed?"
+suggestion = "Keep accepted. Whether a chart of 0.1 MPa should be assessed at all is a question for the review of targets."
+[[cause.match]]
+cases = ["newbeam-tsfactor-mv"]
+checks = ["view"]
+views = ["transverse_average_bond"]
+features = ["fall", "cracking"]
+accepted = ["D61"]
+[[cause.reason]]
+basis = "measured"
+tool = "tools/sources.py, tools/startfrom.py"
+text = "The chart's largest value is about 0.1 MPa at these two stages. In Response's own state r2c is inside on both. Started from Response's state at the stage before, r2c converges (6 to 8 passes, profile error under 1 %) and is still outside on this chart alone."
+[[cause.reason]]
+basis = "inferred"
+text = "That the difference left is what the iteration's 1 % tolerance allows on a chart this small, and not a rule. Not tested further."
+[[cause.diagnostic]]
+run = "python tools/viewlines.py {fixture:newbeam-tsfactor-mv} {record:newbeam-tsfactor-mv} transverse_average_bond --feature cracking --raw"
+[[cause.diagnostic]]
+run = "python tools/startfrom.py {capture:newbeam-tsfactor-mv} {input:newbeam-tsfactor-mv} --stage 11 12"
+
+[[cause]]
+id = "shear-on-crack-web"
+name = "The I-girder with Vecchio-Collins 1992-A: shear on the crack where the web cracks"
+decision = "D88"
+ask = "Accept as its own known deviation (D76), or take it up before the softening models come in?"
+suggestion = "Accept for phase A as its own item, and take it up first when the softening models on the I-girder join in phase B: it is outside in Response's own state, so it is not the named limitation."
+[[cause.match]]
+cases = ["igirder-csoft3-m2v"]
+checks = ["view"]
+views = ["shear_on_crack"]
+pending = ["D76"]
+[[cause.reason]]
+basis = "measured"
+tool = "tools/sources.py"
+text = "Outside by the same amount with r2c in Response's own state at that stage. So it is not the state reached: a rule of this chart, or a state that the charts do not give closely enough to rebuild."
+[[cause.reason]]
+basis = "inferred"
+text = "Which of the two. One approach was allowed in step A-5; it settled the shear stress at that stage (the slopes rule) and not this. The same view was off by as much in Response's own state on the parked softening cases."
+[[cause.rule]]
+address = "00480590"
+kernel = "*Shear on Crack*"
+[[cause.diagnostic]]
+run = "python tools/viewlines.py {fixture:igirder-csoft3-m2v} {record:igirder-csoft3-m2v} shear_on_crack --feature peak --raw"
+[[cause.diagnostic]]
+run = "python tools/diagnose.py states {capture:igirder-csoft3-m2v} {input:igirder-csoft3-m2v} --stages 27 --views"
+
+[[cause]]
+id = "shear-on-crack-tamai"
+name = "Tamai tension stiffening: shear on the crack at the top of the cracked zone"
+decision = "D89"
+ask = "Keep accepted (D61), or look at it with the other shear-on-crack entry?"
+suggestion = "Keep accepted for phase A, and look at it together with the I-girder's shear on the crack: both are outside in Response's own state."
+disagreement = "The assessor says \"one node lower\" is not what the chart shows: r2c's jump is about 1 mm lower, its top value is lower and its band of high values is three points against Response's seven, with the points at other depths. It leans against \"one node and not a rule\"."
+after = "Accepted as a correction of the wording; the cause stays unknown. The diagnostic the assessor names (r2c's view on Response's own depths at that stage) has not been run."
+[[cause.match]]
+cases = ["newbeam-tstiff4-mv"]
+checks = ["view"]
+views = ["shear_on_crack"]
+accepted = ["D61"]
+[[cause.reason]]
+basis = "measured"
+tool = "tools/sources.py, tools/viewlines.py"
+text = "Outside with r2c in Response's own state too, and by more. The limit line of the chart jumps from nothing to several MPa at the top of the cracked zone, and that jump is one node lower in r2c. The top of the curve is flat over seven stages."
+[[cause.reason]]
+basis = "inferred"
+text = "That it is one node at a jump, read from a state that the charts give only node by node, and not a rule. Not tested."
+[[cause.diagnostic]]
+run = "python tools/viewlines.py {fixture:newbeam-tstiff4-mv} {record:newbeam-tstiff4-mv} shear_on_crack --feature peak --raw"
+[[cause.diagnostic]]
+run = "python tools/diagnose.py states {capture:newbeam-tstiff4-mv} {input:newbeam-tstiff4-mv} --stages 38 --views"
+[[cause.diagnostic]]
+run = "python tools/curves.py {fixture:newbeam-tstiff4-mv} {record:newbeam-tstiff4-mv} --last 10"
+
+# ------------------------------------------------------------------ transverse bond, not the state
+
+[[cause]]
+id = "bond-stirrup-end"
+name = "Transverse bond at the end of the stirrups, outside in Response's own state too"
+decision = "D90"
+ask = "Keep accepted (D46, D47, D49, D70), take the bond chart's rule up again, or leave this chart unassessed at the stirrups' end?"
+suggestion = "Keep accepted for phase A; one bounded look at the bond rule on a hoop and at a stirrup's end in phase B. This is the entry where the developer's reason is weakest."
+disagreement = "The assessor says the location does not fit: on the column and the US file case the charts differ mostly inside the depth of the stirrups, not at their ends. The check of the rule holds for the two SI cases only (on the US case the tool returns nothing, which is the tool not converting units), and the remark that the rule was never checked on a hoop is contradicted by the record of the rule itself."
+after = "Accepted. The name of the entry and the third part of the reason are not borne out; the remark on the hoop was out of date. What stands is the measurement: outside in Response's own state. The cause is not known."
+[[cause.match]]
+cases = ["column-mv"]
+checks = ["view"]
+views = ["transverse_average_bond"]
+own_state = "outside"
+accepted = ["D47"]
+[[cause.match]]
+cases = ["newbeam-m05v"]
+checks = ["view"]
+views = ["transverse_average_bond"]
+own_state = "outside"
+accepted = ["D49", "D46"]
+[[cause.match]]
+cases = ["newbeam-us-mv", "newbeam-usfile-mv"]
+checks = ["view"]
+views = ["transverse_average_bond"]
+own_state = "outside"
+accepted = ["D70"]
+[[cause.reason]]
+basis = "measured"
+tool = "tools/sources.py"
+text = "On these checks r2c is outside target with r2c put into Response's own state as well, so the state reached does not explain them (or not all of them)."
+[[cause.reason]]
+basis = "measured"
+tool = "tools/bond.py"
+text = "r2c's rule for this chart, applied to Response's own Stirrup Stress chart, gives Response's bond chart. So the rule that makes the chart from the stirrup stress is the program's."
+[[cause.reason]]
+basis = "inferred"
+text = "What is left: the chart is a difference between neighbouring points, largest where the stirrups end, and a state rebuilt from Response's charts is too coarse there. Not tested. On the column the rule was never checked on a hoop."
+[[cause.rule]]
+address = "0047fcd0"
+kernel = "*Transverse Average Bond*"
+[[cause.diagnostic]]
+run = "python tools/viewlines.py {fixture:column-mv} {record:column-mv} transverse_average_bond --feature peak --raw"
+[[cause.diagnostic]]
+run = "python tools/viewlines.py {fixture:column-mv} {record:column-mv} stirrup_stress --feature peak"
+[[cause.diagnostic]]
+run = "python tools/bond.py {capture:column-mv} {input:column-mv} --stages 36"
+[[cause.diagnostic]]
+run = "python tools/bond.py {capture:newbeam-m05v} --stages 51"
+[[cause.diagnostic]]
+run = "python tools/bond.py {capture:newbeam-us-mv} --stages 30,56"
+[[cause.diagnostic]]
+run = "python tools/diagnose.py states {capture:column-mv} {input:column-mv} --stages 36 --views"
+
+# ------------------------------------------------------------------ the named limitation
+
+[[cause]]
+id = "unsettled-tries"
+name = "Where a stage does not settle, r2c and Response make different tries (the named limitation)"
+decision = "D91"
+ask = "The decision D66 left for the end of phase A: accept the named limitation for phase A, make it an owner's override, move the shear views it governs down a tier, or allow the one further attempt on record?"
+suggestion = "Accept it for phase A as a named limitation and make the one further attempt (tries held one for one to the running program) the first item of phase B."
+disagreement = "The assessor contradicts the reason given for the two Must shape checks: r2c's curves have both falls of load, at Response's stages; the first is just under what the measure counts as a fall, and it comes before the two programs' tries part. It also notes that on the column the tries agree through the peak (it is the passes within a try that end differently), and that Response refuses the stage at the first difference where the reason says its solve gives up."
+after = "The assessor is right on the shapes, and the record (D70) is wrong. Measured, python tools/falls.py: the first fall is 1.99 and 1.97 % of the peak in r2c against 2.06 and 2.07 % in Response, and the measure counts from 2 %. So the two Must shape checks are not the named limitation; they are a fall just under the measure's limit, the kind of V alone (D32). They stay in this entry as assessed; regrouping them is asked under D91. The view checks stand as measured."
+[[cause.match]]
+cases = ["newbeam-us-mv", "newbeam-usfile-mv"]
+checks = ["shape"]
+accepted = ["D70"]
+[[cause.match]]
+cases = ["column-mv"]
+checks = ["view"]
+own_state = "inside"
+accepted = ["D47", "D50"]
+[[cause.match]]
+cases = ["column-interlock-mv"]
+checks = ["view"]
+own_state = "inside"
+pending = ["D74"]
+[[cause.match]]
+cases = ["igirder-mv", "newbeam-m2v"]
+checks = ["view"]
+own_state = "inside"
+accepted = ["D46"]
+[[cause.match]]
+cases = ["newbeam-csa-mv"]
+checks = ["view"]
+own_state = "inside"
+accepted = ["D71"]
+[[cause.match]]
+cases = ["newbeam-m05v"]
+checks = ["view"]
+own_state = "inside"
+accepted = ["D49", "D46"]
+[[cause.match]]
+cases = ["newbeam-m0neg-mv", "newbeam-nmv-incr"]
+checks = ["view"]
+own_state = "inside"
+pending = ["D76"]
+[[cause.match]]
+cases = ["newbeam-tstiff6-mv"]
+checks = ["view"]
+own_state = "inside"
+accepted = ["D61"]
+[[cause.match]]
+cases = ["newbeam-us-mv", "newbeam-usfile-mv"]
+checks = ["view"]
+own_state = "inside"
+accepted = ["D70"]
+[[cause.reason]]
+basis = "measured"
+tool = "tools/sources.py (r2c in Response's own state)"
+text = "Every view check in this entry is inside target when r2c is put into Response's own state at that stage: the rules give Response's view from Response's state. What differs is the state r2c reached. Most are on a part of the curve where the load changes by under 1 % of the peak from stage to stage."
+[[cause.reason]]
+basis = "measured"
+tool = "tools/rtrace.py, tools/tries.py (Response's own tries, read from the running program; a diagnostic, not reference data)"
+text = "r2c makes Response's tries one for one up to a first difference. On the US-units case that is after 29 tries: Response's solve of a stage gives up where r2c keeps a stage that has not settled after 16 passes. From there the two are on different stages; r2c has one fall of load before the peak where Response has two, and that is the shape."
+[[cause.reason]]
+basis = "read"
+address = "00418af0"
+text = "The pass on a stage, its wrapper and the growth of the base step were read and are in r2c. Two approaches were made on what is left (the growth rule: no effect; the program's own solve of the global strains: 18 checks in, 14 out, one of them a Must, so it is off)."
+[[cause.reason]]
+basis = "inferred"
+text = "That nothing but the tries is behind every one of these: the own-state measure was made on all, the trace on four of the ten cases, the start-from measure on three stages (the column's peak and \"N + M + V increasing together\" at cracking do not land in 16 passes; the tension stiffening factor's peak lands). Three things seen in the running program were not read to their cause: why the first step of a solve is sometimes taken on a depth range left by an earlier evaluation; what makes Response's result depend on timing; why its solve gives up at stages r2c solves."
+[[cause.rule]]
+address = "00418af0"
+kernel = "**The passes**"
+[[cause.rule]]
+address = "004276a0"
+kernel = "The global solve with shear"
+[[cause.diagnostic]]
+run = "python tools/curves.py {fixture:newbeam-us-mv} {record:newbeam-us-mv}"
+[[cause.diagnostic]]
+run = "python tools/tries.py {trace:newbeam-us-mv} {fixture:newbeam-us-mv} --context 8"
+[[cause.diagnostic]]
+run = "python tools/tries.py {trace:column-mv} {fixture:column-mv} {input:column-mv} --context 6"
+[[cause.diagnostic]]
+run = "python tools/curves.py {fixture:column-mv} {record:column-mv} --last 10"
+[[cause.diagnostic]]
+run = "python tools/startfrom.py {capture:column-mv} {input:column-mv} --stage 36"
+[[cause.diagnostic]]
+run = "python tools/startfrom.py {capture:newbeam-nmv-incr} --stage 36"
+[[cause.diagnostic]]
+run = "python tools/repeat.py {archive} {repeats} --only newbeam-us-mv newbeam-usfile-mv newbeam-csa-mv"

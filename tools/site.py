@@ -10,6 +10,11 @@ Nothing is run against Response. Branch pages carry a banner naming the branch a
 OUT/branches/index.html lists them. A branch without a dashboard or committed results is
 listed, not built.
 
+Beside each page goes that branch's "Review" page (review.html: the end-of-phase review of
+docs/review.md, built by the branch's tools/review.py from the same results) where the
+branch has one, with the independent assessments it shows copied next to it as written
+(review/independent/). The banner of each page links the two.
+
 Branches are the remote-tracking ones (refs/remotes/origin/*), so the clone must have them
 all (in CI: actions/checkout with fetch-depth 0). Each is checked out into a temporary git
 worktree and removed afterwards.
@@ -79,6 +84,22 @@ def build_one(tree: Path, out: Path) -> str:
     return ""
 
 
+def build_review(tree: Path, out: Path) -> bool:
+    """Build tree's review page into out/review.html, with the independent assessments
+    beside it; False where the branch has none or it does not build (said, not fatal)."""
+    if not (tree / "tools" / "review.py").exists():
+        return False
+    p = subprocess.run([sys.executable, "tools/review.py", "--out", str(out / "review.html")],
+                       cwd=tree, capture_output=True, text=True)
+    if p.returncode != 0:
+        print("  review not built: " + (p.stderr.strip().splitlines() or ["?"])[-1])
+        return False
+    src = tree / "docs" / "review" / "independent"
+    if src.is_dir():
+        shutil.copytree(src, out / "review" / "independent", dirs_exist_ok=True)
+    return True
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     ap.add_argument("out")
@@ -93,6 +114,7 @@ def main(argv=None) -> int:
             try:
                 dest = out if name == MAIN else out / "branches" / slug(name)
                 why = build_one(tree, dest)
+                reviewed = not why and build_review(tree, dest)
             finally:
                 git("worktree", "remove", "--force", str(tree))
             link = "./" if name == MAIN else f"branches/{slug(name)}/"
@@ -100,15 +122,21 @@ def main(argv=None) -> int:
             if why:
                 print(f"{name}: not built ({why})")
                 continue
-            page = dest / "index.html"
-            if name == MAIN:
-                inject(page, banner('Results of <b>main</b>. '
-                                    '<a href="branches/">Preview pages of other branches</a>'))
-            else:
-                inject(page, banner(
-                    f"Preview of branch <b>{html.escape(name)}</b> at {commit} ({date}), "
-                    "not merged into main. "
-                    '<a href="../../">main</a> · <a href="../">all branches</a>'))
+            for page, other in ((dest / "index.html",
+                                 '<a href="review.html"><b>The review</b></a> · '),
+                                (dest / "review.html",
+                                 '<a href="./">The results, check by check</a> · ')):
+                if not reviewed and page.name == "review.html":
+                    continue
+                other = other if reviewed else ""
+                if name == MAIN:
+                    inject(page, banner('Results of <b>main</b>. ' + other +
+                                        '<a href="branches/">Preview pages of other branches</a>'))
+                else:
+                    inject(page, banner(
+                        f"Preview of branch <b>{html.escape(name)}</b> at {commit} ({date}), "
+                        "not merged into main. " + other +
+                        '<a href="../../">main</a> · <a href="../">all branches</a>'))
             print(f"{name}: built")
     idx = out / "branches" / "index.html"
     idx.parent.mkdir(parents=True, exist_ok=True)

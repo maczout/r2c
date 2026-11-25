@@ -722,8 +722,39 @@ with no input and with negative elevations are inside on every check. The parked
 fixtures hold no neighbouring stages, so nothing on them is tested for a spike; a case
 that joins the set gets them (`python tools/retrim.py ARCHIVE --oracle FOLDER`).
 
-**Where a next session picks up**: the owner's answers to D74 to D77 in
-`docs/summary.md`. D77 is whether phase A closes. If cases are to move in first (the two
+**The end-of-phase review** (2026-11-24; the owner's specification is `docs/review.md`).
+A page of the results site, "Review" (`review.html` beside each results page), built by
+CI from the committed results: `python tools/review.py [--out FILE | --list |
+--summary]`. What it reads besides the results:
+
+- `docs/review/causes.toml`, the developer's: every deviation outside target grouped by
+  cause (14 now, for 92 checks), each reason marked measured, read or inferred, the
+  decisions that accepted it, what is asked, and where the independent assessment
+  disagreed. A deviation no cause matches is shown as "not classified".
+- `docs/review/measured.json`, generated: r2c in Response's own state at every view
+  check outside target, on every case (85 checks). Made with the evidence files by
+  `python tools/evidence.py VERIFY_OUT --archive ARCHIVE --inputs … --out FOLDER
+  [--repeats …] [--traces …] [--decompile]`; FOLDER is outside the repository. It must
+  be rerun after a new run of record (`python tools/check.py` warns).
+- `docs/review/independent/ID.md`: each entry's assessment by a separate agent, as
+  written. Not edited; the developer answers in the causes file.
+
+Known about the deviations since the review and not acted on (no kernel change was
+made): the shapes of the two US-units cases are a fall of load 0.01 to 0.03 % of the
+peak under the 2 % the measure counts (`python tools/falls.py VERIFY_OUT`), not the
+named limitation (`docs/summary.md`, D93); the bond chart of "N + M + V increasing
+together" at cracking is a chart of 26.8 MPa and r2c does not settle there in 16 passes
+when started from Response's state before; the Diagonal Spacing miss under tension is
+the stage compared (inside in Response's own state); under no load Response's second
+stage shows a longitudinal bond of 1.8 and 1.6 MPa with no steel stress, not read. The
+name "transverse bond at the stirrups' end" for the checks that are outside in
+Response's own state is not borne out: on the column they differ inside the depth of the
+stirrups.
+
+**Where a next session picks up**: the owner's answers to D78 to D93 (the review) and
+D74 to D77 in `docs/summary.md`. D77 is whether phase A closes. When the owner has
+answered the review, set a tag on that commit and name it as `last_review` in
+`docs/review/causes.toml`, so that "what changed" is counted from it. If cases are to move in first (the two
 softening diagnostics, the two Newbeam cases): each softening case has three repeat
 captures from step A-3; the two Newbeam cases have one capture each and want D57's three.
 For a stiffness rule the check is `python tools/flowset.py ARCHIVE --inputs … [--set

@@ -10,6 +10,11 @@
    marker and matches what tools/report.py writes from its own JSON.
    Also warns when r2c's curves are missing from the JSON (the dashboard needs them).
 4. Every session log in docs/log has the sections the template asks for.
+5. The end-of-phase review (docs/review.md) follows the results: the verdict and headings
+   copied into docs/summary.md are what tools/review.py writes now (an error if not:
+   rerun `python tools/review.py --summary`); warns where the measurements in Response's
+   own state were made on another run, or a deviation has no cause (rerun
+   tools/evidence.py, add the cause to docs/review/causes.toml).
 
 Exit status 0 when all pass; 1 when one fails (stale results only with --strict).
 """
@@ -105,6 +110,32 @@ def main(argv=None) -> int:
     if logs:
         print(f"ok    session logs: {len(logs)} checked" if not bad else
               f"      session logs: {len(logs)} checked")
+
+    summary = ROOT / "docs" / "summary.md"
+    if (ROOT / "docs" / "review" / "causes.toml").exists() and js.exists() and acc:
+        import review
+        data = json.loads(js.read_text())
+        measured = review.load_measured()
+        built = review.build(data["run"], data["results"], acc, review.load_causes(), measured)
+        text = summary.read_text(encoding="utf-8")
+        if review.BEGIN not in text:
+            print("warn  review: docs/summary.md has no review block yet "
+                  "(python tools/review.py --summary)")
+        elif review.summary_block(built) not in text:
+            print("FAIL  review: the verdict and headings in docs/summary.md are not what "
+                  "tools/review.py writes now (rerun python tools/review.py --summary)")
+            bad += 1
+        else:
+            print("ok    review: the summary's verdict and headings are as generated")
+        loose = [e for e in built["entries"] if e["cause"].get("unclassified")]
+        if measured.get("run") and measured["run"] != data["run"].get("commit", "")[:12]:
+            print(f"warn  review: docs/review/measured.json was made on run {measured['run']}, "
+                  "the results on another (rerun tools/evidence.py)")
+        if loose:
+            print(f"warn  review: {len(loose)} deviation(s) with no cause in "
+                  "docs/review/causes.toml: " + ", ".join(e["worst"]["case"] for e in loose))
+        elif not measured.get("run") or measured["run"] == data["run"].get("commit", "")[:12]:
+            print(f"ok    review: {len(built['entries'])} entries, every deviation has a cause")
     return 1 if bad else 0
 
 
