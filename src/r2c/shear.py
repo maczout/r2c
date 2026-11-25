@@ -547,6 +547,8 @@ class Shear(Flexure):
                 break
             e += self.step_share * step
             count += 1
+            if self.debug:
+                print(f"     step {count}: e0={e[0]*1e3:.4f} phi={e[1]*1e6:.4f} gam={e[2]*1e3:.4f} share={self.step_share}")
             if count > 10 and hm < 5.0:
                 self.step_share = 0.5       # half steps from the eleventh on [B 004276a0]
             if count > 50:
@@ -566,6 +568,7 @@ class Shear(Flexure):
         return np.array(x), info, found
 
     trace = None             # tools/trace.py: a list to which each try is added
+    debug = False            # tools/trace.py --set debug=1: print each pass of a stage
     why = ""                 # why the program's solve gave up, for tools/trace.py
     # Response's own solve of the global strains [B 004276a0]: written and off
     # (docs/kernel.md, "The global solve with shear")

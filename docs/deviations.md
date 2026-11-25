@@ -7,11 +7,25 @@ measured on the development results (`docs/verification-results.md`) unless mark
 
 - **Inputs that r2x solves and r2c refuses** (`docs/parity.md`): three compression softening
   models the manual does not list, a segmental curve for reinforcing steel, long-term
-  effects, draped tendons, and `units="roman"` in a file. Whether these are to be solved
-  is with the owner (`docs/summary.md`). The other way round, four inputs on which Response
-  gives up part-way through its solve are solved by r2c; r2c cannot know to stop.
+  effects, draped tendons, and `units="roman"` in a file. The owner's decision (2026-11-24,
+  `docs/brief.md`): refuse them; they may be revisited after the threshold. The other way
+  round, four inputs on which Response gives up part-way through its solve are solved by
+  r2c; r2c cannot know to stop.
 - **`define` and `--report` of r2x are not in r2c.** Both work through Response's own
-  windows.
+  windows. The owner's decision (2026-11-24): not part of the command line that is
+  compared.
+- **With shear, r2c carries on where Response's solve gives up and its response ends.**
+  On sections that fail in flexure with some shear (M/V of 2 to 4 m: the T-beam, the
+  Marshall sample, Newbeam with stronger concrete) the two curves are the same up to
+  Response's last stage; r2c then finds further states and reaches a peak several per cent
+  higher. Response's stiffness at that state differs from r2c's; the term has not been
+  found (`docs/kernel.md`, "Seen in increment 2").
+- **Other shear cases of the wider set outside on the peak or the rising branch**, not yet
+  looked into beyond their traces: the Liping sample at M/V = 2.5 m and the T-beam with
+  CSA factors at 2 m (r2c's peak lower), Newbeam with heavy steel under negative moment
+  (the rising branch).
+- **The Liping sample under axial compression and moment:** the principal tensile stress at
+  the peak differs by more than twice the target. Not looked into.
 - **With shear, where a load stage does not settle, the two programs try different
   states.** Near a flat peak Response and r2c each keep a state that the other does not
   reach, so the shear-related views there differ by up to several times the target while

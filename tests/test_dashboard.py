@@ -16,6 +16,8 @@ def test_page_from_committed_results(tmp_path):
     assert dashboard.main(["--out", str(out)]) == 0
     page = out.read_text(encoding="utf-8")
     assert page.startswith("<!DOCTYPE html>") and "__DATA__" not in page
+    details = (tmp_path / "details.html").read_text(encoding="utf-8")
+    assert 'KIND = "front"' in page and 'KIND = "details"' in details
     run, results = dashboard.load_results(ROOT / "docs" / "verification-results.json")
     data = dashboard.build(run, results, {}, None, ROOT / "tests" / "oracle", [])
     assert len(data["cases"]) == len(results)
@@ -46,3 +48,30 @@ def test_unstable_checks_are_shown_and_left_out_of_the_cells():
             assert (u["view"], u["stage"]) not in shown
     page = dashboard.render(data)
     assert "Where Response itself is unstable" in page
+
+
+def test_front_page_lists_the_cases_outside_target_on_the_control_curve():
+    # owner, 2026-11-24: the first screen answers "how accurate is r2c?"; then the control
+    # curves of the development cases outside target
+    import heldout
+    import report
+    run, results = dashboard.load_results(ROOT / "docs" / "verification-results.json")
+    acc = report.read_targets(ROOT / "docs" / "measures.md")
+    data = dashboard.build(run, results, acc, None, ROOT / "tests" / "oracle", [])
+    assert data["threshold"] == heldout.THRESHOLD and data["heldout"]
+    for c in data["cases"]:
+        if "problem" in c:
+            continue
+        missed = {k for k in dashboard.CURVE_CHECKS if c["checks"].get(k) is False}
+        assert {o["check"] for o in c["curve_out"]} == missed
+        assert all(o["over"] >= 1.0 for o in c["curve_out"])
+
+
+def test_curve_misses_carry_the_priority():
+    checks = {"peak": (7.0, 5.0, False), "curve": (1.0, 5.0, True), "shape": (False, True, False),
+              "post_peak": (20.0, 5.0, False)}
+    got = {o["check"]: o for o in dashboard.curve_misses(checks, "shear")}
+    assert set(got) == {"peak", "shape", "post_peak"}
+    assert got["peak"]["priority"] == 1 and got["post_peak"]["priority"] == 4
+    assert got["post_peak"]["over"] == 4.0
+    assert dashboard.curve_misses(checks, "flexure")[-1]["priority"] == 2

@@ -687,6 +687,13 @@ that fits the section's own strains: the shrinkage profile, then the strains at 
 prestrained bars carry nothing [T 7-3: with shrinkage the first estimate is "a linear fit to
 those profiles"; the second plane and the cut-back are r2c's own].
 
+Under a constant moment, if no state is found from those, the search starts again from
+cracked planes: a strain difference over the depth of 0.25, 0.5, 1, 2, 4 and 8 mm/m, bending
+either way, with the centroid at 0.15 of that difference in tension [O: r2c's own, since
+increment 2. A moment above the cracking moment has no way from the unstrained section
+that brings the residual down across the fall of force at cracking: Newbeam under a
+constant 50 kNm was not solved; Response's first stage there is a cracked state].
+
 ## Load stages
 
 **With shear: Response's own load stage control [B]**, taken over 2026-11-21 in place of
@@ -1009,6 +1016,27 @@ program down, two cases gave another number of stages than in their captures (M/
 80 for 88; V alone: 53 for 52): what Response does at such tries depends on something
 besides the input, timing among it [inferred; the stage control runs one pass at a time
 from the program's idle loop].
+
+**Seen in increment 2 (2026-11-24) [O], on six of the wider development cases** traced
+the same way. On five, Response's response ends where its solve of the global strains
+gives up: the shear strain is carried to 40 to 470 mm/m in a step or two, the state code
+is 4, the tries after it fail down to a multiplier of 0.008 in both control variables,
+and the response is over. r2c finds a state at the same target and carries on, on three of
+them to a peak 6 to 11 % above Response's (the T-beam at M/V = 4 m, the Marshall sample
+at 3 m; Newbeam with 50 MPa concrete at 2 m, where Response hovers under control of the
+shear strain 12 % below r2c's peak). On the Marshall sample the two programs make the
+same 57 tries; at the 58th (45.3386 rad/km) their first two passes agree (loads 253.65
+and 251.97 against r2c's 253.66 and 251.93; errors 47.2 and 23.2 % against 47.2 and
+23.1 %), and inside the first pass the solve's first step lands on the same state (centroid
+strain 9.4919 against 9.4914 mm/m, shear strain 13.536 against 13.539 mm/m). From that
+state Response's second step raises the shear strain to 14.75 mm/m and r2c's copy of the
+solve (`Shear.own_solve`) lowers it to 12.52. So at one and the same state the two
+stiffnesses differ; r2c's agrees with the derivative of its own forces in the shear terms.
+With r2c's other terms, Response's step needs a stiffness against the shear strain that is
+negative there [inferred from the two steps, not read]. In the third pass that step takes
+Response from 13.66 to 65 mm/m and the try fails. Not found: which term of `00427cd0` or
+`0046b940` turns negative at that state. This is where to read next
+(`python tools/rtrace.py --steps`, `python tools/trace.py --set debug=1 --set own_solve=1`).
 
 The pass routine's tests were set against the listing once more [`00418af0`]: one was
 not on record. Under control of the shear strain, from the twelfth pass, a stage whose

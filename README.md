@@ -81,7 +81,7 @@ file, a shape without an outline. Negative shear is refused, as in Response.
     tools/verify.py        run r2c on a set of reference records and compare
     tools/trim.py          cut a record down to a test fixture
     tools/report.py        write docs/verification-results.md from a verify run
-    tools/dashboard.py     the results as one HTML page (published by CI with GitHub Pages)
+    tools/dashboard.py     the results pages: how accurate r2c is, and the details (CI publishes them)
     tools/diagnose.py      r2c at Response's strain states, and along its control values
     tools/decompile.py     a routine of Response's binary, from a Ghidra project kept elsewhere
     tools/capture.py       rebuild the archive of full oracle captures with r2x

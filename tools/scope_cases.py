@@ -17,7 +17,10 @@ the folder tools/variants.py writes, among its --inputs).
 (~/.cache/r2x/prefix-scope-K); r2x's worker runs one Response per prefix.
 
 Group A: the case exercises a kernel path no earlier case reaches. Group B: a combination
-of paths that are each reached already.
+of paths that are each reached already. Group W (increment 2): wider cases of the kinds the
+held-out set draws on (Response's sample files under other loads; materials, shapes,
+reinforcement and loads on the four sections), none of them a held-out case, so that what
+keeps the held-out totals down has a development case like it.
 """
 
 from __future__ import annotations
@@ -40,6 +43,9 @@ ROOT = Path(__file__).resolve().parents[1]
 # The inputs that are in the test set already, under the names their fixtures record
 PRESENT = {"newbeam": "input.r2t", "tbeam": "tbeam.r2t", "column": "column.r2t",
            "igirder": "igirder.r2t"}
+# Response's sample files, found by name in a folder of --inputs (Response's own)
+SAMPLES = {"cm4": "Cm4.rsp", "liping": "Liping LB1.rsp", "marshall": "Marshall.rsp",
+           "dmn1n": "dm-n1n.rsp", "se100": "se100am69.rsp"}
 
 
 def case(group, name, inp, increment, initial="0,0,0", units="si", factors="none",
@@ -90,11 +96,70 @@ CASES = [
     case("B", "newbeam-m0neg-mv", "newbeam", "0,1,1", initial="0,-50,0"),
     case("B", "newbeam-nmv-incr", "newbeam", "-5,1,1"),
     case("B", "newbeam-m-mdmax", "newbeam", "0,1,0", more_detail="max"),
+    # wider cases (increment 2)
+    case("W", "cm4-m3v", "cm4", "0,3,1"),
+    case("W", "cm4-n500-m", "cm4", "0,1,0", initial="-500,0,0"),
+    case("W", "liping-m25v", "liping", "0,2.5,1"),
+    case("W", "liping-n300-m", "liping", "0,1,0", initial="-300,0,0"),
+    case("W", "marshall-mv", "marshall", "0,1,1"),
+    case("W", "marshall-m3v", "marshall", "0,3,1"),
+    case("W", "dmn1n-m4v", "dmn1n", "0,4,1"),
+    case("W", "dmn1n-n200-m", "dmn1n", "0,1,0", initial="-200,0,0"),
+    case("W", "se100-m3v", "se100", "0,3,1"),
+    case("W", "se100-n500-m", "se100", "0,1,0", initial="-500,0,0"),
+    case("W", "newbeam-fc20-mv", "newbeam-fc20", "0,1,1"),
+    case("W", "newbeam-fc20-m", "newbeam-fc20", "0,1,0"),
+    case("W", "newbeam-fc50-m", "newbeam-fc50", "0,1,0"),
+    case("W", "newbeam-fc50-m2v", "newbeam-fc50", "0,2,1"),
+    case("W", "newbeam-fc80-m", "newbeam-fc80", "0,1,0"),
+    case("W", "newbeam-fc80-mv", "newbeam-fc80", "0,1,1"),
+    case("W", "newbeam-fy600-m", "newbeam-fy600", "0,1,0"),
+    case("W", "newbeam-fy600-mv", "newbeam-fy600", "0,1,1"),
+    case("W", "newbeam-deep900-m", "newbeam-deep900", "0,1,0"),
+    case("W", "newbeam-deep900-m15v", "newbeam-deep900", "0,1.5,1"),
+    case("W", "newbeam-slab200-m", "newbeam-slab200", "0,1,0"),
+    case("W", "newbeam-slab200-m2v", "newbeam-slab200", "0,2,1"),
+    case("W", "newbeam-light800-m", "newbeam-light800", "0,1,0"),
+    case("W", "newbeam-light800-mv", "newbeam-light800", "0,1,1"),
+    case("W", "newbeam-heavy2500-m", "newbeam-heavy2500", "0,1,0"),
+    case("W", "newbeam-heavy2500-negm2v", "newbeam-heavy2500", "0,-2,1"),
+    case("W", "newbeam-st150-mv", "newbeam-st150", "0,1,1"),
+    case("W", "newbeam-st150-n200-v", "newbeam-st150", "0,0,1", initial="-200,0,0"),
+    case("W", "newbeam-st2leg200-m2v", "newbeam-st2leg200", "0,2,1"),
+    case("W", "newbeam-mid400-m", "newbeam-mid400", "0,1,0"),
+    case("W", "newbeam-mid400-m2v", "newbeam-mid400", "0,2,1"),
+    case("W", "newbeam-m4v", "newbeam", "0,4,1"),
+    case("W", "newbeam-n500-m2v", "newbeam", "0,2,1", initial="-500,0,0"),
+    case("W", "newbeam-m50-v", "newbeam", "0,0,1", initial="0,50,0"),
+    case("W", "tbeam-m4v", "tbeam", "0,4,1"),
+    case("W", "tbeam-negmv", "tbeam", "0,-1,1"),
+    case("W", "tbeam-n1000-m", "tbeam", "0,1,0", initial="-1000,0,0"),
+    case("W", "tbeam-kgcm-m", "tbeam", "0,1,0", units="kgcm"),
+    case("W", "tbeam-csa-m2v", "tbeam", "0,2,1", factors="csa"),
+    case("W", "tbeam-fc30-m", "tbeam-fc30", "0,1,0"),
+    case("W", "column-n1000-m", "column", "0,1,0", initial="-1000,0,0"),
+    case("W", "column-n6000-m", "column", "0,1,0", initial="-6000,0,0"),
+    case("W", "column-ntens300-m", "column", "0,1,0", initial="300,0,0"),
+    case("W", "column-n3000-m2v", "column", "0,2,1", initial="-3000,0,0"),
+    case("W", "column-us-m", "column", "0,1,0", units="us"),
+    case("W", "column-fc35-nm", "column-fc35", "0,1,0", initial="-2000,0,0"),
+    case("W", "igirder-negm2v", "igirder", "0,-2,1"),
+    case("W", "igirder-m3v", "igirder", "0,3,1"),
+    case("W", "igirder-n500-m", "igirder", "0,1,0", initial="-500,0,0"),
+    case("W", "igirder-dep5-m", "igirder-dep5", "0,1,0"),
+    case("W", "igirder-dep5-m2v", "igirder-dep5", "0,2,1"),
+    case("W", "igirder-fc45-m3v", "igirder-fc45", "0,3,1"),
 ]
 
 
 def input_for(c: dict, folder: Path, sources) -> Path:
     """The case's input, written into the folder under the name its fixture records."""
+    if c["input"] in SAMPLES:
+        found = [Path(d) / SAMPLES[c["input"]] for d in sources
+                 if (Path(d) / SAMPLES[c["input"]]).exists()]
+        if not found:
+            raise SystemExit(f"{SAMPLES[c['input']]}: not in any folder of --inputs")
+        return found[0]
     if c["input"] in PRESENT:
         p = folder / PRESENT[c["input"]]
         data = variants.find_base(c["input"], sources).read_bytes()
@@ -114,7 +179,7 @@ def main(argv=None) -> int:
     ap.add_argument("--inputs", nargs="*", default=[], help="folders with the present inputs")
     ap.add_argument("--fixtures", default=str(ROOT / "tests" / "oracle"))
     ap.add_argument("--only", nargs="*", help="case names (default: all without a fixture)")
-    ap.add_argument("--group", choices=("A", "B"), help="only this group")
+    ap.add_argument("--group", choices=("A", "B", "W"), help="only this group")
     ap.add_argument("--jobs", type=int, default=1, help="captures at once (default: 1)")
     ap.add_argument("--list", action="store_true", help="list the cases and stop")
     a = ap.parse_args(argv)

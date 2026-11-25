@@ -113,6 +113,19 @@ Everything else is reference.
   Its explanation is shown beside the developer's.
 - The owner signs off, or names what is still needed.
 
+## Owner's decisions since
+
+Recorded here at the owner's instruction, in the owner's words. Where one of these differs
+from the text above, it governs.
+
+**2026-11-24**, in answer to the questions of the summary after increment 1:
+
+1. define and --report are not part of "the same command line": they stay refused and are
+   left out of the parity score.
+2. Inputs Response solves but its manual does not document: refuse, listed as known
+   differences. They may be revisited after the threshold.
+3. Solution threshold on priority 1: 99 % without shear, 90 % with.
+
 ## First increment
 
 This increment changes how the work is governed, with the owner's approval.

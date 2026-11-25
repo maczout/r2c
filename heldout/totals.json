@@ -93,6 +93,53 @@
     "moment-axial": 0,
     "shear": 0
    }
+  },
+  {
+   "label": "increment 2",
+   "date": "2026-11-24",
+   "commit": "9fa0690637e9",
+   "cases": {
+    "moment-axial": 27,
+    "shear": 28
+   },
+   "totals": {
+    "moment-axial": {
+     "1": [
+      23,
+      27
+     ],
+     "2": [
+      26,
+      27
+     ],
+     "3": [
+      23,
+      27
+     ]
+    },
+    "shear": {
+     "1": [
+      20,
+      28
+     ],
+     "2": [
+      10,
+      28
+     ],
+     "3": [
+      17,
+      28
+     ],
+     "4": [
+      9,
+      28
+     ]
+    }
+   },
+   "unsolved": {
+    "moment-axial": 0,
+    "shear": 0
+   }
   }
  ]
 }
