@@ -385,18 +385,45 @@ class Shear(Flexure):
             prof = (1.0 - relax) * np.interp(grid, an.shape_z, an.shape) + relax * prof
         an.shape_z, an.shape = grid, prof
 
+    # Written and off (docs/kernel.md, "Accepting a stage"): the two shear stresses of the
+    # profile error read by each layer's parabola, as the program reads them [B 00427180,
+    # 004b6df0]. Off: straight lines between the nodes. It goes with own_solve below, and
+    # the two wait for the owner's answer (docs/summary.md, increment 5)
+    parabolic_error = False
+
     def profile_error(self, z, vstate, tau, v) -> float:
         """Response's measure of how far the shear strain profile is from converged
         [B 00420f20]: the standard deviation, over 50 points of the depth, of the calculated
         shear stress less the state's, over the mean calculated shear stress. 0.9 % (which
-        counts as converged) where the shear is negligible."""
+        counts as converged) where the shear is negligible. Each stress is read at a point
+        from the parabola through the three nodes of the layer the point is in, the upper
+        layer's where the point is on a boundary [B 00427180, 004b6df0]."""
         if abs(v) < 1e-3 * self.vscale:
             return 0.009
         sec = self.sec
-        zf = self.an.profile_z(z).ravel()[::-1]
-        zz, ii = np.unique(zf, return_index=True)
-        calc = np.interp(np.linspace(sec.zbot, sec.ztop, 50), zz, tau.ravel()[::-1][ii])
-        state = np.interp(np.linspace(sec.zbot, sec.ztop, 50), zz, vstate.ravel()[::-1][ii])
+        pts = np.linspace(sec.zbot, sec.ztop, 50)
+        if self.parabolic_error and z.ndim == 2 and z.shape[1] == 3:
+            top, mid, bot = z[:, 0], z[:, 1], z[:, 2]
+            q = np.clip(pts, bot[-1], top[0])
+            # the first layer from the top that holds the point
+            k = np.array([int(np.argmax((top >= x - 1e-9) & (bot <= x + 1e-9))) for x in q])
+            a, b, d = top[k] - mid[k], bot[k] - mid[k], q - mid[k]
+            flat = (np.abs(a) < 1e-12) | (np.abs(b) < 1e-12)
+            a, b = np.where(flat, 1.0, a), np.where(flat, -1.0, b)
+
+            def read(f):
+                ft, fm, fb = f[k, 0] - f[k, 1], f[k, 1], f[k, 2] - f[k, 1]
+                den = a * b * (a - b)
+                c2 = (ft * b - fb * a) / den
+                c1 = (fb * a * a - ft * b * b) / den
+                return np.where(flat, fm, c2 * d * d + c1 * d + fm)
+
+            calc, state = read(tau), read(vstate)
+        else:
+            zf = self.an.profile_z(z).ravel()[::-1]
+            zz, ii = np.unique(zf, return_index=True)
+            calc = np.interp(pts, zz, tau.ravel()[::-1][ii])
+            state = np.interp(pts, zz, vstate.ravel()[::-1][ii])
         d = calc - state
         mean = float(np.mean(calc))
         sd = math.sqrt(max(float(np.sum(d * d) * 50.0 - np.sum(d) ** 2) / 50.0 / 49.0, 0.0))
@@ -533,6 +560,13 @@ class Shear(Flexure):
             on = d > ref
             on &= (d >= 1.0) | (np.arange(3) == ci)
             on[ci] = on[ci] or not on.any()
+            if self.debug:
+                # as tools/rtrace.py --matrix prints Response's: N, N m, per strain and 1/m,
+                # the curvature with Response's sign
+                u = np.array([1.0, -1e-3, 1.0])
+                print("     K " + " ".join(f"{v:.5g}" for v in (k * u[:, None] * u[None, :]).ravel())
+                      + " | rhs " + " ".join(f"{v:.5g}" for v in rhs * u)
+                      + f" | at e0={e[0]:.6g} phi={-e[1]*1e3:.6g} gam={e[2]:.6g}")
             k[ci, ci] *= 1e9                        # the control variable stays where it is
             step = np.zeros(3)
             idx = np.flatnonzero(on)
@@ -691,7 +725,7 @@ class Shear(Flexure):
                 an.shape = an._elastic_shape()
                 self.half_steps, self.step_share = True, 0.5
             if getattr(self, "debug", False):
-                print(f"   pass {passes}: lam={lam:.4f} profile err={err:.4f}")
+                print(f"   pass {passes}: lam={lam:.4f} profile err={err:.6f}")
             if self.pass_code and ctx is not None:
                 # the state code of this pass's state, acted on at once [B 00418af0]
                 code = self.state_code(Stage(e0, phi, gam, lam, n, m, v,

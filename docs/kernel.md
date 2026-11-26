@@ -1219,7 +1219,23 @@ loads at the control value with the shear strain profile as it is; update the pr
 the calculated shear stress; measure the profile error. The error is the standard deviation,
 over 50 points of the depth, of the difference between the calculated shear stress and the
 shear stress of the state, over the mean calculated shear stress (taken as 0.9 % where the
-shear is negligible). After each pass:
+shear is negligible). Both stresses are read at a point from the parabola through the
+three nodes of the layer the point is in (top, middle, bottom), the first layer from the top
+that holds it [B `00420f20`: 50 points from the bottom face to the top; the state's stress by
+`00427180`, the calculated one by the table reader `004b6df0`, which falls back on a straight
+line only outside the table]. r2c reads both by straight lines between nodes; the
+program's reading is **written and off** (`Shear.parabolic_error`, increment 5), because it
+was checked, and belongs, with Response's own solve (`Shear.own_solve`, "The global solve
+with shear" below). Measured with both on, on Newbeam at M/V = 1 m against the running program
+(`python tools/rtrace.py`, `python tools/trace.py --set debug=1 --set own_solve=1`): at the
+six passes of the first cracked stage Response's error is 23.2061, 11.3877, 5.6557, 2.5267,
+1.4096, 0.6438 %; r2c's with straight lines is 23.28, 11.42, 5.66, 2.54, 1.38, 0.62 % and
+with the parabola 23.2057, 11.3875, 5.6557, 2.5266, 1.4097, 0.6439 %, at loads equal to six
+digits. On the uncracked stages before it r2c's error is 0.2 % of itself under Response's
+(5.1781 against 5.1887 %), which is a few millionths of the stress: not found. With the
+parabola alone on the 60 development cases with shear two cases go outside (priority 1 and
+2: shear alone under axial compression, where a stage that does not settle falls the other
+way) and none comes inside [measured, `python tools/verify.py`]. After each pass:
 
 * converged below 1 %: the stage is accepted;
 * else another pass, up to 16; with the error above 10 after four passes the profile is

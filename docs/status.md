@@ -116,7 +116,15 @@ and the two folders of derived inputs in the development archive (`scope-inputs`
 - Diagnosis on a development case: `tools/diagnose.py` (r2c in Response's states),
   `tools/viewlines.py`, `tools/viewmisses.py`, `tools/curves.py`, `tools/sources.py` (state
   or rule?), `tools/startfrom.py`, `tools/flowset.py`, `tools/trace.py`, `tools/tries.py`
-  and `tools/rtrace.py` (Response's own tries, read from the running program).
+  and `tools/rtrace.py` (Response's own tries, read from the running program; with
+  `--steps --matrix` the 3 × 3 stiffness and unbalanced loads of every step of its solve).
+  `tools/stiff.py LOG RECORD` sets r2c's stiffness beside that, try by try and pass by
+  pass, and names the first term that differs.
+- How far Response is from itself when an input changes by next to nothing:
+  `python tools/noise.py capture OUT ...` then `python tools/noise.py score OUT [--list]`
+  (every concrete strength raised by 0.05 %, or `--by PCT`; the development cases with
+  shear, or `--flexure`). It says how much of a priority turns on states Response itself
+  does not hold to.
 - The binary: `tools/decompile.py` shows a routine from a Ghidra project kept outside the
   repository (needs `GHIDRA_HOME`; one call at a time). Its output is never committed.
 - Results pages: `tools/dashboard.py` (the front page, "how accurate is r2c?", and
