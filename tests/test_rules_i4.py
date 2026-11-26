@@ -124,35 +124,30 @@ def test_all_in_tension_every_bar_carries_the_extra_stress_at_a_crack_whichever_
         assert max(extra) == pytest.approx(min(extra), rel=0.02)
 
 
-def test_the_crushing_share_is_written_and_off(oracle_dir):
-    # [B 00419ff0]: 0.5 % of the way come, no count of tries. Off, so that the kernel is the
-    # one the held-out set was scored on in increment 4; with it on Newbeam under axial load
-    # and moment has Response's stages around the extreme fibre's peak strain
+def test_the_crushing_share(oracle_dir):
+    # [B 00419ff0]: 0.5 % of the way come, no count of tries. With it Newbeam under axial
+    # load and moment has Response's stages around the extreme fibre's peak strain
     import compare
     import verify
     from r2c import record, solver, stages
-    assert solver.Flexure.crush_by_share is False
+    assert solver.Flexure.crush_by_share is True
     ref = record.read(oracle_dir / "newbeam-nm.r2x.txt")
     want = compare._curve(ref, "moment_phi")[:22, 0]
-    solver.Flexure.crush_by_share = True
-    try:
-        res = run.solve(None, **verify.options(ref.header))
-    finally:
-        solver.Flexure.crush_by_share = False
+    res = run.solve(None, **verify.options(ref.header))
     got = compare._curve(record.decode(res.record_bytes(stages.ALL)), "moment_phi")[:22, 0]
     assert np.allclose(got, want, atol=2e-3)
 
 
-def test_closing_in_where_the_cracks_close_is_written_and_off():
+def test_closing_in_where_the_cracks_close():
     # [B 00415e30, 0041a870]: the cracks closing between two stages is an event, closed in
-    # on with a stage at 0.8 of the gap. Off, as the crushing share is, and for the same
-    # reason. With it off the closing of cracks is no event at all
+    # on with a stage at 0.8 of the gap. With the switch off it is no event at all
     from r2c import solver
-    assert solver.Flexure.cracks_closing is False
+    assert solver.Flexure.cracks_closing is True
     su = run.setup(None, increment=(0.0, 1.0, 0.0))
     drv = su.driver()
     kept = drv.run(30)
     cracked = next(s for s in kept if drv._marks(s)[0])
+    drv.cracks_closing = False
     assert drv.has_event(cracked, kept[0]) == ""
     drv.cracks_closing = True
     assert drv.has_event(cracked, kept[0]) == "uncrack"

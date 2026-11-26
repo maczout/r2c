@@ -1367,15 +1367,14 @@ class Flexure:
         if self.on_stage:
             self.on_stage(len(self.stages))
 
-    # Written and off (docs/kernel.md, "Closing in on first cracking"): close in on the
-    # extreme fibre reaching its peak strain by the binary's share, 0.5 % of the way come,
-    # with no count of tries [B 00419ff0]. Measured after the held-out score of increment 4
-    # and left off so that the kernel stays the one that was scored.
-    crush_by_share = False
-    # Written and off: the cracks closing between two stages is an event too, closed in on
+    # docs/kernel.md, "Closing in on first cracking": close in on the extreme fibre
+    # reaching its peak strain by the binary's share, 0.5 % of the way come, with no count
+    # of tries [B 00419ff0]. A switch: off gives the 14 tries of increment 4.
+    crush_by_share = True
+    # A switch as well: the cracks closing between two stages is an event too, closed in on
     # with a stage at 0.8 of the gap [B 00415e30, 0041a870, 00419ff0; O: the I-girder
     # under moment]
-    cracks_closing = False
+    cracks_closing = True
 
     def advance(self, cur: Stage, target: float, depth: int,
                 aside: Stage | None = None) -> Stage:

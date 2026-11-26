@@ -847,18 +847,16 @@ development cases without shear: those whose first 25 stages are at Response's c
 values went from 72 to 87, the first 40 from 68 to 81 [`python tools/stagesat.py`]. The
 closing in on the extreme fibre reaching its peak strain is as it was (14 tries, 3 on a
 stage put in between), and Response closes in further on some cases (Newbeam under axial
-load and moment: 3.608, 3.622, 3.633 against r2c's 3.608) [O]. **Written and off**
+load and moment: 3.608, 3.622, 3.633 against r2c's 3.608) [O]. **On since increment 5**
 (`Flexure.crush_by_share`): the binary's own test [B `00419ff0`, as read on 2026-11-21]
 closes in while the step to the stage set aside is more than a share of the way that
 stage has come from the first one: 0.02 for cracking and for cracks closing, 0.005 for
 the extreme fibre's peak strain, 0.01 for a rupture, and no count of tries. With the
 switch on, of the 104 development cases without shear those whose first 60 stages are at
 Response's control values go from 41 to 96 (first 40: 90 to 97; first 25: 96 to 98), and
-no check changes side [measured, 2026-11-25, `python tools/stagesat.py`]. It was measured
-after the held-out set had been scored for increment 4 and is left off so that the kernel
-is the one that was scored: with it off r2c's records of those 104 cases are byte for byte
-the run of record's. Turning it on is the first thing for the next increment. **Also written and off**
-(`Flexure.cracks_closing`): the cracks closing between two stages (the stage before
+no check changes side [measured, 2026-11-25, `python tools/stagesat.py`]. It was written
+after the held-out set had been scored for increment 4 and stayed off until increment 5.
+**Also on since increment 5** (`Flexure.cracks_closing`): the cracks closing between two stages (the stage before
 cracked, this one not) is an event in the binary too [B `00415e30`, event code 2], closed
 in on with a stage at 0.8 of the gap and not 0.2 [B `0041a870`], while the gap is more
 than 0.02 of the way come. On the I-girder under moment, whose top is cracked by the
