@@ -295,7 +295,7 @@ def build(run: dict, results: dict, acc: dict, curves_dir: Path | None, ref_dir:
     return {"run": run, "cases": cases, "gaps": gaps, "stale": stale(run),
             "acceptance": {g: t for g, t in acc.items() if t},
             "views_pct": report.views_limit(acc),
-            "heldout": heldout_runs(), "threshold": heldout.THRESHOLD,
+            "heldout": heldout_runs(), "threshold": heldout.THRESHOLD, "thresholds": heldout.THRESHOLDS,
             "tiers": [dict(n, tier=report.TIERS[t])
                       for t, n in report.tier_counts(ran, acc).items() if n["checks"]]}
 
@@ -454,7 +454,7 @@ ${trend(t)}</div>`; }
   H += `</div><div class="legend"><span><span class="ln" style="border-color:var(--sub)"></span>% of held-out cases inside target, by scoring</span><span><span class="ln" style="border-color:var(--ink-2);border-top-style:dashed"></span>threshold</span></div>`;
   // ----- priority by area
   H += `<h2>Held-out set: every priority, by area</h2>
-<p class="sub">Cases inside target on every check of the priority, at the latest scoring${P ? `; the change is since ${esc(P.label)}` : ""}. The threshold applies to priority 1.</p>
+<p class="sub">Cases inside target on every check of the priority, at the latest scoring${P ? `; the change is since ${esc(P.label)}` : ""}. The owner set a threshold for priorities 1 to 3; priority 4 is reported only.</p>
 <div class="scroll"><table class="pa"><tr><th>Priority</th>${Object.keys(AREAS).map(t => `<th>${AREAS[t][0]} (${L.cases[t]} cases)</th>`).join("")}</tr>`;
   const meter = (v, th) => { const w = 90; let s = `<svg width="${w}" height="12" style="vertical-align:-1px;margin-right:8px" aria-hidden="true"><rect x="0" y="3" width="${w}" height="6" rx="3" fill="var(--grid)"/><rect x="0" y="3" width="${Math.max(2, pc(v) / 100 * w)}" height="6" rx="3" fill="var(--s4)"/>`;
    if (th != null) s += `<line x1="${th / 100 * w - 0.75}" x2="${th / 100 * w - 0.75}" y1="0" y2="12" stroke="var(--ink)" stroke-width="1.5"/>`;
@@ -464,9 +464,9 @@ ${trend(t)}</div>`; }
    for (const t in AREAS) { const v = L.totals[t][p], q = P && P.totals[t][p];
     if (!v || !v[1]) { H += `<td class="c" style="color:var(--ink-3)">no such check</td>`; continue; }
     const d = q ? v[0] - q[0] : null;
-    H += `<td class="c">${meter(v, p === 1 ? D.threshold[t] : null)}${v[0]} of ${v[1]} · ${f(pc(v), 0)} %${d == null ? "" : `<span class="dl">${d > 0 ? "▲ " + d : d < 0 ? "▼ " + (-d) : "no change"}</span>`}</td>`; }
+    H += `<td class="c">${meter(v, (D.thresholds[t] || {})[p])}${v[0]} of ${v[1]} · ${f(pc(v), 0)} %${d == null ? "" : `<span class="dl">${d > 0 ? "▲ " + d : d < 0 ? "▼ " + (-d) : "no change"}</span>`}</td>`; }
    H += `</tr>`; }
-  H += `</table></div><p class="note">${Object.keys(AREAS).map(t => `${AREAS[t][0]}: ${L.unsolved[t]} of ${L.cases[t]} not solved by r2c and counted outside`).join(" · ")}. The mark on a priority 1 bar is the threshold. Held-out results are kept in totals only; no held-out case is shown anywhere.</p>`;
+  H += `</table></div><p class="note">${Object.keys(AREAS).map(t => `${AREAS[t][0]}: ${L.unsolved[t]} of ${L.cases[t]} not solved by r2c and counted outside`).join(" · ")}. The mark on a bar is the threshold of that priority. Held-out results are kept in totals only; no held-out case is shown anywhere.</p>`;
  }
  // ----- development cases outside target on the control curve
  const out = cases.filter(c => (c.curve_out || []).length && c.curve);

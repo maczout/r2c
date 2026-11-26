@@ -10,8 +10,8 @@
 3. docs/summary.md is the one page of the brief: its four parts, within the limits on
    length and on the number of items, and its totals block is what tools/heldout.py writes
    from heldout/totals.json.
-4. The held-out set is frozen and nothing of it per case is committed: the manifest parses
-   and is the one that was frozen, heldout/totals.json holds totals only, and no tracked
+4. The held-out set and the second one for the finish are frozen and nothing of them per
+   case is committed: each manifest parses and is the one that was frozen, heldout/totals.json holds totals only, and no tracked
    file is a capture, a result or a fixture of a held-out case.
 5. Each log in docs/log has the template's sections, among them whether the held-out rule
    was kept.
@@ -115,7 +115,22 @@ def check_heldout(say, tracked: list[str]) -> None:
         return
     man = json.loads(mp.read_text())
     cases = man["cases"]
-    bad = [c["name"] for c in cases
+    # the second set, for the finish: frozen the same way, and not scored
+    fp = heldout.FINISH_MANIFEST
+    finish = json.loads(fp.read_text()) if fp.exists() else None
+    if finish is None:
+        say("FAIL", "held-out: heldout/finish-manifest.json is missing (the second set, "
+                    "owner 2026-11-25: python tools/heldout.py build --set finish)")
+        return
+    if finish.get("frozen_sha256") != heldout.digest(finish["cases"]):
+        say("FAIL", "held-out: the cases in heldout/finish-manifest.json are not the ones "
+                    "that were frozen")
+        return
+    if {c["name"] for c in finish["cases"]} & {c["name"] for c in cases}:
+        say("FAIL", "held-out: a case is in both sets")
+        return
+    both = cases + finish["cases"]
+    bad = [c["name"] for c in both
            if not (re.fullmatch(r"[0-9a-f]{64}", c.get("input_sha256", "") or "0" * 64)
                    and re.fullmatch(r"[0-9a-f]{64}", c.get("capture_sha256", "")))]
     if bad:
@@ -123,9 +138,9 @@ def check_heldout(say, tracked: list[str]) -> None:
     if man.get("frozen_sha256") != heldout.digest(cases):
         say("FAIL", "held-out: the cases in heldout/manifest.json are not the ones that "
                     "were frozen (the set is not changed once built)")
-    names = {c["name"] for c in cases}
+    names = {c["name"] for c in both}
     leaked = [f for f in tracked
-              if Path(f).name.split(".")[0] in names and not f.startswith("heldout/manifest")]
+              if Path(f).name.split(".")[0] in names and not f.startswith("heldout/")]
     if leaked:
         say("FAIL", "held-out: per-case files are tracked: " + ", ".join(leaked[:5]))
     tp = ROOT / "heldout" / "totals.json"
@@ -148,6 +163,8 @@ def check_heldout(say, tracked: list[str]) -> None:
     if not (bad or leaked or named):
         say("ok", f"held-out: {len(cases)} cases, frozen {man.get('frozen')}, as frozen; "
                   f"totals only ({len(heldout.read_totals()['runs'])} run(s) recorded)")
+        say("ok", f"held-out, the second set for the finish: {len(finish['cases'])} cases, "
+                  f"frozen {finish.get('frozen')}, as frozen; not scored")
 
 
 def main(argv=None) -> int:

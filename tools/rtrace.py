@@ -18,7 +18,10 @@ drops a stage put in between, reads the values from the program's memory and let
 on. Nothing in the program or its folder is changed, and the capture it makes is the
 same as without (compare its stage count with the fixture's). With --steps every step of
 the solve of the global strains [B `004276a0`, after `004267c0`] is logged too: whether
-the step routine gave up, and the depth range with stiffness the step was taken on.
+the step routine gave up, and the depth range with stiffness the step was taken on; with
+--matrix as well, the section's 3 x 3 stiffness and the right-hand side the step routine
+was given [B `004267c0`, its arguments], to set beside r2c's at the same state
+(`python tools/trace.py --set debug=1 --set own_solve=1`).
 
 RECORD is the case's fixture or capture: its header gives the loading and settings, as
 for tools/capture.py. Needs r2x importable (PYTHONPATH=R2X/src), Wine, Xvfb and
@@ -56,6 +59,10 @@ SPEC = """\
 STEPS = """\
 00427aef S r:eax i:ebp-130 d:esi+14 d:[ebp-138]+148 d:[ebp-138]+150 d:edi d:edi+8 d:edi+10
 """
+# the step routine's arguments as it is entered [B 004267c0]: the 3 x 3 stiffness by value,
+# then the step and the right-hand side by address, a flag and the control variable
+MATRIX = ("004267c0 K " + " ".join(f"d:esp+{4 + 8 * i:x}" for i in range(9))
+          + " d:[esp+50] d:[esp+50]+8 d:[esp+50]+10 i:esp+54 i:esp+58\n")
 MODES = {0: "e0", 1: "phi", 2: "gam"}
 
 
@@ -119,14 +126,19 @@ def build(cache: Path) -> Path:
 
 def read(log: Path):
     """The tries of a log: a list of dicts, each with its passes and how it ended."""
-    tries, cur, steps = [], None, []
+    tries, cur, steps, k = [], None, [], None
     for line in Path(log).read_text().splitlines():
         f = line.split()
         if not f or f[0].startswith("#"):
             continue
-        if f[0] == "S":
+        if f[0] == "K":
+            k = dict(k=[float(x) for x in f[1:10]], rhs=[float(x) for x in f[10:13]],
+                     ci=int(f[14]))
+        elif f[0] == "S":
             steps.append(dict(ret=int(f[1]), it=int(f[2]), share=float(f[3]),
-                              zhi=float(f[4]), zlo=float(f[5])))
+                              zhi=float(f[4]), zlo=float(f[5]),
+                              e=[float(x) for x in f[6:9]], matrix=k))
+            k = None
         elif f[0] == "P":
             n, done, mode = int(f[1]), int(f[2]), MODES[int(f[3])]
             k = -1e3 if mode == "phi" else 1e3
@@ -190,6 +202,13 @@ def show(log: Path, passes: bool, first: int) -> int:
                     print(f"       pass {q['done'] + 1:2d}: solve {q['r']:2d}, load {q['lam']:.2f}, "
                           f"error {e} %, code {q['code']}, phi {q['phi']:.4f}, e0 {q['e0']:.4f}, "
                           f"gam {q['gam']:.4f}{note}")
+                    for x in s:
+                        if x.get("matrix"):
+                            m = x["matrix"]
+                            print("         step " + str(x["it"]) + ": K "
+                                  + " ".join(f"{v:.5g}" for v in m["k"]) + " | rhs "
+                                  + " ".join(f"{v:.5g}" for v in m["rhs"]) + " | after "
+                                  + " ".join(f"{v:.6g}" for v in x["e"]))
         kept += t["what"] == "kept"
     print(f"{kept} stages kept after the first, {len(tries)} tries")
     return 0
@@ -207,6 +226,8 @@ def main(argv=None) -> int:
     ap.add_argument("--prefix", help="Wine prefix (r2x's default if not given)")
     ap.add_argument("--out", help="where the log goes (outside the repository)")
     ap.add_argument("--steps", action="store_true", help="log every step of the solve too")
+    ap.add_argument("--matrix", action="store_true",
+                    help="with --steps: the 3 x 3 stiffness and right-hand side of every step")
     ap.add_argument("--show", metavar="LOG")
     ap.add_argument("--passes", action="store_true", help="with --show: every pass")
     ap.add_argument("--from", dest="first", type=int, default=0, help="first stage to print")
@@ -224,7 +245,8 @@ def main(argv=None) -> int:
     cache = Path.home() / ".cache" / "r2c"
     exe = build(cache)
     spec = out.with_suffix(".spec")
-    spec.write_text(SPEC + (STEPS if a.steps else ""))
+    spec.write_text(SPEC + (STEPS if a.steps else "")
+                    + (MATRIX if a.steps and a.matrix else ""))
     worker = [sys.executable, str(Path(__file__).resolve()), "--shim"]
     if a.prefix:
         worker += ["--prefix", a.prefix]

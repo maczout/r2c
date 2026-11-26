@@ -1367,15 +1367,14 @@ class Flexure:
         if self.on_stage:
             self.on_stage(len(self.stages))
 
-    # Written and off (docs/kernel.md, "Closing in on first cracking"): close in on the
-    # extreme fibre reaching its peak strain by the binary's share, 0.5 % of the way come,
-    # with no count of tries [B 00419ff0]. Measured after the held-out score of increment 4
-    # and left off so that the kernel stays the one that was scored.
-    crush_by_share = False
-    # Written and off: the cracks closing between two stages is an event too, closed in on
+    # docs/kernel.md, "Closing in on first cracking": close in on the extreme fibre
+    # reaching its peak strain by the binary's share, 0.5 % of the way come, with no count
+    # of tries [B 00419ff0]. A switch: off gives the 14 tries of increment 4.
+    crush_by_share = True
+    # A switch as well: the cracks closing between two stages is an event too, closed in on
     # with a stage at 0.8 of the gap [B 00415e30, 0041a870, 00419ff0; O: the I-girder
     # under moment]
-    cracks_closing = False
+    cracks_closing = True
 
     def advance(self, cur: Stage, target: float, depth: int,
                 aside: Stage | None = None) -> Stage:
@@ -1396,6 +1395,8 @@ class Flexure:
             # is kept and the stepping goes on from it; so is the last one tried.
             first = self.stages[0].control
             step = target - cur.control
+            if self.rupture_halving:
+                return self._close_in_on_rupture(cur, trial, first)
             while abs(step) >= 1e-10 and abs(step) > 0.01 * abs(trial.control - first):
                 step *= 0.2
                 try:
@@ -1448,6 +1449,79 @@ class Flexure:
         self.accept(trial)
         return trial
 
+    # Written and off (docs/kernel.md, "Bar rupture within a step"; increment 5, after the
+    # held-out score): the step multiplier and the base step of Response's stage control,
+    # without shear [B 0041a870, 00418860, as Shear.run has them; O: its own tries on four
+    # cases without shear, read from the running program]. A try that cannot be solved (a
+    # next stage, or the stage a fifth of the way to a rupture) is followed by the
+    # fall-back tries of _fallback_targets; a stage tried on the way to a rupture that is
+    # itself ruptured is the stage set aside from then on; the next stage is the
+    # multiplier times the base step on, the base step a tenth of the farthest target
+    # solved so far, from the fifth stage on; a stage kept at the first try doubles a
+    # multiplier under a quarter. Where Response's fall-back is not written (the change of
+    # control variable) r2c's own is used, as with the switch off.
+    rupture_halving = False
+    mult = 1.0               # the step multiplier, halved by a failed try (with the switch)
+    retried = False          # a try has failed since the last stage kept (with the switch)
+    base = 0.0               # the base step, as it has grown (with the switch)
+
+    def _fallback_targets(self, cur: Stage, failed: float):
+        """The targets Response tries one after another when a try from stage cur has
+        failed at target `failed` [B 0041a870, as Shear.run has it; O: its own tries on
+        four cases without shear]. While the last kept step is shorter than the step
+        tried: half the multiplier, and half the last kept step on. Otherwise, after a
+        first failure: half the multiplier again, and back from the failed target by the
+        multiplier times the base step. A retry grows the base step from its own target.
+        It stops where Response does something that is not written here: a change of
+        control variable (a failure with the multiplier under 0.2), or half a step
+        further on (a whole step refused that is no longer than the last kept one)."""
+        k = len(self.stages) - 1
+        if k < 1:
+            return
+        gap = cur.control - self.stages[k - 1].control
+        while self.mult >= 0.2:
+            if abs(gap) < abs(self.mult * self.base) and self.mult < 1.01:
+                t = cur.control + 0.5 * gap
+                self.mult *= 0.5
+            elif self.mult == 1.0:
+                return
+            else:
+                self.mult *= 0.5
+                t = failed - self.sign * self.mult * self.base
+            self.retried = True
+            if len(self.stages) >= 5:
+                self.base = max(self.base, 0.1 * abs(t))
+            yield t
+            failed = t
+
+    def _close_in_on_rupture(self, cur: Stage, trial: Stage, first: float) -> Stage:
+        """Close in on a rupture between cur and the stage set aside (trial), as Response's
+        stage control does it [B 00415e30, 00419ff0; O]. Returns the stage kept."""
+        for _ in range(60):
+            step = trial.control - cur.control
+            if abs(step) < 1e-10 or abs(step) <= 0.01 * abs(trial.control - first):
+                break                       # close enough: the stage set aside is kept
+            try:
+                sub = self.solve(cur.control + 0.2 * step, cur)
+            except SolveError:
+                # the try fails: the fall-back of the stage control
+                sub = None
+                for t in self._fallback_targets(cur, cur.control + 0.2 * step):
+                    try:
+                        sub = self.solve(t, cur)
+                        break
+                    except SolveError:
+                        continue
+                if sub is None:
+                    break
+            if self.has_event(cur, sub) != "rupture":
+                self.accept(sub)            # short of the rupture: kept, and on from it
+                return sub
+            trial = sub                     # ruptured: the stage set aside from now on
+        trial.tried_event = "rupture"
+        self.accept(trial)
+        return trial
+
     def run(self, max_stages=400) -> list[Stage]:
         st0 = self.initial()
         self.accept(st0)
@@ -1458,14 +1532,30 @@ class Flexure:
         sgn = self.sign
         d0 = self.step0
         cur = st0
+        self.mult, self.base, self.retried = 1.0, d0, False
         try:
             cur = self.advance(cur, c0 + sgn * d0 / 6.0, 2)
             target = c0 + sgn * 7.0 * d0 / 6.0
             peak = 0.0
             while len(self.stages) < max_stages:
+                failed = False
                 try:
                     cur = self.advance(cur, target, 0)
                 except SolveError:
+                    failed = True
+                retried = False
+                if failed and self.rupture_halving:
+                    # Response's fall-back (where it is not written, r2c's own below)
+                    cur = self.stages[-1]
+                    for t in self._fallback_targets(cur, target):
+                        try:
+                            cur = self.advance(cur, t, 0)
+                            retried = True
+                            target = t
+                            break
+                        except SolveError:
+                            continue
+                if failed and not retried:
                     # try to get part of the way before giving up
                     done = False
                     t = target
@@ -1501,7 +1591,19 @@ class Flexure:
                 if self.spent(cur, peak):
                     break
                 # the next step is sized by the target just tried, from the stage reached
-                target = cur.control + sgn * max(d0, 0.1 * abs(target))
+                if self.rupture_halving:
+                    # a stage kept at the first try doubles a multiplier under a quarter
+                    # [B 0041a870, as Shear.run has it]
+                    if not self.retried and self.mult < 0.25:
+                        self.mult *= 2.0
+                    self.retried = False
+                    # the base step grows from the fifth stage on and does not shrink
+                    # [B 00418860, docs/kernel.md "When the base step grows"]
+                    if len(self.stages) >= 5:
+                        self.base = max(self.base, 0.1 * abs(target))
+                    target = cur.control + sgn * self.mult * self.base
+                else:
+                    target = cur.control + sgn * max(d0, 0.1 * abs(target))
         except SolveError:
             pass
         return self.stages[:max_stages]

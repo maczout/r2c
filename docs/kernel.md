@@ -847,18 +847,16 @@ development cases without shear: those whose first 25 stages are at Response's c
 values went from 72 to 87, the first 40 from 68 to 81 [`python tools/stagesat.py`]. The
 closing in on the extreme fibre reaching its peak strain is as it was (14 tries, 3 on a
 stage put in between), and Response closes in further on some cases (Newbeam under axial
-load and moment: 3.608, 3.622, 3.633 against r2c's 3.608) [O]. **Written and off**
+load and moment: 3.608, 3.622, 3.633 against r2c's 3.608) [O]. **On since increment 5**
 (`Flexure.crush_by_share`): the binary's own test [B `00419ff0`, as read on 2026-11-21]
 closes in while the step to the stage set aside is more than a share of the way that
 stage has come from the first one: 0.02 for cracking and for cracks closing, 0.005 for
 the extreme fibre's peak strain, 0.01 for a rupture, and no count of tries. With the
 switch on, of the 104 development cases without shear those whose first 60 stages are at
 Response's control values go from 41 to 96 (first 40: 90 to 97; first 25: 96 to 98), and
-no check changes side [measured, 2026-11-25, `python tools/stagesat.py`]. It was measured
-after the held-out set had been scored for increment 4 and is left off so that the kernel
-is the one that was scored: with it off r2c's records of those 104 cases are byte for byte
-the run of record's. Turning it on is the first thing for the next increment. **Also written and off**
-(`Flexure.cracks_closing`): the cracks closing between two stages (the stage before
+no check changes side [measured, 2026-11-25, `python tools/stagesat.py`]. It was written
+after the held-out set had been scored for increment 4 and stayed off until increment 5.
+**Also on since increment 5** (`Flexure.cracks_closing`): the cracks closing between two stages (the stage before
 cracked, this one not) is an event in the binary too [B `00415e30`, event code 2], closed
 in on with a stage at 0.8 of the gap and not 0.2 [B `0041a870`], while the gap is more
 than 0.02 of the way come. On the I-girder under moment, whose top is cracked by the
@@ -893,6 +891,70 @@ stages are Response's (curvatures 52.25 and 58.02 rad/km, 16.7 and 16.5 kNm); po
 20.3 to 0.0 %. Not right yet for a section with several layers of strand: on the parked
 I-girder under M the response ended as Response's does before this change and does not
 now [O, one run of the parked cases, 2026-11-22; not looked into].
+
+**When the stage a fifth of the way to the rupture cannot be solved: written and off**
+(`Flexure.rupture_halving`, increment 5, after the held-out score) [O: Response's own
+tries, `python tools/rtrace.py`, which reads a case without shear as well; B `00415e30`,
+`00419ff0` for the closing in]. On Newbeam with 500 mm² of bottom steel under moment the
+stage at 95.236 rad/km is ruptured and set aside; the stage a fifth of the way to it,
+88.310, is not solved by Response's solve (nor by r2c's copy of it). Response then
+
+* halves its step multiplier, which stays halved for the rest of the response;
+* tries a stage half the last kept step on (86.578 + ½ · 7.871 = 90.514): ruptured, so
+  it is the stage set aside from then on, and a fifth of the way to it (87.365) is solved
+  short of the rupture and kept;
+* goes on by the multiplier times the base step, the base step being a tenth of the
+  farthest target tried so far (87.365 + ½ · 9.524 = 92.127: ruptured; a fifth of the way,
+  88.318, not solved; the multiplier a quarter; half the last kept step on, 87.759, kept;
+  then 87.759 + ¼ · 9.524 = 90.140: ruptured; a fifth of the way, 88.235, solved and
+  ruptured, and within 1 % of the way come, so it is kept; then 88.235 + ¼ · 9.524 =
+  90.616, kept, and the end test ends the response).
+
+r2c without the switch tries a twenty-fifth of the way after the fifth fails, keeps that
+stage and steps on by a tenth of the target as before; it reaches the rupture a stage
+later and goes on for seven stages after it.
+
+These are the fall-back rules of the stage control as r2c's driver with shear already has
+them from the binary [B `0041a870`, `00418860`; `Shear.run`], and the switch gives them to
+the stepping without shear (`Flexure._fallback_targets`, `Flexure.run`): after a failed
+try, while the last kept step is shorter than the step tried, the multiplier is halved
+and half the last kept step is tried; after a second failure the multiplier is halved
+again and the try is back from the failed target by the multiplier times the base step;
+a retry grows the base step from its own target; a stage kept at the first try doubles a
+multiplier under a quarter; the base step is a tenth of the farthest target solved so
+far, from the fifth stage on, and does not shrink. Not written: the change of control
+variable after a failure with the multiplier under 0.2, and the half step further on
+after a whole step is refused; there r2c's own fall-back is used, as with the switch off.
+Checked against Response's own tries on four cases (`python tools/rtrace.py`): on the Cm4
+sample under negative moment, with two bar ruptures, every one of its last twenty tries
+follows from these rules, and with the switch on r2c's last nine stages are Response's
+within 0.002 rad/km; Newbeam with 500 mm² has Response's 73 stages to the printed digit;
+the I-girder under axial tension has Response's first 50 stages (its three first steps of
+0.1 rad/km) and ends where Response ends. On the 104 development cases without shear
+with it on (`tools/verify.py`, `tools/changes.py`): three checks come inside (the endings
+of Newbeam with 500 mm² and of the I-girder under axial tension, 20.6 and 66.8 % to 0.0
+and 0.1 %; the I-girder's principal tensile stress at its last stage, 8.8 to 0.9 %) and
+none goes outside; priority 2 inside on 101 against 99. Off because the held-out set had
+been scored: with it off the records are the run of record's. Turning it on is the first
+thing for the next increment.
+
+**Two of those traces in full, and what is not written** [O, `python tools/rtrace.py`,
+increment 5]. *The prestressed I-girder under 500 kN of axial tension
+and moment*: the section is cracked from the start and the first three steps are 0.1
+rad/km each (−7.28, −7.18, −7.08, −6.98), after which the base step is a tenth of the
+target (0.698). At the end the solve fails at 35.207 rad/km; the multiplier halves and a
+stage is kept (34.260), fails and halves again (34.624 kept at 0.125), fails once more;
+with the multiplier under 0.2 the control variable changes to the centroid's strain,
+where seven tries fail in a row as the multiplier halves to 0.016, one stage is kept, two
+more fail and the response ends with the multiplier at 0.008. So the stage control with
+shear ("Response's own load stage control") is the one at work without shear, fall-backs
+and all. *The Cm4 sample under 500 kN of axial compression and moment*: the load falls
+between 35.229 and 39.049 rad/km. Response closes in on it (35.993, then 35.381, both
+after the fall), and then goes toward the stage set aside at 39.049 a fifth of what is
+left at a time, thirteen stages, before it takes that stage and steps on: an event of the
+kind closed in on to 0.5 % still lies between each of them and the stage set aside. r2c
+takes the stage set aside straight after the first closing in; its mark for the extreme
+fibre at its peak strain is one flag for the section, set once.
 
 The control variable's value at the initial stage is the curvature or the centroid's strain
 there. More Detail adds a stage between every two up to the peak, among the stages found in
@@ -1215,13 +1277,63 @@ not change what happens on the I-girder at M/V = 1 m. Not used. (Those figures a
 solve with whole steps throughout; with the step factor, read in step A-1c, they are in
 "The shear strain profile between passes".)
 
+**Measured again in increment 5 (2026-11-25), with the stiffness itself read from the
+running program** (`python tools/rtrace.py --steps --matrix`: the 3 × 3 stiffness and the
+unbalanced loads the step routine `004267c0` is given; `python tools/stiff.py` sets r2c's
+beside them, try by try and pass by pass) [O]. On Newbeam at M/V = 1 m, the T-beam at 4 m
+and −1 m, and the I-girder at 3 m (two concretes):
+
+* r2c's stiffness is Response's within 3 % in every term on all but a handful of steps,
+  and to four or five digits on the first steps of a stage. What differs from the first
+  uncracked stage on is small and steady: the four terms that couple the shear strain
+  with the axial load and the moment are about 1 % apart (−38306 against −37891 N per
+  unit shear strain on Newbeam's second pass). Not found: the node's routine `0046b940`
+  was set against r2c's term by term once more, and its two extra arguments are passed
+  as nothing by `00427cd0`; the stirrups' share of the transverse stiffness was tried
+  and changes nothing there.
+* With r2c's copy of the solve on, the two programs' passes agree to five or six digits
+  in load through the first cracked stages, and the solve gives up where Response's does:
+  on the I-girder at 3 m both fail the try at 4.83 rad/km in the same oscillation of the
+  shear strain (6.6, 8.9, 6.1, 9.6, 6.0, 9.9 mm/m …; the stiffness against the shear
+  strain is about half the slope the unbalanced shear shows, so a whole step overshoots).
+* What is left after that is how many steps a solve takes before it stops (one more or
+  one fewer, in about a pass in ten, the unbalanced loads being a few hundred newtons
+  either side of the tolerance) and, through it, on which side of 1 % or 3 % a profile
+  error falls.
+
+On the 60 development cases with shear, with the solve and the parabolic reading of the
+profile error on (`tools/verify.py`, against the run with both off): priority 1 inside on
+54 as before (one in, one out), priority 2 on 24 against 22, priority 3 on 49 against 47,
+priority 4 on 35 against 36; about 2.4 times the running time. Of the 15 cases where r2c
+carries on past Response's last stage (the owner's override), 11 still do; on four r2c
+then ends as Response does (Newbeam with 50 MPa concrete at 2 m: its peak is Response's,
+where it was 10 % above). **Left off for that reason**: it changes what the override
+keeps, which is the owner's to say (`docs/summary.md` after increment 5). The state code
+acted on at every pass (`Shear.pass_code`) on top of it changes one check.
+
 
 **Accepting a stage.** A stage is worked on in passes: solve the global strains for the
 loads at the control value with the shear strain profile as it is; update the profile from
 the calculated shear stress; measure the profile error. The error is the standard deviation,
 over 50 points of the depth, of the difference between the calculated shear stress and the
 shear stress of the state, over the mean calculated shear stress (taken as 0.9 % where the
-shear is negligible). After each pass:
+shear is negligible). Both stresses are read at a point from the parabola through the
+three nodes of the layer the point is in (top, middle, bottom), the first layer from the top
+that holds it [B `00420f20`: 50 points from the bottom face to the top; the state's stress by
+`00427180`, the calculated one by the table reader `004b6df0`, which falls back on a straight
+line only outside the table]. r2c reads both by straight lines between nodes; the
+program's reading is **written and off** (`Shear.parabolic_error`, increment 5), because it
+was checked, and belongs, with Response's own solve (`Shear.own_solve`, "The global solve
+with shear" below). Measured with both on, on Newbeam at M/V = 1 m against the running program
+(`python tools/rtrace.py`, `python tools/trace.py --set debug=1 --set own_solve=1`): at the
+six passes of the first cracked stage Response's error is 23.2061, 11.3877, 5.6557, 2.5267,
+1.4096, 0.6438 %; r2c's with straight lines is 23.28, 11.42, 5.66, 2.54, 1.38, 0.62 % and
+with the parabola 23.2057, 11.3875, 5.6557, 2.5266, 1.4097, 0.6439 %, at loads equal to six
+digits. On the uncracked stages before it r2c's error is 0.2 % of itself under Response's
+(5.1781 against 5.1887 %), which is a few millionths of the stress: not found. With the
+parabola alone on the 60 development cases with shear two cases go outside (priority 1 and
+2: shear alone under axial compression, where a stage that does not settle falls the other
+way) and none comes inside [measured, `python tools/verify.py`]. After each pass:
 
 * converged below 1 %: the stage is accepted;
 * else another pass, up to 16; with the error above 10 after four passes the profile is

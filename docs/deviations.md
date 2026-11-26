@@ -31,13 +31,21 @@ measured on the development results (`docs/verification-results.md`) unless mark
   its next stage is kept far from converged at well under the peak with the stirrups past
   their rupture strain, and the response ends there. r2c finds the cracked states and
   climbs past Response's peak. It is the override's kind, but Response's last stage is
-  the collapsed one, so the comparison up to Response's last stage does not apply; put to
-  the owner.
+  the collapsed one, so the comparison up to Response's last stage does not apply. The
+  owner's decision (2026-11-25): it stays outside and nothing is changed for it.
 - **With shear, where a load stage does not settle, the two programs try different
   states.** Near a flat peak Response and r2c each keep a state that the other does not
   reach, so the shear-related views there differ by up to several times the target while
   peak and rising branch agree. About eleven development cases. Put into Response's own
   state, r2c gives Response's views on most of them, so it is the path and not the rules.
+  Response does not hold to these states itself: with every concrete strength raised by
+  a twentieth of a per cent, Response compared with Response is outside on the
+  shear-related views of about a quarter of the development cases with shear, and with a
+  two-hundredth of a per cent on about one in seven (measured, `tools/noise.py`).
+  Response's own solve of a stage, which gives up where r2c's finds a state, is written
+  in r2c and off; with it on r2c follows more of Response's tries and four of the cases
+  under the override above end as Response's do. Whether to turn it on is put to the
+  owner.
 - **How a response with shear ends.** r2c's last stages and Response's differ on about two
   in five shear cases, now that a case where Response's solve gives up is compared up to
   Response's last stage. This is the lowest priority and has not been worked on.
@@ -45,13 +53,14 @@ measured on the development results (`docs/verification-results.md`) unless mark
   prestressed I-girder under axial tension and moment Response's tries run out at the
   strands' rupture and its response ends at the peak; r2c finds the state after the
   rupture and goes on, so the shapes differ. On Newbeam with very light steel Response
-  ends two stages after the rupture and r2c several stages later.
-- **Where Response puts its stages without shear**, three places where r2c does not
-  follow it: it closes in further on the extreme fibre reaching its peak strain on some
-  cases; it closes in where the cracks close on the I-girder under moment; it takes three
-  small first steps where the section is cracked from the start. The curves agree; the
-  stages are not the same ones. The first two are written and switched off
-  (`docs/kernel.md`), to be turned on at the start of the next increment.
+  ends two stages after the rupture and r2c several stages later; the rule for that one
+  is written and switched off (`docs/kernel.md`), to be turned on at the start of the
+  next increment.
+- **Where Response puts its stages without shear**, a few places where r2c does not
+  follow it: three small first steps where the section is cracked from the start (the
+  I-girder under axial tension); what More Detail at its most puts in at the start; the
+  steps just before light steel ruptures, which Response halves. The curves agree; the
+  stages are not the same ones.
 - **A fall of load at cracking that sits on the edge of what the measure counts.** Under
   shear alone, and on Newbeam in US units, both programs show the fall; in one it is just
   under 2 % of the peak and in the other just over, so the shapes read as different (1.99

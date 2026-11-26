@@ -66,6 +66,10 @@ tuned against. It is frozen; its recipe and hashes are committed (`heldout/manif
   cannot be scored is counted as outside, not dropped.
 - **Nothing per-case is committed or published**: only `heldout/totals.json` and what is
   made from it.
+- **The second set, for the finish** (`heldout/finish-manifest.json`; owner, 2026-11-25):
+  about 20 more cases, frozen the same way in an archive of its own. It is not scored in
+  any way until the finishing steps: `tools/heldout.py score` refuses it, r2c is not run
+  on its inputs, its captures are not opened. Everything above holds for it too.
 - **Each log says whether the rule was kept**, since it rests on instruction.
 - **Floor:** a fall in any area's total is reported to the owner in the summary, even if
   the overall total rises.
@@ -119,7 +123,10 @@ summary.
 - an area's held-out total falls, and it cannot be recovered in the same increment;
 - you want a new override, or a change to a measure or the tolerance;
 - you judge that the solution threshold is reached, or that the approach has plateaued (two
-  increments in a row with no gain in any area's held-out total).
+  increments in a row with no gain in any area's held-out total). The threshold (owner,
+  2026-11-25), on the held-out set, without shear / with: priority 1, 99 % / 99 %;
+  priority 2, 95 % / 60 %; priority 3, 95 % / 85 %; priority 4 is reported only. When it
+  is reached, ask before starting the finishing steps.
 
 Asking means: say it under "Needed from the owner" in `docs/summary.md` and in the pull
 request, with a suggested answer, stop that line of work, and carry on with something
@@ -136,7 +143,7 @@ else. Everything else, decide and note in the log.
 | The measures and the targets | `docs/measures.md` |
 | What is in scope | `docs/scope.md` |
 | Each kernel rule and its source | `docs/kernel.md` |
-| The held-out set: recipe, hashes, totals | `heldout/`, `tools/heldout.py` |
+| The held-out set and the second one for the finish: recipe, hashes, totals | `heldout/`, `tools/heldout.py` |
 | Interface parity with r2x | `tools/parity.py` |
 | Development results against Response (generated) | `docs/verification-results.md`, https://maczout.github.io/r2c/ |
 | What happened in each increment | `docs/log/` |
