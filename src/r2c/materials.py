@@ -27,6 +27,10 @@ SOFTEN_STRAIN = (1, 9, 11, 14, 15)
 SOFTEN_PLATEAU = (3,)
 
 NOVAL = float("nan")   # a bar past rupture
+# The concrete's stiffness as the program's set-up works it out [B 004ac190], docs/kernel.md
+# "The concrete's stiffness": written in increment 7 and off (the secant itself, as before),
+# since on the development set it sends one I-girder with shear outside and brings none in
+OWN_MODULUS = False
 
 
 def auto_ft(fcp: float) -> float:
@@ -77,9 +81,15 @@ class ConcreteLaw:
             a = (70.0 - self.fcp) * a / 10.0 if self.fcp <= 70.0 else 0.0
         self.agg = min(a, 25.0)
         # initial stiffness: the secant at 0.1 mm/m of compression, as Response takes it
+        # [B 004ac190]: the factored stress there over the material factor plus one
+        # millionth, over the strain. So the stiffness in tension is a millionth under the
+        # compression curve's own secant (unfactored; phi is applied to stresses)
         e = np.array([-1e-4])
         s, _ = self._compression(e, np.zeros(1))
-        self.Ec = float(s[0] / e[0]) / self.phi      # unfactored; phi is applied to stresses
+        if OWN_MODULUS:
+            self.Ec = float(s[0]) / (self.phi + 1e-6) / float(e[0])
+        else:
+            self.Ec = float(s[0] / e[0]) / self.phi
         self.ecr = self.ft / (self.Ec + 1e-6)
         self.coef = {TS_VC82: 200.0, TS_CM87: 500.0}.get(self.t_stiff, 0.0)
 
@@ -309,6 +319,11 @@ class ConcreteLaw:
     def stress(self, e: np.ndarray, eo: np.ndarray, ft_eff: np.ndarray, m: np.ndarray):
         """Principal stress for strain e with the other principal strain eo: (stress, f2max)."""
         tens = e >= -1e-9
+        # all in tension, or all in compression: the same numbers without sorting them
+        if tens.all():
+            return self.tension(e, ft_eff, m), np.full_like(e, -self.fcp * self.phi)
+        if not tens.any():
+            return self._compression(e, eo)
         s = np.empty_like(e)
         fmax = np.full_like(e, -self.fcp * self.phi)
         if tens.any():

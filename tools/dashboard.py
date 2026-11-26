@@ -11,7 +11,9 @@ The front page (owner, 2026-11-24) is a snapshot of accuracy, in this order:
 
 1. priority 1 on the held-out set for each area, against the solution threshold, with its
    trend across the recorded scorings (heldout/totals.json; totals only, nothing per case);
-2. the latest held-out totals, priority by area;
+2. the latest held-out totals, priority by area; then, since the owner made speed part of
+   the threshold (2026-11-26), r2c's time beside r2x's on the development cases
+   (tests/oracle/r2x-times.json), by area and by what r2x reads;
 3. the control curves of the development cases that are outside target on a check of the
    control curve (peak, rising branch, shape, ending), worst first: by the highest priority
    missed (docs/measures.md, "Checks by priority"), then by how many times over the target
@@ -298,8 +300,33 @@ def build(run: dict, results: dict, acc: dict, curves_dir: Path | None, ref_dir:
             "heldout": heldout_runs(), "threshold": heldout.THRESHOLD, "thresholds": heldout.THRESHOLDS,
             "repeat": (heldout.read_repeat() or {}).get("totals", {}),
             "repeat_by": heldout.REPEAT_BY, "margin": heldout.MARGIN,
+            "speed": speed(results),
             "tiers": [dict(n, tier=report.TIERS[t])
                       for t, n in report.tier_counts(ran, acc).items() if n["checks"]]}
+
+
+def speed(results: dict) -> list[dict]:
+    """r2c's seconds on each development case beside r2x's on the same input (owner,
+    2026-11-26; tests/oracle/r2x-times.json, tools/r2xtimes.py): by area and by what r2x
+    reads, the cases where r2c takes no longer, the two medians and the largest ratio."""
+    import statistics as st
+    p = ROOT / "tests" / "oracle" / "r2x-times.json"
+    if not p.exists():
+        return []
+    times = json.loads(p.read_text())["cases"]
+    rows = []
+    for g, title in (("flexure", "Without shear"), ("shear", "With shear")):
+        for reading, what in (("all", "every stage"), ("peak", "the peak stage alone")):
+            pairs = [(r["seconds"], times[n][reading]) for n, r in results.items()
+                     if "seconds" in r and reading in times.get(n, {})
+                     and "ref" in r and report.group(r["ref"]) == g]
+            if pairs:
+                rows.append({"area": title, "reads": what, "of": len(pairs),
+                             "within": sum(1 for a, b in pairs if a <= b),
+                             "r2c": round(st.median(a for a, _ in pairs), 1),
+                             "r2x": round(st.median(b for _, b in pairs), 1),
+                             "worst": round(max(a / b for a, b in pairs), 1)})
+    return rows
 
 
 # ---------------------------------------------------------------- page
@@ -447,7 +474,7 @@ function front() {
  if (!runs.length) { H += `<div class="warn">No held-out totals are recorded yet.</div>`; }
  else {
   const L = runs[runs.length - 1], P = runs.length > 1 ? runs[runs.length - 2] : null;
-  H += `<p class="sub">Judged on the held-out set: ${Object.values(L.cases).reduce((a, b) => a + b, 0)} sections and loadings the developer has not tuned against, frozen, compared with Response-2000 within ±5 %. Below: the cases inside target on every priority 1 check (peak, rising branch and shape of the control curve; the stress-state views without shear), against the threshold, at each scoring. The threshold (owner, 2026-11-25) is Response-2000's own score against itself on the same inputs, less ${D.margin} points: Response with every concrete strength raised by ${D.repeat_by} %, compared with Response as it is by the same measure. Latest: ${esc(L.label)}, ${esc(L.date)}.</p><div class="heroes">`;
+  H += `<p class="sub">Judged on the held-out set: ${Object.values(L.cases).reduce((a, b) => a + b, 0)} sections and loadings the developer has not tuned against, frozen, compared with Response-2000 within ±5 %. Below: the cases inside target on every priority 1 check (peak, rising branch and shape of the control curve; the stress-state views without shear), against the threshold, at each scoring. The threshold (owner, 2026-11-25) is Response-2000's own score against itself on the same inputs, less ${D.margin} points: Response with every concrete strength raised by ${D.repeat_by} %, compared with Response as it is by the same measure; without shear the owner keeps 99 % (2026-11-26). Latest: ${esc(L.label)}, ${esc(L.date)}.</p><div class="heroes">`;
   for (const t in AREAS) { const v = L.totals[t][1], n = need(t, v[1]), met = pc(v) >= D.threshold[t];
    H += `<div class="hero"><div class="k"><b>${AREAS[t][0]}</b> · ${AREAS[t][1]} · priority 1, held-out</div>
 <div class="v">${f(pc(v), 0)} %<small>${v[0]} of ${v[1]} cases inside target</small></div>
@@ -472,6 +499,13 @@ ${trend(t)}</div>`; }
     H += `<td class="c">${meter(v, (D.thresholds[t] || {})[p])}${v[0]} of ${v[1]} · ${f(pc(v), 0)} %${d == null ? "" : `<span class="dl">${d > 0 ? "▲ " + d : d < 0 ? "▼ " + (-d) : "no change"}</span>`}${own(t, p, v)}</td>`; }
    H += `</tr>`; }
   H += `</table></div><p class="note">${Object.keys(AREAS).map(t => `${AREAS[t][0]}: ${L.unsolved[t]} of ${L.cases[t]} not solved by r2c and counted outside`).join(" · ")}. The mark on a bar is the threshold of that priority. Held-out results are kept in totals only; no held-out case is shown anywhere.</p>`;
+ }
+ if ((D.speed || []).length) {
+  H += `<h2>Speed: r2c against r2x on the same input</h2>
+<p class="sub">Part of the threshold since 2026-11-26: on every case r2c takes no longer than r2x. <b>Development cases</b> (the held-out set keeps nothing per case), both programs timed on the same machine: r2c's solve, and r2x's whole command, either reading the detail views of every stage (as the comparison here is made) or the peak stage alone (r2x's default; which of the two is meant is with the owner).</p>
+<div class="scroll"><table class="pa"><tr><th>Cases</th><th>r2x reads</th><th>r2c no slower</th><th>r2c, median</th><th>r2x, median</th><th>Slowest case</th></tr>`;
+  for (const r of D.speed) H += `<tr><td>${esc(r.area)}</td><td>${esc(r.reads)}</td><td class="c">${r.within} of ${r.of} · ${f(100 * r.within / r.of, 0)} %</td><td class="c">${f(r.r2c, 1)} s</td><td class="c">${f(r.r2x, 1)} s</td><td class="c">${f(r.worst, 1)} times r2x's</td></tr>`;
+  H += `</table></div>`;
  }
  // ----- development cases outside target on the control curve
  const out = cases.filter(c => (c.curve_out || []).length && c.curve);

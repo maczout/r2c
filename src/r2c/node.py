@@ -19,6 +19,15 @@ BIG = 1e9
 
 
 @dataclass
+class LeanOut:
+    """The fields of NodeOut that the splitting of the layers reads."""
+    f1: np.ndarray
+    f2: np.ndarray
+    e1: np.ndarray
+    ecr: np.ndarray
+
+
+@dataclass
 class NodeOut:
     fcx: np.ndarray
     fcy: np.ndarray
@@ -165,3 +174,72 @@ def evaluate(law: ConcreteLaw, ex, ey, gxy, m, ft_eff, smx, smy, f1cx, f1cy) -> 
     f1crack = np.abs(vci) / t + f1
     return NodeOut(fcx, fcy, v, f1, f2, f2max, e1, e2, theta, w, sdiag, vci, vcimax, f1lim,
                    cracked, f1crack, t, floor, gov, f1draw, ecr0)
+
+
+def lean_state(law: ConcreteLaw, ex, ey, gxy, m, ft_eff, smx, smy, f1cx, f1cy):
+    """(f1, f2, e1, ecr, tan) of evaluate(...), by the same operations in the same order and
+    so the same bits, without the fields that neither the transverse solve's passes nor
+    the splitting of the layers read (crack width and spacing, the shear on the crack,
+    what governs, the limits drawn). Every argument an array of the nodes' length. Held
+    to evaluate by tests/test_speed.py and tools/shadow.py."""
+    phi = law.phi
+    ang = np.arctan2(gxy, ex - ey)
+    theta = np.pi / 2 - 0.5 * ang
+    t = np.tan(theta)
+    big = np.abs(t) > TMAX
+    t = np.where(big, np.sign(t) * TMAX, t)
+    small = np.abs(t) < 1e-6
+    t = np.where(small, np.where(t < 0, -1e-6, 1e-6), t)
+    rad = np.sqrt((ex - ey) ** 2 + gxy ** 2)
+    avg = 0.5 * (ex + ey)
+    e1 = avg + 0.5 * rad
+    e2 = avg - 0.5 * rad
+
+    f1, _ = law.stress(e1, e2, ft_eff, m)
+    f2, f2max = law.stress(e2, e1, ft_eff, m)
+
+    ecr0 = law.crack_strain(ft_eff)
+    f1lim = np.maximum(law.ft, ft_eff) * phi
+    red = np.clip(1.05 - f2 / (f2max - 1e-6), 0.05, 1.0)
+    red = np.where(np.abs(e2) > abs(law.e0), 0.05, red)
+    ecr = ecr0 * red
+    f1lim = f1lim * red
+    f1 = np.minimum(f1, f1lim)
+    k = e1 > ecr
+    if k.any():
+        s = np.sin(theta)
+        c = np.cos(theta)
+        s2 = s * s
+        c2 = 1.0 - s2
+        tk, sk, ck, s2k, c2k = t[k], s[k], c[k], s2[k], c2[k]
+        sd = 1.0 / (np.abs(ck) / smy[k] + np.abs(sk) / smx[k])
+        wk = (e1[k] - ecr[k]) * sd
+        agg = 0.31 + 24.0 * wk / (law.agg + 16.0)
+        vmax = 0.18 * np.sqrt(law.fcp) / agg * phi
+        fl = law.Ec * ecr[k] / (1.0 + 250.0 * wk) * phi
+        fk = f1[k]
+        cx, cy = f1cx[k], f1cy[k]
+        if law.t_stiff == TS_BENTZ:
+            q = 0.25 * law.ft / agg * phi
+            a = np.minimum(np.abs(q / tk), f1lim[k]) * law.tsfactor
+            b = 0.85 * law.ft * phi * np.abs(tk) + cy + fl
+            lb = np.minimum(0.5 * cx, np.minimum(b, a) * law.tsfactor)
+            fk = np.maximum(fk, lb)
+        f1b = cx * s2k + cy * c2k
+        d = np.abs(cx - cy) * sk * ck
+        sg = np.sign(d)
+        vv = np.minimum(np.abs(d), vmax)
+        f1c = sg * vv / tk + cx
+        f1d = np.where(np.abs(tk) >= TMAX, 2.0 * fk, vv * sg * tk + cy)
+        fk = np.minimum(np.minimum(fk, f1b), np.minimum(f1c, f1d))
+        fk = np.where(fk < fl, fl, fk)
+        f1[k] = fk
+    return f1, f2, e1, ecr0, t
+
+
+def transverse_stress(law: ConcreteLaw, ex, ey, gxy, m, ft_eff, smx, smy, f1cx, f1cy):
+    """The concrete's transverse stress alone: evaluate(...).fcy, the same bits (see
+    lean_state)."""
+    f1, f2, _e1, _ecr, t = lean_state(law, ex, ey, gxy, m, ft_eff, smx, smy, f1cx, f1cy)
+    v = (f1 - f2) / (1.0 / t + t)
+    return f1 - v * t

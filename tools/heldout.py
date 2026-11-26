@@ -112,6 +112,11 @@ PRIORITY = {
 # priority 1's.
 
 
+# Kept by the owner (2026-11-26) whatever Response scores against itself: priority 1
+# without shear stays at 99 %.
+KEPT = {"moment-axial": {"1": 99.0}}
+
+
 def read_repeat() -> dict | None:
     return json.loads(REPEAT.read_text()) if REPEAT.exists() else None
 
@@ -119,9 +124,12 @@ def read_repeat() -> dict | None:
 def thresholds(rep: dict | None) -> dict:
     if rep is None:
         return {t: {} for t in AREA_TITLES}
-    return {t: {p: round(100.0 * n / of - MARGIN, 1) for p, (n, of) in by.items()
+    made = {t: {p: round(100.0 * n / of - MARGIN, 1) for p, (n, of) in by.items()
                 if p in "123" and of}
             for t, by in rep["totals"].items()}
+    for t, by in KEPT.items():
+        made.setdefault(t, {}).update(by)
+    return made
 
 
 THRESHOLDS = thresholds(read_repeat())
@@ -758,7 +766,7 @@ def summary_block(totals: dict, rep: dict | None = None) -> str:
            "Cases inside target on every check of the priority, of the cases that have such "
            "a check. One column per increment; then Response against itself (every concrete "
            f"strength raised by {REPEAT_BY:g} %) on the same inputs, and the threshold: that "
-           f"score less {MARGIN:g} points.", "",
+           f"score less {MARGIN:g} points (priority 1 without shear: 99 %, kept by the owner).", "",
            "| Area | Priority | " + " | ".join(f"{r['label']} ({r['date']})" for r in runs)
            + " | Response against itself | Threshold |",
            "|---|---|" + "---:|" * (len(runs) + 2)]
@@ -775,7 +783,7 @@ def summary_block(totals: dict, rep: dict | None = None) -> str:
             if p in th[t]:
                 n, of = last["totals"][t][p]
                 met = "met" if of and 100.0 * n / of >= th[t][p] else "not met"
-                goal = f"{th[t][p]:g} % ({met})"
+                goal = f"{th[t][p]:g} % ({met}{', kept by the owner' if p in KEPT.get(t, {}) else ''})"
             else:
                 goal = "reported only" if p == "4" else "not set"
             out.append(f"| {title} | {names[p]} | " + " | ".join(cells) + f" | {own} | {goal} |")
@@ -796,7 +804,9 @@ def brief_block(rep: dict) -> str:
     for t, title in AREA_TITLES.items():
         for p, (n, of) in rep["totals"][t].items():
             out.append(f"| {title} | {p} | {pct(n, of)} | "
-                       + (f"{th[t][p]:g} %" if p in th[t] else "reported only") + " |")
+                       + ((f"{th[t][p]:g} %" + (" (kept by the owner, 2026-11-26)"
+                                                  if p in KEPT.get(t, {}) else ""))
+                          if p in th[t] else "reported only") + " |")
     out += ["", f"Measured {rep['date']}. Cases: " + ", ".join(
         f"{AREA_TITLES[t].lower()} {rep['cases'][t]} ({rep['unsolved'][t]} not solved by "
         "Response after the change, counted outside)" for t in AREA_TITLES) + ".", REND]

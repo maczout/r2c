@@ -75,3 +75,23 @@ def test_curve_misses_carry_the_priority():
     assert got["peak"]["priority"] == 1 and got["post_peak"]["priority"] == 4
     assert got["post_peak"]["over"] == 4.0
     assert dashboard.curve_misses(checks, "flexure")[-1]["priority"] == 2
+
+
+def test_the_front_page_sets_r2c_s_time_beside_r2x_s():
+    # owner, 2026-11-26: speed is part of the threshold; the page shows it by area and by
+    # what r2x reads, from the committed times
+    import json
+    from pathlib import Path
+
+    root = Path(dashboard.__file__).resolve().parents[1]
+    results = json.loads((root / "docs" / "verification-results.json").read_text())["results"]
+    rows = dashboard.speed(results)
+    assert {(r["area"], r["reads"]) for r in rows} == {
+        (a, w) for a in ("Without shear", "With shear")
+        for w in ("every stage", "the peak stage alone")}
+    assert all(0 <= r["within"] <= r["of"] and r["worst"] > 0 for r in rows)
+    run = json.loads((root / "docs" / "verification-results.json").read_text())["run"]
+    data = dashboard.build(run, results, {}, None, ROOT / "tests" / "oracle", [])
+    assert data["speed"] == rows
+    assert "Speed: r2c against r2x" in dashboard.render(data, "front")
+

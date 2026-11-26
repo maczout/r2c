@@ -130,3 +130,26 @@ limits, so in the same state it would end there too.
 
 The limits in `tests/test_oracle.py` say "no worse than when last compared". They guard what
 works on the development set; they are not the target.
+
+## Speed (owner, 2026-11-26)
+
+Part of the solution threshold since 2026-11-26 (`docs/brief.md`): on every case, r2c's
+run time is no more than r2x's on the same input, measured on the same machine.
+
+- r2x's time: the wall-clock seconds of one `r2x.worker` command on the case, start to
+  exit, with the case's own options (`python tools/r2xtimes.py measure`; recorded for the
+  development set in `tests/oracle/r2x-times.json`). Two readings are recorded: with the
+  detail views of every stage, as the development captures were made and as
+  `tools/verify.py` has r2c write them, and with the detail views of the peak stage
+  alone, r2x's default. Which of the two the threshold means is with the owner
+  (`docs/summary.md`); until answered, the first is the one reported.
+- r2c's time: the seconds `tools/verify.py` records for the solve of the case.
+- `python tools/r2xtimes.py compare VERIFY_OUT` counts the cases within, by area.
+- A speed change changes no result: `tests/oracle/records.json` (the hash of r2c's whole
+  record of every development case), `python tools/same.py VERIFY_OUT`, and the oracle
+  tests, which hold each case they solve to its hash. A change of result rewrites the
+  hashes in its own commit.
+
+Not measured on the held-out sets: nothing per case of theirs is kept, and the scorer's
+only word on time is its limit a case.
+

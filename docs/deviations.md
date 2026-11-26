@@ -52,10 +52,16 @@ measured on the development results (`docs/verification-results.md`) unless mark
   Response's own solve of a stage is on since the owner's answer of 2026-11-25; r2c
   follows more of Response's tries with it, and what is left differs in the fifth digit
   of a load or of a profile error at the try where the two part.
-- **With shear r2c is slow.** Response's own solve of a stage splits the layers anew at
-  every evaluation, and r2c does the same in Python: a case with shear takes several
-  minutes, between three and four times what it took before the solve was turned on
-  (measured, `tools/times.py`). Where to save is in `docs/status.md`.
+- **With shear r2c is slower than r2x on most cases.** Response's own solve of a stage
+  splits the layers anew at every evaluation, and r2c does the same in Python. Since
+  increment 7 what was already solved is kept (`docs/kernel.md`, "What is kept between
+  evaluations, for speed") and a case with shear takes about a fifth of what it did,
+  with every development record unchanged; it is still longer than r2x's whole command
+  on nearly half the cases with shear when r2x reads every stage, and on every one if
+  r2x reads the peak stage alone. Without shear r2c is within r2x's time on every case
+  when r2x reads every stage, and on all but one when it reads the peak alone (measured,
+  six cases at a time for both programs, `tools/r2xtimes.py`). The owner made speed part
+  of the threshold on 2026-11-26.
 - **The T-beam with material factors, steel stress at a crack at the peak:** Response
   gives its yielded bottom bars no value at the crack and r2c gives their average stress.
 - **How a response with shear ends.** r2c's last stages and Response's differ on about two
