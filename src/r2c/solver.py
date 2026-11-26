@@ -1395,6 +1395,8 @@ class Flexure:
             # is kept and the stepping goes on from it; so is the last one tried.
             first = self.stages[0].control
             step = target - cur.control
+            if self.rupture_halving:
+                return self._close_in_on_rupture(cur, trial, first)
             while abs(step) >= 1e-10 and abs(step) > 0.01 * abs(trial.control - first):
                 step *= 0.2
                 try:
@@ -1447,6 +1449,43 @@ class Flexure:
         self.accept(trial)
         return trial
 
+    # Written and off (docs/kernel.md, "Bar rupture within a step"; increment 5, after the
+    # held-out score): what Response does when the stage a fifth of the way to a rupture
+    # cannot be solved [O: its own tries on Newbeam with 500 mm2 of bottom steel, read from
+    # the running program]. The step multiplier is halved, for the rest of the response;
+    # a stage is tried half the last kept step on; if that one is ruptured it is the stage
+    # set aside from then on. And the next stage is the multiplier times the base step on,
+    # the base step being a tenth of the farthest target tried so far.
+    rupture_halving = False
+    mult = 1.0               # the step multiplier, halved by a failed try (with the switch)
+    base = 0.0               # the base step, as it has grown (with the switch)
+
+    def _close_in_on_rupture(self, cur: Stage, trial: Stage, first: float) -> Stage:
+        """Close in on a rupture between cur and the stage set aside (trial), as Response's
+        stage control does it [B 00415e30, 00419ff0; O]. Returns the stage kept."""
+        for _ in range(60):
+            step = trial.control - cur.control
+            if abs(step) < 1e-10 or abs(step) <= 0.01 * abs(trial.control - first):
+                break                       # close enough: the stage set aside is kept
+            try:
+                sub = self.solve(cur.control + 0.2 * step, cur)
+            except SolveError:
+                # the try fails: half the multiplier, and half the last kept step on
+                self.mult *= 0.5
+                k = len(self.stages) - 1
+                last = cur.control - self.stages[k - 1].control if k >= 1 else step
+                try:
+                    sub = self.solve(cur.control + 0.5 * last, cur)
+                except SolveError:
+                    break
+            if self.has_event(cur, sub) != "rupture":
+                self.accept(sub)            # short of the rupture: kept, and on from it
+                return sub
+            trial = sub                     # ruptured: the stage set aside from now on
+        trial.tried_event = "rupture"
+        self.accept(trial)
+        return trial
+
     def run(self, max_stages=400) -> list[Stage]:
         st0 = self.initial()
         self.accept(st0)
@@ -1457,6 +1496,7 @@ class Flexure:
         sgn = self.sign
         d0 = self.step0
         cur = st0
+        self.mult, self.base = 1.0, d0
         try:
             cur = self.advance(cur, c0 + sgn * d0 / 6.0, 2)
             target = c0 + sgn * 7.0 * d0 / 6.0
@@ -1500,7 +1540,11 @@ class Flexure:
                 if self.spent(cur, peak):
                     break
                 # the next step is sized by the target just tried, from the stage reached
-                target = cur.control + sgn * max(d0, 0.1 * abs(target))
+                if self.rupture_halving:
+                    self.base = max(self.base, 0.1 * abs(target))
+                    target = cur.control + sgn * self.mult * self.base
+                else:
+                    target = cur.control + sgn * max(d0, 0.1 * abs(target))
         except SolveError:
             pass
         return self.stages[:max_stages]

@@ -41,3 +41,36 @@ def test_a_step_of_the_stress_between_two_layers_is_read_layer_by_layer():
     got = drv.profile_error(z, state, calc, 1e6)
     d = np.array([1.0] * 25 + [2.0] * 25)
     assert got == pytest.approx(np.std(d, ddof=1) / np.mean(d), rel=1e-9)
+
+
+def test_closing_in_on_a_rupture_when_the_try_fails_is_written_and_off(oracle_dir):
+    # [B 00415e30, 00419ff0; O: Response's own tries on this case, tools/rtrace.py]: the
+    # stage a fifth of the way to the rupture cannot be solved; Response halves its step
+    # multiplier and tries half the last kept step on, and its last five stages follow.
+    # Off, so that the kernel is the one the held-out set was scored on in increment 5
+    import sys
+    from pathlib import Path
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
+    import compare
+    import verify
+    from r2c import record, solver, stages
+    assert solver.Flexure.rupture_halving is False
+    ref = record.read(oracle_dir / "newbeam-light500-m.r2x.txt")
+    path = verify.find_input(ref.header["input-name"], ref.header.get("input-sha256"),
+                             [d for d in verify_inputs() if d])
+    if path is None:
+        pytest.skip("the input of newbeam-light500-m is not at hand")
+    want = compare._curve(ref, "moment_phi")
+    solver.Flexure.rupture_halving = True
+    try:
+        res = run.solve(path, **verify.options(ref.header))
+    finally:
+        solver.Flexure.rupture_halving = False
+    got = compare._curve(record.decode(res.record_bytes(stages.ALL)), "moment_phi")
+    assert len(got) == len(want) == 73
+    assert np.allclose(got[-5:], want[-5:], atol=2e-3)
+
+
+def verify_inputs():
+    import os
+    return [os.environ.get(k) for k in ("R2C_SCOPE_DIR", "R2C_RESPONSE_DIR", "R2C_DEFINE_DIR")]

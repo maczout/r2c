@@ -892,6 +892,36 @@ stages are Response's (curvatures 52.25 and 58.02 rad/km, 16.7 and 16.5 kNm); po
 I-girder under M the response ended as Response's does before this change and does not
 now [O, one run of the parked cases, 2026-11-22; not looked into].
 
+**When the stage a fifth of the way to the rupture cannot be solved: written and off**
+(`Flexure.rupture_halving`, increment 5, after the held-out score) [O: Response's own
+tries, `python tools/rtrace.py`, which reads a case without shear as well; B `00415e30`,
+`00419ff0` for the closing in]. On Newbeam with 500 mm² of bottom steel under moment the
+stage at 95.236 rad/km is ruptured and set aside; the stage a fifth of the way to it,
+88.310, is not solved by Response's solve (nor by r2c's copy of it). Response then
+
+* halves its step multiplier, which stays halved for the rest of the response;
+* tries a stage half the last kept step on (86.578 + ½ · 7.871 = 90.514): ruptured, so
+  it is the stage set aside from then on, and a fifth of the way to it (87.365) is solved
+  short of the rupture and kept;
+* goes on by the multiplier times the base step, the base step being a tenth of the
+  farthest target tried so far (87.365 + ½ · 9.524 = 92.127: ruptured; a fifth of the way,
+  88.318, not solved; the multiplier a quarter; half the last kept step on, 87.759, kept;
+  then 87.759 + ¼ · 9.524 = 90.140: ruptured; a fifth of the way, 88.235, solved and
+  ruptured, and within 1 % of the way come, so it is kept; then 88.235 + ¼ · 9.524 =
+  90.616, kept, and the end test ends the response).
+
+r2c without the switch tries a twenty-fifth of the way after the fifth fails, keeps that
+stage and steps on by a tenth of the target as before; it reaches the rupture a stage
+later and goes on for seven stages after it. With the switch on r2c's 73 stages are
+Response's 73 to the printed digit [measured]. On the 104 development cases without
+shear with it on (`tools/verify.py`, `tools/changes.py`): two checks come inside (the
+ending of that case, 20.6 to 0.0 %; the principal tensile stress at the last stage of the
+prestressed I-girder under axial tension, 8.8 to 3.4 %) and none goes outside. Seen on
+one case with two instances of each step, so "half the last kept step" is a reading:
+the multiplier times a base step kept with the stage would give the same two numbers.
+Off because the held-out set had been scored: with it off the records are the run of
+record's. Turning it on is the first thing for the next increment.
+
 The control variable's value at the initial stage is the curvature or the centroid's strain
 there. More Detail adds a stage between every two up to the peak, among the stages found in
 the first control variable, to at most 327 stages.

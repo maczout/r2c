@@ -13,8 +13,8 @@ For the developer: what exists now and how to work on it. The owner reads
   layering, the solves without shear, shear by the longitudinal stiffness method with
   Response's stiffness rules and its load stage control. Each rule and its source:
   `docs/kernel.md`. Switches for rules that are written and off are listed there
-  (`Shear.own_solve`, `Shear.parabolic_error`, `Shear.pass_code`,
-  `Analysis.own_stirrup_history`).
+  (`Flexure.rupture_halving`, `Shear.own_solve`, `Shear.parabolic_error`,
+  `Shear.pass_code`, `Analysis.own_stirrup_history`).
 - **The development set**: 164 fixtures in `tests/oracle`, each a capture cut to the stages
   the measure compares: 55 on Newbeam under varied loads, materials, settings and units, the
   T-beam, the column and the I-girder; 52 wider cases since increment 2
@@ -40,15 +40,24 @@ The threshold (owner, 2026-11-25) on the held-out set, without shear / with: pri
 96 / 39, 96 / 71. Increment 5 moved no total: one more such increment is the plateau of
 the brief.
 
-1. **If the owner says yes: turn on Response's own solve with the parabolic error**
+1. **Turn on `Flexure.rupture_halving`** (`docs/kernel.md`, "Bar rupture within a step":
+   what Response does when the stage a fifth of the way to a rupture cannot be solved).
+   Written after the held-out score of increment 5 and off for that reason alone. Set
+   the class attribute to True, run `python tools/verify.py`, then `python
+   tools/stagesat.py`. Measured on the 104 cases without shear: two checks come inside
+   (the ending of Newbeam with 500 mm² of bottom steel; a view at the last stage of the
+   I-girder under axial tension), none goes outside, and that Newbeam has Response's 73
+   stages to the digit. Then look at the two Cm4 cases that part from Response at their
+   66th stage (`python tools/stagesat.py VERIFY_OUT --first 100 --list`).
+2. **If the owner says yes: turn on Response's own solve with the parabolic error**
    (`Shear.own_solve`, `Shear.parabolic_error`; `docs/kernel.md`, "The global solve with
    shear", "Measured again in increment 5"). Set both class attributes to True and run
    `python tools/verify.py`. Measured on the 60 development cases with shear: priority 2
    from 22 to 24 inside, priority 3 from 47 to 49, priority 1 the same, 2.4 times the
    time; 4 of the 15 cases under the override then end as Response does, which is why it
    waits for the owner. With it on, the passes agree with Response's to five or six
-   digits where they were followed, and what is left to differ is in 2 below.
-2. **With shear, with the solve on: how many steps a solve takes before it stops, and
+   digits where they were followed, and what is left to differ is in 3 below.
+3. **With shear, with the solve on: how many steps a solve takes before it stops, and
    the 1 % in the coupling terms of the stiffness.** `python tools/rtrace.py RECORD
    --steps --matrix`, then `python tools/stiff.py LOG RECORD`, lists the tries in which a
    pass takes one step more or fewer than Response's, or a term of the stiffness is
@@ -57,36 +66,33 @@ the brief.
    that is a state simple enough to work by hand, and it was not found. After it, the
    first place the two part on Newbeam is the stage at 0.5556 rad/km (loads 56.7793
    against 56.7789 kN after the first solve).
-3. **Which cases to work on with shear**: `python tools/noise.py score OUT --list` names
+4. **Which cases to work on with shear**: `python tools/noise.py score OUT --list` names
    the development cases where Response does not hold to itself under a change of
    0.05 % in the concrete strength (16 for priority 2); the other 24 where r2c is outside
    priority 2 are the ones a rule or the solve can bring in. Most are I-girders and
    T-beams, the kinds the held-out scorer shows outside for priority 2 and 3.
-4. **Priority 1 without shear** needs the one held-out case left (a rectangular beam
+5. **Priority 1 without shear** needs the one held-out case left (a rectangular beam
    under moment, outside on all three priorities). On the development set nothing of
-   that kind is outside priority 1. Outside priority 2: Newbeam with 500 mm² of bottom
-   steel, where r2c reaches the rupture one stage after Response and then goes on for
-   seven stages where Response ends after one. Response's steps there halve after a
-   failed try and then change control variable (0.787, 0.394 rad/km, then a step in the
-   centroid's strain); r2c's stepping without shear does neither (`Flexure.advance`,
-   `Flexure.run`; the base step and first step of a case without shear on Response's
-   own stage control [B `00419250`, `0041a870`] are the job, then `python
-   tools/stagesat.py`). The prestressed I-girder under axial tension is the same job:
-   Response's steps halve to the strands' rupture and the response ends.
-5. **Still to differ without shear in where the stages are** (`python tools/stagesat.py
+   that kind is outside priority 1. Outside priority 2 was Newbeam with 500 mm² of bottom
+   steel, which item 1 brings inside. Still outside there: the prestressed I-girder under
+   axial tension (its shape and its ending: Response's steps halve to the strands'
+   rupture and the response ends at the peak; with item 1 on, its last-stage view comes
+   inside and the ending does not), and the Cm4 sample under axial compression (its
+   ending). Trace both with `python tools/rtrace.py`, which works without shear too.
+6. **Still to differ without shear in where the stages are** (`python tools/stagesat.py
    VERIFY_OUT --list`): three small first steps where the section is cracked from the
    start (the I-girder under axial tension); what More Detail at its most puts in at the
    start; the column under 600 kN of tension around first cracking; the I-girder under
    500 kN of compression at its 56th stage.
-6. **The rules with shear that the state does not explain** (`python tools/sources.py`):
+7. **The rules with shear that the state does not explain** (`python tools/sources.py`):
    the stirrups' stress at a crack at nodes that have only just cracked; shear on the
    crack with Tamai tension stiffening; the Transverse Bond chart where a half layer's
    top node has next to no shear strain (kept at Newbeam M/V = 0.5 m, dropped under a
    thermal gradient: the rule that tells the two apart was not found).
-7. **Long shear responses are slow** (the column under 3000 kN at M/V = 2 m takes about
+8. **Long shear responses are slow** (the column under 3000 kN at M/V = 2 m takes about
    ten minutes; with Response's own solve on, fifteen).
-8. **Not yet checked on parity:** the two programs run end to end on the same input.
-9. **Newbeam under an axial tension of 300 kN** has no state under its initial load in
+9. **Not yet checked on parity:** the two programs run end to end on the same input.
+10. **Newbeam under an axial tension of 300 kN** has no state under its initial load in
    r2c ("no equilibrium under the initial loads"). Seen in passing; what Response does
    was not looked at.
 
