@@ -100,6 +100,10 @@ before changing the kernel; `docs/measures.md` before judging a result). Run
   `docs/deviations.md` in plain language (no numbers for the entries) and say why in the log.
 - A script that answered a question goes in `tools/` in the same session, with a docstring
   saying what it answers. One that is no longer used is deleted or moved to `tools/attic/`.
+- **A speed change changes no result** (owner, 2026-11-26): every development record is
+  identical before and after it. `tests/oracle/records.json` holds each record's hash;
+  after a speed change run the set and `python tools/same.py VERIFY_OUT`. A change of
+  result rewrites the hashes in its own commit (`--write`).
 - After a kernel change, regenerate the development results:
   `python tools/verify.py tests/oracle --inputs FOLDERS --out VERIFY_OUT --jobs N`, then
   `python tools/report.py VERIFY_OUT`. The results pages are rebuilt from the committed JSON
@@ -136,8 +140,6 @@ summary.
   (owner, 2026-11-26): on every case r2c's run time is no more than r2x's on the same
   input, on the same machine (`tools/r2xtimes.py`, `tests/oracle/r2x-times.json`). When
   it is reached, ask before starting the finishing steps.
-- **A speed change changes no result** (owner, 2026-11-26): every development record is
-  identical before and after it (`tools/same.py`, and the test with it).
 
 Asking means: say it under "Needed from the owner" in `docs/summary.md` and in the pull
 request, with a suggested answer, stop that line of work, and carry on with something
