@@ -185,11 +185,50 @@ unit strain and per 1/m):
 | V by axial strain, stage 1, pass 3 | −27086.5 | −26813.0 | −27085.0 |
 | N by shear strain, stage 3, first step | −19754.68 | −19509.36 | −19753.87 |
 
-What is left (*measured*, not explained): at the very first step, with no shear strain
-at all, Response's V-by-shear-strain term is 1989208877 and r2c's 1990492051 (0.064 %
-apart); from the second step on the two agree to six digits. Where a node has no shear
-strain at all the program takes another routine (`004a7b60`, the test at the head of
-`004a8b20`): its shear stiffness was not read.
+What was left after it: at the very first step, with no shear strain at all, Response's
+V-by-shear-strain term is 1989208877 and r2c's 1990492051 (0.064 % apart). That is the
+profile the first stage starts from, next.
+
+### The profile the first stage starts from [B `004357d0`, `0041e840`], read 2026-11-26 (increment 7): not in the kernel
+
+Source: the routine that makes the profile of the uncracked section, `004357d0` (read in
+the decompiler). The hold at the nodes afterwards is the profile update `0041e840`; that
+it runs after the stage under the constant loads is *inferred* from the numbers below,
+not read. No thesis equation beyond VQ/Ib.
+
+What `004357d0` does: for each row of the outline it lays stations from the row's top
+downward a twenty-first of the section's depth apart, with the row's two ends (22
+stations on a rectangle); at each station the first moment, about the centroid, of the
+area above it, over the width there (area and moment summed by trapezoids between the
+stations); the table is then divided by its own mean over the depth, read straight
+between its stations, with no width in it. r2c has the same quantity on its own grid of
+a hundred heights, with the mean weighted by the width (`Analysis._elastic_shape`).
+*Inferred from the measurements*: after the stage under the constant loads the profile
+is held at the nodes of that stage's layers, straight between, and brought to a mean of
+one by Simpson's rule over each layer's three nodes. The same table is what the profile
+is put back to when a stage's passes are far off (`00418af0`).
+
+*Measured* (Newbeam at M/V = 1 m, as above; r2c with the concrete's stiffness rule on in
+both columns):
+
+| Term | Response | r2c without | r2c with |
+|---|---:|---:|---:|
+| V by shear strain, stage 1, first step | 1989208877 | 1990492051 | 1989210646 |
+| N by shear strain, stage 1, pass 2 | −38305.5 | −38275.1 | −38305.4 |
+| N by shear strain, stage 1, pass 3 | −38060.1 | −38053.5 | −38060.1 |
+| V by shear strain, stage 2, first step | 1989229803 | 1989219894 | 1989229803 |
+| N by shear strain, stage 2, first step | −6468.64 | −6468.12 | −6468.64 |
+
+**Not in the kernel.** It is written on the branch `trial/i7-start-profile`
+(`Analysis.own_start_profile`, `Analysis._profile_stations`, `Shear.hold_profile`), with
+the concrete's stiffness rule on. With both on, on all 164 development cases
+(*measured*, `tools/byprio.py`): without shear no case changes side; with shear two
+cases leave priority 1 (the I-girder at M/V = 3 m and Newbeam from a US-units file at
+1 m) and one leaves priority 2, none comes inside. Not checked: sections with a step in
+width (the routine adds a point at a step, the value above times the ratio of the
+widths), and whether the stage under constant loads holds the profile where those loads
+include shear. Merge it with the concrete's stiffness rule, when the cases that fall
+have been read at the stage where they part from Response.
 
 Why it is off (*measured*, all 164 development cases, `tools/verify.py` with the rule
 on, `tools/byprio.py` and `tools/changes.py` against the run without it): 162 records
