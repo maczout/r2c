@@ -314,16 +314,39 @@ def outside_manual(difference: str) -> bool:
     return ": r2x solves, r2c refuses: " in difference or "units='roman'" in difference
 
 
-def verdict(same: int, n: int, accepted: int, every_part: bool = True) -> str:
+# The four inputs on which Response gives up part-way through its solve and r2x fails,
+# while r2c solves them: accepted as known differences by the owner (2026-11-25,
+# docs/brief.md). These four and no others: a new input of the kind is a difference.
+GIVES_UP = {"newbeam-csoft1", "newbeam-loads-ntension-mv", "newbeam-loads-m0-v",
+            "newbeam-loads-nv"}
+
+
+def gives_up(difference: str) -> bool:
+    """Is this difference of part (c) one of the four the owner accepted on 2026-11-25:
+    Response gives up part-way, r2x fails, r2c solves?"""
+    m = re.fullmatch(r"probe (\S+): r2x fails, r2c solves", difference)
+    return bool(m) and m.group(1) in GIVES_UP
+
+
+def verdict(same: int, n: int, accepted: int, every_part: bool = True,
+            gave_up: int = 0) -> str:
     """The headline, in the form the owner asked for (2026-11-25, docs/brief.md): parity is
-    complete when the only differences left are the inputs refused by the owner's decision."""
+    complete when the only differences left are the inputs refused by the owner's decision
+    (accepted) and the inputs Response gives up on part-way, accepted the same day
+    (gave_up)."""
     head = f"{same} of {n} checks the same"
     if not every_part:
         return f"Interface parity: {head} (partial: not every part was run)"
-    other = n - same - accepted
+    other = n - same - accepted - gave_up
+    known = f"{accepted} accepted refusals" + (
+        f" and the {gave_up} accepted inputs on which Response gives up part-way"
+        if gave_up else "")
     if other:
         return (f"Interface parity: not complete: {other} difference(s) besides the "
-                f"{accepted} accepted refusals ({head})")
+                f"{known} ({head})")
+    if gave_up:
+        return (f"Interface parity: complete except accepted refusals ({accepted}, and "
+                f"{gave_up} accepted inputs on which Response gives up part-way; {head})")
     if accepted:
         return f"Interface parity: complete except accepted refusals ({accepted}; {head})"
     return f"Interface parity: complete ({head})"
@@ -363,6 +386,7 @@ def main(argv=None) -> int:
 
     total = [0, 0]
     known: list[str] = []
+    gave_up: list[str] = []
 
     lines: list[str] = []
     say = lines.append
@@ -400,9 +424,16 @@ def main(argv=None) -> int:
         same, n, diff = refusals(a.inputs)
         scored("(c) refusals, inputs solved or refused alike", same, n)
         known = [d for d in diff if outside_manual(d)]
+        gave_up = [d for d in diff if gives_up(d)]
         for d in diff:
-            if d not in known:
+            if d not in known and d not in gave_up:
                 say(f"    differs  {d}")
+        if gave_up:
+            say(f"(c) of these differences, known: {len(gave_up)} are inputs on which "
+                "Response gives up part-way through its solve and r2c solves, accepted by "
+                "the owner (2026-11-25)")
+            for d in gave_up:
+                say(f"    known    {d}")
         if known:
             say(f"(c) of these differences, known: {len(known)} are inputs outside the manual "
                 "that r2c refuses by the owner's decision (2026-11-24)")
@@ -411,13 +442,14 @@ def main(argv=None) -> int:
     else:
         say("(c) refusals: not run (give --inputs FOLDERS)")
     complete = bool(a.records and a.inputs)
-    head = verdict(total[0], total[1], len(known) if a.inputs else 0, complete)
+    head = verdict(total[0], total[1], len(known) if a.inputs else 0, complete,
+                   len(gave_up))
     print("\n".join(lines + [head]))
     if a.out:
         if not complete:
             ap.error("--out needs every part: give --records and --inputs")
         Path(a.out).write_text(render(head, lines), encoding="utf-8")
-    return 0 if complete and total[1] - total[0] == len(known) else 1
+    return 0 if complete and total[1] - total[0] == len(known) + len(gave_up) else 1
 
 if __name__ == "__main__":
     raise SystemExit(main())

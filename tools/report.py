@@ -361,7 +361,9 @@ def shape_cell(c, g="flexure") -> str:
 
 def unstable_note(res: dict, acc: dict) -> str:
     n = len(unstable_checks(res, acc))
-    return f"; {n} view check{'s' if n != 1 else ''} unstable in Response, not assessed" if n else ""
+    upto = "; compared up to Response's last stage (override)" if "upto" in res else ""
+    return upto + (f"; {n} view check{'s' if n != 1 else ''} unstable in Response, not assessed"
+                   if n else "")
 
 
 def render(results: dict, run: dict, acc: dict, acc_path: str) -> str:
@@ -473,7 +475,13 @@ def render(results: dict, run: dict, acc: dict, acc_path: str) -> str:
             "printed precision), the view spikes there and the check is reported and not "
             "assessed. A stage without both neighbours is not tested. Shape: the curve's features in order (cracking, falls of load before the "
             "peak, the peak, how the response ends), read alike from both curves; it matches "
-            "when they are the same. Stage counts are not compared.", ""]
+            "when they are the same. Stage counts are not compared. Compared up to Response's "
+            "last stage: on a case with shear where Response's last stage still carries at "
+            "least 0.8 of its peak load, r2c's curve passes that stage within the target on "
+            "the curves and r2c carries on from there to end somewhere else, r2c's curve is cut at its point nearest "
+            "that stage and every check is made on the cut curve; the views come from r2c's "
+            "stages up to the first one at or past that point (owner, 2026-11-25: the "
+            "override for shear responses that Response's solve ends early).", ""]
     return "\n".join(out)
 
 

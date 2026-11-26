@@ -4,12 +4,13 @@
 
 What `tools/parity.py` finds when it sets r2c beside r2x (its docstring says how each part is measured). Nothing is run against Response. A difference is listed whether or not it is meant to be closed; `docs/deviations.md` says which are known and why. `define` and `--report` of r2x are not part of the command line that is compared and are left out of the score (owner, 2026-11-24).
 
-**Interface parity: not complete: 4 difference(s) besides the 15 accepted refusals (307 of 326 checks the same).**
+**Interface parity: complete except accepted refusals (15, and 4 accepted inputs on which Response gives up part-way; 369 of 388 checks the same).**
 
 - **(a) command line, the items of r2x's parser: 19 of 19 the same**
 - **(a) command line, command lines taken or refused alike: 42 of 42 the same**
-- **(b) the record, development cases with the same format: 107 of 107 the same**
-- **(c) refusals, inputs solved or refused alike: 139 of 158 the same**
+- **(b) the record, development cases with the same format: 155 of 155 the same**
+- **(c) refusals, inputs solved or refused alike: 153 of 172 the same**
+- **(c) of these differences, known: 4 are inputs on which Response gives up part-way through its solve and r2c solves, accepted by the owner (2026-11-25)**
   - `probe newbeam-csoft1: r2x fails, r2c solves`
   - `probe newbeam-loads-ntension-mv: r2x fails, r2c solves`
   - `probe newbeam-loads-m0-v: r2x fails, r2c solves`

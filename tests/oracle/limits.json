@@ -1,0 +1,442 @@
+{
+ "cm4-m3v": [
+  0.65,
+  1.39
+ ],
+ "cm4-n500-m": [
+  0.06,
+  0.14
+ ],
+ "cm4-negm": [
+  0.06,
+  0.12
+ ],
+ "cm4-ntens200-m": [
+  0.06,
+  0.11
+ ],
+ "column-fc35-nm": [
+  0.06,
+  0.18
+ ],
+ "column-n1000-m": [
+  0.06,
+  0.12
+ ],
+ "column-n3000-m": [
+  0.06,
+  0.12
+ ],
+ "column-n3000-m2v": [
+  0.67,
+  3.41
+ ],
+ "column-n6000-m": [
+  0.06,
+  0.27
+ ],
+ "column-ntens150-m": [
+  0.06,
+  0.11
+ ],
+ "column-ntens300-m": [
+  0.06,
+  0.13
+ ],
+ "column-ntens400-m": [
+  0.06,
+  0.13
+ ],
+ "column-ntens600-m": [
+  0.06,
+  0.14
+ ],
+ "column-ntens900-m": [
+  0.06,
+  0.13
+ ],
+ "column-us-m": [
+  0.06,
+  0.12
+ ],
+ "dmn1n-m4v": [
+  0.58,
+  2.07
+ ],
+ "dmn1n-n200-m": [
+  0.05,
+  0.11
+ ],
+ "dmn1n-negm": [
+  0.05,
+  0.11
+ ],
+ "dmn1n-ntens100-m": [
+  0.05,
+  0.11
+ ],
+ "igirder-dep5-m": [
+  0.06,
+  0.11
+ ],
+ "igirder-dep5-m2v": [
+  0.78,
+  0.94
+ ],
+ "igirder-fc45-m": [
+  0.06,
+  0.39
+ ],
+ "igirder-fc45-m3v": [
+  0.67,
+  0.74
+ ],
+ "igirder-m3v": [
+  0.63,
+  2.32
+ ],
+ "igirder-n500-m": [
+  0.06,
+  0.11
+ ],
+ "igirder-negm2v": [
+  1.45,
+  7.07
+ ],
+ "igirder-ntens500-m": [
+  0.11,
+  1.31
+ ],
+ "liping-m25v": [
+  0.79,
+  0.67
+ ],
+ "liping-n300-m": [
+  0.05,
+  0.12
+ ],
+ "liping-negm": [
+  0.05,
+  0.11
+ ],
+ "liping-ntens200-m": [
+  0.06,
+  0.11
+ ],
+ "marshall-m3v": [
+  0.94,
+  0.98
+ ],
+ "marshall-mv": [
+  0.56,
+  0.62
+ ],
+ "marshall-n500-m": [
+  0.06,
+  0.12
+ ],
+ "newbeam-cmod1-n500-m": [
+  0.05,
+  0.12
+ ],
+ "newbeam-cmod1-negm": [
+  0.05,
+  0.12
+ ],
+ "newbeam-deep900-m": [
+  0.05,
+  0.12
+ ],
+ "newbeam-deep900-m15v": [
+  0.63,
+  2.23
+ ],
+ "newbeam-deep900-n1500-m": [
+  0.05,
+  0.13
+ ],
+ "newbeam-deep900-negm": [
+  0.05,
+  0.11
+ ],
+ "newbeam-e0-m": [
+  0.05,
+  0.11
+ ],
+ "newbeam-fc20-m": [
+  0.05,
+  0.11
+ ],
+ "newbeam-fc20-mv": [
+  0.55,
+  0.81
+ ],
+ "newbeam-fc30-m": [
+  0.05,
+  0.12
+ ],
+ "newbeam-fc45-cmod1-m": [
+  0.05,
+  0.11
+ ],
+ "newbeam-fc50-m": [
+  0.05,
+  0.11
+ ],
+ "newbeam-fc50-m2v": [
+  0.53,
+  0.92
+ ],
+ "newbeam-fc50-tstiff2-m": [
+  0.05,
+  0.11
+ ],
+ "newbeam-fc65-m": [
+  0.05,
+  0.12
+ ],
+ "newbeam-fc65-negm": [
+  0.05,
+  0.11
+ ],
+ "newbeam-fc80-m": [
+  0.05,
+  0.11
+ ],
+ "newbeam-fc80-mv": [
+  0.75,
+  0.89
+ ],
+ "newbeam-ft-m": [
+  0.05,
+  0.11
+ ],
+ "newbeam-fy300-m": [
+  0.05,
+  0.11
+ ],
+ "newbeam-fy450-m": [
+  0.05,
+  0.11
+ ],
+ "newbeam-fy450-negm": [
+  0.05,
+  0.12
+ ],
+ "newbeam-fy600-m": [
+  0.05,
+  0.12
+ ],
+ "newbeam-fy600-mv": [
+  0.55,
+  0.62
+ ],
+ "newbeam-heavy2500-m": [
+  0.05,
+  0.11
+ ],
+ "newbeam-heavy2500-negm": [
+  0.05,
+  0.11
+ ],
+ "newbeam-heavy2500-negm2v": [
+  0.82,
+  0.9
+ ],
+ "newbeam-heavy3500-m": [
+  0.05,
+  0.12
+ ],
+ "newbeam-heavy3500-negm": [
+  0.05,
+  0.11
+ ],
+ "newbeam-light300-m": [
+  0.05,
+  0.12
+ ],
+ "newbeam-light400-m": [
+  0.05,
+  0.11
+ ],
+ "newbeam-light500-m": [
+  0.05,
+  0.11
+ ],
+ "newbeam-light500-n300-m": [
+  0.05,
+  0.11
+ ],
+ "newbeam-light700-m": [
+  0.05,
+  0.12
+ ],
+ "newbeam-light800-m": [
+  0.05,
+  0.12
+ ],
+ "newbeam-light800-mv": [
+  0.7,
+  1.64
+ ],
+ "newbeam-light800-negm": [
+  0.05,
+  0.11
+ ],
+ "newbeam-m4v": [
+  0.6,
+  0.71
+ ],
+ "newbeam-m50-v": [
+  0.69,
+  1.98
+ ],
+ "newbeam-mid400-m": [
+  0.05,
+  0.12
+ ],
+ "newbeam-mid400-m2v": [
+  0.56,
+  0.79
+ ],
+ "newbeam-mid400-n1000-m": [
+  0.05,
+  0.4
+ ],
+ "newbeam-n1000-v": [
+  0.66,
+  1.32
+ ],
+ "newbeam-n300-v": [
+  1.05,
+  1.11
+ ],
+ "newbeam-n500-m2v": [
+  0.59,
+  0.73
+ ],
+ "newbeam-slab150-m": [
+  0.05,
+  0.11
+ ],
+ "newbeam-slab150-negm": [
+  0.05,
+  0.13
+ ],
+ "newbeam-slab200-m": [
+  0.05,
+  0.11
+ ],
+ "newbeam-slab200-m2v": [
+  0.64,
+  3.02
+ ],
+ "newbeam-slab200-n300-m": [
+  0.05,
+  0.11
+ ],
+ "newbeam-slab200-negm": [
+  0.05,
+  0.11
+ ],
+ "newbeam-slab300-m": [
+  0.06,
+  0.11
+ ],
+ "newbeam-slab300-negm": [
+  0.05,
+  0.11
+ ],
+ "newbeam-st150-mv": [
+  0.58,
+  0.98
+ ],
+ "newbeam-st150-n200-v": [
+  0.6,
+  0.76
+ ],
+ "newbeam-st150-n400-v": [
+  0.51,
+  0.81
+ ],
+ "newbeam-st2leg200-m2v": [
+  0.56,
+  0.85
+ ],
+ "newbeam-st2leg200-n300-v": [
+  14.26,
+  9.39
+ ],
+ "newbeam-tstiff1-m": [
+  0.05,
+  0.11
+ ],
+ "newbeam-tstiff2-m": [
+  0.05,
+  0.11
+ ],
+ "newbeam-tstiff3-m": [
+  0.05,
+  0.11
+ ],
+ "newbeam-tstiff4-m": [
+  0.05,
+  0.11
+ ],
+ "newbeam-tstiff6-m": [
+  0.05,
+  0.11
+ ],
+ "newbeam-zero": [
+  0.05,
+  0.1
+ ],
+ "se100-m3v": [
+  0.65,
+  0.7
+ ],
+ "se100-n500-m": [
+  0.05,
+  0.11
+ ],
+ "se100-negm": [
+  0.05,
+  0.11
+ ],
+ "se100-ntens300-m": [
+  0.05,
+  0.11
+ ],
+ "tbeam-csa-m2v": [
+  0.66,
+  0.75
+ ],
+ "tbeam-fc30-m": [
+  0.06,
+  0.13
+ ],
+ "tbeam-fc30-negm": [
+  0.06,
+  0.11
+ ],
+ "tbeam-kgcm-m": [
+  0.05,
+  0.11
+ ],
+ "tbeam-m4v": [
+  0.53,
+  0.69
+ ],
+ "tbeam-n1000-m": [
+  0.05,
+  0.11
+ ],
+ "tbeam-negmv": [
+  2.06,
+  0.9
+ ],
+ "tbeam-ntens500-m": [
+  0.06,
+  0.13
+ ]
+}

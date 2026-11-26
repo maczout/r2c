@@ -271,6 +271,21 @@ its own face value: where r2c had a sloping limit from 0.76 MPa at the face, Res
 a flat 0.83 MPa (Newbeam with CSA factors under M, last stage: the limit line of the
 Principal Tensile Stress chart 11.3 % off before, 0.0 % with the rule).
 
+### Steel stress at a crack with the whole depth in tension [B `00442e50`; O], 2026-11-25
+
+The bars' stress at a crack comes from an extra curvature about the axis of the tension
+zone: the moment about that axis of the concrete tension the cracks do not carry is taken
+by the bars in tension (`Analysis.steel_at_crack`). With the whole depth in tension the
+axis is far outside the section, the whole depth is on its tension side whichever way the
+section bends, and the extra curvature comes to the same extra strain in every bar. Until
+2026-11-25 r2c took the tension side from the sign of the curvature and so, bending one of
+the two ways, found no concrete on it: the bars showed their average stress at the crack,
+and a bar under its cracking strain showed nothing. Seen on the Liping sample under axial
+tension, then moment, at the stage after cracking: Response's four layers carry 8.49 and
+8.45 MPa more at the crack than on average, top and bottom alike (24.97, 24.73, 18.57,
+18.57 MPa); r2c had 16.48, 16.29, 0 and 0, and with the rule 24.97, 24.73, 18.57, 18.57
+[measured, the fixture liping-ntens200-m].
+
 ### A node with next to no shear strain [B `004a8b20`, `004a7b60`], read 2026-11-23 (step A-2)
 
 Before Response solves a node's transverse strain (`004a8b20`) it tests the
@@ -314,8 +329,11 @@ stage is not Response's node for node: it hangs on a profile value of millionths
 Tables over the depth [B]:
 
 * longitudinal and transverse crack spacing: "Crack spacing over the depth", below;
-* the bond parameter M (100 stations): from the bars' perimeters within 7.5 db, falling to
-  nothing one crack spacing away; M = 3.6·b·s/(π·db·legs) for stirrups; the lesser governs;
+* the bond parameter M (100 stations), two tables: for the bars [`004fec60`], each layer's
+  perimeter over the concrete area within 7.5 db of it, times 2.5, falling to nothing one
+  crack spacing away; for the stirrups [`004ff1a0`], M = 3.6·(b·s + 1e-4 m²)/(π·db·legs).
+  Each table is read at the node's height and the lesser of the two readings governs
+  [`004a94d0`, `004ff850`]; see "The concrete area in the bond parameter" below;
 * the steel ratio for the strain concentration of stirrups at a crack (100 stations).
 
 ### Crack spacing over the depth [B `0043f570`, `0043faf0`, `0043e8d0`, `00440100`, `0043f0d0`], read 2026-11-22
@@ -359,6 +377,17 @@ the angle whose sine is the height above the hoop's middle over its half height 
 0.1 mm). Five times the depth where no stirrup reaches, at the bottom face and where
 there is no width; no less than the aggregate size held between 2 and 25 mm.
 
+*The number of types is Response's own count of transverse reinforcement: every type in
+the input, a cross tie with no vertical leg among them* [O, 2026-11-25: the Liping sample,
+which has two ties and one stirrup]. There db and sv are a third of the stirrup's own, and
+the spacing in the 75 mm web is 83.9 mm where r2c, counting the stirrup alone, had 233.4
+(418.2 against 773.9 in the flanges). Each type's ends, the ties' too, put points in the
+table one of its own diameters above and below. With both, r2c's table is Response's chart
+within 0.03 % at all 89 points of it [measured, the capture of liping-negm]. The same
+count now divides the stirrups' area where their spacing is set against the depth (the
+stirrups' share in the transverse stiffness), which matters only where a spacing exceeds
+the depth [inferred: the same count; not checked on a case].
+
 *The points* [`0043f0d0`], for each part of the outline from the top down: its top (the
 first part), or where the width steps from the part above, the lower side of the step,
 0.1 mm under it if the section widens there; one stirrup diameter above and below the
@@ -394,6 +423,48 @@ at the peak of the I-girder with shear (2.5 to 49.8 %, and that case's Should vi
 it) and of M/V = 2 m (3.7 to 22.5 %), a spike at the end of the stirrups in a stage of
 r2c's own that has not converged; two views of M/V = 0.5 m by a point; the post-peak of V
 alone (3.7 to 6.9 %).
+
+### The concrete area in the bond parameter [B `004fd7c0`, `004fec60`], read 2026-11-25
+
+The area of concrete within 7.5 db of a layer is summed over the parts of the outline by a
+routine that only the bond parameter uses, and it gives each part one width: the width at
+the part's upper end.
+
+* A part wholly within the range: its height times that width.
+* A part in which the range ends, from the part's bottom up to the cut: the height times
+  the mean of that width and the width at the cut.
+* A part in which the range starts, from the cut up to the part's top: the same mean, which
+  is the true trapezoid.
+* A range within one part: the true trapezoid.
+
+On a part of constant width this is the area. On a taper it is not: one that narrows upward
+counts for less than its area, one that widens upward for more. The small numbers the
+routines add are in metres: 1e-6 m² to the area, 1e-4 m to the crack spacing the tent is
+built on, 1e-4 m² to the stirrups' width times spacing (r2c had 1e-4 mm and 1e-4 mm², which
+is nothing), and 1e-4 per metre to the sum.
+
+**The tent's reach is the spacing table's own value at the layer** [`004fec60` reads the
+table through `004ff450`], not the spacing a node takes, which is held to the depth. On a
+section whose bars are further apart than it is deep (a slab strip: three bars in 1000 mm,
+300 mm deep) the table gives 674 to 1379 mm where the node's spacing is 300 mm, and the
+tent reaches that much further. Until 2026-11-25 r2c built the tent on the node's spacing,
+and its tension stiffening on such a section was 10 to 15 % under Response's away from the
+bars. Checked by asking Response: three probes of the 1000 x 300 mm slab strip (the top
+layer with one bar, with two, and taken out), the bond parameter worked back from the
+charts as above; with the rule r2c's is Response's within 0.15 % at every node read, where
+it was 15 to 46 % off [measured; the probes are kept with the run, not in the repository].
+The same probes show that a layer given no number of bars has one.
+
+Found on the Liping sample (flanges with tapers, a web of 75 mm, stirrups at 125 mm): from
+Response's charts of principal tensile stress and strain the bond parameter can be worked
+back, M = (ft/f1 − 1)²/ε1 where the crack check does not govern. Before, Response's M was
+0.90 of r2c's around the bottom bars and 1.10 around the top ones, and 1.011 in the web;
+with the rule the ratio is 1.0000 at every node read, top, bottom and web, and on the
+I-girder under moment (no tapers) 1.000 ± 0.001 [measured, the captures of liping-n300-m,
+liping-negm and igirder-dep5-m]. The view that showed it: principal tensile stress at the
+peak of liping-n300-m, 13.3 % off before, 0.0 % with the rule. Until 2026-11-25 r2c also took
+the lesser of the two tables station by station and read the result between stations; at
+the edge of a layer's tent that differs by one station's worth (2 % at one node).
 
 ### At a step in width [O]
 
@@ -758,6 +829,55 @@ response ends when the extreme compressive strain passes 4·ε0, when no state i
 target nor at a half, quarter and eighth of the step, and when the load has run out.
 Response's end tests for these cases (the next section, 3 to 6) come to the same on the
 cases compared.
+
+*Closing in on first cracking* [B `00415e30`, `00419ff0`; O], since 2026-11-25. A stage
+that is cracked where the stage before was not is set aside, and a stage a fifth of the way
+to it is tried. If that one is cracked it is set aside in its turn and a fifth of the way to
+it is tried; if it is not it is kept, and the next try is a fifth of what is left from it
+to the nearest stage set aside. This goes on while what is left is more than 2 % of the
+way the control variable has come from the first stage; then the stages set aside are
+kept as they were found, nearest first. Seen stage for stage on two captures [O]: the
+Liping sample under axial tension (curvatures 0.041, 0.0423, 0.0433, 0.0441, 0.0474,
+0.073 rad/km, where r2c had 0.041, 0.0474, 0.073) and a slab strip under negative moment
+(−1.167, −1.175, −1.181, −1.186, −1.207, −1.367, −2.167, where r2c had −1.167, −1.207,
+−1.367, −2.167). Until then r2c set aside two stages at most, tried 14 times at most and
+stopped at a step of 0.0036 of the base step, which stood in for the way come from the
+first stage where that stage is not at zero (a thermal gradient). Measured on the 95
+development cases without shear: those whose first 25 stages are at Response's control
+values went from 72 to 87, the first 40 from 68 to 81 [`python tools/stagesat.py`]. The
+closing in on the extreme fibre reaching its peak strain is as it was (14 tries, 3 on a
+stage put in between), and Response closes in further on some cases (Newbeam under axial
+load and moment: 3.608, 3.622, 3.633 against r2c's 3.608) [O]. **Written and off**
+(`Flexure.crush_by_share`): the binary's own test [B `00419ff0`, as read on 2026-11-21]
+closes in while the step to the stage set aside is more than a share of the way that
+stage has come from the first one: 0.02 for cracking and for cracks closing, 0.005 for
+the extreme fibre's peak strain, 0.01 for a rupture, and no count of tries. With the
+switch on, of the 104 development cases without shear those whose first 60 stages are at
+Response's control values go from 41 to 96 (first 40: 90 to 97; first 25: 96 to 98), and
+no check changes side [measured, 2026-11-25, `python tools/stagesat.py`]. It was measured
+after the held-out set had been scored for increment 4 and is left off so that the kernel
+is the one that was scored: with it off r2c's records of those 104 cases are byte for byte
+the run of record's. Turning it on is the first thing for the next increment. **Also written and off**
+(`Flexure.cracks_closing`): the cracks closing between two stages (the stage before
+cracked, this one not) is an event in the binary too [B `00415e30`, event code 2], closed
+in on with a stage at 0.8 of the gap and not 0.2 [B `0041a870`], while the gap is more
+than 0.02 of the way come. On the I-girder under moment, whose top is cracked by the
+prestress and closes as the moment grows, Response's stages are −0.631, −0.549, −0.533,
+−0.530, −0.530, −0.529, −0.503, −0.471, −0.431 rad/km; r2c went from −0.631 to −0.431, and
+with the switch on has Response's nine, and all 66 stages of the case [measured]. With
+both switches on, of the 104 cases without shear the first 25 stages are at Response's
+control values on 100, the first 40 on 99 and the first 60 on 98 (96, 90 and 41 with
+both off), and no check changes side on the development set [measured, 2026-11-25]. Off
+for the same reason; with both off r2c's records are byte for byte the run of record's. Not taken over: Response takes three small first steps where the section is cracked
+from the start (the I-girder under axial tension) [O].
+
+*The end test on a stage that was set aside* [O], since 2026-11-25. "Nothing new has
+happened" in the end test below is asked of the stage as it was tried: a stage that was set
+aside for an event and kept afterwards counts as one at which something happened, whatever
+lies between it and the stage kept just before it. Seen on Newbeam with 800 mm² of bottom
+steel under negative moment: after the bars rupture three stages set aside are kept
+(−52.055, −52.972, −57.556 rad/km) and Response goes on to −63.312 before it ends; r2c
+ended at −57.556, and its last-stage views were 9 % off for being a stage short.
 
 *Bar rupture within a step, and the end after it* [B `00415e30`, `00419ff0`, `00418fd0`,
 `00419990`], since 2026-11-22. A stage in which the number of ruptured bars has changed is

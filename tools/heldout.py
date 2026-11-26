@@ -4,6 +4,7 @@
     python tools/heldout.py list
     python tools/heldout.py build ARCHIVE --response-dir DIR --inputs DIR [DIR ...] [--jobs N]
     python tools/heldout.py score ARCHIVE --inputs DIR [DIR ...] [--jobs N] [--record LABEL]
+                                          [--kinds]
     python tools/heldout.py summary
 
 Answers "how good is r2c on sections the developer has not tuned against?", in totals.
@@ -28,6 +29,11 @@ many cases are inside target on every check of that priority. A case r2c does no
 LABEL the totals are appended to heldout/totals.json, the only held-out result that is
 committed. Everything per case (r2c's records, the comparisons) is written under
 ARCHIVE/results/ and nowhere else.
+
+With --kinds `score` also prints the cases outside target by kind: for each area and
+priority, how many cases of each section type and loading path are outside (owner,
+2026-11-25: "with no curves, numbers or case names"; it is for choosing what to add to the
+development set). The kinds are printed and not recorded.
 
 THE HELD-OUT RULE (CLAUDE.md): the developer does not open anything under ARCHIVE/results,
 does not run r2c on a held-out input to look at it, and does not diagnose with these cases.
@@ -368,11 +374,61 @@ def verify_frozen(archive: Path) -> list[dict]:
     return man["cases"]
 
 
+SECTIONS = {"newbeam": "rectangular beam", "tbeam": "T-beam", "column": "circular column",
+            "igirder": "prestressed I-girder", "h-deep": "deep rectangular beam",
+            "h-slab": "slab strip without stirrups"}
+
+
+def kind(c: dict) -> tuple[str, str]:
+    """A case's kind, from its recipe alone: (section type, loading path)."""
+    k = c["input"]
+    if k in SAMPLES:
+        section = "a sample file of Response's"
+    else:
+        section = SECTIONS.get(k) or SECTIONS[H[k].base if k in H else k]
+    n0, m0, _v0 = (float(x) for x in c["initial"].split(","))
+    _n, m, v = (float(x) for x in c["increment"].split(","))
+    path = []
+    if n0:
+        path.append("axial compression, then" if n0 < 0 else "axial tension, then")
+    if m0:
+        path.append("a moment, then")
+    if v and not m:
+        path.append("shear alone")
+    elif v:
+        path.append(("negative " if m < 0 else "") + "moment and shear, M/V "
+                    + ("under 2 m" if abs(m / v) < 2.0 else "2 m or more"))
+    else:
+        path.append(("negative " if m < 0 else "") + "moment")
+    return section, " ".join(path)
+
+
+def text_kinds(kinds: dict) -> str:
+    """The cases outside target by kind, as printed: no case names, no values."""
+    out = ["Cases outside target by kind (section type; loading path): outside of that kind"]
+    for t, title in AREA_TITLES.items():
+        for p, by in kinds[t].items():
+            bad = {k: v for k, v in by.items() if v[0]}
+            out.append(f"  {title}, priority {p}:" + ("" if bad else " none outside"))
+            for (section, path), (n, of) in sorted(bad.items()):
+                out.append(f"    {section}; {path}: {n} of {of}")
+    return "\n".join(out)
+
+
 def tally(cases: list[dict], results: dict, acc: dict) -> dict:
-    """{area: {priority: [inside, of]}} and the number of cases not solved, by area."""
+    """{area: {priority: [inside, of]}} and the number of cases not solved, by area; and
+    "kinds", {area: {priority: {kind: [outside, of]}}} for the cases that have a recipe
+    (kind), which is printed on request and never recorded."""
     import report
 
     totals = {t: {p: [0, 0] for p in PRIORITY[g]} for g, t in AREAS.items()}
+    kinds = {t: {p: {} for p in PRIORITY[g]} for g, t in AREAS.items()}
+
+    def count(c, t, p, outside):
+        if "input" in c:
+            n = kinds[t][p].setdefault(kind(c), [0, 0])
+            n[0] += outside
+            n[1] += 1
     unsolved = {t: 0 for t in AREAS.values()}
     groups = {t: g for g, t in AREAS.items()}
     for c in cases:
@@ -383,6 +439,7 @@ def tally(cases: list[dict], results: dict, acc: dict) -> dict:
             unsolved[t] += 1
             for p in PRIORITY[g]:
                 totals[t][p][1] += 1
+                count(c, t, p, 1)
             continue
         chk = report.assess(res, acc)
         for p, names in PRIORITY[g].items():
@@ -391,7 +448,8 @@ def tally(cases: list[dict], results: dict, acc: dict) -> dict:
                 continue
             totals[t][p][1] += 1
             totals[t][p][0] += all(oks)
-    return {"totals": totals, "unsolved": unsolved}
+            count(c, t, p, 0 if all(oks) else 1)
+    return {"totals": totals, "unsolved": unsolved, "kinds": kinds}
 
 
 def score(a, ap) -> int:
@@ -421,11 +479,16 @@ def score(a, ap) -> int:
         results = dict(ex.map(one, cases))
     (out / "results.json").write_text(json.dumps(results, indent=1))
     acc = report.read_targets(ROOT / "docs" / "measures.md")
+    recipe = {c["name"]: c for c in CASES}
+    counted = tally([dict(recipe[c["name"]], area=c["area"]) for c in cases], results, acc)
+    kinds = counted.pop("kinds")
     run = dict(label=label, date=dt.date.today().isoformat(),
                commit=(commit if rc == 0 else "") + ("+dirty" if dirty else ""),
                cases={t: sum(c["area"] == t for c in cases) for t in AREAS.values()},
-               **tally(cases, results, acc))
+               **counted)
     print(text_totals(run))
+    if a.kinds:
+        print(text_kinds(kinds))
     if a.record:
         if dirty:
             raise SystemExit("not recorded: src/ has uncommitted changes")
@@ -529,6 +592,9 @@ def main(argv=None) -> int:
     ap.add_argument("--jobs", type=int, default=1)
     ap.add_argument("--record", metavar="LABEL",
                     help="score: append the totals to heldout/totals.json under this label")
+    ap.add_argument("--kinds", action="store_true",
+                    help="score: also print the cases outside target by kind (section type "
+                         "and loading path), with no names or values")
     ap.add_argument("--dry-freeze", action="store_true",
                     help="build: capture, but do not write the manifest")
     a = ap.parse_args(argv)

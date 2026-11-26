@@ -52,8 +52,11 @@ When these pull against each other, the higher one wins.
 The held-out set (`heldout/`) is what "good" is judged on: sections the developer has not
 tuned against. It is frozen; its recipe and hashes are committed (`heldout/manifest.json`).
 
-- **Score it only with `tools/heldout.py score`**, which prints totals by area and priority
-  and nothing else. Its per-case results go to the archive outside the repository.
+- **Score it only with `tools/heldout.py score`**, which prints totals by area and priority.
+  It may also print the failing cases by kind (section type, loading path, area and
+  priority), with no curves, numbers or case names (owner, 2026-11-25): that is for
+  choosing what to add to the development set, and nothing else. Its per-case results go
+  to the archive outside the repository.
 - **Do not open per-case held-out results**, by any route: not the scorer's files in the
   archive, not r2c's own output for a held-out case, not a comparison of one. Do not run r2c
   on a held-out input to look at what it does.
@@ -78,6 +81,11 @@ before changing the kernel; `docs/measures.md` before judging a result). Run
 
 **During.**
 
+- **The budget is meant to be used** (owner, 2026-11-25). When a line of work ends, start
+  the next. A question for the owner does not end the increment: record it with a
+  suggested answer, act on that answer where it can be undone, and carry on. Stop only
+  when the budget is spent or a stop-and-ask condition of the brief is met. Open-ended
+  work on stages that do not settle is in bounds; measure it and log it.
 - Work on the development set. The order of the priorities guides effort; it does not gate.
 - Accepting a deviation or dropping an approach is the developer's call. Put it in
   `docs/deviations.md` in plain language (no numbers for the entries) and say why in the log.
@@ -114,8 +122,8 @@ summary.
   increments in a row with no gain in any area's held-out total).
 
 Asking means: say it under "Needed from the owner" in `docs/summary.md` and in the pull
-request, stop that line of work, and carry on with something else. Everything else, decide
-and note in the log.
+request, with a suggested answer, stop that line of work, and carry on with something
+else. Everything else, decide and note in the log.
 
 ## Where things are
 

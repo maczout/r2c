@@ -59,6 +59,7 @@ def test_totals_hold_totals_only():
 def test_a_case_r2c_does_not_solve_counts_outside_on_every_priority():
     cases = [{"name": "a", "area": "shear"}, {"name": "b", "area": "moment-axial"}]
     t = heldout.tally(cases, {"a": {"failed": "x"}}, report.read_targets(ROOT / "docs" / "measures.md"))
+    t.pop("kinds")
     assert t["unsolved"] == {"moment-axial": 1, "shear": 1}
     assert t["totals"]["shear"] == {p: [0, 1] for p in "1234"}
     assert t["totals"]["moment-axial"] == {p: [0, 1] for p in "123"}
@@ -73,3 +74,15 @@ def test_priorities_are_counted_from_the_report_s_own_assessment():
     assert t["1"] == [0, 1]      # the rising branch is outside
     assert t["4"] == [1, 1]      # the ending is inside
     assert t["2"] == [0, 0] and t["3"] == [0, 0]   # no views compared: no such check
+
+
+def test_the_kinds_name_no_case_and_carry_no_value():
+    acc = report.read_targets(ROOT / "docs" / "measures.md")
+    cases = [dict(c, area=heldout.area(c)) for c in heldout.CASES]
+    text = heldout.text_kinds(heldout.tally(cases, {}, acc)["kinds"])
+    assert "outside" in text and "T-beam" in text and "shear alone" in text
+    for c in heldout.CASES:
+        assert c["name"] not in text
+    assert "%" not in text and "h-" not in text
+    # every case of the recipe has a kind
+    assert len({heldout.kind(c) for c in heldout.CASES}) > 10

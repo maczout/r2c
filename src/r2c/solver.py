@@ -429,7 +429,7 @@ class Analysis:
         # [B 004a9d90, 004ff8f0]
         sh = sec.shrinkage(zf)
         ex = self.strain(e0, phi, zf) - sh
-        m = sec.tab(sec.t_m, zf)
+        m = sec.bond_m(zf)
         ft = np.interp(zf, sec.tz, self.t_ft)
         smx = sec.smx_at(zf)
         smt = sec.smt_at(zf)
@@ -532,7 +532,7 @@ class Analysis:
             yld += rho * st.steel.fy * st.steel.phi
             capt += rho * cap
             rho_t += rho
-            a_n += np.where(inside, st.area / len(sec.stirrups), 0.0)
+            a_n += np.where(inside, st.area / sec.n_trans, 0.0)
             a_s += np.where(inside, st.area / (st.space + 1e-4), 0.0)
         eff = np.clip(0.5 * (3.0 - a_n / (a_s + 1e-9) / sec.h), 0.0, 1.0)
         res = eff * (np.maximum(yld, capt) - tot)
@@ -794,7 +794,13 @@ class Analysis:
         fl = ft / (1.0 + 250.0 * out.w)
         g = np.maximum(out.f1 - fl, 0.0) + out.vci / out.tan
         cr = out.e1 > out.ecr
-        side = (z >= zref) if phi <= 0 else (z <= zref)
+        if abs(zref) >= FAR:
+            # all in tension: the axis is far outside and the whole depth is on its
+            # tension side, whichever way the section bends [O: the Liping sample under
+            # axial tension, then moment; Response's bars all carry the same extra stress]
+            side = np.ones(len(z), dtype=bool)
+        else:
+            side = (z >= zref) if phi <= 0 else (z <= zref)
         ok = cr & side
         d = np.abs(zref - z)
         k = ok[:-1] & ok[1:]
@@ -1343,6 +1349,8 @@ class Flexure:
         cb, kb, gb = self._marks(b)
         if cb and not ca:
             return "crack"
+        if ca and not cb and self.cracks_closing:
+            return "uncrack"
         if kb and not ka:
             return "crush"
         if gb > ga:
@@ -1359,6 +1367,16 @@ class Flexure:
         if self.on_stage:
             self.on_stage(len(self.stages))
 
+    # Written and off (docs/kernel.md, "Closing in on first cracking"): close in on the
+    # extreme fibre reaching its peak strain by the binary's share, 0.5 % of the way come,
+    # with no count of tries [B 00419ff0]. Measured after the held-out score of increment 4
+    # and left off so that the kernel stays the one that was scored.
+    crush_by_share = False
+    # Written and off: the cracks closing between two stages is an event too, closed in on
+    # with a stage at 0.8 of the gap [B 00415e30, 0041a870, 00419ff0; O: the I-girder
+    # under moment]
+    cracks_closing = False
+
     def advance(self, cur: Stage, target: float, depth: int,
                 aside: Stage | None = None) -> Stage:
         """Accept a stage at the target, approaching it in geometric steps when something
@@ -1368,6 +1386,9 @@ class Flexure:
         fresh = depth != 0 or aside is not None or len(self.stages) < 2
         trial = self.solve(target, cur, aside=aside, fresh=fresh)
         kind = self.has_event(cur, trial)
+        # what happened on the way to this stage when it was tried: the end test asks for
+        # it, not for what lies between the stage and the one kept just before it
+        trial.tried_event = kind
         if kind == "rupture" and depth == 0:
             # steel ruptures within the step [B 00415e30, 00419ff0]: the stage is set aside
             # and one a fifth of the way there is tried, and so on while the step is more
@@ -1386,12 +1407,29 @@ class Flexure:
                     break
             self.accept(trial)
             return trial
-        if depth < 2 and kind and kind != "rupture":
-            for _ in range(14 if (depth == 0 or kind == "crack") else 3):
-                t1 = cur.control + 0.2 * (target - cur.control)
-                if kind == "crack" and abs(t1 - cur.control) < max(
-                        0.004 * abs(cur.control), 0.0036 * self.step0):
-                    break
+        by_share = kind in ("crack", "uncrack") or (kind == "crush" and self.crush_by_share)
+        if by_share or (kind == "crush" and depth < 2):
+            # cracking: the stage is set aside and one a fifth of the way to it is tried,
+            # again and again, each one that shows the cracking set aside in its turn,
+            # while what is left to the nearest stage set aside is more than 2 % of the
+            # way come from the first stage [B 00415e30, 00419ff0; O: docs/kernel.md,
+            # "Closing in on first cracking"]. The extreme fibre at its peak strain: as
+            # before, 14 tries, 3 on a stage that was itself put in between [O]
+            share = 0.005 if kind == "crush" else 0.02
+            # where the cracks close the stage put in is at 0.8 of the gap [B 0041a870]
+            part = 0.8 if kind == "uncrack" else 0.2
+            for _ in range(100 if by_share else 14 if depth == 0 else 3):
+                t1 = cur.control + part * (target - cur.control)
+                if self.crush_by_share or kind == "uncrack":
+                    # as the binary has it: the step to the stage set aside against the way
+                    # that stage has come from the first one [B 00419ff0]
+                    travel = abs(target - self.stages[0].control)
+                    if abs(target - cur.control) <= share * travel:
+                        break
+                else:
+                    travel = abs(cur.control - self.stages[0].control)
+                    if kind == "crack" and abs(target - cur.control) < 0.02 * travel:
+                        break
                 try:
                     sub = self.advance(cur, t1, depth + 1, aside=trial)
                 except SolveError:
@@ -1480,6 +1518,11 @@ class Flexure:
         """Less than a fifth of the peak load is left at a stage, the eleventh or later, at
         which nothing new has happened since the one before [B 00419990]."""
         if len(self.stages) < 11 or not (peak > 0 and st.lam < 0.2 * peak):
+            return False
+        # a stage that was set aside for an event and kept afterwards counts as one at
+        # which something new happened [O: Newbeam with light steel under negative moment,
+        # where Response goes one stage beyond the last stage set aside]
+        if getattr(st, "tried_event", ""):
             return False
         return self.has_event(self.stages[-2], st) == ""
 
