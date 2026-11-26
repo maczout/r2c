@@ -1,477 +1,663 @@
 {
  "cases": {
   "cm4-m3v": {
-   "peak": 9.7
+   "peak": 9.7,
+   "all": 156.2
   },
   "cm4-n500-m": {
-   "peak": 5.8
+   "peak": 5.8,
+   "all": 77.9
   },
   "cm4-negm": {
-   "peak": 6.0
+   "peak": 6.0,
+   "all": 96.0
   },
   "cm4-ntens200-m": {
-   "peak": 5.8
+   "peak": 5.8,
+   "all": 62.9
   },
   "column-fc35-nm": {
-   "peak": 5.6
+   "peak": 5.6,
+   "all": 51.4
   },
   "column-interlock-mv": {
-   "peak": 7.5
+   "peak": 7.5,
+   "all": 48.4
   },
   "column-mv": {
-   "peak": 6.8
+   "peak": 6.8,
+   "all": 44.5
   },
   "column-n1000-m": {
-   "peak": 5.0
+   "peak": 5.0,
+   "all": 58.6
   },
   "column-n3000-m": {
-   "peak": 5.0
+   "peak": 5.0,
+   "all": 48.7
   },
   "column-n3000-m2v": {
-   "peak": 6.7
+   "peak": 6.7,
+   "all": 73.5
   },
   "column-n4000-m": {
-   "peak": 4.9
+   "peak": 4.9,
+   "all": 67.6
   },
   "column-n6000-m": {
-   "peak": 5.1
+   "peak": 5.1,
+   "all": 57.8
   },
   "column-nonly": {
-   "peak": 4.9
+   "peak": 4.9,
+   "all": 55.9
   },
   "column-ntens150-m": {
-   "peak": 5.0
+   "peak": 5.0,
+   "all": 87.2
   },
   "column-ntens300-m": {
-   "peak": 5.2
+   "peak": 5.2,
+   "all": 79.7
   },
   "column-ntens400-m": {
-   "peak": 5.0
+   "peak": 5.0,
+   "all": 88.4
   },
   "column-ntens600-m": {
-   "peak": 5.3
+   "peak": 5.3,
+   "all": 89.1
   },
   "column-ntens900-m": {
-   "peak": 5.0
+   "peak": 5.0,
+   "all": 71.6
   },
   "column-us-m": {
-   "peak": 4.9
+   "peak": 4.9,
+   "all": 81.4
   },
   "dmn1n-m4v": {
-   "peak": 6.6
+   "peak": 6.6,
+   "all": 76.2
   },
   "dmn1n-n200-m": {
-   "peak": 4.9
+   "peak": 4.9,
+   "all": 72.0
   },
   "dmn1n-negm": {
-   "peak": 5.2
+   "peak": 5.2,
+   "all": 94.6
   },
   "dmn1n-ntens100-m": {
-   "peak": 5.1
+   "peak": 5.1,
+   "all": 77.2
   },
   "igirder-csoft3-m2v": {
-   "peak": 5.7
+   "peak": 5.7,
+   "all": 60.7
   },
   "igirder-dep5-m": {
-   "peak": 5.2
+   "peak": 5.2,
+   "all": 80.3
   },
   "igirder-dep5-m2v": {
-   "peak": 6.3
+   "peak": 6.3,
+   "all": 63.7
   },
   "igirder-fc45-m": {
-   "peak": 5.0
+   "peak": 5.0,
+   "all": 81.8
+  },
+  "igirder-fc45-m3v": {
+   "all": 74.1
   },
   "igirder-m": {
-   "peak": 4.9
+   "peak": 4.9,
+   "all": 86.1
   },
   "igirder-m3v": {
-   "peak": 6.8
+   "peak": 6.8,
+   "all": 71.9
   },
   "igirder-mv": {
-   "peak": 5.4
+   "peak": 5.4,
+   "all": 38.6
   },
   "igirder-n500-m": {
-   "peak": 5.0
+   "peak": 5.0,
+   "all": 81.0
+  },
+  "igirder-negm2v": {
+   "all": 47.1
   },
   "igirder-ntens500-m": {
-   "peak": 5.0
+   "peak": 5.0,
+   "all": 69.4
   },
   "liping-m25v": {
-   "peak": 7.4
+   "peak": 7.4,
+   "all": 191.9
   },
   "liping-n300-m": {
-   "peak": 4.9
+   "peak": 4.9,
+   "all": 75.3
   },
   "liping-negm": {
-   "peak": 5.0
+   "peak": 5.0,
+   "all": 76.6
   },
   "liping-ntens200-m": {
-   "peak": 5.1
+   "peak": 5.1,
+   "all": 85.9
   },
   "marshall-m3v": {
-   "peak": 6.4
+   "peak": 6.4,
+   "all": 76.6
   },
   "marshall-mv": {
-   "peak": 12.9
+   "peak": 12.9,
+   "all": 57.0
   },
   "marshall-n500-m": {
-   "peak": 5.1
+   "peak": 5.1,
+   "all": 71.7
   },
   "newbeam-axialloc-nm": {
-   "peak": 4.9
+   "peak": 4.9,
+   "all": 58.9
   },
   "newbeam-bardep-m": {
-   "peak": 5.2
+   "peak": 5.2,
+   "all": 62.2
   },
   "newbeam-bartherm-m": {
-   "peak": 4.9
+   "peak": 4.9,
+   "all": 57.1
   },
   "newbeam-cmod0-m": {
-   "peak": 5.1
+   "peak": 5.1,
+   "all": 57.9
   },
   "newbeam-cmod1-n500-m": {
-   "peak": 5.1
+   "peak": 5.1,
+   "all": 67.3
   },
   "newbeam-cmod1-negm": {
-   "peak": 5.0
+   "peak": 5.0,
+   "all": 74.8
   },
   "newbeam-cmod3-m": {
-   "peak": 4.9
+   "peak": 4.9,
+   "all": 66.5
   },
   "newbeam-csa": {
-   "peak": 5.3
+   "peak": 5.3,
+   "all": 69.8
   },
   "newbeam-csa-mv": {
-   "peak": 6.1
+   "peak": 6.1,
+   "all": 52.7
   },
   "newbeam-csafile-m": {
-   "peak": 4.9
+   "peak": 4.9,
+   "all": 69.1
   },
   "newbeam-csafile-none-m": {
-   "peak": 5.1
+   "peak": 5.1,
+   "all": 66.8
   },
   "newbeam-deep900-m": {
-   "peak": 4.9
+   "peak": 4.9,
+   "all": 69.7
   },
   "newbeam-deep900-m15v": {
-   "peak": 16.3
+   "peak": 16.3,
+   "all": 82.4
   },
   "newbeam-deep900-n1500-m": {
-   "peak": 4.9
+   "peak": 4.9,
+   "all": 58.2
   },
   "newbeam-deep900-negm": {
-   "peak": 4.9
+   "peak": 4.9,
+   "all": 52.5
   },
   "newbeam-e0-m": {
-   "peak": 4.9
+   "peak": 4.9,
+   "all": 59.8
   },
   "newbeam-fc20-m": {
-   "peak": 5.1
+   "peak": 5.1,
+   "all": 56.0
   },
   "newbeam-fc20-mv": {
-   "peak": 5.7
+   "peak": 5.7,
+   "all": 49.7
   },
   "newbeam-fc30-m": {
-   "peak": 4.9
+   "peak": 4.9,
+   "all": 63.4
   },
   "newbeam-fc45-cmod1-m": {
-   "peak": 4.9
+   "peak": 4.9,
+   "all": 64.1
   },
   "newbeam-fc50-m": {
-   "peak": 4.9
+   "peak": 4.9,
+   "all": 70.2
   },
   "newbeam-fc50-m2v": {
-   "peak": 6.1
+   "peak": 6.1,
+   "all": 59.7
   },
   "newbeam-fc50-tstiff2-m": {
-   "peak": 5.0
+   "peak": 5.0,
+   "all": 76.6
   },
   "newbeam-fc65-m": {
-   "peak": 4.9
+   "peak": 4.9,
+   "all": 74.4
   },
   "newbeam-fc65-negm": {
-   "peak": 5.0
+   "peak": 5.0,
+   "all": 81.5
   },
   "newbeam-fc80-m": {
-   "peak": 5.0
+   "peak": 5.0,
+   "all": 75.7
   },
   "newbeam-fc80-mv": {
-   "peak": 7.3
+   "peak": 7.3,
+   "all": 51.1
   },
   "newbeam-ft-m": {
-   "peak": 4.8
+   "peak": 4.8,
+   "all": 66.3
   },
   "newbeam-fy300-m": {
-   "peak": 4.8
+   "peak": 4.8,
+   "all": 77.0
   },
   "newbeam-fy450-m": {
-   "peak": 4.9
+   "peak": 4.9,
+   "all": 79.5
   },
   "newbeam-fy450-negm": {
-   "peak": 4.9
+   "peak": 4.9,
+   "all": 85.2
   },
   "newbeam-fy600-m": {
-   "peak": 5.1
+   "peak": 5.1,
+   "all": 77.4
   },
   "newbeam-fy600-mv": {
-   "peak": 5.9
+   "peak": 5.9,
+   "all": 58.8
   },
   "newbeam-heavy2500-m": {
-   "peak": 4.9
+   "peak": 4.9,
+   "all": 75.4
   },
   "newbeam-heavy2500-negm": {
-   "peak": 5.4
+   "peak": 5.4,
+   "all": 94.7
+  },
+  "newbeam-heavy2500-negm2v": {
+   "all": 203.1
   },
   "newbeam-heavy3500-m": {
-   "peak": 5.2
+   "peak": 5.2,
+   "all": 78.8
   },
   "newbeam-heavy3500-negm": {
-   "peak": 5.0
+   "peak": 5.0,
+   "all": 93.3
   },
   "newbeam-kgcm": {
-   "peak": 5.2
+   "peak": 5.2,
+   "all": 86.1
   },
   "newbeam-kgcmfile-mv": {
-   "peak": 6.4
+   "peak": 6.4,
+   "all": 63.1
   },
   "newbeam-light300-m": {
-   "peak": 5.1
+   "peak": 5.1,
+   "all": 84.4
   },
   "newbeam-light400-m": {
-   "peak": 5.0
+   "peak": 5.0,
+   "all": 98.5
   },
   "newbeam-light500-m": {
-   "peak": 5.4
+   "peak": 5.4,
+   "all": 101.7
   },
   "newbeam-light500-n300-m": {
-   "peak": 5.3
+   "peak": 5.3,
+   "all": 85.3
   },
   "newbeam-light700-m": {
-   "peak": 5.3
+   "peak": 5.3,
+   "all": 90.8
   },
   "newbeam-light800-m": {
-   "peak": 5.0
+   "peak": 5.0,
+   "all": 87.2
   },
   "newbeam-light800-mv": {
-   "peak": 7.7
+   "peak": 7.7,
+   "all": 157.3
   },
   "newbeam-light800-negm": {
-   "peak": 5.0
+   "peak": 5.0,
+   "all": 96.6
   },
   "newbeam-m": {
-   "peak": 5.1
+   "peak": 5.1,
+   "all": 77.6
   },
   "newbeam-m-md2": {
-   "peak": 8.2
+   "peak": 8.2,
+   "all": 272.7
   },
   "newbeam-m-mdmax": {
-   "peak": 10.0
+   "peak": 10.0,
+   "all": 391.2
   },
   "newbeam-m05v": {
-   "peak": 8.4
+   "peak": 8.4,
+   "all": 80.0
   },
   "newbeam-m0neg-mv": {
-   "peak": 9.4
+   "peak": 9.4,
+   "all": 64.9
   },
   "newbeam-m2v": {
-   "peak": 20.6
+   "peak": 20.6,
+   "all": 129.4
+  },
+  "newbeam-m4v": {
+   "all": 86.2
   },
   "newbeam-m50-v": {
-   "peak": 7.6
+   "peak": 7.6,
+   "all": 80.9
   },
   "newbeam-mid400-m": {
-   "peak": 5.1
+   "peak": 5.1,
+   "all": 73.1
+  },
+  "newbeam-mid400-m2v": {
+   "all": 50.6
   },
   "newbeam-mid400-n1000-m": {
-   "peak": 4.8
+   "peak": 4.8,
+   "all": 57.5
   },
   "newbeam-mv": {
-   "peak": 6.1
+   "peak": 6.1,
+   "all": 54.4
   },
   "newbeam-mv-md2": {
-   "peak": 10.3
+   "peak": 10.3,
+   "all": 166.7
   },
   "newbeam-n1000-v": {
-   "peak": 7.5
+   "peak": 7.5,
+   "all": 55.2
   },
   "newbeam-n2000-m": {
-   "peak": 5.1
+   "peak": 5.1,
+   "all": 50.7
   },
   "newbeam-n300-v": {
-   "peak": 10.6
+   "peak": 10.6,
+   "all": 61.5
   },
   "newbeam-n500-m2v": {
-   "peak": 6.3
+   "peak": 6.3,
+   "all": 70.4
   },
   "newbeam-ncomp-v": {
-   "peak": 9.9
+   "peak": 9.9,
+   "all": 65.1
   },
   "newbeam-negm": {
-   "peak": 5.1
+   "peak": 5.1,
+   "all": 83.9
   },
   "newbeam-nm": {
-   "peak": 5.2
+   "peak": 5.2,
+   "all": 48.1
   },
   "newbeam-nmv": {
-   "peak": 12.4
+   "peak": 12.4,
+   "all": 76.5
   },
   "newbeam-nmv-incr": {
-   "peak": 6.0
+   "peak": 6.0,
+   "all": 66.0
   },
   "newbeam-nonly": {
-   "peak": 5.2
+   "peak": 5.2,
+   "all": 50.8
   },
   "newbeam-nostirrups-mv": {
-   "peak": 5.9
+   "peak": 5.9,
+   "all": 48.9
   },
   "newbeam-ntension-m": {
-   "peak": 5.2
+   "peak": 5.2,
+   "all": 101.6
   },
   "newbeam-shrink-m": {
-   "peak": 5.0
+   "peak": 5.0,
+   "all": 68.6
   },
   "newbeam-slab150-m": {
-   "peak": 5.0
+   "peak": 5.0,
+   "all": 77.4
   },
   "newbeam-slab150-negm": {
-   "peak": 5.0
+   "peak": 5.0,
+   "all": 85.3
   },
   "newbeam-slab200-m": {
-   "peak": 5.0
+   "peak": 5.0,
+   "all": 70.5
   },
   "newbeam-slab200-m2v": {
-   "peak": 5.6
+   "peak": 5.6,
+   "all": 73.8
   },
   "newbeam-slab200-n300-m": {
-   "peak": 5.0
+   "peak": 5.0,
+   "all": 82.5
   },
   "newbeam-slab200-negm": {
-   "peak": 5.0
+   "peak": 5.0,
+   "all": 84.5
   },
   "newbeam-slab300-m": {
-   "peak": 5.1
+   "peak": 5.1,
+   "all": 93.8
   },
   "newbeam-slab300-negm": {
-   "peak": 5.1
+   "peak": 5.1,
+   "all": 92.1
   },
   "newbeam-smx-mv": {
-   "peak": 6.4
+   "peak": 6.4,
+   "all": 64.5
   },
   "newbeam-st150-mv": {
-   "peak": 7.0
+   "peak": 7.0,
+   "all": 126.6
   },
   "newbeam-st150-n200-v": {
-   "peak": 7.6
+   "peak": 7.6,
+   "all": 107.7
   },
   "newbeam-st150-n400-v": {
-   "peak": 5.6
+   "peak": 5.6,
+   "all": 54.6
+  },
+  "newbeam-st2leg200-m2v": {
+   "all": 81.2
   },
   "newbeam-st2leg200-n300-v": {
-   "peak": 5.6
+   "peak": 5.6,
+   "all": 55.1
   },
   "newbeam-stirrupdep-mv": {
-   "peak": 6.2
+   "peak": 6.2,
+   "all": 62.7
   },
   "newbeam-tension": {
-   "peak": 4.9
+   "peak": 4.9,
+   "all": 38.0
   },
   "newbeam-thermgrad-m": {
-   "peak": 5.0
+   "peak": 5.0,
+   "all": 71.8
   },
   "newbeam-tsfactor-mv": {
-   "peak": 11.8
+   "peak": 11.8,
+   "all": 58.0
   },
   "newbeam-tstiff1-m": {
-   "peak": 5.0
+   "peak": 5.0,
+   "all": 75.3
   },
   "newbeam-tstiff1-mv": {
-   "peak": 6.6
+   "peak": 6.6,
+   "all": 56.8
   },
   "newbeam-tstiff2-m": {
-   "peak": 4.9
+   "peak": 4.9,
+   "all": 73.9
   },
   "newbeam-tstiff2-mv": {
-   "peak": 5.9
+   "peak": 5.9,
+   "all": 55.2
   },
   "newbeam-tstiff3-m": {
-   "peak": 5.2
+   "peak": 5.2,
+   "all": 69.7
   },
   "newbeam-tstiff3-mv": {
-   "peak": 6.2
+   "peak": 6.2,
+   "all": 55.5
   },
   "newbeam-tstiff4-m": {
-   "peak": 5.0
+   "peak": 5.0,
+   "all": 73.7
   },
   "newbeam-tstiff4-mv": {
-   "peak": 6.0
+   "peak": 6.0,
+   "all": 52.6
   },
   "newbeam-tstiff6-m": {
-   "peak": 5.0
+   "peak": 5.0,
+   "all": 66.6
   },
   "newbeam-tstiff6-mv": {
-   "peak": 6.6
+   "peak": 6.6,
+   "all": 44.3
   },
   "newbeam-us": {
-   "peak": 5.1
+   "peak": 5.1,
+   "all": 64.9
   },
   "newbeam-us-mv": {
-   "peak": 12.5
+   "peak": 12.5,
+   "all": 77.4
   },
   "newbeam-usfile-mv": {
-   "peak": 11.9
+   "peak": 11.9,
+   "all": 71.0
   },
   "newbeam-usfile-si-m": {
-   "peak": 4.9
+   "peak": 4.9,
+   "all": 65.0
   },
   "newbeam-v0-m": {
-   "peak": 6.2
+   "peak": 6.2,
+   "all": 76.0
   },
   "newbeam-vonly": {
-   "peak": 7.4
+   "peak": 7.4,
+   "all": 64.9
   },
   "newbeam-zero": {
-   "peak": 5.4
+   "peak": 5.4,
+   "all": 6.4
   },
   "se100-m3v": {
-   "peak": 7.0
+   "peak": 7.0,
+   "all": 65.7
   },
   "se100-n500-m": {
-   "peak": 5.0
+   "peak": 5.0,
+   "all": 78.0
   },
   "se100-negm": {
-   "peak": 5.4
+   "peak": 5.4,
+   "all": 73.3
   },
   "se100-ntens300-m": {
-   "peak": 5.3
+   "peak": 5.3,
+   "all": 75.4
   },
   "tbeam-csa-m2v": {
-   "peak": 6.2
+   "peak": 6.2,
+   "all": 60.3
   },
   "tbeam-fc30-m": {
-   "peak": 5.2
+   "peak": 5.2,
+   "all": 73.8
   },
   "tbeam-fc30-negm": {
-   "peak": 5.0
+   "peak": 5.0,
+   "all": 70.9
   },
   "tbeam-kgcm-m": {
-   "peak": 5.0
+   "peak": 5.0,
+   "all": 67.7
   },
   "tbeam-m": {
-   "peak": 5.0
+   "peak": 5.0,
+   "all": 67.7
+  },
+  "tbeam-m4v": {
+   "all": 64.1
   },
   "tbeam-n1000-m": {
-   "peak": 4.9
+   "peak": 4.9,
+   "all": 69.2
   },
   "tbeam-negm": {
-   "peak": 4.9
+   "peak": 4.9,
+   "all": 70.3
+  },
+  "tbeam-negmv": {
+   "all": 48.3
   },
   "tbeam-ntens500-m": {
-   "peak": 5.0
+   "peak": 5.0,
+   "all": 68.2
   }
  },
  "measured": {
   "peak": {
-   "when": "2026-11-26T06:02:50-07:00",
+   "when": "2026-11-26T06:39:05-07:00",
+   "machine": "Linux x86_64, 32 cores",
+   "jobs": 6,
+   "what": "wall-clock seconds of one r2x.worker command, start to exit"
+  },
+  "all": {
+   "when": "2026-11-26T06:38:35-07:00",
    "machine": "Linux x86_64, 32 cores",
    "jobs": 6,
    "what": "wall-clock seconds of one r2x.worker command, start to exit"

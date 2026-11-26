@@ -3,7 +3,7 @@
 
     python tools/r2xtimes.py measure SCRATCH --response-dir DIR --inputs DIR [DIR ...]
                              [--jobs N] [--only NAME ...] [--stage all|peak]
-    python tools/r2xtimes.py compare VERIFY_OUT [--list]
+    python tools/r2xtimes.py compare VERIFY_OUT [--list] [--reading all|peak] [--archive DIR]
 
 Answers the owner's speed threshold (2026-11-26): on every case, r2c's run time is no more
 than r2x's on the same input, measured on the same machine.
@@ -21,7 +21,10 @@ outside the repository, and are not used for anything else. Needs r2x importable
 compare sets r2c's seconds in a verify run (tools/verify.py's "seconds": the solve alone,
 in a process that is already running) beside them: the number of cases where r2c takes no
 longer than r2x, by area, for each of the two readings, and with --list the cases that
-take longer, slowest first by ratio. Development runs only.
+take longer, slowest first by ratio. --archive DIR adds a third reading: the seconds
+tools/capture.py recorded in the development archive's manifest when each case was
+captured, one at a time (the same command as "every stage"). Where r2x fails on a case at
+a reading there is no time and the case is left out of that row. Development runs only.
 """
 from __future__ import annotations
 
@@ -49,6 +52,7 @@ from r2c import record  # noqa: E402
 ROOT = Path(__file__).resolve().parents[1]
 TIMES = ROOT / "tests" / "oracle" / "r2x-times.json"
 READINGS = ("all", "peak")
+NAMES = {"all": "every stage", "peak": "the peak", "capture": "every stage, as captured"}
 
 
 def load() -> dict:
@@ -126,13 +130,21 @@ def compare(a) -> int:
         raise SystemExit("development runs only")
     results = json.loads((Path(a.run) / "results.json").read_text())
     cases = load()["cases"]
+    readings = READINGS
+    if a.archive:
+        # the seconds tools/capture.py recorded when each case was captured (one at a time)
+        man = json.loads((Path(a.archive) / "manifest.json").read_text())
+        for n, c in cases.items():
+            if "seconds" in man.get(n, {}):
+                c["capture"] = man[n]["seconds"]
+        readings = READINGS + ("capture",)
     print("Cases where r2c takes no longer than r2x (r2c: seconds of the solve in "
           "tools/verify.py; r2x: seconds of its worker's command)")
     print("| Cases | r2x reads | Within | r2c median | r2x median | Largest ratio |")
     print("|---|---|---:|---:|---:|---:|")
     over_all = []
     for g, title in (("flexure", "without shear"), ("shear", "with shear")):
-        for reading in READINGS:
+        for reading in readings:
             rows = [(results[n]["seconds"], c[reading], n) for n, c in cases.items()
                     if reading in c and "seconds" in results.get(n, {})
                     and report.group(results[n]["ref"]) == g]
@@ -140,7 +152,7 @@ def compare(a) -> int:
                 continue
             inside = sum(1 for r, x, _ in rows if r <= x)
             worst = max(r / x for r, x, _ in rows)
-            print(f"| {len(rows)} {title} | {'every stage' if reading == 'all' else 'the peak'} | "
+            print(f"| {len(rows)} {title} | {NAMES[reading]} | "
                   f"{inside} of {len(rows)} | {st.median(r for r, _, _ in rows):.1f} | "
                   f"{st.median(x for _, x, _ in rows):.1f} | {worst:.1f} |")
             if reading == a.reading:
@@ -167,6 +179,7 @@ def main(argv=None) -> int:
     c.add_argument("run")
     c.add_argument("--list", action="store_true")
     c.add_argument("--reading", choices=READINGS, default="all")
+    c.add_argument("--archive", help="also against the seconds in this archive's manifest")
     a = ap.parse_args(argv)
     return measure(a) if a.cmd == "measure" else compare(a)
 

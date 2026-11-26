@@ -114,6 +114,7 @@ class Analysis:
         self.dead = np.zeros(len(sec.layers), dtype=bool)   # ruptured at a crack
         self.last_ey = None
         self._nodes = None      # the nodes' transverse solves so far (NodeStore)
+        self._layers = {}       # the nodes of the layers between given bounds (layer_nodes)
 
     # -- layers ---------------------------------------------------------------------------------
     def _initial_bounds(self) -> np.ndarray:
@@ -201,6 +202,20 @@ class Analysis:
         """(z, b) arrays of shape (L, 3): top, middle and bottom of every layer."""
         sec = self.sec
         bd = self.bounds if bounds is None else bounds
+        # the same bounds give the same nodes: kept, since the layers are split anew from
+        # the base layers at every evaluation of a state and pass through the same bounds
+        key = bd.tobytes()
+        kept = self._layers.get(key)
+        if kept is not None:
+            return kept[0].copy(), kept[1].copy()
+        z, b = self._layer_nodes(bd)
+        if len(self._layers) > 4000:
+            self._layers.clear()
+        self._layers[key] = (z, b)
+        return z.copy(), b.copy()
+
+    def _layer_nodes(self, bd):
+        sec = self.sec
         zt, zb = bd[:-1], bd[1:]
         zm = 0.5 * (zt + zb)
         z = np.stack([zt, zm, zb], axis=1)
@@ -968,6 +983,7 @@ class NodeStore:
     and each stirrup type's ratio and factor there. Nothing else enters the solve."""
 
     PASSES = 40
+    light = True             # the passes read the transverse stress alone (_stress)
     CAP = 20000              # nodes kept; past that the store is emptied
 
     def __init__(self, an: "Analysis", stirrups):
@@ -1035,6 +1051,32 @@ class NodeStore:
             outs.append((sel, o))
         return tot.reshape(shp), outs
 
+    def _stress(self, ids, ey):
+        """Total transverse stress at nodes ids, one strain a node: _run's first result, by
+        the same operations, without the nodes' other fields."""
+        an, sec = self.an, self.an.sec
+        c = self.cols[ids]
+        idx = c[:, 0]
+        one = len(sec.laws) == 1
+        tot = None if one else np.empty(len(ids))
+        for j, law in enumerate(sec.laws):
+            if one:
+                cj, eyl = c, ey
+            else:
+                sel = idx == j
+                if not sel.any():
+                    continue
+                cj, eyl = c[sel], ey[sel]
+            subs = [(st, cj[:, 11 + 2 * i], cj[:, 12 + 2 * i])
+                    for i, st in enumerate(self.stirrups)]
+            st_tot, st_res, _ = an.stirrup_stress(subs, eyl, cj[:, 9], cj[:, 10])
+            fcy = nodelib.transverse_stress(law, cj[:, 1], eyl - cj[:, 2], cj[:, 3], cj[:, 4],
+                                            cj[:, 5], cj[:, 6], cj[:, 7], cj[:, 8], st_res)
+            if one:
+                return fcy + st_tot
+            tot[sel] = fcy + st_tot
+        return tot
+
     def _bracket(self, ids):
         """New nodes: the ladder of transverse strains scanned for the first change of sign."""
         n = len(ids)
@@ -1061,7 +1103,7 @@ class NodeStore:
         if it % 3 == 2:
             x = 0.5 * (lo + hi)
         x = np.clip(x, np.minimum(lo, hi), np.maximum(lo, hi))
-        fx, _ = self._run(ids, x)
+        fx = self._stress(ids, x) if self.light else self._run(ids, x)[0]
         neg = fx <= 0
         lo = np.where(neg, x, lo)
         flo = np.where(neg, fx, flo)
