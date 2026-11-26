@@ -303,8 +303,14 @@ the last are not past it themselves. Where a node is, the range is set to the to
 the bottom of the section each divided by 100: a hundredth of the depth about the
 origin of heights, not an empty range. r2c's test (`Shear.crush_marks`) is the same
 strain against the same strain; r2c leaves an empty range, so every term of its
-stiffness is zero, where the program's has the stiffness of that sliver. Not changed:
-it is not what parts the two programs here.
+stiffness is zero, where the program's has the stiffness of that sliver. Written in
+increment 8 and **off** (`Shear.sliver`: the range from the bottom over 100 to the top
+over 100, heights from the centroid, which is *inferred*): with it, on the 60
+development cases with shear of that day, four leave priority 1 and none comes in
+(*measured*, `tools/trial.py --set Shear.sliver=1`, `tools/byprio.py`). Either the
+origin of heights is another, or what the step routine does on that range is not what
+r2c's does; the kernel's own note on the stale range says the program's stiffness is
+singular on it. It is not what parts the two programs here.
 
 What parts them (*measured*, the capture of every stage against r2c's record, both rules
 of increment 7 on; `tools/viewlines.py --raw`, the nodes at the top of the bottom
@@ -819,8 +825,10 @@ change, with no check changing side on those two; the others cannot change.
 
 Speed: the solve takes a handful of steps a node in place of a ladder of 27 strains and
 up to 40 closings in, and a node is solved once an evaluation. Shear alone on Newbeam:
-26 s for the whole response where the kept solves took 35 s (one case, a busy machine);
-not timed on the set.
+26 s for the whole response where the kept solves took 35 s (one case, a busy machine).
+On the set it is the other way: without the solves kept between evaluations a case
+with shear takes about twice as long (*measured*, `tools/times.py`, both runs on a busy
+machine; r2c's standing beside r2x is generated into the brief).
 
 ## Layers [T 7-3; B `00434eb0`, `004a9d90`, `004a9be0`]
 
@@ -1880,7 +1888,7 @@ Besides: a stage with less than 1 % of the load of the one before is dropped; of
 stages in a row with no load, one is dropped; the response ends after 327 solves. The stage
 Response shows when the solve ends is the one with the largest load.
 
-### A stage kept as it is from the twelfth pass [B `00418af0`, `004156b0`]: on, measured on one case
+### A stage kept as it is from the twelfth pass [B `00418af0`, `004156b0`], written 2026-11-26 (increment 8): on
 
 Switch: `Shear.fibre_take`.
 
@@ -1897,6 +1905,12 @@ after the peak, Response kept, 207.44 kN, error 15.15 %, 12 passes; r2c without 
 193.93, 10.46 %, 16 passes (its first twelve passes are Response's, 220.7075 to 207.4385
 against 220.7075 to 207.4378); with it 207.44, 15.15 %, 12. Three more stages of that
 response end on the twelfth pass in Response.
+
+On the 78 development cases with shear (*measured*, `tools/trial.py --set
+Shear.fibre_take=0` beside the full run, `tools/byprio.py`): no case changes side on
+priorities 1 to 3 with it; on priority 4 Newbeam with stirrups at 150 mm under 200 kN
+of compression, then shear, is inside without it and outside with it, and under shear
+alone the override no longer applies with it. On because it is the binary's rule.
 
 Open after both: at the first step of the try after that stage the two stiffnesses are
 the same; at its third, where Response's depth range with stiffness has moved (top at

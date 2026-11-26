@@ -28,9 +28,15 @@ def test_every_development_case_has_its_record_s_hash():
     assert data["made_on"].get("numpy")
 
 
-def test_the_node_store_gives_the_batch_solve_bit_for_bit():
+def test_the_node_store_gives_the_batch_solve_bit_for_bit(monkeypatch):
     # Newbeam at M/V = 1 m, the first 400 transverse solves (the uncracked stages and the
-    # first cracked ones): every field of every node, compared as bits
+    # first cracked ones): every field of every node, compared as bits. The store keeps
+    # r2c's earlier solve of a node, which has one answer for a node's inputs; with the
+    # program's own solve (increment 8: on with shear, the answer depends on where the
+    # node starts) the store is not used, so the claim is tested with that solve off
+    from r2c import solver
+
+    monkeypatch.setattr(solver.Analysis, "own_transverse", False)
     n, differs = shadow.shadow("newbeam-mv", calls=400)
     assert n == 400 and not differs, differs
 
