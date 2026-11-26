@@ -78,7 +78,13 @@ the brief.
    axial tension (its shape and its ending: Response's steps halve to the strands'
    rupture and the response ends at the peak; with item 1 on, its last-stage view comes
    inside and the ending does not), and the Cm4 sample under axial compression (its
-   ending). Trace both with `python tools/rtrace.py`, which works without shear too.
+   ending). Response's own tries on both were traced with `python tools/rtrace.py`, which
+   works without shear too, and are written out in `docs/kernel.md` ("Two more of
+   Response's own tries without shear"): on the I-girder the fall-backs of the stage
+   control with shear (the multiplier halved after a failed solve, the control variable
+   changed under 0.2, the end under 0.01), which `Flexure.run` does not have; on Cm4 a
+   second event between the stage kept after the fall and the stage set aside, which
+   r2c's one flag for the extreme fibre's peak strain cannot show.
 6. **Still to differ without shear in where the stages are** (`python tools/stagesat.py
    VERIFY_OUT --list`): three small first steps where the section is cracked from the
    start (the I-girder under axial tension); what More Detail at its most puts in at the

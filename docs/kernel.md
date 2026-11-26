@@ -922,6 +922,24 @@ the multiplier times a base step kept with the stage would give the same two num
 Off because the held-out set had been scored: with it off the records are the run of
 record's. Turning it on is the first thing for the next increment.
 
+**Two more of Response's own tries without shear, traced and not written** [O, `python
+tools/rtrace.py`, increment 5]. *The prestressed I-girder under 500 kN of axial tension
+and moment*: the section is cracked from the start and the first three steps are 0.1
+rad/km each (−7.28, −7.18, −7.08, −6.98), after which the base step is a tenth of the
+target (0.698). At the end the solve fails at 35.207 rad/km; the multiplier halves and a
+stage is kept (34.260), fails and halves again (34.624 kept at 0.125), fails once more;
+with the multiplier under 0.2 the control variable changes to the centroid's strain,
+where seven tries fail in a row as the multiplier halves to 0.016, one stage is kept, two
+more fail and the response ends with the multiplier at 0.008. So the stage control with
+shear ("Response's own load stage control") is the one at work without shear, fall-backs
+and all. *The Cm4 sample under 500 kN of axial compression and moment*: the load falls
+between 35.229 and 39.049 rad/km. Response closes in on it (35.993, then 35.381, both
+after the fall), and then goes toward the stage set aside at 39.049 a fifth of what is
+left at a time, thirteen stages, before it takes that stage and steps on: an event of the
+kind closed in on to 0.5 % still lies between each of them and the stage set aside. r2c
+takes the stage set aside straight after the first closing in; its mark for the extreme
+fibre at its peak strain is one flag for the section, set once.
+
 The control variable's value at the initial stage is the curvature or the centroid's strain
 there. More Detail adds a stage between every two up to the peak, among the stages found in
 the first control variable, to at most 327 stages.

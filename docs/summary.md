@@ -34,8 +34,9 @@ except accepted refusals** (15, and the 4 accepted inputs).
 - **Your six answers are recorded** (`docs/brief.md`, `CLAUDE.md`). **The second held-out
   set is built and frozen, in its own commit**: 22 cases (10 without shear, 12 with) in
   `heldout/finish-manifest.json`. It is not scored; the scorer refuses it.
-- **Kernel:** the two stage-control rules written last increment are on. Without shear,
-  98 of 104 development cases now step where Response steps; no check changed side.
+- **Kernel:** the two stage-control rules of last increment are on (98 of 104 cases
+  without shear now step where Response steps; no check changed side). A rule for the
+  end at a bar rupture was found after the score and is written and off.
 - **Measured, and it bears on the threshold** (`tools/noise.py`): Response compared with
   Response after every concrete strength is raised by 0.05 % is inside on 95 %, 73 % and
   88 % of the 60 development cases with shear for priorities 1, 2, 3 (98, 85, 97 % at
@@ -61,8 +62,7 @@ except accepted refusals** (15, and the 4 accepted inputs).
 - **With shear, r2c carries on where Response's solve gives up** (your override; compared
   up to Response's last stage), and after the web cracks under axial compression.
 - **How a response without shear ends when steel ruptures:** on the prestressed I-girder
-  under axial tension Response ends at the peak and r2c goes on; with very light steel
-  r2c goes on for several stages more.
+  under axial tension Response ends at the peak and r2c goes on.
 - **Inputs r2x solves and r2c refuses** (your decision), and the four accepted inputs.
 - **A fall of load at cracking on the edge of what the measure counts** (shear alone, US units).
 

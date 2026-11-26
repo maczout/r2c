@@ -53,7 +53,9 @@ measured on the development results (`docs/verification-results.md`) unless mark
   prestressed I-girder under axial tension and moment Response's tries run out at the
   strands' rupture and its response ends at the peak; r2c finds the state after the
   rupture and goes on, so the shapes differ. On Newbeam with very light steel Response
-  ends two stages after the rupture and r2c several stages later.
+  ends two stages after the rupture and r2c several stages later; the rule for that one
+  is written and switched off (`docs/kernel.md`), to be turned on at the start of the
+  next increment.
 - **Where Response puts its stages without shear**, a few places where r2c does not
   follow it: three small first steps where the section is cracked from the start (the
   I-girder under axial tension); what More Detail at its most puts in at the start; the
