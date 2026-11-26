@@ -134,7 +134,8 @@ def test_the_threshold_is_response_s_own_score_less_three_points():
     rep = {"totals": {"moment-axial": {"1": [27, 27], "2": [26, 27], "3": [0, 0]},
                       "shear": {"1": [27, 28], "2": [14, 28], "3": [21, 28], "4": [20, 28]}}}
     th = heldout.thresholds(rep)
-    assert th["moment-axial"] == {"1": 97.0, "2": 93.3}
+    # priority 1 without shear: 99 %, kept by the owner (2026-11-26) whatever Response scores
+    assert th["moment-axial"] == {"1": 99.0, "2": 93.3}
     assert th["shear"] == {"1": 93.4, "2": 47.0, "3": 72.0}      # priority 4: reported only
     assert heldout.thresholds(None) == {"moment-axial": {}, "shear": {}}
 

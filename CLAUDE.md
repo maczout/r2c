@@ -132,7 +132,12 @@ summary.
   2026-11-25), on the held-out set, for each area and priority 1 to 3: Response's own
   score there against itself after every concrete strength is raised by 0.05 %, less 3
   points (`heldout/repeatability.json`, the values in the brief); priority 4 is reported
-  only. When it is reached, ask before starting the finishing steps.
+  only. Priority 1 without shear keeps 99 % (owner, 2026-11-26). Speed is part of it
+  (owner, 2026-11-26): on every case r2c's run time is no more than r2x's on the same
+  input, on the same machine (`tools/r2xtimes.py`, `tests/oracle/r2x-times.json`). When
+  it is reached, ask before starting the finishing steps.
+- **A speed change changes no result** (owner, 2026-11-26): every development record is
+  identical before and after it (`tools/same.py`, and the test with it).
 
 Asking means: say it under "Needed from the owner" in `docs/summary.md` and in the pull
 request, with a suggested answer, stop that line of work, and carry on with something

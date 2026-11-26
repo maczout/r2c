@@ -202,7 +202,7 @@ check of the priority, and the threshold that follows (that score less 3 points)
 
 | Area | Priority | Response against itself | Threshold |
 |---|---|---:|---:|
-| Moment and axial | 1 | 20 of 27 (74 %) | 71.1 % |
+| Moment and axial | 1 | 20 of 27 (74 %) | 99 % (kept by the owner, 2026-11-26) |
 | Moment and axial | 2 | 27 of 27 (100 %) | 97 % |
 | Moment and axial | 3 | 27 of 27 (100 %) | 97 % |
 | Shear | 1 | 27 of 28 (96 %) | 93.4 % |
@@ -212,6 +212,23 @@ check of the priority, and the threshold that follows (that score less 3 points)
 
 Measured 2026-11-25. Cases: moment and axial 27 (0 not solved by Response after the change, counted outside), shear 28 (0 not solved by Response after the change, counted outside).
 <!-- repeat:end -->
+
+**2026-11-26**, in answer to the questions of the summary after increment 6:
+
+1. Response's own solve of a stage stays on. Work on the stage that does not settle at
+   the fall of load when the web cracks (rectangular beams under moment and shear).
+2. Priority 1 without shear keeps a threshold of 99 %; the threshold from Response
+   against itself applies to the other cells.
+3. Speed is now part of the threshold: on every case, r2c's run time is no more than
+   r2x's on the same input, measured on the same machine. Measure r2x's time per case
+   on the development set first and record it. Make r2c faster without changing a
+   single result: every development record must be identical before and after a
+   speed change, and the test that checks it goes in with the first speed commit.
+4. Budget: about three hours of work, used as CLAUDE.md says. Split it between
+   accuracy with shear and speed as you judge best.
+
+If the threshold is reached or the plateau rule is met, stop and ask before starting the
+finishing steps.
 
 ## First increment
 
