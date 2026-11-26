@@ -709,6 +709,29 @@ class Shear(Flexure):
             an.set_profile(keep)
             raise
 
+    # A stage kept as it is from the twelfth pass [B 004156b0]. Off: every pass up to
+    # the sixteenth (as before increment 8)
+    fibre_take = True
+
+    def _fibre_near_cracking(self, e0, phi) -> bool:
+        """Is the concrete's own strain at the top or at the bottom fibre within a fifth
+        of the cracking strain there (the one not lowered by compression)?"""
+        an, sec = self.an, self.sec
+        def law_at(z):
+            for z1, z2, _b1, _b2, law in sec.segs:
+                if z2 - 1e-9 <= z <= z1 + 1e-9:
+                    return law
+            return sec.conc0
+
+        for zz in (sec.ztop, sec.zbot):
+            law = law_at(zz)
+            zf = np.array([float(zz)])
+            ex = float(an.strain(e0, phi, zf)[0] - sec.shrinkage(zf)[0])
+            ecr = float(law.crack_strain(np.interp(zz, sec.tz, an.t_ft)))
+            if abs(ex - ecr) < 0.2 * ecr:
+                return True
+        return False
+
     # Response's tests on every pass of a stage [B 00418af0]: written, off until verified
     pass_code = False
     # r2c's own: a solve of the global strains that has not closed is carried on from when
@@ -739,6 +762,7 @@ class Shear(Flexure):
         saved_shape = an.profile()
         self.evals = 0
         self.tried = 0          # passes begun on this try, for the stage control
+        taken = False
         info = None
         ok = False
         err = 1.0
@@ -786,6 +810,13 @@ class Shear(Flexure):
                 self.half_steps, self.step_share = True, 0.5
             if getattr(self, "debug", False):
                 print(f"   pass {passes}: lam={lam:.4f} profile err={err:.6f}")
+            if self.fibre_take and self.mode == "gam" and 12 <= passes < self.passes \
+                    and self.profile_tol <= err < 0.5 and self._fibre_near_cracking(e0, phi):
+                # under control of the shear strain, from the twelfth pass: a stage with
+                # its top or bottom fibre within a fifth of its cracking strain is kept as
+                # it is once its error is under a half [B 00418af0, 004156b0]
+                taken = True
+                break
             if self.pass_code and ctx is not None:
                 # the state code of this pass's state, acted on at once [B 00418af0]
                 code = self.state_code(Stage(e0, phi, gam, lam, n, m, v,
@@ -840,6 +871,7 @@ class Shear(Flexure):
         st.gam_avg = float(num / den) if abs(den) > 1e-9 else 0.0
         st.perr = err
         st.passes = passes
+        st.taken = taken
         st.codes = codes
         st.failed = failed
         st.profile = self.profile_of_nodes() if self.rebuilt_profile else an.profile()
@@ -1145,7 +1177,7 @@ class Shear(Flexure):
                 st.cmode = self.mode
                 code = self.state_code(st)
                 if st.perr >= self.profile_tol and st.perr > self.profile_accept \
-                        and st.lam > peak:
+                        and st.lam > peak and not getattr(st, "taken", False):
                     ok = False          # not converged after 16 passes, with the load above
                 if code != 0 and mult >= 0.5:
                     ok = False

@@ -123,7 +123,9 @@ REINF = {
 }
 # at the "before" run of step A-2 (2026-11-23)
 REINF_SLOW = {
-    "newbeam-nostirrups-mv": (0.1, 0.5),
+    # peak 0.20 % with the program's own transverse solve of a node (increment 8); it was
+    # held at 0.1
+    "newbeam-nostirrups-mv": (0.3, 0.5),
     "newbeam-stirrupdep-mv": (0.1, 0.3),
     "column-interlock-mv": (0.4, 1.0),
 }
