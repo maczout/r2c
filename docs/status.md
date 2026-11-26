@@ -54,13 +54,20 @@ development set.
    176.3, 1.93; on newbeam-us-mv the fall comes one stage later in r2c (`python
    tools/byprio.py RUN_I5 RUN_I6`; the curves side by side from the records). Trace both
    (`python tools/rtrace.py RECORD --steps`, `python tools/trace.py RECORD --set debug=1`)
-   and compare pass by pass at that stage (`tools/tries.py`). To try first on the
-   shear-alone case: `Shear.relax`, r2c's own damping of the profile update in the
-   second half of the passes under shear alone, which dates from before Response's solve
-   was on (Response's update has no damping). Add development cases of the held-out
-   kind (Newbeam variants at M/V of 0.5 to 1.5 m with a marked fall at cracking:
-   `tools/scope_cases.py`, `tools/capture.py --add`).
-
+   and compare pass by pass at that stage (`tools/tries.py`).
+   **Turn off r2c's own damping first** (`Shear.relax`: half the profile update in the
+   second half of the passes under shear alone; r2c's own, from before Response's solve
+   was on, and Response's update has none). Tried after the held-out score, so the
+   kernel is as scored: `python tools/trial.py OUT --inputs FOLDERS --set Shear.relax=1
+   --only` the eight development cases under shear alone, then `python tools/byprio.py
+   RUN OUT`. Without it newbeam-m50-v is back inside priority 1 and 3 (rising branch
+   11.0 to 0.9 %), newbeam-n300-v comes inside priority 2 and newbeam-st150-n200-v
+   priority 4; none of the eight goes outside on a priority (two rising branches move
+   by under 1 %, inside and outside as before). Make `relax` return 1 and run the set.
+   It does not reach the held-out kind that fell (moment and shear together is not
+   stepped in the shear strain): for that, add development cases of the kind (Newbeam
+   variants at M/V of 0.5 to 1.5 m with a marked fall at cracking: `tools/scope_cases.py`,
+   `tools/capture.py --add`) and look at the same stage on newbeam-us-mv.
 2. **Speed with shear.** A case with shear takes about 3.7 times what it did
    (`python tools/times.py BEFORE AFTER`; median 86 to 318 s on the development set, the
    column under 3000 kN at M/V = 2 m 421 to 1109 s; the held-out scorer's limit is 1800 s
@@ -139,7 +146,8 @@ and the two folders of derived inputs in the development archive (`scope-inputs`
   checks that changed side; `python tools/limits.py OUT` holds the regression limits to a
   run without solving again (`--write` adds generated limits for cases that have none);
   `python tools/recompare.py OUT_COPY` compares a run's records again under the measure
-  as it is now. `python tools/byprio.py RUN_A RUN_B [...]` lists the cases that change
+  as it is now. `python tools/trial.py OUT --set Class.name=VALUE --only NAMES` runs some
+  cases with a switch set differently, without editing the source. `python tools/byprio.py RUN_A RUN_B [...]` lists the cases that change
   side on a priority between runs; `python tools/times.py BEFORE AFTER` r2c's run time
   per case in two runs.
 - Response against itself on the held-out inputs, which the threshold is made from:
