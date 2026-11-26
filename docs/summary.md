@@ -1,7 +1,7 @@
 # r2c: summary for the owner
 
 One page, kept current each increment (`docs/brief.md`, "Reporting"). Last updated
-2026-11-25, after increment 5. Everything else in `docs/` is reference.
+2026-11-25, after increment 6. Everything else in `docs/` is reference.
 
 ## Held-out totals
 
@@ -10,61 +10,61 @@ One page, kept current each increment (`docs/brief.md`, "Reporting"). Last updat
 
 Cases inside target on every check of the priority, of the cases that have such a check. One column per increment; then Response against itself (every concrete strength raised by 0.05 %) on the same inputs, and the threshold: that score less 3 points.
 
-| Area | Priority | increment 3 (2026-11-25) | increment 3, measured up to Response's last stage (2026-11-25) | increment 4 (2026-11-25) | increment 5 (2026-11-25) | Response against itself | Threshold |
-|---|---|---:|---:|---:|---:|---:|---:|
-| Moment and axial | 1: peak, rising branch, shape; stress-state views | 23 of 27 (85 %) | 23 of 27 (85 %) | 26 of 27 (96 %) | 26 of 27 (96 %) | 20 of 27 (74 %) | 71.1 % (met) |
-| Moment and axial | 2: endings without shear; shear-related views | 26 of 27 (96 %) | 26 of 27 (96 %) | 26 of 27 (96 %) | 26 of 27 (96 %) | 27 of 27 (100 %) | 97 % (not met) |
-| Moment and axial | 3: cracking-related views | 23 of 27 (85 %) | 23 of 27 (85 %) | 26 of 27 (96 %) | 26 of 27 (96 %) | 27 of 27 (100 %) | 97 % (not met) |
-| Shear | 1: peak, rising branch, shape; stress-state views | 22 of 28 (79 %) | 27 of 28 (96 %) | 27 of 28 (96 %) | 27 of 28 (96 %) | 27 of 28 (96 %) | 93.4 % (met) |
-| Shear | 2: endings without shear; shear-related views | 11 of 28 (39 %) | 11 of 28 (39 %) | 11 of 28 (39 %) | 11 of 28 (39 %) | 18 of 28 (64 %) | 61.3 % (not met) |
-| Shear | 3: cracking-related views | 19 of 28 (68 %) | 19 of 28 (68 %) | 20 of 28 (71 %) | 20 of 28 (71 %) | 25 of 28 (89 %) | 86.3 % (not met) |
-| Shear | 4: endings with shear | 9 of 28 (32 %) | 20 of 28 (71 %) | 20 of 28 (71 %) | 20 of 28 (71 %) | 25 of 27 (93 %) | reported only |
+| Area | Priority | increment 4 (2026-11-25) | increment 5 (2026-11-25) | increment 6 (2026-11-25) | Response against itself | Threshold |
+|---|---|---:|---:|---:|---:|---:|
+| Moment and axial | 1: peak, rising branch, shape; stress-state views | 26 of 27 (96 %) | 26 of 27 (96 %) | 27 of 27 (100 %) | 20 of 27 (74 %) | 71.1 % (met) |
+| Moment and axial | 2: endings without shear; shear-related views | 26 of 27 (96 %) | 26 of 27 (96 %) | 27 of 27 (100 %) | 27 of 27 (100 %) | 97 % (met) |
+| Moment and axial | 3: cracking-related views | 26 of 27 (96 %) | 26 of 27 (96 %) | 27 of 27 (100 %) | 27 of 27 (100 %) | 97 % (met) |
+| Shear | 1: peak, rising branch, shape; stress-state views | 27 of 28 (96 %) | 27 of 28 (96 %) | 26 of 28 (93 %) | 27 of 28 (96 %) | 93.4 % (not met) |
+| Shear | 2: endings without shear; shear-related views | 11 of 28 (39 %) | 11 of 28 (39 %) | 12 of 28 (43 %) | 18 of 28 (64 %) | 61.3 % (not met) |
+| Shear | 3: cracking-related views | 20 of 28 (71 %) | 20 of 28 (71 %) | 22 of 28 (79 %) | 25 of 28 (89 %) | 86.3 % (not met) |
+| Shear | 4: endings with shear | 20 of 28 (71 %) | 20 of 28 (71 %) | 20 of 28 (71 %) | 25 of 27 (93 %) | reported only |
 
 Cases: moment and axial 27 (0 not solved by r2c, counted outside), shear 28 (0 not solved by r2c, counted outside).
 <!-- heldout:end -->
 
-Measured with `python tools/heldout.py score`, 55 frozen cases, once, at the end. **No
-total fell and none rose**: the first increment with no gain (the plateau rule counts two
-in a row). Against the tightened threshold: priority 1, 96 % and 96 % (99 asked); priority
-2, 96 % and 39 % (95, 60); priority 3, 96 % and 71 % (95, 85). **Interface parity: complete
-except accepted refusals** (15, and the 4 accepted inputs).
+Measured with `python tools/heldout.py score` (55 frozen cases, once, at the end) and
+`repeat` (Response only). **Without shear every priority is at 27 of 27 and meets its
+threshold. With shear, priority 2 and 3 rose and priority 1 fell, 27 to 26 of 28**: the
+floor of the brief, item 1 below. Not a plateau. **Interface parity: complete except
+accepted refusals** (15, and the 4 accepted inputs).
 
 ## What changed
 
-- **Your six answers are recorded** (`docs/brief.md`, `CLAUDE.md`). **The second held-out
-  set is built and frozen, in its own commit**: 22 cases (10 without shear, 12 with) in
-  `heldout/finish-manifest.json`. It is not scored; the scorer refuses it.
-- **Kernel:** the two stage-control rules of last increment are on (98 of 104 cases
-  without shear now step where Response steps; no check changed side). A rule for the
-  end at a bar rupture was found after the score and is written and off.
-- **Measured, and it bears on the threshold** (`tools/noise.py`): Response compared with
-  Response after every concrete strength is raised by 0.05 % is inside on 95 %, 73 % and
-  88 % of the 60 development cases with shear for priorities 1, 2, 3 (98, 85, 97 % at
-  0.005 %). r2c is inside on 90, 37 and 78 % of the same cases.
+- **Your three answers are recorded; the threshold is now Response's own score less 3
+  points** (the two right-hand columns; also in `docs/brief.md` and on the results page).
+- **Response's own solve of a stage is on, with your override as a step of its own**:
+  where its tries run out, r2c's earlier solve takes over; 14 development cases are
+  compared up to Response's last stage (15 before). **Run time per case** (development
+  set, same machine and jobs): without shear a median of 3.2 s before and after; with
+  shear a median of 86 s before and 318 s after, the longest 421 s and 1109 s.
+- **Two rules**: which bars show a stress at a crack (from the binary), and the stirrup
+  ratio at a web's edge (from Response's charts; it was what set I-girders and T-beams
+  apart). Development set with shear: priority 2 from 22 to 27 of 60, priority 3 from 47
+  to 50, priority 1 at 54; without shear priority 2 from 99 to 101 of 104.
 
 ## Needed from the owner
 
-1. **Priority 1 with shear at 99 % is 28 of 28, and your second answer leaves one of the
-   28 outside.** It cannot be met as set; and Response itself, nudged, reaches 95 to 98 %.
-   Suggested: 96 % (27 of 28), or leave that case out of the count.
-2. **Turn on Response's own solve of a stage?** It is written and off, with the binary's
-   reading of the profile error. On: with shear, development priority 2 goes from 22 to
-   24 of 60 and priority 3 from 47 to 49, priority 1 stays at 54; 2.4 times slower. But
-   4 of the 15 cases under your "carry on" override then end as Response does. Suggested:
-   yes. One switch undoes it. Left off because the override is yours.
-3. **Budget for increment 6**: three hours suggested; if 2 is yes, that is the work.
+1. **Priority 1 with shear fell by one case (96 to 93 %), and is now one case under the
+   new threshold.** The kind: a rectangular beam under moment and shear, M/V under 2 m.
+   On two development cases, since Response's solve went on: at the fall of load when
+   the web cracks, the stage that does not settle is kept in another state than
+   Response's, 10 to 15 % of the load off at that one stage. Not recovered. Suggested:
+   keep the solve on; next increment works on that stage. Turning it off is one switch.
+2. **Priority 1 without shear: Response against itself is 74 %, so the threshold there
+   is 71 %**; r2c is at 100 %. Suggested: keep the earlier 99 % for that cell.
+3. **With shear r2c is now 3.7 times slower.** Suggested: accept it for now; three hours
+   for increment 7, accuracy with shear first, speed if time is left.
 
 ## Top known deviations
 
-- **With shear, where a load stage does not settle, the two programs try different
-  states:** most of priority 2 with shear. Response does not hold to these states itself
-  when an input changes in its fourth digit (above).
+- **With shear, where a load stage does not settle, the two programs keep different
+  states:** most of priority 2 with shear, and the fall of load at cracking in item 1.
+  Response does not hold to these states itself (64 % against itself on priority 2).
 - **With shear, r2c carries on where Response's solve gives up** (your override; compared
   up to Response's last stage), and after the web cracks under axial compression.
-- **How a response without shear ends when steel ruptures:** on the prestressed I-girder
-  under axial tension Response ends at the peak and r2c goes on.
+- **With shear r2c is slow:** several minutes a case.
 - **Inputs r2x solves and r2c refuses** (your decision), and the four accepted inputs.
 - **A fall of load at cracking on the edge of what the measure counts** (shear alone, US units).
 
-The full list is `docs/deviations.md`. Results: https://maczout.github.io/r2c/ (this branch:
-`branches/dev-i5/`). How the work is done: `CLAUDE.md`.
+Full list: `docs/deviations.md`. Results: https://maczout.github.io/r2c/ (`branches/dev-i6/`).

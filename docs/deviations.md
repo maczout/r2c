@@ -52,6 +52,12 @@ measured on the development results (`docs/verification-results.md`) unless mark
   Response's own solve of a stage is on since the owner's answer of 2026-11-25; r2c
   follows more of Response's tries with it, and what is left differs in the fifth digit
   of a load or of a profile error at the try where the two part.
+- **With shear r2c is slow.** Response's own solve of a stage splits the layers anew at
+  every evaluation, and r2c does the same in Python: a case with shear takes several
+  minutes, between three and four times what it took before the solve was turned on
+  (measured, `tools/times.py`). Where to save is in `docs/status.md`.
+- **The T-beam with material factors, steel stress at a crack at the peak:** Response
+  gives its yielded bottom bars no value at the crack and r2c gives their average stress.
 - **How a response with shear ends.** r2c's last stages and Response's differ on about two
   in five shear cases, now that a case where Response's solve gives up is compared up to
   Response's last stage. This is the lowest priority and has not been worked on.
@@ -90,8 +96,9 @@ measured on the development results (`docs/verification-results.md`) unless mark
 - **The stirrups' stress at a crack where the web has only just cracked** (the I-girder
   and the T-beam with shear, at cracking and at the peak): at nodes a few millionths of
   strain past cracking the two programs' transverse strains differ by as much again, the
-  crack width with them, and the stress at the crack follows the crack width. At a step
-  in width Response shows no shear on the crack at one node where r2c does.
+  crack width with them, and the stress at the crack follows the crack width. (The
+  nodes at a step in width, where Response showed no shear on the crack and r2c did,
+  are Response's since the stirrup ratio there is taken by the narrower width.)
 - **A spike one node wide at the tip of the cracked zone** (principal tensile stress,
   cases without shear): where it falls between two nodes its height as sampled hangs on a
   tenth of a millimetre in the neutral axis. Inside target on the development set, by

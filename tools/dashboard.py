@@ -463,9 +463,9 @@ ${trend(t)}</div>`; }
    return s + `</svg>`; };
   const own = (t, p, v) => { const r = (D.repeat[t] || {})[p], th = (D.thresholds[t] || {})[p];
    if (!r || !r[1]) return "";
-   return `<div class="dl" style="display:block;margin:2px 0 0 98px">Response against itself: ${r[0]} of ${r[1]} · ${f(pc(r), 0)} %${th == null ? "; reported only" : `; threshold ${f(th, 1)} %: ${pc(v) >= th ? "✓ reached" : "✗ not reached"}`}</div>`; };
+   return `<div class="dl" style="display:block;white-space:normal;margin:2px 0 0 98px">Response against itself: <span style="white-space:nowrap">${r[0]} of ${r[1]} · ${f(pc(r), 0)} %</span><br>${th == null ? "no threshold: reported only" : `threshold ${f(th, 1)} %: ${pc(v) >= th ? "✓ reached" : "✗ not reached"}`}</div>`; };
   for (const p of [1, 2, 3, 4]) {
-   H += `<tr><td>${PN[p]}</td>`;
+   H += `<tr><td style="min-width:16em">${PN[p]}</td>`;
    for (const t in AREAS) { const v = L.totals[t][p], q = P && P.totals[t][p];
     if (!v || !v[1]) { H += `<td class="c" style="color:var(--ink-3)">no such check</td>`; continue; }
     const d = q ? v[0] - q[0] : null;
