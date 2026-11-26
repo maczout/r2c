@@ -1213,6 +1213,40 @@ not change what happens on the I-girder at M/V = 1 m. Not used. (Those figures a
 solve with whole steps throughout; with the step factor, read in step A-1c, they are in
 "The shear strain profile between passes".)
 
+**Measured again in increment 5 (2026-11-25), with the stiffness itself read from the
+running program** (`python tools/rtrace.py --steps --matrix`: the 3 × 3 stiffness and the
+unbalanced loads the step routine `004267c0` is given; `python tools/stiff.py` sets r2c's
+beside them, try by try and pass by pass) [O]. On Newbeam at M/V = 1 m, the T-beam at 4 m
+and −1 m, and the I-girder at 3 m (two concretes):
+
+* r2c's stiffness is Response's within 3 % in every term on all but a handful of steps,
+  and to four or five digits on the first steps of a stage. What differs from the first
+  uncracked stage on is small and steady: the four terms that couple the shear strain
+  with the axial load and the moment are about 1 % apart (−38306 against −37891 N per
+  unit shear strain on Newbeam's second pass). Not found: the node's routine `0046b940`
+  was set against r2c's term by term once more, and its two extra arguments are passed
+  as nothing by `00427cd0`; the stirrups' share of the transverse stiffness was tried
+  and changes nothing there.
+* With r2c's copy of the solve on, the two programs' passes agree to five or six digits
+  in load through the first cracked stages, and the solve gives up where Response's does:
+  on the I-girder at 3 m both fail the try at 4.83 rad/km in the same oscillation of the
+  shear strain (6.6, 8.9, 6.1, 9.6, 6.0, 9.9 mm/m …; the stiffness against the shear
+  strain is about half the slope the unbalanced shear shows, so a whole step overshoots).
+* What is left after that is how many steps a solve takes before it stops (one more or
+  one fewer, in about a pass in ten, the unbalanced loads being a few hundred newtons
+  either side of the tolerance) and, through it, on which side of 1 % or 3 % a profile
+  error falls.
+
+On the 60 development cases with shear, with the solve and the parabolic reading of the
+profile error on (`tools/verify.py`, against the run with both off): priority 1 inside on
+54 as before (one in, one out), priority 2 on 24 against 22, priority 3 on 49 against 47,
+priority 4 on 35 against 36; about 2.4 times the running time. Of the 15 cases where r2c
+carries on past Response's last stage (the owner's override), 11 still do; on four r2c
+then ends as Response does (Newbeam with 50 MPa concrete at 2 m: its peak is Response's,
+where it was 10 % above). **Left off for that reason**: it changes what the override
+keeps, which is the owner's to say (`docs/summary.md` after increment 5). The state code
+acted on at every pass (`Shear.pass_code`) on top of it changes one check.
+
 
 **Accepting a stage.** A stage is worked on in passes: solve the global strains for the
 loads at the control value with the shear strain profile as it is; update the profile from
