@@ -484,6 +484,24 @@ class Analysis:
         node's own layer."""
         return self.sec.width(self.profile_z(z).ravel())
 
+    # On since increment 6 (docs/kernel.md, "The stirrups' ratio on the thin layer
+    # across a step"): the stirrup ratio of the nodes of that layer by the narrower width
+    thin_rho_narrow = True
+
+    def rho_width(self, zf, bw):
+        """The width a node's stirrup ratio is worked out with: the node's own (bw), but on
+        the thin layer across a step in width, its two ends included, the narrower of the
+        two widths [O: Response's nodes there, docs/kernel.md]."""
+        if not self.thin_rho_narrow or not self.thin_side:
+            return bw
+        zf = np.asarray(zf, dtype=float).ravel()
+        bw = np.array(bw, dtype=float).ravel()
+        for zs in self.thin_side:
+            on = np.abs(zf - zs) <= THIN + 1e-9
+            if on.any():
+                bw[on] = min(self.sec.width_side(zs, True), self.sec.width_side(zs, False))
+        return bw
+
     def stirrups_at(self, zf, bw=None):
         """For every stirrup type: (ratio by node, strain factor, force factor). bw is the
         width at each node where the caller knows which side of a step the node is on."""
@@ -544,7 +562,7 @@ class Analysis:
         the concrete's shrinkage or thermal strain at each node: the concrete works on the
         transverse strain less it, the stirrups on the whole of it [B 004a8b20, 0046aaa0]."""
         sec = self.sec
-        sts = self.stirrups_at(zf, self.node_width(z))
+        sts = self.stirrups_at(zf, self.rho_width(zf, self.node_width(z)))
         rcrit = sec.tab(sec.t_rhocrit, zf)
         epy = np.interp(zf, self.epy_z, self.epy)
         idx = self.law_index(zf, z)
@@ -735,7 +753,8 @@ class Analysis:
         fsy = np.zeros(len(sel))
         fsycr = np.zeros(len(sel))
         if (self.shear or sec.shrink) and sec.stirrups:
-            tot, _res, rho_t = self.stirrup_stress(self.stirrups_at(zz, b.ravel()[sel]), ey,
+            tot, _res, rho_t = self.stirrup_stress(
+                self.stirrups_at(zz, self.rho_width(zz, b.ravel()[sel])), ey,
                                                    sec.tab(sec.t_rhocrit, zz),
                                                    np.interp(zz, self.epy_z, self.epy))
             has = rho_t > 0

@@ -23,7 +23,14 @@ measured on the development results (`docs/verification-results.md`) unless mark
   the two curves are the same up to Response's last stage; r2c then finds further states
   and reaches a peak several per cent higher. This is the owner's override (2026-11-25,
   `docs/brief.md`): r2c keeps carrying on, and such a case is compared up to Response's
-  last stage (`docs/measures.md`, "The overrides").
+  last stage (`docs/measures.md`, "The overrides"). Since Response's own solve of a stage
+  was turned on, r2c's tries run out where Response's do, and the override is a step of
+  its own: r2c's earlier solve takes over from that stage, and where it finds nothing
+  beyond it either, the response is the one the earlier solve finds from the start, if
+  that one passes the stage and goes on (`docs/kernel.md`, "The global solve with
+  shear"). Of the cases that were compared up to Response's last stage before, all but
+  one still are; on that one (Newbeam with elasto-plastic tension stiffening) neither
+  solve finds a settled state beyond Response's last stage, and r2c now ends there too.
 - **With shear under axial compression, just after the web cracks, Response's response
   ends on a collapsed state and r2c's does not** (Newbeam with closed stirrups under
   axial compression and shear alone). Both programs hover at the cracking load for ten
@@ -42,25 +49,22 @@ measured on the development results (`docs/verification-results.md`) unless mark
   a twentieth of a per cent, Response compared with Response is outside on the
   shear-related views of about a quarter of the development cases with shear, and with a
   two-hundredth of a per cent on about one in seven (measured, `tools/noise.py`).
-  Response's own solve of a stage, which gives up where r2c's finds a state, is written
-  in r2c and off; with it on r2c follows more of Response's tries and four of the cases
-  under the override above end as Response's do. Whether to turn it on is put to the
-  owner.
+  Response's own solve of a stage is on since the owner's answer of 2026-11-25; r2c
+  follows more of Response's tries with it, and what is left differs in the fifth digit
+  of a load or of a profile error at the try where the two part.
 - **How a response with shear ends.** r2c's last stages and Response's differ on about two
   in five shear cases, now that a case where Response's solve gives up is compared up to
   Response's last stage. This is the lowest priority and has not been worked on.
 - **How a response without shear ends when steel ruptures**, two places. On the
   prestressed I-girder under axial tension and moment Response's tries run out at the
   strands' rupture and its response ends at the peak; r2c finds the state after the
-  rupture and goes on, so the shapes differ. On Newbeam with very light steel Response
-  ends two stages after the rupture and r2c several stages later; the rule for that one
-  is written and switched off (`docs/kernel.md`), to be turned on at the start of the
-  next increment.
+  rupture and goes on, so the shapes differ; its ending is inside since the rule for a
+  failed try on the way to a rupture was turned on, and Newbeam with very light steel
+  now ends where Response's does.
 - **Where Response puts its stages without shear**, a few places where r2c does not
   follow it: three small first steps where the section is cracked from the start (the
-  I-girder under axial tension); what More Detail at its most puts in at the start; the
-  steps just before light steel ruptures, which Response halves. The curves agree; the
-  stages are not the same ones.
+  I-girder under axial tension); what More Detail at its most puts in at the start.
+  The curves agree; the stages are not the same ones.
 - **A fall of load at cracking that sits on the edge of what the measure counts.** Under
   shear alone, and on Newbeam in US units, both programs show the fall; in one it is just
   under 2 % of the peak and in the other just over, so the shapes read as different (1.99
@@ -71,8 +75,6 @@ measured on the development results (`docs/verification-results.md`) unless mark
 - **The horizontal tie with stirrups in the same section:** r2c draws the stirrups' bond as
   if the ties were not there. Inferred, not measured; with ties alone the chart is zero in
   both programs.
-- **Elasto-plastic tension stiffening, with shear:** r2c keeps a stage that Response
-  refuses and carries on past Response's last stage.
 - **The circular column under axial load alone, after its peak.** r2c keeps its uniform
   post-peak response. This is the owner's override (`docs/brief.md`), not a defect; its
   checks are counted outside. The same holds for any section that stays uniform under

@@ -239,7 +239,7 @@ class Shear(Flexure):
         ks = np.zeros(n_)
         a_n = np.zeros(n_)
         a_s = np.zeros(n_)
-        for st, rho, fac in an.stirrups_at(zf, an.node_width(z)):
+        for st, rho, fac in an.stirrups_at(zf, an.rho_width(zf, an.node_width(z))):
             if not rho.any():
                 continue
             ks += rho * fac * st.steel.tangent(ey * fac + st.prestrain) * st.steel.phi

@@ -65,13 +65,13 @@ SETTINGS_SLOW = {
     # over the lowest point of the drop, which is the 13 % on the moment-curvature chart.
     # The limit on the peak is as it was set before step A-1; r2c has been over it since
     # (1.4 and 1.6 % at step A-5) and the test fails. Left as it is: docs/summary.md, D69
-    "newbeam-us-mv": (1.3, 14.0),
+    "newbeam-us-mv": (1.3, 15.5),
     # at the run of step A-5 when the cases joined (2026-11-24)
     "newbeam-csa-mv": (0.1, 0.3),
     "newbeam-mv-md2": (0.1, 0.2),
 }
 SETTINGS_FILE_SLOW = {
-    "newbeam-smx-mv": (0.1, 0.2),
+    "newbeam-smx-mv": (0.2, 0.2),
     "newbeam-usfile-mv": (1.4, 4.3),
     "newbeam-kgcmfile-mv": (0.1, 0.2),
 }

@@ -13,9 +13,43 @@ def _driver():
     return su, su.driver()
 
 
-def test_the_switches_are_off():
-    assert Shear.own_solve is False
+def test_response_s_own_solve_is_on_and_the_override_is_in_force():
+    # owner, 2026-11-25 (docs/brief.md): Response's own solve of a stage is on, and the
+    # "carry on" override is kept in force explicitly
+    assert Shear.own_solve is True and Shear.parabolic_error is True
+    assert Shear.carry_on is True and Shear.carried_from is None
     assert Shear.pass_code is False
+
+
+def test_the_override_takes_over_once_and_only_while_the_load_holds():
+    from types import SimpleNamespace as NS
+    su, drv = _driver()
+    drv.mode0 = "phi"
+    drv.stages = [NS(lam=0.0), NS(lam=100.0), NS(lam=95.0)]
+    assert drv._carry_on(NS(lam=70.0), 100.0) is False      # the load has fallen: an end
+    assert drv.carried_from is None and drv.own_solve is True
+    assert drv._carry_on(NS(lam=95.0), 100.0) is True
+    assert drv.carried_from == 3
+    assert drv.own_solve is False and drv.parabolic_error is False
+    assert Shear.own_solve is True                          # this response alone
+    assert drv._carry_on(NS(lam=95.0), 100.0) is False      # once in a response
+    off = _driver()[1]
+    off.carry_on = False
+    off.stages = drv.stages
+    assert off._carry_on(NS(lam=95.0), 100.0) is False      # off: ends as Response does
+
+
+def test_the_fallback_wants_a_response_that_passes_the_stage_and_goes_on():
+    from types import SimpleNamespace as NS
+    from r2c import run
+    d = NS(mode0="phi", control_of=lambda s, mode=None: s.phi)
+    mine = [NS(phi=x, lam=y) for x, y in ((0, 0), (1, 80), (2, 100))]
+    on = [NS(phi=x, lam=y) for x, y in ((0, 0), (1, 80), (2, 99), (3, 90))]
+    assert run._carries_on(d, mine, d, on) is True
+    ends = on[:3]
+    assert run._carries_on(d, mine, d, ends) is False       # nothing beyond the stage
+    elsewhere = [NS(phi=x, lam=y) for x, y in ((0, 0), (1, 60), (2, 75), (3, 80))]
+    assert run._carries_on(d, mine, d, elsewhere) is False  # does not pass the stage
 
 
 def test_update_leaves_a_converged_profile_as_it_is_but_for_its_scale():

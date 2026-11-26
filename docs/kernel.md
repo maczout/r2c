@@ -504,6 +504,29 @@ transverse crack spacing has a point on each side of a step since 2026-11-22 ("C
 spacing over the depth"); the bond parameter and the steel ratio at a crack are still
 interpolated across a step from their 100 stations.
 
+### The stirrups' ratio on the thin layer across a step [O], 2026-11-25 (increment 6)
+
+On the thin layer Response puts across a step in width ("Layers"), its two ends included,
+a node's stirrup ratio is worked out with the narrower of the two widths, whichever side
+of the step the node's own width is on; the node's width for its stresses and for the
+shear flow stays its own (`Analysis.rho_width`, `Analysis.thin_rho_narrow`). Not read in
+the binary: seen in Response's charts and written from them. On the I-girder at M/V = 3 m
+and on the T-beam at M/V = 4 m and under −M with shear, the two nodes of that layer on
+the flange's side stand apart from the flange's nodes next to them in every chart from
+the stage the flange cracks: no shear on the crack where the flange has some, a smaller
+transverse strain and stirrup stress, and a shear strain that falls behind the flange's
+stage by stage (the T-beam at M/V = 4 m, four stages before the peak: 1.190 against 1.430
+mm/m just above, transverse strain 0.273 against 0.409). r2c gave those nodes the
+flange's ratio, a third of the web's, and its nodes there were the flange's: 1.444 and
+0.413. With the rule: 1.1915 and 0.2730, no shear on the crack, and the layers next to
+the step are split where Response splits them (the jump of the shear strain now falls
+inside the flange's layer, as in Response). The jump of the stirrup stress across the
+layer is what Response's Transverse Average Bond chart shows as a spike at a web's edge.
+Before this the two programs' shear strain agreed over the rest of the flange to a
+thousandth and differed at these nodes by a factor of two at the peak
+[measured, `python tools/viewlines.py`, the fixtures igirder-m3v and tbeam-m4v].
+Not checked: a step where the stirrups end, and a change of concrete at one width.
+
 ### Hoops [T 7-6]
 
 A hoop's strain is the transverse strain times sin²α and only the transverse component of
