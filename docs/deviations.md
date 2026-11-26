@@ -60,8 +60,14 @@ measured on the development results (`docs/verification-results.md`) unless mark
   on nearly half the cases with shear when r2x reads every stage, and on every one if
   r2x reads the peak stage alone. Without shear r2c is within r2x's time on every case
   when r2x reads every stage, and on all but one when it reads the peak alone (measured,
-  six cases at a time for both programs, `tools/r2xtimes.py`). The owner made speed part
-  of the threshold on 2026-11-26.
+  six cases at a time for both programs, `tools/r2xtimes.py`). The owner's decision
+  (2026-11-26): speed is a reported measure, not a target; the bar is r2x reading every
+  stage; no compiled routines. r2c's standing is generated into the brief
+  (`docs/brief.md`, "Owner's decisions since") and shown on the results page.
+- **The shear-related views, on the held-out set, stand under Response's own score
+  against itself** (priority 2 with shear). It is the path above, at stages that do not
+  settle. The owner's decision (2026-11-26): reported, not a target; the standing is
+  generated into the brief beside Response's own score.
 - **The T-beam with material factors, steel stress at a crack at the peak:** Response
   gives its yielded bottom bars no value at the crack and r2c gives their average stress.
 - **How a response with shear ends.** r2c's last stages and Response's differ on about two
@@ -110,3 +116,13 @@ measured on the development results (`docs/verification-results.md`) unless mark
   tenth of a millimetre in the neutral axis. Inside target on the development set, by
   less than elsewhere.
 - **No load at all:** the longitudinal bond chart of the single stage differs.
+
+## A finding for r2x, not a deviation of r2c
+
+- **At its default setting (reading the detail views of the peak stage alone) r2x fails
+  on eight of the sixty development cases with shear**: it stops with "Response has more
+  than the N stages on its control curves". Reading every stage (`--stage all`) it
+  captures all of them, and that is how every fixture here was made. Measured twice
+  with `tools/r2xtimes.py measure --stage peak`; the cases are the ones with no "peak"
+  time in `tests/oracle/r2x-times.json`. Noted for r2x at the owner's instruction
+  (2026-11-26); nothing changes in r2c.

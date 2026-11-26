@@ -136,7 +136,9 @@ def test_the_threshold_is_response_s_own_score_less_three_points():
     th = heldout.thresholds(rep)
     # priority 1 without shear: 99 %, kept by the owner (2026-11-26) whatever Response scores
     assert th["moment-axial"] == {"1": 99.0, "2": 93.3}
-    assert th["shear"] == {"1": 93.4, "2": 47.0, "3": 72.0}      # priority 4: reported only
+    # priority 4: reported only; priority 2 with shear too since the owner's answer of
+    # 2026-11-26 (the live targets with shear are priorities 1 and 3)
+    assert th["shear"] == {"1": 93.4, "3": 72.0}
     assert heldout.thresholds(None) == {"moment-axial": {}, "shear": {}}
 
 

@@ -179,6 +179,11 @@ def check_heldout(say, tracked: list[str]) -> None:
         say("FAIL", "held-out: the brief's measured values of Response against itself are "
                     "not what tools/heldout.py writes (rerun python tools/heldout.py summary)")
         return
+    if heldout.standing_block(heldout.read_totals(), rep) not in brief:
+        say("FAIL", "the brief's standing on the reported measures (priority 2 with shear, "
+                    "speed) is not what tools/heldout.py writes (rerun python "
+                    "tools/heldout.py summary)")
+        return
     say("ok", "held-out: Response against itself recorded, totals only; the threshold "
               "follows from it and the brief has the values as generated")
     if not (bad or leaked or named):
