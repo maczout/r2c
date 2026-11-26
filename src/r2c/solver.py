@@ -115,6 +115,8 @@ class Analysis:
         self.last_ey = None
         self._nodes = None      # the nodes' transverse solves so far (NodeStore)
         self._layers = {}       # the nodes of the layers between given bounds (layer_nodes)
+        self._path = None       # the heights the last splitting asked for (warm)
+        self._visited = None    # while the layers are being split: the heights asked for
 
     # -- layers ---------------------------------------------------------------------------------
     def _initial_bounds(self) -> np.ndarray:
@@ -435,10 +437,9 @@ class Analysis:
         return z3, z4
 
     # -- nodes ----------------------------------------------------------------------------------
-    def eval_nodes(self, e0, phi, gam, z, f1cx, ey=None):
-        """Concrete stresses at heights z (any shape) for the global strain state."""
+    def _inputs(self, e0, phi, gam, z, f1cx):
+        """What a node's state is worked out from, at heights z (any shape), flattened."""
         sec = self.sec
-        shp = z.shape
         zf = z.ravel()
         # the concrete's own strain: the section's, less what shrinkage or temperature
         # would give it unrestrained. The offset is the same along and across the member
@@ -452,9 +453,18 @@ class Analysis:
         cx = f1cx(zf)
         g = gam * np.interp(self.profile_z(z).ravel(), self.shape_z, self.shape) \
             if gam != 0.0 else np.zeros_like(zf)
+        return zf, sh, ex, m, ft, smx, smt, cx, g
+
+    def eval_nodes(self, e0, phi, gam, z, f1cx, ey=None):
+        """Concrete stresses at heights z (any shape) for the global strain state."""
+        sec = self.sec
+        shp = z.shape
+        zf, sh, ex, m, ft, smx, smt, cx, g = self._inputs(e0, phi, gam, z, f1cx)
         if (self.shear or sec.shrink) and ey is None:
             # with shear, and at any node with shrinkage or thermal strain, the transverse
             # strain is solved for [B 004a8b20: its test for the node with no stirrups]
+            if self._visited is not None:
+                self._visited.append(z)
             out, eyv = self.transverse(zf, z, ex, g, m, ft, smx, smt, cx, sh)
             return out, ex, g, smx, smt, eyv
         eyv = np.zeros_like(zf) if ey is None else ey.ravel()
@@ -583,6 +593,11 @@ class Analysis:
         again: a node is asked for some ten times over). See NodeStore."""
         if not self.node_store:
             return self.transverse_batch(zf, z, ex, g, m, ft, smx, smt, cx, sh)
+        table = self._table(zf, z, ex, g, m, ft, smx, smt, cx, sh)
+        return self._nodes.solve(table)
+
+    def _table(self, zf, z, ex, g, m, ft, smx, smt, cx, sh):
+        """One row a node: everything its transverse solve works from (NodeStore)."""
         sec = self.sec
         sts = self.stirrups_at(zf, self.rho_width(zf, self.node_width(z)))
         cols = [self.law_index(zf, z).astype(float), ex,
@@ -592,7 +607,36 @@ class Analysis:
             cols += [rho, fac]
         if self._nodes is None:
             self._nodes = NodeStore(self, [st for st, _r, _f in sts])
-        return self._nodes.solve(np.ascontiguousarray(np.stack(cols, axis=1)))
+        return np.ascontiguousarray(np.stack(cols, axis=1))
+
+    # Before the layers are split for a state, the nodes the last splitting passed through
+    # are solved at the new state in one go (warm, below). It changes no number: the store
+    # gives each call what solving it alone gives. Off: every split solves its new nodes
+    # as it comes to them, some ten small solves one after the other
+    warm_ahead = True
+
+    def warm(self, e0, phi, gam, f1cx, heights=None):
+        """Solve, at this state, the heights the last splitting of the layers asked for (or
+        those given): most of them are asked for again, since the layers of a state are
+        nearly those of the state before. One solve of them all together in place of one
+        at each split."""
+        heights = self._path if heights is None else heights
+        if not self.warm_ahead or not self.node_store or not heights \
+                or not (self.shear or self.sec.shrink):
+            return
+        tables = []
+        for z in heights:
+            zf, sh, ex, m, ft, smx, smt, cx, g = self._inputs(e0, phi, gam, z, f1cx)
+            tables.append(self._table(zf, z, ex, g, m, ft, smx, smt, cx, sh))
+        self._nodes.solve(np.concatenate(tables, axis=0), results=False)
+
+    def _keep_path(self, visited):
+        """The heights a splitting asked for, each row of nodes once, by the rows' length
+        (a node's inputs depend on the row it is in: which side of a step it is on)."""
+        by = {}
+        for z in visited:
+            by.setdefault(z.shape[1:] if z.ndim == 2 else (), []).append(z)
+        self._path = [np.unique(np.concatenate(zs, axis=0), axis=0) for zs in by.values()]
 
     def transverse_batch(self, zf, z, ex, g, m, ft, smx, smt, cx, sh=None):
         """The transverse strain of every node, from the condition that there is no total
@@ -684,6 +728,10 @@ class Analysis:
         z, b = self.layer_nodes(bounds)
         es, fs = self.steel(e0, phi)
         f1cx = self.crack_check(e0, phi, es, fs)
+        if sec.layers and self._visited is None:
+            # the layers' nodes and the bars' heights are solved together (they are asked
+            # for one after the other below; the numbers are the same)
+            self.warm(e0, phi, gam, f1cx, [z, np.array([l.z for l in sec.layers])])
         out, ex, g, smx, smt, eyn = self.eval_nodes(e0, phi, gam, z, f1cx)
         fcx = out.fcx.reshape(z.shape)
         vv = out.v.reshape(z.shape)
@@ -717,6 +765,18 @@ class Analysis:
         es, fs = self.steel(e0, phi)
         f1cx = self.crack_check(e0, phi, es, fs)
         hmin = sec.h / 1024.0
+        self.warm(e0, phi, gam, f1cx)
+        self._visited = []
+        try:
+            return self._refine(e0, phi, gam, f1cx, hmin, before)
+        finally:
+            if self._visited:
+                # and the bars' heights, which the forces of the state are asked at next
+                bars = [np.array([l.z for l in sec.layers])] if sec.layers else []
+                self._keep_path(self._visited + bars)
+            self._visited = None
+
+    def _refine(self, e0, phi, gam, f1cx, hmin, before):
         z, _b = self.layer_nodes()
         out, *_ = self.eval_nodes(e0, phi, gam, z, f1cx)
         tol1 = 0.002 * max(float(np.max(np.abs(out.f1))), 1e-6)
@@ -1115,23 +1175,27 @@ class NodeStore:
         self.gap[ids, it] = np.abs(hi - lo)
         self.done[ids] = it + 1
 
-    def solve(self, table):
+    def solve(self, table, results=True):
         """(the nodes' states, their transverse strains) for the rows of table, one row a
-        node: the inputs in the order Analysis.transverse stacks them."""
+        node: the inputs in the order Analysis._table stacks them. Without results: the
+        nodes are taken as far as this call's stop and nothing is returned."""
         if self.n > self.CAP:
             self.clear()
         n, ncol = table.shape
-        ids = np.empty(n, dtype=np.int64)
-        new = []
         known = self.ids
-        for i in range(n):
-            key = table[i].tobytes()
-            j = known.get(key)
-            if j is None:
-                j = known[key] = self.n
-                self.n += 1
-                new.append(i)
-            ids[i] = j
+        keys = table.view(np.dtype((np.void, 8 * ncol))).ravel().tolist()
+        found = list(map(known.get, keys))
+        new = []
+        if None in found:
+            for i, j in enumerate(found):
+                if j is None:
+                    j = known.get(keys[i])      # the same node twice in one call
+                    if j is None:
+                        j = known[keys[i]] = self.n
+                        self.n += 1
+                        new.append(i)
+                    found[i] = j
+        ids = np.array(found, dtype=np.int64)
         if new:
             while self.cols is None or self.n > len(self.cols):
                 self._grow(ncol)
@@ -1149,21 +1213,25 @@ class NodeStore:
                 stop = it
                 if np.max(self.off[live, it]) < 1e-7 or np.max(self.gap[live, it]) < 1e-12:
                     break
+        if not results:
+            return None
         # each node's result at that pass (a node with no bracket: as it was left)
         at = np.where(self.ok[ids], stop, -1)
-        rows = np.empty(n, dtype=np.int64)
+        span = self.PASSES + 1
+        code = (ids * span + (at + 1)).tolist()
+        got = list(map(self.rows.get, code))
         lack = {}
-        for i in range(n):
-            key = (int(ids[i]), int(at[i]))
-            r = self.rows.get(key)
-            if r is None:
-                r = lack.get(key)
+        if None in got:
+            for i, r in enumerate(got):
                 if r is None:
-                    r = lack[key] = self.nrows + len(lack)
-            rows[i] = r
+                    r = lack.get(code[i])
+                    if r is None:
+                        r = lack[code[i]] = self.nrows + len(lack)
+                    got[i] = r
+        rows = np.array(got, dtype=np.int64)
         if lack:
-            who = np.array([k[0] for k in lack], dtype=np.int64)
-            when = np.array([k[1] for k in lack], dtype=np.int64)
+            who = np.array([k // span for k in lack], dtype=np.int64)
+            when = np.array([k % span - 1 for k in lack], dtype=np.int64)
             ey = np.where(when >= 0, self.x[who, np.maximum(when, 0)], self.ey0[who])
             _, outs = self._run(who, ey)
             r0 = self.nrows
