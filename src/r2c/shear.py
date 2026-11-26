@@ -121,8 +121,17 @@ class Shear(Flexure):
         if marks is None:
             marks = self.crush_marks(e2, idx)
         if not marks[0] and not marks[1] and marks[2]:
-            zlo, zhi = ztop, zbot
+            if self.sliver:
+                zlo, zhi = zbot / 100.0, ztop / 100.0
+            else:
+                zlo, zhi = ztop, zbot
         return zlo, zhi
+
+    # Where concrete is crushed inside the depth with both faces sound the program leaves
+    # the top and the bottom of the section each divided by 100 as the range [B 00440ea0,
+    # its last block], not an empty one. Off: the empty range (every term of the stiffness
+    # zero, so the try has no state)
+    sliver = False
 
     def crush_marks(self, e2, idx):
         """Whether the concrete is past its strain at peak stress at the top node, at the
