@@ -1078,6 +1078,10 @@ class NodeStore:
         self.ey0 = more(None if first else self.ey0, ())
         self.ok = more(None if first else self.ok, (), bool, False)
         self.done = more(None if first else self.done, (), np.int64)
+        ns = len(self.stirrups)
+        self.yld = more(None if first else self.yld, ())
+        self.eff = more(None if first else self.eff, ())
+        self.kc = more(None if first else self.kc, (ns,))
         self.x = more(None if first else self.x, (self.PASSES,))
         self.off = more(None if first else self.off, (self.PASSES,))
         self.gap = more(None if first else self.gap, (self.PASSES,))
@@ -1111,6 +1115,63 @@ class NodeStore:
             outs.append((sel, o))
         return tot.reshape(shp), outs
 
+    def _constants(self, ids):
+        """What Analysis.stirrup_stress works out at every call and does not depend on the
+        transverse strain, once a node: the stirrups' yield force, the share of their
+        reserve that counts, and each type's strain concentration at a crack."""
+        sec = self.an.sec
+        c = self.cols[ids]
+        rcrit = c[:, 9]
+        yld = np.zeros(len(ids))
+        a_n = np.zeros(len(ids))
+        a_s = np.zeros(len(ids))
+        for i, st in enumerate(self.stirrups):
+            rho = c[:, 11 + 2 * i]
+            inside = rho > 0
+            yld += rho * st.steel.fy * st.steel.phi
+            a_n += np.where(inside, st.area / sec.n_trans, 0.0)
+            a_s += np.where(inside, st.area / (st.space + 1e-4), 0.0)
+            base = 0.625 if st.strand else 1.0
+            self.kc[ids, i] = np.where(rcrit > 0,
+                                       np.maximum(1.0, base * 0.014 / np.maximum(rcrit, 1e-12)),
+                                       2.0)
+        self.yld[ids] = yld
+        self.eff[ids] = np.clip(0.5 * (3.0 - a_n / (a_s + 1e-9) / sec.h), 0.0, 1.0)
+
+    def _stirrups(self, ids, sel, cj, ey):
+        """(the stirrups' total average stress, their reserve at a crack) at one strain a
+        node: Analysis.stirrup_stress's first two results by the same operations, with the
+        constants of _constants and each steel's curve read once where it read it twice."""
+        tot = np.zeros_like(ey)
+        capt = np.zeros_like(ey)
+        rcrit, epy = cj[:, 9], cj[:, 10]
+        kc = self.kc[ids] if sel is None else self.kc[ids][sel]
+        for i, st in enumerate(self.stirrups):
+            rho = cj[:, 11 + 2 * i]
+            if not rho.any():
+                continue
+            sl = st.steel
+            ein = ey * cj[:, 12 + 2 * i]
+            e = ein + st.prestrain
+            raw = sl.raw(e)
+            fs = raw * sl.phi
+            fs = np.where(np.isnan(fs), 0.0, fs)
+            lin = (e - epy) * sl.E * sl.phi
+            fs = np.where((fs > 0) & (fs - lin > 1e-6), np.maximum(lin, -sl.fy * sl.phi), fs)
+            # the capacity at a crack [SteelLaw.crack_capacity]
+            ec = kc[:, i] * ein + st.prestrain + (sl.esh - sl.fy / sl.E)
+            sc = sl.raw(ec)
+            inside = np.where(np.isnan(sc), sl.fu, np.maximum(sc, sl.fy))
+            beyond = np.where(e >= sl.fy / sl.E, sc, sl.fu)
+            cap = np.where(ec <= sl.eu, inside, beyond)
+            cap = np.where(np.isnan(raw), np.nan, cap * sl.phi)
+            cap = np.where(np.isnan(cap), fs, cap)
+            tot += rho * fs
+            capt += rho * cap
+        yld = self.yld[ids] if sel is None else self.yld[ids][sel]
+        eff = self.eff[ids] if sel is None else self.eff[ids][sel]
+        return tot, eff * (np.maximum(yld, capt) - tot)
+
     def _stress(self, ids, ey):
         """Total transverse stress at nodes ids, one strain a node: _run's first result, by
         the same operations, without the nodes' other fields."""
@@ -1121,15 +1182,13 @@ class NodeStore:
         tot = None if one else np.empty(len(ids))
         for j, law in enumerate(sec.laws):
             if one:
-                cj, eyl = c, ey
+                sel, cj, eyl = None, c, ey
             else:
                 sel = idx == j
                 if not sel.any():
                     continue
                 cj, eyl = c[sel], ey[sel]
-            subs = [(st, cj[:, 11 + 2 * i], cj[:, 12 + 2 * i])
-                    for i, st in enumerate(self.stirrups)]
-            st_tot, st_res, _ = an.stirrup_stress(subs, eyl, cj[:, 9], cj[:, 10])
+            st_tot, st_res = self._stirrups(ids, sel, cj, eyl)
             fcy = nodelib.transverse_stress(law, cj[:, 1], eyl - cj[:, 2], cj[:, 3], cj[:, 4],
                                             cj[:, 5], cj[:, 6], cj[:, 7], cj[:, 8], st_res)
             if one:
@@ -1140,6 +1199,7 @@ class NodeStore:
     def _bracket(self, ids):
         """New nodes: the ladder of transverse strains scanned for the first change of sign."""
         n = len(ids)
+        self._constants(ids)
         ladder = self.cols[ids, 2][:, None] + self.ladder[None, :]
         f, _ = self._run(ids, ladder)
         pos = f > 0

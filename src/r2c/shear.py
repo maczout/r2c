@@ -65,7 +65,7 @@ class Shear(Flexure):
         ec = st.crack_strain(es - l.prestrain, l.prestrain, l.rho, l.strand)
         return float(max(st.tangent(es), st.tangent(ec))) * st.phi
 
-    def zone(self, e0, phi, es, e2, zf, idx):
+    def zone(self, e0, phi, es, e2, zf, idx, marks=None):
         """The depth range (zlo, zhi) outside which Response gives concrete and bars no
         stiffness in the shear flow calculation [B 00440ea0]. At a face cracked in flexure it
         ends at the outer edge of the outermost bar in the cracked zone that still has
@@ -118,11 +118,27 @@ class Shear(Flexure):
         zhi = min(max(zhi, zbot), ztop)
         zlo = min(max(zlo, zbot), ztop)
         # concrete crushed inside the depth with both faces sound: nothing is left
-        e0s = np.array([law.e0 for law in sec.laws])[idx]
-        crushed = e2 < -e0s
-        if not crushed[0] and not crushed[-1] and crushed.any():
+        if marks is None:
+            marks = self.crush_marks(e2, idx)
+        if not marks[0] and not marks[1] and marks[2]:
             zlo, zhi = ztop, zbot
         return zlo, zhi
+
+    def crush_marks(self, e2, idx):
+        """Whether the concrete is past its strain at peak stress at the top node, at the
+        bottom node, and at any node: what the depth range with stiffness is ended by."""
+        e0s = np.array([law.e0 for law in self.sec.laws])[idx]
+        crushed = e2 < -e0s
+        return bool(crushed[0]), bool(crushed[-1]), bool(crushed.any())
+
+    # The crushing marks the first step of a solve works on are those of the nodes as the
+    # last evaluation left them, not of the state the solve starts from: after a try that
+    # ran away into crushed concrete the stage's strains are put back and the nodes are
+    # not, so the next try's first step finds no depth with stiffness and fails at once
+    # (docs/kernel.md, "The first step after a try that ran away"; read from the running
+    # program, the solve's steps at 00427aef)
+    stale_marks = False
+    marks_left = None        # the marks of the last state evaluated by the program's solve
 
     # the slopes of the compressive stress in the node's stiffness: the program's analytic
     # ones [B 004ac960] in place of differences taken on the stress relation. With them
@@ -131,7 +147,7 @@ class Shear(Flexure):
     # "The stiffness in the shear flow calculation")
     own_slopes = True
 
-    def tangent(self, e0, phi, gam):
+    def tangent(self, e0, phi, gam, marks=None):
         """Per node: the condensed tangent stiffness (j, k, m, n) of thesis eq. 6-4, with the
         state it was taken at. The node's stiffness is Response's own [B 0046b940, 00427cd0]:
         analytic, in the principal directions, with the tension's stiffness set by what
@@ -254,7 +270,7 @@ class Shear(Flexure):
         mm = G - H * D * inv
         nn = I - H * F * inv
 
-        zlo, zhi = self.zone(e0, phi, es, e2, zf, idx)
+        zlo, zhi = self.zone(e0, phi, es, e2, zf, idx, marks)
         e0s = np.array([law.e0 for law in sec.laws])[idx]
         off = (zf > zhi + 1e-9) | (zf < zlo - 1e-9) | (e2 < -e0s)
         jj, kk, mm, nn = (np.where(off, 0.0, q) for q in (jj, kk, mm, nn))
@@ -533,11 +549,18 @@ class Shear(Flexure):
         si = np.array([1.0, 1e-3, 1.0])            # N, N mm, N to N, N m, N
         count = 0
         found = False
+        # the nodes as the last evaluation left them, for the first step
+        left = self.marks_left if self.stale_marks else None
+        seen = None
 
         def state():
+            nonlocal seen
             an.refine(e[0], e[1], e[2])
             self.evals += 1
-            f = np.array(an.forces(e[0], e[1], e[2]))
+            n_, m_, v_, det = an.forces(e[0], e[1], e[2], want_detail=True)
+            f = np.array((n_, m_, v_))
+            zz = det[0]
+            seen = self.crush_marks(det[2].e2, an.law_index(zz.ravel(), zz))
             lam = (f[kl] - con[kl]) / inc[kl]
             return f, lam, (con + lam * inc - f)
 
@@ -551,7 +574,7 @@ class Shear(Flexure):
             if err < tol and count:
                 found = True
                 break
-            t = self.tangent(e[0], e[1], e[2])
+            t = self.tangent(e[0], e[1], e[2], left if count == 0 else None)
             k, _bars = self._stiffness(t, np.interp(an.profile_z(t["z"]), an.shape_z, an.shape))
             # which strains have a stiffness to step on, against that of the control
             d = np.abs(np.array([k[0, 0], k[1, 1] / 1e6 / (hm * hm), k[2, 2]]))
@@ -592,6 +615,7 @@ class Shear(Flexure):
                 break
         if found and count:
             f, lam, rhs = state()
+        self.marks_left = seen
         if self.mode != "gam" and not self.half_steps:
             self.step_share = 1.0           # whole steps again for the next solve
         self.unbalance = float(np.max(np.abs(rhs * si))) if np.all(np.isfinite(rhs)) else math.inf
