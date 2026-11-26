@@ -4,9 +4,10 @@
     python tools/proftime.py NAME --inputs DIR [DIR ...] [--top N] [--callers FUNC]
 
 Runs the case as tools/verify.py does, under cProfile, and prints the functions by their
-own time and by cumulative time (the top N of each, default 25), then r2c's seconds
-without the profiler's overhead are NOT given: time a case with tools/verify.py. With
---callers FUNC also who calls a function and how often. Development cases only.
+own time and by cumulative time (the top N of each, default 25). The seconds include the
+profiler's overhead (about a fifth more): time a case with tools/verify.py. With
+--callers FUNC also who calls a function and how often; --dump FILE keeps the profile.
+Development cases only.
 """
 from __future__ import annotations
 

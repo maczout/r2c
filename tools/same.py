@@ -56,6 +56,12 @@ def here() -> bool:
 
 
 def digest(data: bytes) -> str:
+    """The hash of a record without the line that names the input file: the same input is
+    found under one name by tools/verify.py and under another by the tests (the Quick
+    Define sections are all called hand.r2t in r2x), and the name is no result."""
+    head, sep, rest = data.partition(b"\ninput-name:")
+    if sep:
+        data = head + rest[rest.index(b"\n"):]
     return hashlib.sha256(data).hexdigest()
 
 

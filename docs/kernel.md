@@ -128,7 +128,8 @@ there on a chart of 1.06 (6.1 %, a Should check at the last stage: `docs/summary
 
 * Automatic properties: Ec = 3320√fc′ + 6900; n = 0.8 + fc′/17; ε0 = (fc′/Ec)·n/(n − 1) [T].
   Automatic tensile strength ft = min(0.15·fc′, 1.4·(1 + 0.01·fc′)) MPa, not the thesis'
-  0.45·fc′^0.4 [B]. The stiffness used for cracking strains is the secant at −0.1 mm/m [B].
+  0.45·fc′^0.4 [B]. The stiffness used for cracking strains is the secant at −0.1 mm/m [B];
+  see "The concrete's stiffness" below.
 * Base curves: linear, parabola, Popovics/Thorenfeldt/Collins (default), elastic-plastic,
   segmental [T, manual Table 2-1]. For a segmental curve the peak is the largest stress of the
   segments.
@@ -145,6 +146,64 @@ there on a chart of 1.06 (6.1 %, a Should check at the last stage: `docs/summary
 * Aggregate size for shear on the crack falls linearly to zero between 60 and 70 MPa, and is
   capped at 25 mm [T, B]. vci,max = 0.18√fc′/(0.31 + 24w/(a + 16)) [T].
 * The material factor multiplies every concrete stress.
+
+### The concrete's stiffness [B `004ac190`], read 2026-11-26 (increment 7): written, off
+
+Source: the concrete set-up `004ac190` (the material factor is the global the tension's
+slope is multiplied by in `004ac960`). No thesis equation: the thesis gives Ec only as
+an automatic property.
+
+The stiffness the concrete has up to cracking is the stress the compression routine
+`004ad9c0` gives at a strain of 0.1 mm/m (factored), divided by the material factor plus
+one millionth, divided by the strain. The cracking strain is the cracking strength over
+that stiffness plus 1 Pa. So in tension the concrete is a millionth less stiff than the
+compression curve's own secant at that strain. r2c divides by the material factor
+alone. The rule is written (`materials.OWN_MODULUS`, in `ConcreteLaw`'s set-up) and
+**off**: see the end of this section.
+
+Why a millionth shows: where one principal strain is tensile and the other compressive
+and both are small, the terms of the node's stiffness that couple the shear strain with
+the longitudinal strain are the difference between the stiffness in tension and the
+compression curve's (about a ten-thousandth of the stiffness at these strains), so a
+millionth of the stiffness is one per cent of them. Those terms steer every step of
+Response's solve with shear.
+
+*Measured* (Newbeam at M/V = 1 m, Response's stiffness read from the running program,
+`tools/rtrace.py --steps --matrix`, against r2c's printed to ten digits; N, N m, per
+unit strain and per 1/m):
+
+| Term, first step of the first stage (no shear strain yet) | Response | r2c before | r2c with the rule |
+|---|---:|---:|---:|
+| N by axial strain | 4293234094 | 4293236092 | 4293234094 |
+| N by curvature | −48967198.44 | −48967487.60 | −48967198.44 |
+| M by curvature | 136905404.2 | 136905461.7 | 136905404.2 |
+
+| Coupling terms, later steps | Response | r2c before | r2c with the rule |
+|---|---:|---:|---:|
+| N by shear strain, stage 1, pass 2 | −38305.5 | −37890.8 | −38275.1 |
+| N by shear strain, stage 1, pass 3 | −38060.1 | −37671.5 | −38053.5 |
+| V by axial strain, stage 1, pass 3 | −27086.5 | −26813.0 | −27085.0 |
+| N by shear strain, stage 3, first step | −19754.68 | −19509.36 | −19753.87 |
+
+What is left (*measured*, not explained): at the very first step, with no shear strain
+at all, Response's V-by-shear-strain term is 1989208877 and r2c's 1990492051 (0.064 %
+apart); from the second step on the two agree to six digits. Where a node has no shear
+strain at all the program takes another routine (`004a7b60`, the test at the head of
+`004a8b20`): its shear stiffness was not read.
+
+Why it is off (*measured*, all 164 development cases, `tools/verify.py` with the rule
+on, `tools/byprio.py` and `tools/changes.py` against the run without it): 162 records
+change in their last digits; without shear no case changes side; with shear the
+I-girder at M/V = 3 m leaves priority 1 (its rising branch, 23 %: the override takes
+over six stages earlier and the curve between is the earlier solve's) and the I-girder
+with deeper strands at 2 m leaves priority 3 (a case on which Response does not hold to
+itself, `tools/noise.py`); none comes inside. Set beside Response's own steps on the
+I-girder at 3 m (`tools/stiff.py`), r2c follows 34 of Response's 58 tries throughout
+with the rule and 35 without: the rule is not what parts them there (the first term to
+differ is the shear stiffness, 2.5 %, at the 26th stage). So the rule is right and one
+case that sits on an edge fell the wrong way; it was not turned on in the increment
+that found it because the held-out set is scored once. Turn it on with the I-girder at
+3 m read at the stage where the two part.
 
 ### Compression softening [B `004ad9c0`, set-up `004ac190`]
 
@@ -1348,10 +1407,11 @@ and −1 m, and the I-girder at 3 m (two concretes):
   and to four or five digits on the first steps of a stage. What differs from the first
   uncracked stage on is small and steady: the four terms that couple the shear strain
   with the axial load and the moment are about 1 % apart (−38306 against −37891 N per
-  unit shear strain on Newbeam's second pass). Not found: the node's routine `0046b940`
-  was set against r2c's term by term once more, and its two extra arguments are passed
-  as nothing by `00427cd0`; the stirrups' share of the transverse stiffness was tried
-  and changes nothing there.
+  unit shear strain on Newbeam's second pass). Found in increment 7: the concrete's
+  stiffness itself ("The concrete's stiffness", under "Concrete": written, off); with
+  it the terms are within 0.01 to 0.08 %. What had been ruled out before: the node's routine
+  `0046b940`, set against r2c's term by term, and the stirrups' share of the transverse
+  stiffness.
 * With r2c's copy of the solve on, the two programs' passes agree to five or six digits
   in load through the first cracked stages, and the solve gives up where Response's does:
   on the I-girder at 3 m both fail the try at 4.83 rad/km in the same oscillation of the
@@ -1619,6 +1679,11 @@ gives, bit for bit, and the owner's rule is that a speed change changes no resul
   state's forces. Since the store gives each call what solving it alone gives, what it
   was asked before changes no number.
 - **The layers' nodes are kept by their bounds** (`Analysis.layer_nodes`).
+- **The splitting of the layers is given the four fields it reads** (`node.lean_state`,
+  `eval_nodes(..., lean=True)`): the principal stresses, the principal tensile strain
+  and the cracking strain, by the same operations as `node.evaluate`.
+- **The concrete's stress is not sorted into tension and compression where every strain
+  of a call is on one side** (`ConcreteLaw.stress`).
 
 `Analysis.node_store`, `Analysis.warm_ahead` and `NodeStore.light` turn each off.
 
