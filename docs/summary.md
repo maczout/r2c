@@ -27,12 +27,12 @@ Measured with `python tools/heldout.py score` (55 frozen cases, once, at the end
 **Without shear every threshold is met. With shear priority 3 rose by one case; nothing
 fell.** Not a plateau; threshold not reached. **Speed** (development set, six cases at
 a time for both programs): without shear r2c is within r2x's time on 104 of 104 cases;
-with shear on 47 of 60, the slowest 3.4 times r2x's. **Interface parity: complete
+with shear on 33 of 60, the slowest 3.6 times r2x's. **Interface parity: complete
 except accepted refusals** (15, and the 4 accepted inputs).
 
 ## What changed
 
-- **Speed: with shear a median of 47 s a case, from 353 s** (r2x: 64 s), **and every one
+- **Speed: with shear a median of 47 s a case, from 353 s** (r2x: 50 s), **and every one
   of the 164 development records is identical before and after**, held by a hash of
   each record in the tests. What was already solved is kept; no rule changed.
 - **Accuracy with shear:** r2c's own damping under shear alone is off (development set:
@@ -45,10 +45,10 @@ except accepted refusals** (15, and the 4 accepted inputs).
 ## Needed from the owner
 
 1. **Which r2x time is the bar?** Reading every stage, as the captures are made (a
-   median of 64 s with shear), or r2x's default, the peak stage alone (5 to 21 s)?
+   median of 50 s with shear), or r2x's default, the peak stage alone (5 to 21 s)?
    Against the default no case with shear is within (2 to 37 times over; a median of
    6.5) and r2c in Python will not get there. Suggested: every stage.
-2. **The 13 cases with shear still over** (1.0 to 3.4 times). Exact savings left are
+2. **The 27 cases with shear still over** (1.0 to 3.6 times; 15 by over a fifth). Exact savings left are
    about a tenth; the rest is Python's cost per state. Suggested: allow one compiled
    routine for the node with one new set of record hashes, held to no development
    check changing side; or accept a factor for cases with shear.
@@ -63,7 +63,7 @@ except accepted refusals** (15, and the 4 accepted inputs).
   moment and shear. Response does not hold to these states itself.
 - **With shear, r2c carries on where Response's solve gives up** (your override; compared
   up to Response's last stage), and after the web cracks under axial compression.
-- **With shear r2c is slower than r2x on about one case in five** (item 2).
+- **With shear r2c is slower than r2x on 27 of 60 development cases** (item 2).
 - **Inputs r2x solves and r2c refuses** (your decision), and the four accepted inputs.
 - **A fall of load at cracking on the edge of what the measure counts** (shear alone, US units).
 

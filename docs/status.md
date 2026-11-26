@@ -52,7 +52,7 @@ cases); priority 3 rose by one case in increment 7 and nothing fell. Outside pri
 with shear: a rectangular beam under axial compression, then shear alone, and one under
 moment and shear at M/V under 2 m (`tools/heldout.py score --kinds`). Speed on the
 development set, six at a time as r2x was timed: all 104 cases without shear within
-r2x's time, 47 of the 60 with shear, the slowest 3.4 times (`python tools/r2xtimes.py
+r2x's time, 33 of the 60 with shear, the slowest 3.6 times (`python tools/r2xtimes.py
 compare RUN --list`). Which of r2x's times is meant (every stage, or the peak alone) is
 with the owner (`docs/summary.md`).
 
@@ -63,11 +63,29 @@ response starts from (branch `trial/i7-start-profile`, with the first rule on): 
 stages is Response's to six digits or more, which is what item 2 and item 5 were
 looking for. On the development set they send the I-girder at M/V = 3 m and Newbeam
 from a US-units file at 1 m outside priority 1 and bring nothing in, so they were left
-off in the increment that found them. Read those two cases at the stage where they part
-from Response with the rules on (`tools/tries.py`, `tools/stiff.py` against the logs of
-`tools/rtrace.py --steps --matrix`; on the I-girder the first term to differ is the
-shear stiffness, 2.5 %, at the 26th stage), then turn both on with new record hashes
-(`python tools/same.py RUN --write`).
+off in the increment that found them. Where the two cases part from Response with the
+rules on (read after the score, `tools/tries.py` and `tools/trace.py --set debug=1`
+against Response's logs, from a copy of the tree with both rules on):
+- **The I-girder at M/V = 3 m.** With or without the rules r2c ends its tries on "no
+  state (singular stiffness)": on some pass every term of its stiffness is zero, which
+  is `Shear.zone`'s "concrete crushed inside the depth with both faces sound: nothing is
+  left". Without the rules that is at Response's 43rd stage (3.99 rad/km, which
+  Response keeps after 14 passes), with them one stage earlier (3.63 rad/km, shear
+  strain 5.3 mm/m); Response's first failed try is at 4.83 rad/km. So r2c finds a node
+  past the strain at peak stress where Response's kept stages suggest it does not, and
+  the rules only move the pass on which it tips. Read the crushed test in `00440ea0`
+  (which strain against which strain at peak, and whether an empty range ends the step
+  or becomes the 3 mm range of "The first step after a try that ran away").
+- **Newbeam from a US-units file at M/V = 1 m.** With the rules r2c's profile errors at
+  the uncracked stages are Response's (0.16, 0.23, 0.04 % at stages 3 to 5; without
+  them 0.28, 0.08, 0.22 %). They part at the closing in on cracking: after the cracked
+  6th stage is set aside and a stage is put in before it, Response's profile error is
+  0.22 % and r2c's 0.04 %, and at the next step Response cracks and r2c with the rules
+  stays uncracked. *Inferred*: a stage put back does not go on with the last kept
+  stage's profile but starts from the table of the uncracked section again. Read
+  `004190a0` and `00415e30` for which profile a put-back stage gets.
+
+Then turn both on with new record hashes (`python tools/same.py RUN --write`).
 
 1. **Speed with shear: what is left** (owner, 2026-11-26: r2c no slower than r2x on any
    case; `docs/measures.md`, "Speed"). `python tools/r2xtimes.py compare RUN --list`
@@ -86,7 +104,7 @@ shear stiffness, 2.5 %, at the 26th stage), then turn both on with new record ha
    so not done: evaluating only the layers still looked at; reusing a node's state
    from another stopping pass. Beyond that the count of states is Response's own
    (20 a stage on that case), and Python's cost a state is the floor: the slowest case
-   (the column under 3000 kN at M/V = 2 m) is 3.4 times r2x's time. A compiled node
+   (the column under 3000 kN at M/V = 2 m) is 3.6 times r2x's time. A compiled node
    routine would not give numpy's last bits; it is with the owner (`docs/summary.md`).
    **Do not edit `src/` while a verify run is going**: `shear.py` is imported by each
    worker when its first case starts, not when the run starts.

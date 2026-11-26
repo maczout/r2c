@@ -57,7 +57,7 @@ measured on the development results (`docs/verification-results.md`) unless mark
   increment 7 what was already solved is kept (`docs/kernel.md`, "What is kept between
   evaluations, for speed") and a case with shear takes about a fifth of what it did,
   with every development record unchanged; it is still longer than r2x's whole command
-  on about one case in five with shear when r2x reads every stage, and on every one if
+  on nearly half the cases with shear when r2x reads every stage, and on every one if
   r2x reads the peak stage alone. Without shear r2c is within r2x's time on every case
   when r2x reads every stage, and on all but one when it reads the peak alone (measured,
   six cases at a time for both programs, `tools/r2xtimes.py`). The owner made speed part
