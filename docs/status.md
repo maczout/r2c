@@ -85,7 +85,30 @@ against Response's logs, from a copy of the tree with both rules on):
   stage's profile but starts from the table of the uncracked section again. Read
   `004190a0` and `00415e30` for which profile a put-back stage gets.
 
-Then turn both on with new record hashes (`python tools/same.py RUN --write`).
+Both leads were then read in the binary, after the score, and tried on branches (not in
+the kernel):
+- **A stage put back or put in gets its profile made anew from its own nodes**
+  [B `0041c060`, called by `004190a0` and `00415e30`]: each layer's top and middle node
+  and the last layer's bottom node, the node's shear strain over the stage's, not
+  renormalised; under a shear strain of 1e-7 the table of the uncracked section. With
+  it r2c's put-in stages on the US-units case have Response's profile error (0.22 %)
+  and r2c cracks where Response does. Branch `trial/i7-putback-profile`.
+- **The I-girder's empty depth range came from the stirrups' plastic strain at the thin
+  layer across a step**: r2c's table of it has no height on the flange's side of the
+  step, so those nodes took most of the web's plastic strain, unloaded and crushed. With
+  the two sides kept apart the thin layer's nodes are Response's to three or four
+  digits at stages 36 to 43. The binary's crushed test is r2c's; where r2c empties the
+  range the binary leaves a sliver (top/100 to bottom/100), not written. Branch
+  `trial/i7-crushed-range`.
+- **All four together** (branch `trial/i7-all-four`; all 164 development cases,
+  `tools/byprio.py` against the run of record): without shear no case changes side;
+  with shear priority 1 at 54 of 60 (55 now), priority 2 at 31 (28), priority 3 at 51
+  (51), priority 4 at 36 of 59 (36 of 58). The three I-girders that were outside come
+  inside on every priority; Newbeam from a US-units file leaves priority 1 and Newbeam
+  at M/V = 0.5 m and under a moment, then shear, lose priority 3 and 4. Start the next
+  increment from that branch: read those three cases, then merge it with new record
+  hashes (`python tools/same.py RUN --write`) and the kernel notes drafted outside the
+  repository beside the runs.
 
 1. **Speed with shear: what is left** (owner, 2026-11-26: r2c no slower than r2x on any
    case; `docs/measures.md`, "Speed"). `python tools/r2xtimes.py compare RUN --list`
