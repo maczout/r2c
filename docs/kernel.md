@@ -912,18 +912,34 @@ stage at 95.236 rad/km is ruptured and set aside; the stage a fifth of the way t
 
 r2c without the switch tries a twenty-fifth of the way after the fifth fails, keeps that
 stage and steps on by a tenth of the target as before; it reaches the rupture a stage
-later and goes on for seven stages after it. With the switch on r2c's 73 stages are
-Response's 73 to the printed digit [measured]. On the 104 development cases without
-shear with it on (`tools/verify.py`, `tools/changes.py`): two checks come inside (the
-ending of that case, 20.6 to 0.0 %; the principal tensile stress at the last stage of the
-prestressed I-girder under axial tension, 8.8 to 3.4 %) and none goes outside. Seen on
-one case with two instances of each step, so "half the last kept step" is a reading:
-the multiplier times a base step kept with the stage would give the same two numbers.
-Off because the held-out set had been scored: with it off the records are the run of
-record's. Turning it on is the first thing for the next increment.
+later and goes on for seven stages after it.
 
-**Two more of Response's own tries without shear, traced and not written** [O, `python
-tools/rtrace.py`, increment 5]. *The prestressed I-girder under 500 kN of axial tension
+These are the fall-back rules of the stage control as r2c's driver with shear already has
+them from the binary [B `0041a870`, `00418860`; `Shear.run`], and the switch gives them to
+the stepping without shear (`Flexure._fallback_targets`, `Flexure.run`): after a failed
+try, while the last kept step is shorter than the step tried, the multiplier is halved
+and half the last kept step is tried; after a second failure the multiplier is halved
+again and the try is back from the failed target by the multiplier times the base step;
+a retry grows the base step from its own target; a stage kept at the first try doubles a
+multiplier under a quarter; the base step is a tenth of the farthest target solved so
+far, from the fifth stage on, and does not shrink. Not written: the change of control
+variable after a failure with the multiplier under 0.2, and the half step further on
+after a whole step is refused; there r2c's own fall-back is used, as with the switch off.
+Checked against Response's own tries on four cases (`python tools/rtrace.py`): on the Cm4
+sample under negative moment, with two bar ruptures, every one of its last twenty tries
+follows from these rules, and with the switch on r2c's last nine stages are Response's
+within 0.002 rad/km; Newbeam with 500 mm² has Response's 73 stages to the printed digit;
+the I-girder under axial tension has Response's first 50 stages (its three first steps of
+0.1 rad/km) and ends where Response ends. On the 104 development cases without shear
+with it on (`tools/verify.py`, `tools/changes.py`): three checks come inside (the endings
+of Newbeam with 500 mm² and of the I-girder under axial tension, 20.6 and 66.8 % to 0.0
+and 0.1 %; the I-girder's principal tensile stress at its last stage, 8.8 to 0.9 %) and
+none goes outside; priority 2 inside on 101 against 99. Off because the held-out set had
+been scored: with it off the records are the run of record's. Turning it on is the first
+thing for the next increment.
+
+**Two of those traces in full, and what is not written** [O, `python tools/rtrace.py`,
+increment 5]. *The prestressed I-girder under 500 kN of axial tension
 and moment*: the section is cracked from the start and the first three steps are 0.1
 rad/km each (−7.28, −7.18, −7.08, −6.98), after which the base step is a tenth of the
 target (0.698). At the end the solve fails at 35.207 rad/km; the multiplier halves and a

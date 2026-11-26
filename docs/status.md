@@ -44,11 +44,13 @@ the brief.
    what Response does when the stage a fifth of the way to a rupture cannot be solved).
    Written after the held-out score of increment 5 and off for that reason alone. Set
    the class attribute to True, run `python tools/verify.py`, then `python
-   tools/stagesat.py`. Measured on the 104 cases without shear: two checks come inside
-   (the ending of Newbeam with 500 mm² of bottom steel; a view at the last stage of the
-   I-girder under axial tension), none goes outside, and that Newbeam has Response's 73
-   stages to the digit. Then look at the two Cm4 cases that part from Response at their
-   66th stage (`python tools/stagesat.py VERIFY_OUT --first 100 --list`).
+   tools/stagesat.py`. Measured on the 104 cases without shear: three checks come inside
+   (the endings of Newbeam with 500 mm² of bottom steel and of the I-girder under axial
+   tension; a view at the I-girder's last stage), none goes outside. Then write the two
+   branches it leaves to r2c's own fall-back (the change of control variable; the half
+   step further on), both in `Shear.run` already, and look at the two Cm4 cases that
+   part from Response at their 66th stage (`python tools/stagesat.py VERIFY_OUT --first
+   100 --list`).
 2. **If the owner says yes: turn on Response's own solve with the parabolic error**
    (`Shear.own_solve`, `Shear.parabolic_error`; `docs/kernel.md`, "The global solve with
    shear", "Measured again in increment 5"). Set both class attributes to True and run
@@ -73,16 +75,13 @@ the brief.
    T-beams, the kinds the held-out scorer shows outside for priority 2 and 3.
 5. **Priority 1 without shear** needs the one held-out case left (a rectangular beam
    under moment, outside on all three priorities). On the development set nothing of
-   that kind is outside priority 1. Outside priority 2 was Newbeam with 500 mm² of bottom
-   steel, which item 1 brings inside. Still outside there: the prestressed I-girder under
-   axial tension (its shape and its ending: Response's steps halve to the strands'
-   rupture and the response ends at the peak; with item 1 on, its last-stage view comes
-   inside and the ending does not), and the Cm4 sample under axial compression (its
-   ending). Response's own tries on both were traced with `python tools/rtrace.py`, which
+   that kind is outside priority 1. Outside priority 2 were Newbeam with 500 mm² of
+   bottom steel and the prestressed I-girder under axial tension, which item 1 brings
+   inside (the I-girder's shape stays outside priority 1). Still outside there: the Cm4
+   sample under axial compression (its ending). Response's own tries on both were traced with `python tools/rtrace.py`, which
    works without shear too, and are written out in `docs/kernel.md` ("Two more of
-   Response's own tries without shear"): on the I-girder the fall-backs of the stage
-   control with shear (the multiplier halved after a failed solve, the control variable
-   changed under 0.2, the end under 0.01), which `Flexure.run` does not have; on Cm4 a
+   those traces in full"): on the I-girder the change of control variable, which item 1
+   does not write; on Cm4 a
    second event between the stage kept after the fall and the stage set aside, which
    r2c's one flag for the extreme fibre's peak strain cannot show.
 6. **Still to differ without shear in where the stages are** (`python tools/stagesat.py
