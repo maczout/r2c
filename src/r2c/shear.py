@@ -805,11 +805,10 @@ class Shear(Flexure):
 
     def relax(self, passes: int) -> float:
         """The share of the updated profile taken: all of it (the update is Response's, which
-        is damped in itself). Under shear alone, half of it in the second half of the passes
-        [O, r2c's own: without it the stage past the peak does not settle, where Response's
-        does; with it everywhere, r2c settles where Response's stages stand still]."""
-        if self.mode0 == "gam" and passes >= self.passes // 2:
-            return 0.5
+        is damped in itself and has no other damping). Until increment 7 r2c took half of
+        it in the second half of the passes under shear alone, from before Response's own
+        solve of a stage was on; with that solve on, the damping left the first cracked
+        stage in another state than Response's."""
         return 1.0
 
     # -- Response's load stage control [B; docs/kernel.md "Response's own load stage control"] ---
