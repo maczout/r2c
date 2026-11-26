@@ -296,6 +296,8 @@ def build(run: dict, results: dict, acc: dict, curves_dir: Path | None, ref_dir:
             "acceptance": {g: t for g, t in acc.items() if t},
             "views_pct": report.views_limit(acc),
             "heldout": heldout_runs(), "threshold": heldout.THRESHOLD, "thresholds": heldout.THRESHOLDS,
+            "repeat": (heldout.read_repeat() or {}).get("totals", {}),
+            "repeat_by": heldout.REPEAT_BY, "margin": heldout.MARGIN,
             "tiers": [dict(n, tier=report.TIERS[t])
                       for t, n in report.tier_counts(ran, acc).items() if n["checks"]]}
 
@@ -445,7 +447,7 @@ function front() {
  if (!runs.length) { H += `<div class="warn">No held-out totals are recorded yet.</div>`; }
  else {
   const L = runs[runs.length - 1], P = runs.length > 1 ? runs[runs.length - 2] : null;
-  H += `<p class="sub">Judged on the held-out set: ${Object.values(L.cases).reduce((a, b) => a + b, 0)} sections and loadings the developer has not tuned against, frozen, compared with Response-2000 within ±5 %. Below: the cases inside target on every priority 1 check (peak, rising branch and shape of the control curve; the stress-state views without shear), against the threshold the owner set, at each scoring. Latest: ${esc(L.label)}, ${esc(L.date)}.</p><div class="heroes">`;
+  H += `<p class="sub">Judged on the held-out set: ${Object.values(L.cases).reduce((a, b) => a + b, 0)} sections and loadings the developer has not tuned against, frozen, compared with Response-2000 within ±5 %. Below: the cases inside target on every priority 1 check (peak, rising branch and shape of the control curve; the stress-state views without shear), against the threshold, at each scoring. The threshold (owner, 2026-11-25) is Response-2000's own score against itself on the same inputs, less ${D.margin} points: Response with every concrete strength raised by ${D.repeat_by} %, compared with Response as it is by the same measure. Latest: ${esc(L.label)}, ${esc(L.date)}.</p><div class="heroes">`;
   for (const t in AREAS) { const v = L.totals[t][1], n = need(t, v[1]), met = pc(v) >= D.threshold[t];
    H += `<div class="hero"><div class="k"><b>${AREAS[t][0]}</b> · ${AREAS[t][1]} · priority 1, held-out</div>
 <div class="v">${f(pc(v), 0)} %<small>${v[0]} of ${v[1]} cases inside target</small></div>
@@ -454,17 +456,20 @@ ${trend(t)}</div>`; }
   H += `</div><div class="legend"><span><span class="ln" style="border-color:var(--sub)"></span>% of held-out cases inside target, by scoring</span><span><span class="ln" style="border-color:var(--ink-2);border-top-style:dashed"></span>threshold</span></div>`;
   // ----- priority by area
   H += `<h2>Held-out set: every priority, by area</h2>
-<p class="sub">Cases inside target on every check of the priority, at the latest scoring${P ? `; the change is since ${esc(P.label)}` : ""}. The owner set a threshold for priorities 1 to 3; priority 4 is reported only.</p>
+<p class="sub">Cases inside target on every check of the priority, at the latest scoring${P ? `; the change is since ${esc(P.label)}` : ""}. Beside each: Response-2000 against itself on the same inputs (every concrete strength raised by ${D.repeat_by} %), and the threshold for priorities 1 to 3, which is that score less ${D.margin} points; priority 4 is reported only.</p>
 <div class="scroll"><table class="pa"><tr><th>Priority</th>${Object.keys(AREAS).map(t => `<th>${AREAS[t][0]} (${L.cases[t]} cases)</th>`).join("")}</tr>`;
   const meter = (v, th) => { const w = 90; let s = `<svg width="${w}" height="12" style="vertical-align:-1px;margin-right:8px" aria-hidden="true"><rect x="0" y="3" width="${w}" height="6" rx="3" fill="var(--grid)"/><rect x="0" y="3" width="${Math.max(2, pc(v) / 100 * w)}" height="6" rx="3" fill="var(--s4)"/>`;
    if (th != null) s += `<line x1="${th / 100 * w - 0.75}" x2="${th / 100 * w - 0.75}" y1="0" y2="12" stroke="var(--ink)" stroke-width="1.5"/>`;
    return s + `</svg>`; };
+  const own = (t, p, v) => { const r = (D.repeat[t] || {})[p], th = (D.thresholds[t] || {})[p];
+   if (!r || !r[1]) return "";
+   return `<div class="dl" style="display:block;white-space:normal;margin:2px 0 0 98px">Response against itself: <span style="white-space:nowrap">${r[0]} of ${r[1]} · ${f(pc(r), 0)} %</span><br>${th == null ? "no threshold: reported only" : `threshold ${f(th, 1)} %: ${pc(v) >= th ? "✓ reached" : "✗ not reached"}`}</div>`; };
   for (const p of [1, 2, 3, 4]) {
-   H += `<tr><td>${PN[p]}</td>`;
+   H += `<tr><td style="min-width:16em">${PN[p]}</td>`;
    for (const t in AREAS) { const v = L.totals[t][p], q = P && P.totals[t][p];
     if (!v || !v[1]) { H += `<td class="c" style="color:var(--ink-3)">no such check</td>`; continue; }
     const d = q ? v[0] - q[0] : null;
-    H += `<td class="c">${meter(v, (D.thresholds[t] || {})[p])}${v[0]} of ${v[1]} · ${f(pc(v), 0)} %${d == null ? "" : `<span class="dl">${d > 0 ? "▲ " + d : d < 0 ? "▼ " + (-d) : "no change"}</span>`}</td>`; }
+    H += `<td class="c">${meter(v, (D.thresholds[t] || {})[p])}${v[0]} of ${v[1]} · ${f(pc(v), 0)} %${d == null ? "" : `<span class="dl">${d > 0 ? "▲ " + d : d < 0 ? "▼ " + (-d) : "no change"}</span>`}${own(t, p, v)}</td>`; }
    H += `</tr>`; }
   H += `</table></div><p class="note">${Object.keys(AREAS).map(t => `${AREAS[t][0]}: ${L.unsolved[t]} of ${L.cases[t]} not solved by r2c and counted outside`).join(" · ")}. The mark on a bar is the threshold of that priority. Held-out results are kept in totals only; no held-out case is shown anywhere.</p>`;
  }

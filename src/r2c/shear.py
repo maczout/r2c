@@ -239,7 +239,7 @@ class Shear(Flexure):
         ks = np.zeros(n_)
         a_n = np.zeros(n_)
         a_s = np.zeros(n_)
-        for st, rho, fac in an.stirrups_at(zf, an.node_width(z)):
+        for st, rho, fac in an.stirrups_at(zf, an.rho_width(zf, an.node_width(z))):
             if not rho.any():
                 continue
             ks += rho * fac * st.steel.tangent(ey * fac + st.prestrain) * st.steel.phi
@@ -385,11 +385,10 @@ class Shear(Flexure):
             prof = (1.0 - relax) * np.interp(grid, an.shape_z, an.shape) + relax * prof
         an.shape_z, an.shape = grid, prof
 
-    # Written and off (docs/kernel.md, "Accepting a stage"): the two shear stresses of the
-    # profile error read by each layer's parabola, as the program reads them [B 00427180,
-    # 004b6df0]. Off: straight lines between the nodes. It goes with own_solve below, and
-    # the two wait for the owner's answer (docs/summary.md, increment 5)
-    parabolic_error = False
+    # The two shear stresses of the profile error read by each layer's parabola, as the
+    # program reads them [B 00427180, 004b6df0] (docs/kernel.md, "Accepting a stage"). Off:
+    # straight lines between the nodes. On with own_solve below (owner, 2026-11-25)
+    parabolic_error = True
 
     def profile_error(self, z, vstate, tau, v) -> float:
         """Response's measure of how far the shear strain profile is from converged
@@ -604,9 +603,16 @@ class Shear(Flexure):
     trace = None             # tools/trace.py: a list to which each try is added
     debug = False            # tools/trace.py --set debug=1: print each pass of a stage
     why = ""                 # why the program's solve gave up, for tools/trace.py
-    # Response's own solve of the global strains [B 004276a0]: written and off
-    # (docs/kernel.md, "The global solve with shear")
-    own_solve = False
+    # Response's own solve of the global strains [B 004276a0] (docs/kernel.md, "The global
+    # solve with shear"): on (owner, 2026-11-25)
+    own_solve = True
+    # The owner's override (docs/brief.md, 2026-11-25): where Response's solve gives up
+    # and ends a shear response early, r2c carries on. With Response's own solve on, r2c's
+    # tries run out where Response's do; the response is then carried on by r2c's own solve
+    # (Newton's method, the nested search, a state nearly in balance), from the last stage
+    # kept, with whole steps again. Off: the response ends there, as Response's does.
+    carry_on = True
+    carried_from = None      # the number of stages kept when the override took over
     step_share = 1.0         # the share of a step of that solve that is taken
     half_steps = False       # Response's flag that keeps that share at one half
 
@@ -1116,6 +1122,14 @@ class Shear(Flexure):
                     if getattr(self, "debug", False):
                         print(f"  control {old} -> {other} at stage {n_st}")
                     continue
+                if self.carried_from is not None:
+                    # under the override the stage control is r2c's own too: half the
+                    # step from the last stage kept, until a state is found
+                    mult *= 0.5
+                    target = self.control_of(prev) + mult * d0
+                    if mult < 0.005:
+                        break
+                    continue
                 # closer to the stage before [B 0041a870, 1]; the next solve starts on half
                 # steps [B 00418af0]
                 self.step_share = 0.5
@@ -1138,7 +1152,13 @@ class Shear(Flexure):
                     mult *= 0.5
                     target = target * 0.5 if n_st == 1 else target - mult * d0
                 if mult < 0.005:
-                    break
+                    if not self._carry_on(prev, peak):
+                        break
+                    # the owner's override: r2c's own solve from the last stage kept
+                    mult, retries = 1.0, 0
+                    pending.clear()
+                    start = None
+                    target = self.control_of(prev) + d0
                 continue
             # accepted
             if mult == 1.5:
@@ -1159,6 +1179,25 @@ class Shear(Flexure):
                 grow(target)
             next_target()
         return self.stages[:max_stages]
+
+    def _carry_on(self, last: Stage, peak: float) -> bool:
+        """The owner's override, when the tries on a stage have run out: is the response
+        carried on by r2c's own solve? Once in a response, where it is Response's solve
+        that has given up (own_solve on) and the response has not ended by Response's own
+        tests: the last stage kept still carries 0.8 of the largest load, the share under
+        which a failure in the section ends a response [B 00419990] and above which the
+        measure reads an early end as the solve giving up (docs/measures.md)."""
+        if not (self.carry_on and self.own_solve) or self.carried_from is not None:
+            return False
+        if len(self.stages) < 2 or abs(last.lam) < 0.8 * abs(peak):
+            return False
+        self.own_solve = self.parabolic_error = False      # on this instance, from here on
+        self.half_steps = self.mode0 == "e0"
+        self.step_share = 1.0
+        self.carried_from = len(self.stages)
+        if getattr(self, "debug", False):
+            print(f"  override: carried on by r2c's own solve from stage {self.carried_from}")
+        return True
 
     def _uncommit(self):
         """Put the history (plastic strains, ruptured bars) back to that of the stages kept,

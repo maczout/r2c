@@ -126,3 +126,31 @@ def test_the_second_set_is_not_scored():
         heldout.main(["score", "/nowhere", "--set", "finish"])
     assert all(sum(r["cases"].values()) == len(manifest()["cases"])
                for r in heldout.read_totals()["runs"])
+
+
+# -- Response against itself, and the threshold made from it (owner, 2026-11-25) ---------------
+
+def test_the_threshold_is_response_s_own_score_less_three_points():
+    rep = {"totals": {"moment-axial": {"1": [27, 27], "2": [26, 27], "3": [0, 0]},
+                      "shear": {"1": [27, 28], "2": [14, 28], "3": [21, 28], "4": [20, 28]}}}
+    th = heldout.thresholds(rep)
+    assert th["moment-axial"] == {"1": 97.0, "2": 93.3}
+    assert th["shear"] == {"1": 93.4, "2": 47.0, "3": 72.0}      # priority 4: reported only
+    assert heldout.thresholds(None) == {"moment-axial": {}, "shear": {}}
+
+
+def test_response_against_itself_is_recorded_in_totals_only():
+    rep = heldout.read_repeat()
+    assert rep is not None and rep["by_per_cent"] == 0.05
+    heldout.check_repeat(rep)
+    assert heldout.THRESHOLDS == heldout.thresholds(rep)
+    text = heldout.REPEAT.read_text()
+    assert not any(c["name"] in text for c in heldout.CASES)
+    with pytest.raises(ValueError):
+        heldout.check_repeat(dict(rep, cases_outside=["x"]))
+    assert heldout.brief_block(rep) in (ROOT / "docs" / "brief.md").read_text(encoding="utf-8")
+
+
+def test_response_against_itself_is_refused_for_the_second_set():
+    with pytest.raises(SystemExit):
+        heldout.main(["repeat", "/nowhere", "--set", "finish"])

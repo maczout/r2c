@@ -160,6 +160,27 @@ def check_heldout(say, tracked: list[str]) -> None:
     except ValueError as e:
         say("FAIL", f"held-out: heldout/totals.json: {e}")
         return
+    rep = heldout.read_repeat()
+    if rep is None:
+        say("FAIL", "held-out: heldout/repeatability.json is missing (Response against "
+                    "itself, which the threshold is made from: python tools/heldout.py repeat)")
+        return
+    try:
+        heldout.check_repeat(rep)
+    except ValueError as e:
+        say("FAIL", f"held-out: heldout/repeatability.json: {e}")
+        return
+    rt = (ROOT / "heldout" / "repeatability.json").read_text()
+    if any(re.search(rf"(?<![\w-]){re.escape(n)}(?![\w-])", rt) for n in names):
+        say("FAIL", "held-out: heldout/repeatability.json names a case (totals only)")
+        return
+    brief = (ROOT / "docs" / "brief.md").read_text(encoding="utf-8")
+    if heldout.brief_block(rep) not in brief:
+        say("FAIL", "held-out: the brief's measured values of Response against itself are "
+                    "not what tools/heldout.py writes (rerun python tools/heldout.py summary)")
+        return
+    say("ok", "held-out: Response against itself recorded, totals only; the threshold "
+              "follows from it and the brief has the values as generated")
     if not (bad or leaked or named):
         say("ok", f"held-out: {len(cases)} cases, frozen {man.get('frozen')}, as frozen; "
                   f"totals only ({len(heldout.read_totals()['runs'])} run(s) recorded)")

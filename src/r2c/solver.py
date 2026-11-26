@@ -484,6 +484,24 @@ class Analysis:
         node's own layer."""
         return self.sec.width(self.profile_z(z).ravel())
 
+    # On since increment 6 (docs/kernel.md, "The stirrups' ratio on the thin layer
+    # across a step"): the stirrup ratio of the nodes of that layer by the narrower width
+    thin_rho_narrow = True
+
+    def rho_width(self, zf, bw):
+        """The width a node's stirrup ratio is worked out with: the node's own (bw), but on
+        the thin layer across a step in width, its two ends included, the narrower of the
+        two widths [O: Response's nodes there, docs/kernel.md]."""
+        if not self.thin_rho_narrow or not self.thin_side:
+            return bw
+        zf = np.asarray(zf, dtype=float).ravel()
+        bw = np.array(bw, dtype=float).ravel()
+        for zs in self.thin_side:
+            on = np.abs(zf - zs) <= THIN + 1e-9
+            if on.any():
+                bw[on] = min(self.sec.width_side(zs, True), self.sec.width_side(zs, False))
+        return bw
+
     def stirrups_at(self, zf, bw=None):
         """For every stirrup type: (ratio by node, strain factor, force factor). bw is the
         width at each node where the caller knows which side of a step the node is on."""
@@ -544,7 +562,7 @@ class Analysis:
         the concrete's shrinkage or thermal strain at each node: the concrete works on the
         transverse strain less it, the stirrups on the whole of it [B 004a8b20, 0046aaa0]."""
         sec = self.sec
-        sts = self.stirrups_at(zf, self.node_width(z))
+        sts = self.stirrups_at(zf, self.rho_width(zf, self.node_width(z)))
         rcrit = sec.tab(sec.t_rhocrit, zf)
         epy = np.interp(zf, self.epy_z, self.epy)
         idx = self.law_index(zf, z)
@@ -735,7 +753,8 @@ class Analysis:
         fsy = np.zeros(len(sel))
         fsycr = np.zeros(len(sel))
         if (self.shear or sec.shrink) and sec.stirrups:
-            tot, _res, rho_t = self.stirrup_stress(self.stirrups_at(zz, b.ravel()[sel]), ey,
+            tot, _res, rho_t = self.stirrup_stress(
+                self.stirrups_at(zz, self.rho_width(zz, b.ravel()[sel])), ey,
                                                    sec.tab(sec.t_rhocrit, zz),
                                                    np.interp(zz, self.epy_z, self.epy))
             has = rho_t > 0
@@ -884,9 +903,15 @@ class Analysis:
             for i in range(len(sec.layers)):
                 res[i] = float("nan") if i in tension else fs[i]
             return res
-        for i, l, e, arm in bars:
+        # a bar shows a stress at the crack where the concrete at its height is cracked
+        # with the extra strain added: the node's principal tensile strain there, plus the
+        # extra strain, against the cracking strain [B 00442e50: the strain read is the
+        # nodes' principal one, not the bar's own; the two are one without shear]
+        e1 = np.interp([l.z for _i, l, _e, _a in bars], z[::-1], out.e1[::-1]) \
+            if bars else np.zeros(0)
+        for (i, l, e, arm), e1b in zip(bars, e1):
             ecr = max(float(np.interp(l.z, sec.tz, self.t_ft)) / law.Ec, law.ecr)
-            if e + arm * dphi - float(sec.shrinkage(np.array([l.z]))[0]) >= ecr:
+            if float(e1b) + arm * dphi >= ecr:
                 res[i] = at(i, l, e, arm * dphi)
         return res
 
@@ -1460,7 +1485,7 @@ class Flexure:
     # solved so far, from the fifth stage on; a stage kept at the first try doubles a
     # multiplier under a quarter. Where Response's fall-back is not written (the change of
     # control variable) r2c's own is used, as with the switch off.
-    rupture_halving = False
+    rupture_halving = True
     mult = 1.0               # the step multiplier, halved by a failed try (with the switch)
     retried = False          # a try has failed since the last stage kept (with the switch)
     base = 0.0               # the base step, as it has grown (with the switch)

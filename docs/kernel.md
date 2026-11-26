@@ -286,6 +286,26 @@ tension, then moment, at the stage after cracking: Response's four layers carry 
 18.57 MPa); r2c had 16.48, 16.29, 0 and 0, and with the rule 24.97, 24.73, 18.57, 18.57
 [measured, the fixture liping-ntens200-m].
 
+### Which bars show a stress at a crack [B `00442e50`, its last loop; `00427180`], read 2026-11-25 (increment 6)
+
+After the extra curvature is found, a bar in tension is given a stress at the crack only
+where the concrete at its height is cracked with the extra strain added. The strain the
+binary tests is not the bar's own: it is the nodes' principal tensile strain read at the
+bar's height (the node record's field at +0x18, by the table reader `00427180`), plus the
+bar's distance from the axis times the extra curvature, less the shrinkage strain there,
+against the larger of the cracking strength at that height over Ec and the cracking
+strain. A bar under that shows nothing. Without shear the principal tensile strain at a
+node is the longitudinal one, and r2c, which tested the bar's own strain, was right there;
+with shear a bar with next to no strain of its own, in a web cracked diagonally, shows a
+stress at the crack in Response and showed nothing in r2c (Newbeam under an axial
+compression of 300 kN and shear, at the peak: bottom bars at 1.06 MPa on average, 14.33
+at the crack in Response, 0 in r2c). r2c: `Analysis.steel_at_crack`, reading its nodes'
+principal tensile strain (the concrete's own, net of shrinkage) linearly at the bar.
+Not found (the T-beam with CSA factors at M/V = 2 m, at the peak): Response gives its
+bottom bars, which have yielded on average, no value at the crack, and r2c their average
+stress; in Response the concrete's moment is then over the capacity moment (the routine
+leaves by `004440d0`), in r2c it is not.
+
 ### A node with next to no shear strain [B `004a8b20`, `004a7b60`], read 2026-11-23 (step A-2)
 
 Before Response solves a node's transverse strain (`004a8b20`) it tests the
@@ -483,6 +503,29 @@ is there ("Layers", "Across a step"), with a point of the profile at each of its
 transverse crack spacing has a point on each side of a step since 2026-11-22 ("Crack
 spacing over the depth"); the bond parameter and the steel ratio at a crack are still
 interpolated across a step from their 100 stations.
+
+### The stirrups' ratio on the thin layer across a step [O], 2026-11-25 (increment 6)
+
+On the thin layer Response puts across a step in width ("Layers"), its two ends included,
+a node's stirrup ratio is worked out with the narrower of the two widths, whichever side
+of the step the node's own width is on; the node's width for its stresses and for the
+shear flow stays its own (`Analysis.rho_width`, `Analysis.thin_rho_narrow`). Not read in
+the binary: seen in Response's charts and written from them. On the I-girder at M/V = 3 m
+and on the T-beam at M/V = 4 m and under −M with shear, the two nodes of that layer on
+the flange's side stand apart from the flange's nodes next to them in every chart from
+the stage the flange cracks: no shear on the crack where the flange has some, a smaller
+transverse strain and stirrup stress, and a shear strain that falls behind the flange's
+stage by stage (the T-beam at M/V = 4 m, four stages before the peak: 1.190 against 1.430
+mm/m just above, transverse strain 0.273 against 0.409). r2c gave those nodes the
+flange's ratio, a third of the web's, and its nodes there were the flange's: 1.444 and
+0.413. With the rule: 1.1915 and 0.2730, no shear on the crack, and the layers next to
+the step are split where Response splits them (the jump of the shear strain now falls
+inside the flange's layer, as in Response). The jump of the stirrup stress across the
+layer is what Response's Transverse Average Bond chart shows as a spike at a web's edge.
+Before this the two programs' shear strain agreed over the rest of the flange to a
+thousandth and differed at these nodes by a factor of two at the peak
+[measured, `python tools/viewlines.py`, the fixtures igirder-m3v and tbeam-m4v].
+Not checked: a step where the stirrups end, and a change of concrete at one width.
 
 ### Hoops [T 7-6]
 
@@ -892,8 +935,8 @@ stages are Response's (curvatures 52.25 and 58.02 rad/km, 16.7 and 16.5 kNm); po
 I-girder under M the response ended as Response's does before this change and does not
 now [O, one run of the parked cases, 2026-11-22; not looked into].
 
-**When the stage a fifth of the way to the rupture cannot be solved: written and off**
-(`Flexure.rupture_halving`, increment 5, after the held-out score) [O: Response's own
+**When the stage a fifth of the way to the rupture cannot be solved** (`Flexure.rupture_halving`,
+written in increment 5 after the held-out score and off then; on since increment 6) [O: Response's own
 tries, `python tools/rtrace.py`, which reads a case without shear as well; B `00415e30`,
 `00419ff0` for the closing in]. On Newbeam with 500 mm² of bottom steel under moment the
 stage at 95.236 rad/km is ruptured and set aside; the stage a fifth of the way to it,
@@ -1249,7 +1292,7 @@ not on record. Under control of the shear strain, from the twelfth pass, a stage
 top or bottom fibre is within a fifth of its cracking strain is kept as it is once its
 error is under 50 % [`004156b0`]. Not in r2c; no traced case shows it deciding a try.
 
-### The global solve with shear [B `004276a0`, `004267c0`], read 2026-11-22: written, off
+### The global solve with shear [B `004276a0`, `004267c0`], read 2026-11-22: on since increment 6
 
 Response's solve of the three global strains of a stage, the same routine as the general
 solve without shear ("The stage solve without shear"). The load factor is read off the
@@ -1266,8 +1309,26 @@ least one step. It fails after 50 steps, when the system cannot be solved, or wh
 is larger than 0.5 in all. With shear it returns found or not found only: the third
 status (−2) that the stage control tests for is returned without shear alone.
 
-r2c has it as `Shear.own_solve`, off: what runs is r2c's own solve (Newton's method on the
-true residual with a search along the step, then a bracketing search). Measured with it on
+r2c has it as `Shear.own_solve`, **on since increment 6 (owner, 2026-11-25)**, with the
+profile error read by parabolas (`Shear.parabolic_error`, "Accepting a stage"). r2c's own
+solve (Newton's method on the true residual with a search along the step, then a
+bracketing search) is what ran before, and what runs under the override below.
+
+**The owner's override, kept in force explicitly** (`Shear.carry_on`, `Shear._carry_on`,
+`run.solve`; `docs/brief.md`, 2026-11-25: where Response's solve gives up and ends a shear
+response early, r2c carries on) [O, r2c's own arrangement]. With Response's solve on,
+r2c's tries on a stage run out where Response's do (the step multiplier under 0.005).
+Where the last stage kept then still carries 0.8 of the largest load (under that, a
+failure in the section ends the response by Response's own test, `00419990`), the
+response is carried on from that stage by r2c's own solve, with r2c's own halving of the
+step from the last stage kept, once in a response. Where r2c's own solve finds no stage
+beyond it either, the response is the one r2c's own solve finds from the start, if that
+one goes further in the first control variable; else it ends there, as Response's does.
+`Result.carried_from` says which: the number of stages kept when the override took over,
+0 where the whole response is r2c's own solve's (`tools/verify.py` writes it into a
+case's results). With `Shear.carry_on` off the response ends as Response's does.
+
+Measured before it was turned on, with it on
 (2026-11-22, the eleven shear cases, `tools/changes.py` against the run before): 8 checks
 come inside (the post-peak of "constant V, then M", 5.9 to 1.8 %; views at the peak of
 M/V = 0.5 m and of the I-girder) and 13 go outside (12 views of V alone at its fall of
@@ -1321,9 +1382,9 @@ shear is negligible). Both stresses are read at a point from the parabola throug
 three nodes of the layer the point is in (top, middle, bottom), the first layer from the top
 that holds it [B `00420f20`: 50 points from the bottom face to the top; the state's stress by
 `00427180`, the calculated one by the table reader `004b6df0`, which falls back on a straight
-line only outside the table]. r2c reads both by straight lines between nodes; the
-program's reading is **written and off** (`Shear.parabolic_error`, increment 5), because it
-was checked, and belongs, with Response's own solve (`Shear.own_solve`, "The global solve
+line only outside the table]. r2c read both by straight lines between nodes until increment 6; the
+program's reading (`Shear.parabolic_error`, written in increment 5) is on with
+Response's own solve, with which it was checked and belongs (`Shear.own_solve`, "The global solve
 with shear" below). Measured with both on, on Newbeam at M/V = 1 m against the running program
 (`python tools/rtrace.py`, `python tools/trace.py --set debug=1 --set own_solve=1`): at the
 six passes of the first cracked stage Response's error is 23.2061, 11.3877, 5.6557, 2.5267,

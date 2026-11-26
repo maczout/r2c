@@ -66,6 +66,11 @@ tuned against. It is frozen; its recipe and hashes are committed (`heldout/manif
   cannot be scored is counted as outside, not dropped.
 - **Nothing per-case is committed or published**: only `heldout/totals.json` and what is
   made from it.
+- **Response against itself** (owner, 2026-11-25): `tools/heldout.py repeat` captures
+  Response on each held-out input with every concrete strength raised by 0.05 % and
+  prints totals only (`heldout/repeatability.json`); the threshold is made from them. No
+  r2c result is involved. Its captures and per-case comparisons stay in the archive and
+  are not opened either.
 - **The second set, for the finish** (`heldout/finish-manifest.json`; owner, 2026-11-25):
   about 20 more cases, frozen the same way in an archive of its own. It is not scored in
   any way until the finishing steps: `tools/heldout.py score` refuses it, r2c is not run
@@ -124,9 +129,10 @@ summary.
 - you want a new override, or a change to a measure or the tolerance;
 - you judge that the solution threshold is reached, or that the approach has plateaued (two
   increments in a row with no gain in any area's held-out total). The threshold (owner,
-  2026-11-25), on the held-out set, without shear / with: priority 1, 99 % / 99 %;
-  priority 2, 95 % / 60 %; priority 3, 95 % / 85 %; priority 4 is reported only. When it
-  is reached, ask before starting the finishing steps.
+  2026-11-25), on the held-out set, for each area and priority 1 to 3: Response's own
+  score there against itself after every concrete strength is raised by 0.05 %, less 3
+  points (`heldout/repeatability.json`, the values in the brief); priority 4 is reported
+  only. When it is reached, ask before starting the finishing steps.
 
 Asking means: say it under "Needed from the owner" in `docs/summary.md` and in the pull
 request, with a suggested answer, stop that line of work, and carry on with something
@@ -143,7 +149,7 @@ else. Everything else, decide and note in the log.
 | The measures and the targets | `docs/measures.md` |
 | What is in scope | `docs/scope.md` |
 | Each kernel rule and its source | `docs/kernel.md` |
-| The held-out set and the second one for the finish: recipe, hashes, totals | `heldout/`, `tools/heldout.py` |
+| The held-out set and the second one for the finish: recipe, hashes, totals; Response against itself and the threshold | `heldout/`, `tools/heldout.py` |
 | Interface parity with r2x | `tools/parity.py` |
 | Development results against Response (generated) | `docs/verification-results.md`, https://maczout.github.io/r2c/ |
 | What happened in each increment | `docs/log/` |
