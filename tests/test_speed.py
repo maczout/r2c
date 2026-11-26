@@ -55,6 +55,11 @@ def test_the_light_pass_gives_the_node_routine_s_transverse_stress():
     smy = rng.uniform(50.0, 600.0, n)
     cx = rng.uniform(0.0, 6.0, n)
     cy = rng.uniform(0.0, 6.0, n)
-    want = node.evaluate(law, ex, ey, g, m, ft, smx, smy, cx, cy).fcy
+    full = node.evaluate(law, ex, ey, g, m, ft, smx, smy, cx, cy)
     got = node.transverse_stress(law, ex, ey, g, m, ft, smx, smy, cx, cy)
-    assert got.tobytes() == want.tobytes()
+    assert got.tobytes() == full.fcy.tobytes()
+    # and the fields the splitting of the layers reads
+    f1, f2, e1, ecr, t = node.lean_state(law, ex, ey, g, m, ft, smx, smy, cx, cy)
+    for a, b in ((f1, full.f1), (f2, full.f2), (e1, full.e1), (ecr, full.ecr), (t, full.tan)):
+        assert a.tobytes() == b.tobytes()
+    assert full.cracked.any() and not full.cracked.all()

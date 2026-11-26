@@ -455,8 +455,10 @@ class Analysis:
             if gam != 0.0 else np.zeros_like(zf)
         return zf, sh, ex, m, ft, smx, smt, cx, g
 
-    def eval_nodes(self, e0, phi, gam, z, f1cx, ey=None):
-        """Concrete stresses at heights z (any shape) for the global strain state."""
+    def eval_nodes(self, e0, phi, gam, z, f1cx, ey=None, lean=False):
+        """Concrete stresses at heights z (any shape) for the global strain state. lean: the
+        caller reads f1, f2, e1 and ecr alone (the splitting of the layers), and where
+        the transverse strain is solved for, only those are worked out."""
         sec = self.sec
         shp = z.shape
         zf, sh, ex, m, ft, smx, smt, cx, g = self._inputs(e0, phi, gam, z, f1cx)
@@ -465,7 +467,7 @@ class Analysis:
             # strain is solved for [B 004a8b20: its test for the node with no stirrups]
             if self._visited is not None:
                 self._visited.append(z)
-            out, eyv = self.transverse(zf, z, ex, g, m, ft, smx, smt, cx, sh)
+            out, eyv = self.transverse(zf, z, ex, g, m, ft, smx, smt, cx, sh, lean=lean)
             return out, ex, g, smx, smt, eyv
         eyv = np.zeros_like(zf) if ey is None else ey.ravel()
         cy = np.zeros_like(zf)
@@ -586,7 +588,7 @@ class Analysis:
     # call solves its whole batch again (transverse_batch), which is the definition
     node_store = True
 
-    def transverse(self, zf, z, ex, g, m, ft, smx, smt, cx, sh=None):
+    def transverse(self, zf, z, ex, g, m, ft, smx, smt, cx, sh=None, lean=False):
         """The transverse solve of transverse_batch, with the same numbers bit for bit, without
         solving a node again that was solved before with the same inputs (the layers are
         split anew at every evaluation of a state, and each split evaluates every layer
@@ -594,7 +596,7 @@ class Analysis:
         if not self.node_store:
             return self.transverse_batch(zf, z, ex, g, m, ft, smx, smt, cx, sh)
         table = self._table(zf, z, ex, g, m, ft, smx, smt, cx, sh)
-        return self._nodes.solve(table)
+        return self._nodes.solve(table, "lean" if lean and self._nodes.light else True)
 
     def _table(self, zf, z, ex, g, m, ft, smx, smt, cx, sh):
         """One row a node: everything its transverse solve works from (NodeStore)."""
@@ -778,7 +780,7 @@ class Analysis:
 
     def _refine(self, e0, phi, gam, f1cx, hmin, before):
         z, _b = self.layer_nodes()
-        out, *_ = self.eval_nodes(e0, phi, gam, z, f1cx)
+        out, *_ = self.eval_nodes(e0, phi, gam, z, f1cx, lean=True)
         tol1 = 0.002 * max(float(np.max(np.abs(out.f1))), 1e-6)
         tol2 = 0.002 * max(float(np.max(np.abs(out.f2))), 1e-6)
         done = np.zeros(len(z), dtype=bool)
@@ -786,13 +788,13 @@ class Analysis:
             z, _b = self.layer_nodes()
             if len(z) >= self.max_layers - 2 or done.all():
                 break
-            out, *_ = self.eval_nodes(e0, phi, gam, z, f1cx)
+            out, *_ = self.eval_nodes(e0, phi, gam, z, f1cx, lean=True)
             f1 = out.f1.reshape(z.shape)
             f2 = out.f2.reshape(z.shape)
             over = (out.e1 - out.ecr).reshape(z.shape)
             zq = np.stack([0.75 * z[:, 0] + 0.25 * z[:, 2], 0.25 * z[:, 0] + 0.75 * z[:, 2]],
                           axis=1)
-            oq, *_ = self.eval_nodes(e0, phi, gam, zq, f1cx)
+            oq, *_ = self.eval_nodes(e0, phi, gam, zq, f1cx, lean=True)
             q1 = oq.f1.reshape(zq.shape)
             q2 = oq.f2.reshape(zq.shape)
 
@@ -1060,6 +1062,9 @@ class NodeStore:
         self.rows = {}           # (node, pass) -> row of the kept results
         self.fields = None
         self.nrows = 0
+        self.lrows = {}          # the same for the lean results
+        self.lfields = None
+        self.nlrows = 0
 
     def _grow(self, ncol):
         cap = 1024 if self.cols is None else 2 * len(self.cols)
@@ -1196,6 +1201,32 @@ class NodeStore:
             tot[sel] = fcy + st_tot
         return tot
 
+    def _lean(self, ids, ey):
+        """(f1, f2, e1, ecr) at nodes ids, one strain a node: those fields of _run's states,
+        by the same operations."""
+        sec = self.an.sec
+        c = self.cols[ids]
+        idx = c[:, 0]
+        one = len(sec.laws) == 1
+        got = None if one else [np.empty(len(ids)) for _ in range(4)]
+        for j, law in enumerate(sec.laws):
+            if one:
+                sel, cj, eyl = None, c, ey
+            else:
+                sel = idx == j
+                if not sel.any():
+                    continue
+                cj, eyl = c[sel], ey[sel]
+            _tot, st_res = self._stirrups(ids, sel, cj, eyl)
+            f1, f2, e1, ecr, _t = nodelib.lean_state(
+                law, cj[:, 1], eyl - cj[:, 2], cj[:, 3], cj[:, 4], cj[:, 5], cj[:, 6],
+                cj[:, 7], cj[:, 8], st_res)
+            if one:
+                return f1, f2, e1, ecr
+            for a, v in zip(got, (f1, f2, e1, ecr)):
+                a[sel] = v
+        return got
+
     def _bracket(self, ids):
         """New nodes: the ladder of transverse strains scanned for the first change of sign."""
         n = len(ids)
@@ -1279,20 +1310,41 @@ class NodeStore:
         at = np.where(self.ok[ids], stop, -1)
         span = self.PASSES + 1
         code = (ids * span + (at + 1)).tolist()
-        got = list(map(self.rows.get, code))
+        lean = results == "lean"
+        kept = self.lrows if lean else self.rows
+        base = self.nlrows if lean else self.nrows
+        got = list(map(kept.get, code))
         lack = {}
         if None in got:
             for i, r in enumerate(got):
                 if r is None:
                     r = lack.get(code[i])
                     if r is None:
-                        r = lack[code[i]] = self.nrows + len(lack)
+                        r = lack[code[i]] = base + len(lack)
                     got[i] = r
         rows = np.array(got, dtype=np.int64)
         if lack:
             who = np.array([k // span for k in lack], dtype=np.int64)
             when = np.array([k % span - 1 for k in lack], dtype=np.int64)
             ey = np.where(when >= 0, self.x[who, np.maximum(when, 0)], self.ey0[who])
+        if lean:
+            if lack:
+                vals = self._lean(who, ey)
+                self.nlrows += len(lack)
+                kept.update(lack)
+                if self.lfields is None:
+                    self.lfields = [np.zeros(1024) for _ in range(5)]
+                if self.nlrows > len(self.lfields[0]):
+                    size = max(2 * len(self.lfields[0]), self.nlrows)
+                    for q, a in enumerate(self.lfields):
+                        b = np.zeros(size)
+                        b[: len(a)] = a
+                        self.lfields[q] = b
+                for a, v in zip(self.lfields, (ey,) + tuple(vals)):
+                    a[base: self.nlrows] = v
+            f = self.lfields
+            return nodelib.LeanOut(f[1][rows], f[2][rows], f[3][rows], f[4][rows]), f[0][rows]
+        if lack:
             _, outs = self._run(who, ey)
             r0 = self.nrows
             self.nrows += len(lack)

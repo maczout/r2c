@@ -309,6 +309,11 @@ class ConcreteLaw:
     def stress(self, e: np.ndarray, eo: np.ndarray, ft_eff: np.ndarray, m: np.ndarray):
         """Principal stress for strain e with the other principal strain eo: (stress, f2max)."""
         tens = e >= -1e-9
+        # all in tension, or all in compression: the same numbers without sorting them
+        if tens.all():
+            return self.tension(e, ft_eff, m), np.full_like(e, -self.fcp * self.phi)
+        if not tens.any():
+            return self._compression(e, eo)
         s = np.empty_like(e)
         fmax = np.full_like(e, -self.fcp * self.phi)
         if tens.any():

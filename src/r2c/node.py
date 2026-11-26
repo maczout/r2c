@@ -19,6 +19,15 @@ BIG = 1e9
 
 
 @dataclass
+class LeanOut:
+    """The fields of NodeOut that the splitting of the layers reads."""
+    f1: np.ndarray
+    f2: np.ndarray
+    e1: np.ndarray
+    ecr: np.ndarray
+
+
+@dataclass
 class NodeOut:
     fcx: np.ndarray
     fcy: np.ndarray
@@ -167,12 +176,12 @@ def evaluate(law: ConcreteLaw, ex, ey, gxy, m, ft_eff, smx, smy, f1cx, f1cy) -> 
                    cracked, f1crack, t, floor, gov, f1draw, ecr0)
 
 
-def transverse_stress(law: ConcreteLaw, ex, ey, gxy, m, ft_eff, smx, smy, f1cx, f1cy):
-    """The concrete's transverse stress alone: evaluate(...).fcy, by the same operations in
-    the same order and so the same bits, without the fields the transverse solve's passes
-    do not read (crack width and spacing, the shear on the crack, what governs, the limits
-    drawn). Every argument an array of the nodes' length. Held to evaluate by
-    tests/test_speed.py and tools/shadow.py."""
+def lean_state(law: ConcreteLaw, ex, ey, gxy, m, ft_eff, smx, smy, f1cx, f1cy):
+    """(f1, f2, e1, ecr, tan) of evaluate(...), by the same operations in the same order and
+    so the same bits, without the fields that neither the transverse solve's passes nor
+    the splitting of the layers read (crack width and spacing, the shear on the crack,
+    what governs, the limits drawn). Every argument an array of the nodes' length. Held
+    to evaluate by tests/test_speed.py and tools/shadow.py."""
     phi = law.phi
     ang = np.arctan2(gxy, ex - ey)
     theta = np.pi / 2 - 0.5 * ang
@@ -189,11 +198,11 @@ def transverse_stress(law: ConcreteLaw, ex, ey, gxy, m, ft_eff, smx, smy, f1cx, 
     f1, _ = law.stress(e1, e2, ft_eff, m)
     f2, f2max = law.stress(e2, e1, ft_eff, m)
 
-    ecr = law.crack_strain(ft_eff)
+    ecr0 = law.crack_strain(ft_eff)
     f1lim = np.maximum(law.ft, ft_eff) * phi
     red = np.clip(1.05 - f2 / (f2max - 1e-6), 0.05, 1.0)
     red = np.where(np.abs(e2) > abs(law.e0), 0.05, red)
-    ecr = ecr * red
+    ecr = ecr0 * red
     f1lim = f1lim * red
     f1 = np.minimum(f1, f1lim)
     k = e1 > ecr
@@ -225,5 +234,12 @@ def transverse_stress(law: ConcreteLaw, ex, ey, gxy, m, ft_eff, smx, smy, f1cx, 
         fk = np.minimum(np.minimum(fk, f1b), np.minimum(f1c, f1d))
         fk = np.where(fk < fl, fl, fk)
         f1[k] = fk
+    return f1, f2, e1, ecr0, t
+
+
+def transverse_stress(law: ConcreteLaw, ex, ey, gxy, m, ft_eff, smx, smy, f1cx, f1cy):
+    """The concrete's transverse stress alone: evaluate(...).fcy, the same bits (see
+    lean_state)."""
+    f1, f2, _e1, _ecr, t = lean_state(law, ex, ey, gxy, m, ft_eff, smx, smy, f1cx, f1cy)
     v = (f1 - f2) / (1.0 / t + t)
     return f1 - v * t

@@ -45,11 +45,12 @@ def shadow(name: str, inputs=(), calls: int | None = None) -> tuple[int, str]:
     count = [0]
     found = [""]
 
-    def both(self, zf, z, ex, g, m, ft, smx, smt, cx, sh=None):
-        out, ey = fast(self, zf, z, ex, g, m, ft, smx, smt, cx, sh)
+    def both(self, zf, z, ex, g, m, ft, smx, smt, cx, sh=None, lean=False):
+        out, ey = fast(self, zf, z, ex, g, m, ft, smx, smt, cx, sh, lean=lean)
         want, wey = self.transverse_batch(zf, z, ex, g, m, ft, smx, smt, cx, sh)
         count[0] += 1
-        pairs = [("ey", ey, wey)] + [(k, getattr(out, k), v) for k, v in want.__dict__.items()]
+        # the fields the call was given: all of them, or the lean ones
+        pairs = [("ey", ey, wey)] + [(k, v, getattr(want, k)) for k, v in out.__dict__.items()]
         for field, a, b in pairs:
             if a.dtype != b.dtype or a.shape != b.shape or a.tobytes() != b.tobytes():
                 if not (a.shape == b.shape and np.array_equal(a, b, equal_nan=True)
