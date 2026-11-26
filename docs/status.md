@@ -67,7 +67,14 @@ development set.
    It does not reach the held-out kind that fell (moment and shear together is not
    stepped in the shear strain): for that, add development cases of the kind (Newbeam
    variants at M/V of 0.5 to 1.5 m with a marked fall at cracking: `tools/scope_cases.py`,
-   `tools/capture.py --add`) and look at the same stage on newbeam-us-mv.
+   `tools/capture.py --add`) and look at the same stage on newbeam-us-mv. There
+   (`python tools/trace.py tests/oracle/newbeam-us-mv.r2x.txt`) r2c's tries in the
+   curvature fail from 1.79 rad/km on, it changes to the shear strain at its 29th stage
+   and then steps by a tenth (mean shear strain 1.94, 2.14, then the fall at 2.75 mm/m
+   and 43.1 kN); Response's stages there are at 1.79, 2.07, then 2.85 mm/m at 40.2 kN,
+   and 2.97 at 43.0. So after the change of control variable Response's next step is
+   larger than r2c's, or its 31st stage is one that did not settle: read Response's own
+   tries there (`python tools/rtrace.py`) before anything else.
 2. **Speed with shear.** A case with shear takes about 3.7 times what it did
    (`python tools/times.py BEFORE AFTER`; median 86 to 318 s on the development set, the
    column under 3000 kN at M/V = 2 m 421 to 1109 s; the held-out scorer's limit is 1800 s
