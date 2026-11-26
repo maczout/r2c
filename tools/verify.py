@@ -98,6 +98,9 @@ def one(args):
     (out / f"{name}.r2x.txt").write_bytes(data)
     result = cmp.compare(ref, record.decode(data), views=True)
     result["seconds"] = round(took, 1)
+    if res.carried_from is not None:
+        # the owner's override took over from Response's own solve at this stage count
+        result["carried_from"] = res.carried_from
     (out / f"{name}.json").write_text(json.dumps(result, indent=1))
     return name, result
 

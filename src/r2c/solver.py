@@ -884,9 +884,15 @@ class Analysis:
             for i in range(len(sec.layers)):
                 res[i] = float("nan") if i in tension else fs[i]
             return res
-        for i, l, e, arm in bars:
+        # a bar shows a stress at the crack where the concrete at its height is cracked
+        # with the extra strain added: the node's principal tensile strain there, plus the
+        # extra strain, against the cracking strain [B 00442e50: the strain read is the
+        # nodes' principal one, not the bar's own; the two are one without shear]
+        e1 = np.interp([l.z for _i, l, _e, _a in bars], z[::-1], out.e1[::-1]) \
+            if bars else np.zeros(0)
+        for (i, l, e, arm), e1b in zip(bars, e1):
             ecr = max(float(np.interp(l.z, sec.tz, self.t_ft)) / law.Ec, law.ecr)
-            if e + arm * dphi - float(sec.shrinkage(np.array([l.z]))[0]) >= ecr:
+            if float(e1b) + arm * dphi >= ecr:
                 res[i] = at(i, l, e, arm * dphi)
         return res
 
@@ -1460,7 +1466,7 @@ class Flexure:
     # solved so far, from the fifth stage on; a stage kept at the first try doubles a
     # multiplier under a quarter. Where Response's fall-back is not written (the change of
     # control variable) r2c's own is used, as with the switch off.
-    rupture_halving = False
+    rupture_halving = True
     mult = 1.0               # the step multiplier, halved by a failed try (with the switch)
     retried = False          # a try has failed since the last stage kept (with the switch)
     base = 0.0               # the base step, as it has grown (with the switch)
