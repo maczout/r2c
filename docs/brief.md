@@ -153,6 +153,27 @@ from the text above, it governs.
    Stop only when the budget is spent or a stop-and-ask condition in the brief is met.
    Open-ended work on stages that do not settle is in bounds; measure and log it.
 
+**2026-11-25**, in answer to the questions of the summary after increment 4:
+
+1. Keep the developer's rule for telling a case where Response's solve gives up. It will
+   be the first thing the independent assessor checks at the finish.
+2. The case under axial compression and shear where Response's solve breaks down after
+   the web cracks stays outside; nothing is changed for it.
+3. The bug fix in the measure (a difference of exactly two printed units) is confirmed.
+4. The solution threshold is tightened. On the held-out set:
+   - priority 1: 99 % without shear, 99 % with;
+   - priority 2: 95 % without shear, 60 % with;
+   - priority 3: 95 % without shear, 85 % with;
+   - priority 4 (endings with shear): no target, reported only.
+   The plateau rule is unchanged: two increments in a row with no gain in any area's
+   held-out total.
+5. Before any kernel work, build a second held-out set for the finish: about 20 cases
+   of the same spread, captured through r2x, frozen with its recipe and hashes, and not
+   scored in any way until the finishing steps. Its own commit.
+6. Budget: about three hours of work, used as CLAUDE.md says.
+
+If the threshold is reached, stop and ask before starting the finishing steps.
+
 ## First increment
 
 This increment changes how the work is governed, with the owner's approval.

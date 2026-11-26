@@ -80,9 +80,12 @@ PRIORITY = {
     "shear": {"1": ("peak", "curve", "shape", "views"), "2": ("views_should",),
               "3": ("views_could",), "4": ("post_peak",)},
 }
-# the solution threshold (set by the owner, 2026-11-24; docs/brief.md, "Owner's decisions
-# since"): priority 1, per cent of cases inside
-THRESHOLD = {"moment-axial": 99.0, "shear": 90.0}
+# the solution threshold (set by the owner, tightened 2026-11-25; docs/brief.md, "Owner's
+# decisions since"): per cent of cases inside, by area and priority. Priority 4 (endings
+# with shear) has no target and is reported only. THRESHOLD is priority 1's.
+THRESHOLDS = {"moment-axial": {"1": 99.0, "2": 95.0, "3": 95.0},
+              "shear": {"1": 99.0, "2": 60.0, "3": 85.0}}
+THRESHOLD = {t: by["1"] for t, by in THRESHOLDS.items()}
 TIME_LIMIT = 1800   # seconds for r2c on one case before it counts as not solved
 
 # ---------------------------------------------------------------------------------------
@@ -560,8 +563,10 @@ def summary_block(totals: dict) -> str:
     out += ["", "Cases: " + ", ".join(
         f"{AREA_TITLES[t].lower()} {last['cases'][t]} ({last['unsolved'][t]} not solved by "
         "r2c, counted outside)" for t in AREA_TITLES)
-        + f". Threshold set by the owner, priority 1: {THRESHOLD['moment-axial']:g} % "
-        f"without shear, {THRESHOLD['shear']:g} % with.", END]
+        + ". Threshold set by the owner, without shear / with: "
+        + "; ".join(f"priority {p} {THRESHOLDS['moment-axial'][p]:g} % / "
+                    f"{THRESHOLDS['shear'][p]:g} %" for p in ("1", "2", "3"))
+        + "; priority 4 reported only.", END]
     return "\n".join(out)
 
 

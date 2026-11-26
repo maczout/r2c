@@ -119,7 +119,10 @@ summary.
 - an area's held-out total falls, and it cannot be recovered in the same increment;
 - you want a new override, or a change to a measure or the tolerance;
 - you judge that the solution threshold is reached, or that the approach has plateaued (two
-  increments in a row with no gain in any area's held-out total).
+  increments in a row with no gain in any area's held-out total). The threshold (owner,
+  2026-11-25), on the held-out set, without shear / with: priority 1, 99 % / 99 %;
+  priority 2, 95 % / 60 %; priority 3, 95 % / 85 %; priority 4 is reported only. When it
+  is reached, ask before starting the finishing steps.
 
 Asking means: say it under "Needed from the owner" in `docs/summary.md` and in the pull
 request, with a suggested answer, stop that line of work, and carry on with something
