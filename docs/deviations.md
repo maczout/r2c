@@ -49,18 +49,21 @@ measured on the development results (`docs/verification-results.md`) unless mark
   a twentieth of a per cent, Response compared with Response is outside on the
   shear-related views of about a quarter of the development cases with shear, and with a
   two-hundredth of a per cent on about one in seven (measured, `tools/noise.py`).
-  Response's own solve of a stage is on since the owner's answer of 2026-11-25; r2c
-  follows more of Response's tries with it, and what is left differs in the fifth digit
-  of a load or of a profile error at the try where the two part.
+  Response's own solve of a stage is on since the owner's answer of 2026-11-25, and
+  since increment 8 a node's transverse strain is solved the way the program solves it;
+  r2c follows more of Response's tries with each. What is left turns on a limit at a
+  stage that does not settle: a profile error after sixteen passes just over the limit
+  in one program and just under it in the other, so one keeps the stage and the other
+  halves the step (Newbeam at a small M/V, in SI and in US units).
 - **With shear r2c is slower than r2x on most cases.** Response's own solve of a stage
-  splits the layers anew at every evaluation, and r2c does the same in Python. Since
-  increment 7 what was already solved is kept (`docs/kernel.md`, "What is kept between
-  evaluations, for speed") and a case with shear takes about a fifth of what it did,
-  with every development record unchanged; it is still longer than r2x's whole command
-  on nearly half the cases with shear when r2x reads every stage, and on every one if
-  r2x reads the peak stage alone. Without shear r2c is within r2x's time on every case
-  when r2x reads every stage, and on all but one when it reads the peak alone (measured,
-  six cases at a time for both programs, `tools/r2xtimes.py`). The owner's decision
+  splits the layers anew at every evaluation, and r2c does the same in Python. In
+  increment 7 what was already solved was kept between evaluations and a case with
+  shear took about a fifth of what it had. Since increment 8 a node's transverse strain
+  is solved as the program solves it, and that answer depends on where the node starts,
+  so the solves kept by node are not used with shear and a case takes about twice what
+  it did in increment 7 (measured, `tools/times.py`). Without shear r2c is within r2x's
+  time on every case when r2x reads every stage (measured, six cases at a time for both
+  programs, `tools/r2xtimes.py`). The owner's decision
   (2026-11-26): speed is a reported measure, not a target; the bar is r2x reading every
   stage; no compiled routines. r2c's standing is generated into the brief
   (`docs/brief.md`, "Owner's decisions since") and shown on the results page.
@@ -83,10 +86,6 @@ measured on the development results (`docs/verification-results.md`) unless mark
   follow it: three small first steps where the section is cracked from the start (the
   I-girder under axial tension); what More Detail at its most puts in at the start.
   The curves agree; the stages are not the same ones.
-- **A fall of load at cracking that sits on the edge of what the measure counts.** Under
-  shear alone, and on Newbeam in US units, both programs show the fall; in one it is just
-  under 2 % of the peak and in the other just over, so the shapes read as different (1.99
-  and 1.97 % against 2.06 and 2.07 % on the US-units cases, measured).
 - **The I-girder with shear keeps a stage that Response drops.** At one stage the cracks at
   the top close; Response fails at that try every time and r2c does not, so the shapes
   differ at that point.
