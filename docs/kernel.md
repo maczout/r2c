@@ -839,10 +839,10 @@ does of its own inside that frame, or reads into it:
   strain times the mean of one and (calculated stress over the state's stress), that factor
   within ten either way; the profile is then brought back to a mean of one. Where a node
   carries no shear yet, r2c's own: the calculated stress over the node's tangent stiffness.
-* Under shear alone, half of the update is taken in the second half of the sixteen passes
-  [O, r2c's own, from that one loading: without it the stage past the peak does not settle
-  where Response's does; with it under every loading r2c settles where Response's stages
-  stand still].
+* The update is taken whole under every loading (`Shear.relax`). Until increment 7 half
+  of it was taken in the second half of the passes under shear alone [O, r2c's own, from
+  before Response's own solve of a stage was on]; with that solve on, it left the first
+  cracked stage in another state than Response's, and it is off.
 * Shear alone is stepped in the shear strain, 0.02 mm/m a stage, half that under a constant
   compression [O: Response's stages under shear alone are evenly spaced in the shear strain
   while the axial strain stays at nothing; the binary's choice read for the beam gives the
@@ -1406,6 +1406,36 @@ way) and none comes inside [measured, `python tools/verify.py`]. After each pass
 * a stage whose state code is not zero (below) is refused while the multiplier is 0.5 or
   more, and one with code 3 is refused while its load is above the largest so far.
 
+### The first step after a try that ran away [B, from the running program], 2026-11-26 (increment 7): written, off
+
+Source: Response's own solve steps read from the running program (`tools/rtrace.py
+--steps`, the place at `00427aef` inside the general solve `004276a0`; the depth range
+with stiffness is `00440ea0`'s). Not read in the decompiler: which routine leaves the
+nodes as they are when a stage is put back (`004190a0` puts back the strains, the stored
+depth range, the profile and the ruptured marks). No thesis equation.
+
+*Measured* (Newbeam in US units at M/V = 1 m, twice, at Response's 27th and 29th stage):
+when a try ends with its solve run away into crushed concrete, the last step of that
+solve is taken on a depth range with stiffness of 3 mm either side of mid-depth, which
+is what the routine gives when concrete is crushed inside the depth with both faces
+sound. The stage's strains are then put back for the next try, but the first step of the
+next try's solve is taken on that same 3 mm range, though it starts from the strains of
+the stage before, whose own range is the whole cracked depth. That step is wild and the
+try fails at once, on its first pass. *Inferred*: the test "crushed inside the depth" is
+made on the nodes as the last evaluation left them, and the range's ends on the strains
+the step starts from.
+
+Written as `Shear.stale_marks` (`Shear.crush_marks`, `Shear.marks_left`): the program's
+solve remembers, from its last evaluation of a state, whether the top node, the bottom
+node and any node were past the strain at peak stress, and the first step of the next
+solve takes its depth range with those marks. **Off.** On the case it was read from,
+r2c's second try at that stage then fails at once, as Response's does; on the 60
+development cases with shear it changes 39 records, sends four cases outside on the
+shear-related views (priority 2: 28 to 24) and leaves the other totals as they were
+(*measured*, `tools/trial.py --set Shear.stale_marks=1`, `tools/byprio.py`). The marks
+are an inference and the routine that keeps them was not read: read it before turning
+this on.
+
 ### The shear strain profile between passes [B], read 2026-11-22 (step A-1c): written, off
 
 What the program does to the shear strain profile within a stage, when it reports a stage
@@ -1563,6 +1593,35 @@ Besides: a stage with less than 1 % of the load of the one before is dropped; of
 stages in a row with no load, one is dropped; the response ends after 327 solves. The stage
 Response shows when the solve ends is the one with the largest load.
 
+## What is kept between evaluations, for speed [O], 2026-11-26 (increment 7)
+
+None of this is a rule of the calculation: each gives the numbers the plain routine
+gives, bit for bit, and the owner's rule is that a speed change changes no result
+(`docs/brief.md`, 2026-11-26). Held to that by `tests/test_speed.py`, `tools/shadow.py`
+(every transverse solve of a run done both ways and compared as bits) and
+`tests/oracle/records.json` with `tools/same.py` (the hash of every development record).
+
+- **The nodes' transverse solves are kept by node** (`NodeStore`,
+  `Analysis.transverse`; the plain routine is `Analysis.transverse_batch`). The layers
+  are split anew at every evaluation of a state, and every split evaluates every layer
+  again: a node was solved some eleven times over with the same inputs (*measured*,
+  Newbeam at M/V = 1 m). The plain routine closes in on all the nodes of a call together
+  and stops for all of them at the same pass, so a node's last digits depend on the
+  nodes it is asked for with; the store therefore keeps each node's whole sequence of
+  tries, works out the pass at which a call stops from the sequences of its own nodes,
+  and reads each node at that pass.
+- **The passes read the transverse stress alone** (`node.transverse_stress`,
+  `NodeStore._stirrups`): the same operations in the same order as `node.evaluate` and
+  `Analysis.stirrup_stress`, without the fields a pass does not use, and with what does
+  not depend on the transverse strain worked out once a node.
+- **Before the layers are split for a state, the heights the last splitting asked for are
+  solved together** (`Analysis.warm`), and the layers' nodes with the bars' heights for a
+  state's forces. Since the store gives each call what solving it alone gives, what it
+  was asked before changes no number.
+- **The layers' nodes are kept by their bounds** (`Analysis.layer_nodes`).
+
+`Analysis.node_store`, `Analysis.warm_ahead` and `NodeStore.light` turn each off.
+
 ## Inferred or fitted values, in one place
 
 | What | Value | Basis |
@@ -1574,7 +1633,6 @@ Response shows when the solve ends is the one with the largest load.
 | The two sides of a step in width kept apart | profile and stirrup ratio | r2c's own; Response's charts show both sides (I-girder) |
 | A circle from Quick Define is its 13 rows, straight between | yes | one case (column, N alone) |
 | "Not closed" global solution carried on from | out of balance under 2 % of the section's scale | r2c's own reading of Response's solve status |
-| Damping under shear alone | half the update in the second half of the passes | one loading (shear alone) |
 | Shear alone stepped in the shear strain | 0.02 mm/m; half under constant compression | two cases |
 | "Large" constant axial load for the base step | above 0.1 MPa on the gross area | one case |
 | State code 1 needs no stirrup at the node | yes | one case (no stirrups) |
