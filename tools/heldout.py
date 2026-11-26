@@ -5,6 +5,7 @@
     python tools/heldout.py build ARCHIVE --response-dir DIR --inputs DIR [DIR ...] [--jobs N]
     python tools/heldout.py score ARCHIVE --inputs DIR [DIR ...] [--jobs N] [--record LABEL]
                                           [--kinds]
+    python tools/heldout.py repeat ARCHIVE --response-dir DIR [--jobs N] [--record]
     python tools/heldout.py summary
     python tools/heldout.py list --set finish
     python tools/heldout.py build ARCHIVE2 --set finish --response-dir DIR --inputs DIR [...]
@@ -40,6 +41,17 @@ development set). The kinds are printed and not recorded.
 THE HELD-OUT RULE (CLAUDE.md): the developer does not open anything under ARCHIVE/results,
 does not run r2c on a held-out input to look at it, and does not diagnose with these cases.
 This tool prints nothing per case in `score`, on purpose; do not add an option that does.
+
+`repeat` answers "how often does Response agree with itself on these inputs?" (owner,
+2026-11-25). It raises every concrete strength of each held-out input by 0.05 %, captures
+the changed input from Response-2000 through r2x with the case's own options into
+ARCHIVE/repeat/, compares that capture with the frozen one exactly as `score` compares
+r2c's record, and prints ONLY the totals, by area and priority. Response against Response:
+r2c is not run. A changed input that Response does not solve counts as outside. With
+--record the totals are written to heldout/repeatability.json; the solution threshold for
+priorities 1 to 3 is that score less 3 points (THRESHOLDS below reads the file). Its
+per-case comparisons stay in ARCHIVE/repeat/ and fall under the held-out rule like the
+rest: not opened.
 
 `summary` rewrites the totals block of docs/summary.md from heldout/totals.json.
 
@@ -78,6 +90,9 @@ ROOT = Path(__file__).resolve().parents[1]
 MANIFEST = ROOT / "heldout" / "manifest.json"
 FINISH_MANIFEST = ROOT / "heldout" / "finish-manifest.json"
 TOTALS = ROOT / "heldout" / "totals.json"
+REPEAT = ROOT / "heldout" / "repeatability.json"
+REPEAT_BY = 0.05    # per cent added to every concrete strength (owner, 2026-11-25)
+MARGIN = 3.0        # points under Response's own score: the threshold (owner, 2026-11-25)
 SUMMARY = ROOT / "docs" / "summary.md"
 BEGIN, END = "<!-- heldout:begin -->", "<!-- heldout:end -->"
 
@@ -90,12 +105,27 @@ PRIORITY = {
     "shear": {"1": ("peak", "curve", "shape", "views"), "2": ("views_should",),
               "3": ("views_could",), "4": ("post_peak",)},
 }
-# the solution threshold (set by the owner, tightened 2026-11-25; docs/brief.md, "Owner's
-# decisions since"): per cent of cases inside, by area and priority. Priority 4 (endings
-# with shear) has no target and is reported only. THRESHOLD is priority 1's.
-THRESHOLDS = {"moment-axial": {"1": 99.0, "2": 95.0, "3": 95.0},
-              "shear": {"1": 99.0, "2": 60.0, "3": 85.0}}
-THRESHOLD = {t: by["1"] for t, by in THRESHOLDS.items()}
+# The solution threshold (owner, 2026-11-25; docs/brief.md, "Owner's decisions since"): for
+# each area and priority 1 to 3, Response's own score against itself on the held-out inputs
+# (heldout/repeatability.json, written by `repeat --record`) less MARGIN points, in per cent
+# of cases inside. Priority 4 (endings with shear) is reported only. THRESHOLD is
+# priority 1's.
+
+
+def read_repeat() -> dict | None:
+    return json.loads(REPEAT.read_text()) if REPEAT.exists() else None
+
+
+def thresholds(rep: dict | None) -> dict:
+    if rep is None:
+        return {t: {} for t in AREA_TITLES}
+    return {t: {p: round(100.0 * n / of - MARGIN, 1) for p, (n, of) in by.items()
+                if p in "123" and of}
+            for t, by in rep["totals"].items()}
+
+
+THRESHOLDS = thresholds(read_repeat())
+THRESHOLD = {t: by.get("1") for t, by in THRESHOLDS.items()}
 TIME_LIMIT = 1800   # seconds for r2c on one case before it counts as not solved
 
 # ---------------------------------------------------------------------------------------
@@ -587,6 +617,98 @@ def score(a, ap) -> int:
     return 0
 
 
+# ---------------------------------------------------------------------------------------
+# repeat: Response against itself, totals only
+# ---------------------------------------------------------------------------------------
+
+def repeat(a, ap) -> int:
+    import capture as cap
+    import compare as cmp
+    import noise
+    import report
+    import verify
+    from r2c import record
+
+    if a.set != "heldout":
+        ap.error("the second set is not scored in any way until the finishing steps")
+    archive = outside_repo(ap, a.archive)
+    cases = verify_frozen(archive)
+    out = archive / "repeat"
+    (out / "inputs").mkdir(parents=True, exist_ok=True)
+    prefixes: queue.Queue = queue.Queue()
+    for k in range(max(a.jobs, 1)):
+        prefixes.put(Path.home() / ".cache" / "r2x" / f"prefix-scope-{k}")
+
+    def one(c):
+        dest = out / f"{c['name']}.r2x.txt"
+        if dest.exists():
+            return
+        if not a.response_dir:
+            ap.error("--response-dir or $R2X_RESPONSE_DIR is required")
+        h = record.read(archive / "fixtures" / dest.name).header
+        src = verify.find_input(c["input_name"], c["input_sha256"], [archive / "inputs-src"])
+        inp = out / "inputs" / c["name"] / src.name
+        inp.parent.mkdir(exist_ok=True)
+        inp.write_bytes(noise.stronger(src.read_bytes(), REPEAT_BY))
+        prefix = prefixes.get()
+        try:
+            worker = [sys.executable, "-m", "r2x.worker", "--prefix", str(prefix)]
+            subprocess.run(cap.command(h, inp, dest, worker, a.response_dir),
+                           capture_output=True, text=True)
+        finally:
+            prefixes.put(prefix)
+
+    with ThreadPoolExecutor(max_workers=max(a.jobs, 1)) as ex:
+        list(ex.map(one, cases))
+    results = {}
+    for c in cases:
+        p = out / f"{c['name']}.r2x.txt"
+        if p.exists():
+            ref = record.read(archive / "fixtures" / p.name)
+            results[c["name"]] = cmp.compare(ref, record.read(p), views=True)
+    (out / "results.json").write_text(json.dumps(results, indent=1))
+    acc = report.read_targets(ROOT / "docs" / "measures.md")
+    counted = tally([{"name": c["name"], "area": c["area"]} for c in cases], results, acc)
+    rep = {"what": f"Response-2000 with every concrete strength raised by {REPEAT_BY:g} %, "
+                   "compared with Response as it is by the measure r2c is held to; cases "
+                   "inside target on every check of the priority",
+           "date": dt.date.today().isoformat(), "by_per_cent": REPEAT_BY,
+           "cases": {t: sum(c["area"] == t for c in cases) for t in AREAS.values()},
+           "totals": counted["totals"], "unsolved": counted["unsolved"]}
+    print(text_repeat(rep))
+    if a.record:
+        REPEAT.write_text(json.dumps(rep, indent=1) + "\n")
+        print("recorded in heldout/repeatability.json")
+    return 0
+
+
+def text_repeat(rep: dict) -> str:
+    out = [f"Response against itself on the held-out inputs ({rep['date']}; every concrete "
+           f"strength raised by {rep['by_per_cent']:g} %): cases inside target on every check "
+           "of the priority"]
+    th = thresholds(rep)
+    for t, title in AREA_TITLES.items():
+        out.append(f"  {title} ({rep['cases'][t]} cases, {rep['unsolved'][t]} not solved by "
+                   "Response after the change and counted outside):")
+        for p, (n, of) in rep["totals"][t].items():
+            out.append(f"    priority {p}: {pct(n, of)}"
+                       + (f"; threshold {th[t][p]:g} %" if p in th[t] else "; reported only"))
+    return "\n".join(out)
+
+
+def check_repeat(rep: dict) -> None:
+    """Totals only. Raises ValueError."""
+    if set(rep) != {"what", "date", "by_per_cent", "cases", "totals", "unsolved"}:
+        raise ValueError("fields other than the totals'")
+    if set(rep["cases"]) != set(AREA_TITLES) or set(rep["unsolved"]) != set(AREA_TITLES):
+        raise ValueError("areas other than the two")
+    for t, by in rep["totals"].items():
+        for p, v in by.items():
+            if not (t in AREA_TITLES and p in "1234" and len(v) == 2
+                    and all(isinstance(x, int) for x in v) and 0 <= v[0] <= v[1]):
+                raise ValueError(f"{t} priority {p} is not a total")
+
+
 def pct(n: int, of: int) -> str:
     return f"{n} of {of} ({100.0 * n / of:.0f} %)" if of else "none"
 
@@ -626,31 +748,58 @@ def check_totals(totals: dict) -> None:
                     raise ValueError(f"run {r['label']!r}: {t} priority {p} is not a total")
 
 
-def summary_block(totals: dict) -> str:
-    """The totals of every recorded run, one column each (the trend), for docs/summary.md."""
-    runs = totals["runs"][-5:]
+def summary_block(totals: dict, rep: dict | None = None) -> str:
+    """The totals of the last recorded runs, one column each (the trend), then Response's
+    own score against itself and the threshold made from it, for docs/summary.md."""
+    rep = read_repeat() if rep is None else rep
+    th = thresholds(rep)
+    runs = totals["runs"][-4:]
     out = [BEGIN, "<!-- Generated by tools/heldout.py summary. Do not edit: rerun it. -->", "",
            "Cases inside target on every check of the priority, of the cases that have such "
-           "a check. One column per increment.", "",
-           "| Area | Priority | " + " | ".join(f"{r['label']} ({r['date']})" for r in runs) + " |",
-           "|---|---|" + "---:|" * len(runs)]
+           "a check. One column per increment; then Response against itself (every concrete "
+           f"strength raised by {REPEAT_BY:g} %) on the same inputs, and the threshold: that "
+           f"score less {MARGIN:g} points.", "",
+           "| Area | Priority | " + " | ".join(f"{r['label']} ({r['date']})" for r in runs)
+           + " | Response against itself | Threshold |",
+           "|---|---|" + "---:|" * (len(runs) + 2)]
     names = {"1": "1: peak, rising branch, shape; stress-state views",
              "2": "2: endings without shear; shear-related views",
              "3": "3: cracking-related views", "4": "4: endings with shear"}
+    last = runs[-1]
     for t, title in AREA_TITLES.items():
         for p in ("1", "2", "3", "4"):
             if not any(p in r["totals"][t] for r in runs):
                 continue
             cells = [pct(*r["totals"][t][p]) if p in r["totals"][t] else "" for r in runs]
-            out.append(f"| {title} | {names[p]} | " + " | ".join(cells) + " |")
-    last = runs[-1]
+            own = pct(*rep["totals"][t][p]) if rep and p in rep["totals"][t] else "not measured"
+            if p in th[t]:
+                n, of = last["totals"][t][p]
+                met = "met" if of and 100.0 * n / of >= th[t][p] else "not met"
+                goal = f"{th[t][p]:g} % ({met})"
+            else:
+                goal = "reported only" if p == "4" else "not set"
+            out.append(f"| {title} | {names[p]} | " + " | ".join(cells) + f" | {own} | {goal} |")
     out += ["", "Cases: " + ", ".join(
         f"{AREA_TITLES[t].lower()} {last['cases'][t]} ({last['unsolved'][t]} not solved by "
-        "r2c, counted outside)" for t in AREA_TITLES)
-        + ". Threshold set by the owner, without shear / with: "
-        + "; ".join(f"priority {p} {THRESHOLDS['moment-axial'][p]:g} % / "
-                    f"{THRESHOLDS['shear'][p]:g} %" for p in ("1", "2", "3"))
-        + "; priority 4 reported only.", END]
+        "r2c, counted outside)" for t in AREA_TITLES) + ".", END]
+    return "\n".join(out)
+
+
+RBEGIN, REND = "<!-- repeat:begin -->", "<!-- repeat:end -->"
+
+
+def brief_block(rep: dict) -> str:
+    """The measured values the owner asked to have in the brief, generated."""
+    th = thresholds(rep)
+    out = [RBEGIN, "<!-- Generated by tools/heldout.py summary. Do not edit: rerun it. -->", "",
+           "| Area | Priority | Response against itself | Threshold |", "|---|---|---:|---:|"]
+    for t, title in AREA_TITLES.items():
+        for p, (n, of) in rep["totals"][t].items():
+            out.append(f"| {title} | {p} | {pct(n, of)} | "
+                       + (f"{th[t][p]:g} %" if p in th[t] else "reported only") + " |")
+    out += ["", f"Measured {rep['date']}. Cases: " + ", ".join(
+        f"{AREA_TITLES[t].lower()} {rep['cases'][t]} ({rep['unsolved'][t]} not solved by "
+        "Response after the change, counted outside)" for t in AREA_TITLES) + ".", REND]
     return "\n".join(out)
 
 
@@ -667,20 +816,31 @@ def write_summary() -> int:
         raise SystemExit(f"docs/summary.md has no {BEGIN} ... {END} block to fill")
     SUMMARY.write_text(text, encoding="utf-8")
     print("docs/summary.md: totals block rewritten")
+    rep = read_repeat()
+    if rep is not None:
+        brief = ROOT / "docs" / "brief.md"
+        text = brief.read_text(encoding="utf-8")
+        if RBEGIN not in text:
+            raise SystemExit(f"docs/brief.md has no {RBEGIN} ... {REND} block to fill")
+        text = re.sub(re.escape(RBEGIN) + r".*?" + re.escape(REND),
+                      lambda _m: brief_block(rep), text, flags=re.S)
+        brief.write_text(text, encoding="utf-8")
+        print("docs/brief.md: the measured values of Response against itself rewritten")
     return 0
 
 
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0],
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("action", choices=("list", "build", "score", "summary"))
+    ap.add_argument("action", choices=("list", "build", "score", "repeat", "summary"))
     ap.add_argument("archive", nargs="?", help="the held-out archive (outside the repository)")
     ap.add_argument("--response-dir", default=os.environ.get("R2X_RESPONSE_DIR"))
     ap.add_argument("--inputs", nargs="*", default=[],
                     help="Response's folder and the folders with the development inputs")
     ap.add_argument("--jobs", type=int, default=1)
-    ap.add_argument("--record", metavar="LABEL",
-                    help="score: append the totals to heldout/totals.json under this label")
+    ap.add_argument("--record", metavar="LABEL", nargs="?", const="repeat",
+                    help="score: append the totals to heldout/totals.json under this label; "
+                         "repeat: write the totals to heldout/repeatability.json")
     ap.add_argument("--kinds", action="store_true",
                     help="score: also print the cases outside target by kind (section type "
                          "and loading path), with no names or values")
@@ -701,7 +861,7 @@ def main(argv=None) -> int:
         return write_summary()
     if not a.archive:
         ap.error("ARCHIVE is required")
-    return build(a, ap) if a.action == "build" else score(a, ap)
+    return {"build": build, "score": score, "repeat": repeat}[a.action](a, ap)
 
 
 if __name__ == "__main__":

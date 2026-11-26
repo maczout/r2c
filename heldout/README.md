@@ -8,6 +8,11 @@ What "good" is judged on (`docs/brief.md`): cases the developer has not tuned ag
   are listed under `not_captured` and are not cases.
 - `totals.json`: the totals of each recorded scoring, by area and priority. Nothing per
   case.
+- `repeatability.json`: Response-2000 against itself on the same inputs (owner,
+  2026-11-25): with every concrete strength raised by 0.05 %, how many cases are inside
+  target against Response as it is, by area and priority. Written by `python
+  tools/heldout.py repeat ARCHIVE --record`. No r2c result is in it and nothing per case.
+  The solution threshold for priorities 1 to 3 is this score less 3 points.
 
 - `finish-manifest.json`: the second set, for the finish (owner, 2026-11-25). The same
   form, frozen the same way, in an archive of its own. It is not scored in any way until
