@@ -6,6 +6,8 @@
     python tools/heldout.py score ARCHIVE --inputs DIR [DIR ...] [--jobs N] [--record LABEL]
                                           [--kinds]
     python tools/heldout.py summary
+    python tools/heldout.py list --set finish
+    python tools/heldout.py build ARCHIVE2 --set finish --response-dir DIR --inputs DIR [...]
 
 Answers "how good is r2c on sections the developer has not tuned against?", in totals.
 
@@ -41,6 +43,13 @@ This tool prints nothing per case in `score`, on purpose; do not add an option t
 
 `summary` rewrites the totals block of docs/summary.md from heldout/totals.json.
 
+THE SECOND SET, FOR THE FINISH (owner, 2026-11-25; `--set finish`): about 20 more cases of
+the same spread, with values of their own, built and frozen the same way into an archive of
+its own and into heldout/finish-manifest.json. It is "not scored in any way until the
+finishing steps": `score --set finish` refuses, and nothing here runs r2c on its cases. The
+held-out rule covers it whole. Do not remove the refusal before the owner starts the
+finishing steps.
+
 `build` needs r2x importable (PYTHONPATH=R2X/src) and one Wine prefix per job
 (~/.cache/r2x/prefix-scope-K, as tools/scope_cases.py uses them).
 """
@@ -67,6 +76,7 @@ from variants import T4, Variant, attr, conc, rows  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
 MANIFEST = ROOT / "heldout" / "manifest.json"
+FINISH_MANIFEST = ROOT / "heldout" / "finish-manifest.json"
 TOTALS = ROOT / "heldout" / "totals.json"
 SUMMARY = ROOT / "docs" / "summary.md"
 BEGIN, END = "<!-- heldout:begin -->", "<!-- heldout:end -->"
@@ -174,6 +184,42 @@ H["h-ig-fc40"] = Variant("igirder", "the I-girder with 40 MPa concrete",
                          [sub("fcp", "60.0", "40.0")])
 
 
+# ---------------------------------------------------------------------------------------
+# The second set, for the finish (owner, 2026-11-25): the same spread, values of its own.
+# ---------------------------------------------------------------------------------------
+F: dict[str, Variant] = {}
+F["f-fc40"] = Variant("newbeam", "Newbeam with 40 MPa concrete", [sub("fcp", "35.0", "40.0")])
+F["f-fc60"] = Variant("newbeam", "Newbeam with 60 MPa concrete", [sub("fcp", "35.0", "60.0")])
+F["f-fy350"] = Variant("newbeam", "Newbeam with 350 MPa steel, longitudinal and transverse",
+                       [sub("fy", "400.0", "350.0", 2)])
+F["f-csoft8"] = Variant("newbeam", "Newbeam, compression softening model 8",
+                        conc("c_soft", "8"))
+F["f-deep800"] = Variant(
+    "newbeam", "a deep beam, 300 x 800 mm, 1800 mm2 bottom steel, stirrups at 175 mm",
+    [(NB_OUTLINE, "800.0\t300.0\r\n\t\t\t\t\t0.0\t300.0"), sub("par1", "250.0", "300.0"),
+     sub("par2", "600.0", "800.0"), sub("z", "538.95", "738.95"),
+     sub("A", "1500.0", "1800.0"), sub("space", "250.0", "175.0"),
+     sub("disttop", "554.3", "754.3")])
+F["f-slab220"] = Variant(
+    "newbeam", "a slab strip, 1000 x 220 mm, no stirrups",
+    [(NB_OUTLINE, "220.0\t1000.0\r\n\t\t\t\t\t0.0\t1000.0"), sub("par1", "250.0", "1000.0"),
+     sub("par2", "600.0", "220.0"), sub("z", "538.95", "178.00"), sub("A", "300.0", "450.0"),
+     sub("z", "63.90", "42.00"), (NB_STIRRUPS, "")])
+F["f-heavy2000"] = Variant("newbeam", "Newbeam with 2000 mm2 bottom and 600 mm2 top steel",
+                           [sub("A", "1500.0", "2000.0"), sub("A", "300.0", "600.0")])
+F["f-st200"] = Variant("newbeam", "Newbeam with stirrups at 200 mm",
+                       [sub("space", "250.0", "200.0")])
+F["f-mid500"] = Variant(
+    "newbeam", "Newbeam with a third layer of steel, 500 mm2 at 350 mm",
+    [(NB_TOP_END, NB_TOP_END + "\t\t<longreinfx\t" + attr("z", "350.00") + T4
+      + attr("type", "Steel 1") + T4 + attr("num", "2") + T4 + attr("A", "500.0") + T4
+      + attr("bartitle", "15M") + T4 + attr("name", "mid") + "\t/>\r\n")])
+F["f-tb-fc35"] = Variant("tbeam", "the T-beam with 35 MPa concrete and stirrups at 250 mm",
+                         [sub("fcp", "40.0", "35.0"), sub("space", "300.0", "250.0")])
+F["f-ig-dep55"] = Variant("igirder", "the I-girder with its strands prestrained to 5.50 mm/m",
+                          [sub("dep", "6.50", "5.50", 2)])
+
+
 def case(name, inp, increment, initial="0,0,0", units="si", factors="none", more_detail="0"):
     return dict(name=name, input=inp, initial=initial, increment=increment, units=units,
                 factors=factors, more_detail=more_detail)
@@ -243,6 +289,39 @@ CASES = [
     case("h-ig-dep4-m3v", "h-ig-dep4", "0,3,1"),
     case("h-ig-fc40-m25v", "h-ig-fc40", "0,2.5,1"),
 ]
+FINISH_CASES = [
+    # Response's sample files
+    case("f-cm4-n300-m25v", "cm4", "0,2.5,1", initial="-300,0,0"),
+    case("f-liping-m3v", "liping", "0,3,1"),
+    case("f-se100-n200-m", "se100", "0,1,0", initial="-200,0,0"),
+    case("f-marshall-ntens300-m", "marshall", "0,1,0", initial="300,0,0"),
+    # materials
+    case("f-fc40-m", "f-fc40", "0,1,0"),
+    case("f-fc60-m15v", "f-fc60", "0,1.5,1"),
+    case("f-fy350-mv", "f-fy350", "0,1,1"),
+    case("f-csoft8-m2v", "f-csoft8", "0,2,1"),
+    # shapes
+    case("f-deep800-m25v", "f-deep800", "0,2.5,1"),
+    case("f-slab220-m", "f-slab220", "0,1,0"),
+    # reinforcement
+    case("f-heavy2000-n800-m", "f-heavy2000", "0,1,0", initial="-800,0,0"),
+    case("f-st200-m2v", "f-st200", "0,2,1"),
+    case("f-mid500-m15v", "f-mid500", "0,1.5,1"),
+    # loads
+    case("f-nb-m150-v", "newbeam", "0,0,1", initial="0,150,0"),
+    # the T-beam, the column and the I-girder
+    case("f-tb-m15v", "tbeam", "0,1.5,1"),
+    case("f-tb-fc35-n500-m", "f-tb-fc35", "0,1,0", initial="-500,0,0"),
+    case("f-tb-kgcm-negm", "tbeam", "0,-1,0", units="kgcm"),
+    case("f-col-n4500-m", "column", "0,1,0", initial="-4500,0,0"),
+    case("f-col-n1500-m15v", "column", "0,1.5,1", initial="-1500,0,0"),
+    case("f-col-csa-m", "column", "0,1,0", factors="csa"),
+    case("f-ig-m25v", "igirder", "0,2.5,1"),
+    case("f-ig-dep55-m", "f-ig-dep55", "0,1,0"),
+]
+RECIPES = {**H, **F}
+# the two sets: the cases of each and where each is frozen
+SETS = {"heldout": (CASES, MANIFEST), "finish": (FINISH_CASES, FINISH_MANIFEST)}
 PRESENT = {"newbeam": "input.r2t", "tbeam": "tbeam.r2t", "column": "column.r2t",
            "igirder": "igirder.r2t"}
 
@@ -254,7 +333,7 @@ def what(c: dict) -> str:
     if k in PRESENT:
         return {"newbeam": "Newbeam", "tbeam": "the T-beam", "column": "the column",
                 "igirder": "the I-girder"}[k] + ", as it is"
-    return H[k].what
+    return RECIPES[k].what
 
 
 def input_bytes(c: dict, folders) -> tuple[str, bytes]:
@@ -268,7 +347,7 @@ def input_bytes(c: dict, folders) -> tuple[str, bytes]:
         raise SystemExit(f"{SAMPLES[k]} not found directly in a folder of --inputs")
     if k in PRESENT:
         return PRESENT[k], variants.find_base(k, folders).read_bytes()
-    variants.VARIANTS[k] = H[k]
+    variants.VARIANTS[k] = RECIPES[k]
     return f"{k}.r2t", variants.build(k, folders)
 
 
@@ -300,8 +379,9 @@ def outside_repo(ap, path: str) -> Path:
 def build(a, ap) -> int:
     import capture
 
+    CASES, MANIFEST = SETS[a.set]
     if MANIFEST.exists():
-        ap.error("heldout/manifest.json exists: the set is frozen and is not rebuilt")
+        ap.error(f"heldout/{MANIFEST.name} exists: the set is frozen and is not rebuilt")
     if not a.response_dir:
         ap.error("--response-dir or $R2X_RESPONSE_DIR is required")
     archive = outside_repo(ap, a.archive)
@@ -379,7 +459,8 @@ def verify_frozen(archive: Path) -> list[dict]:
 
 SECTIONS = {"newbeam": "rectangular beam", "tbeam": "T-beam", "column": "circular column",
             "igirder": "prestressed I-girder", "h-deep": "deep rectangular beam",
-            "h-slab": "slab strip without stirrups"}
+            "h-slab": "slab strip without stirrups", "f-deep800": "deep rectangular beam",
+            "f-slab220": "slab strip without stirrups"}
 
 
 def kind(c: dict) -> tuple[str, str]:
@@ -388,7 +469,7 @@ def kind(c: dict) -> tuple[str, str]:
     if k in SAMPLES:
         section = "a sample file of Response's"
     else:
-        section = SECTIONS.get(k) or SECTIONS[H[k].base if k in H else k]
+        section = SECTIONS.get(k) or SECTIONS[RECIPES[k].base if k in RECIPES else k]
     n0, m0, _v0 = (float(x) for x in c["initial"].split(","))
     _n, m, v = (float(x) for x in c["increment"].split(","))
     path = []
@@ -458,6 +539,9 @@ def tally(cases: list[dict], results: dict, acc: dict) -> dict:
 def score(a, ap) -> int:
     import report
 
+    if a.set != "heldout":
+        ap.error("the second set is not scored in any way until the finishing steps (owner, "
+                 "2026-11-25; CLAUDE.md, \"The held-out rule\")")
     archive = outside_repo(ap, a.archive)
     cases = verify_frozen(archive)
     rc, commit = subprocess.getstatusoutput(f"git -C {ROOT} rev-parse --short=12 HEAD")
@@ -600,11 +684,14 @@ def main(argv=None) -> int:
     ap.add_argument("--kinds", action="store_true",
                     help="score: also print the cases outside target by kind (section type "
                          "and loading path), with no names or values")
+    ap.add_argument("--set", choices=tuple(SETS), default="heldout",
+                    help="list, build: the held-out set (the default) or the second one, "
+                         "for the finish, which is built and frozen but not scored")
     ap.add_argument("--dry-freeze", action="store_true",
                     help="build: capture, but do not write the manifest")
     a = ap.parse_args(argv)
     if a.action == "list":
-        for c in CASES:
+        for c in SETS[a.set][0]:
             opts = " ".join(f"{k}={c[k]}" for k in ("units", "factors", "more_detail")
                             if c[k] not in ("si", "none", "0"))
             print(f"{c['name']}: {area(c)}: {what(c)}; {c['initial']} + {c['increment']}"

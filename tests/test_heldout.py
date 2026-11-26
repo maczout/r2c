@@ -86,3 +86,43 @@ def test_the_kinds_name_no_case_and_carry_no_value():
     assert "%" not in text and "h-" not in text
     # every case of the recipe has a kind
     assert len({heldout.kind(c) for c in heldout.CASES}) > 10
+
+
+# The second set, for the finish (owner, 2026-11-25): the hash over its cases as frozen.
+# It changes only if the set is changed: do not update it to make this test pass.
+FINISH_FROZEN = "6adde32d2513409b3133bb05030419695e5ac69fccd4aebc6a46d573545182f1"
+
+
+def finish_manifest():
+    return json.loads(heldout.FINISH_MANIFEST.read_text())
+
+
+def test_the_second_set_is_the_frozen_one_and_follows_from_its_recipe():
+    man = finish_manifest()
+    assert man["frozen_sha256"] == FINISH_FROZEN
+    assert heldout.digest(man["cases"]) == FINISH_FROZEN
+    assert 18 <= len(man["cases"]) <= 24
+    by = {c["name"]: c for c in heldout.FINISH_CASES}
+    for c in man["cases"]:
+        r = by[c["name"]]
+        assert all(c[k] == r[k] for k in r)
+        assert c["area"] == heldout.area(r)
+    areas = [c["area"] for c in man["cases"]]
+    assert areas.count("moment-axial") >= 8 and areas.count("shear") >= 8
+
+
+def test_no_case_of_the_second_set_is_a_development_or_a_held_out_case():
+    dev = {p.name for p in (ROOT / "tests" / "oracle").rglob("*.r2x.txt")}
+    key = lambda c: (c["input_sha256"], c["initial"], c["increment"], c["units"],  # noqa: E731
+                     c["factors"], c["more_detail"])
+    first = {key(c) for c in manifest()["cases"]}
+    for c in finish_manifest()["cases"]:
+        assert f"{c['name']}.r2x.txt" not in dev
+        assert key(c) not in first
+
+
+def test_the_second_set_is_not_scored():
+    with pytest.raises(SystemExit):
+        heldout.main(["score", "/nowhere", "--set", "finish"])
+    assert all(sum(r["cases"].values()) == len(manifest()["cases"])
+               for r in heldout.read_totals()["runs"])

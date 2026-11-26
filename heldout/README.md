@@ -9,6 +9,11 @@ What "good" is judged on (`docs/brief.md`): cases the developer has not tuned ag
 - `totals.json`: the totals of each recorded scoring, by area and priority. Nothing per
   case.
 
+- `finish-manifest.json`: the second set, for the finish (owner, 2026-11-25). The same
+  form, frozen the same way, in an archive of its own. It is not scored in any way until
+  the finishing steps: `tools/heldout.py score --set finish` refuses, and no total of it
+  exists.
+
 The recipe itself (the text edits that derive each input) is in `tools/heldout.py`. The
 captures, the inputs and every per-case result are in an archive outside the repository.
 
