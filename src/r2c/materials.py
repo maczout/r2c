@@ -28,9 +28,8 @@ SOFTEN_PLATEAU = (3,)
 
 NOVAL = float("nan")   # a bar past rupture
 # The concrete's stiffness as the program's set-up works it out [B 004ac190], docs/kernel.md
-# "The concrete's stiffness": written in increment 7 and off (the secant itself, as before),
-# since on the development set it sends one I-girder with shear outside and brings none in
-OWN_MODULUS = False
+# "The concrete's stiffness". Off: the secant itself (as before increment 8)
+OWN_MODULUS = True
 
 
 def auto_ft(fcp: float) -> float:
