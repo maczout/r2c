@@ -113,6 +113,7 @@ class Analysis:
         self.epy = np.zeros(2)
         self.dead = np.zeros(len(sec.layers), dtype=bool)   # ruptured at a crack
         self.last_ey = None
+        self._nodes = None      # the nodes' transverse solves so far (NodeStore)
 
     # -- layers ---------------------------------------------------------------------------------
     def _initial_bounds(self) -> np.ndarray:
@@ -556,11 +557,35 @@ class Analysis:
         res = eff * (np.maximum(yld, capt) - tot)
         return tot, res, rho_t
 
+    # The transverse solve by node, with what was found kept (transverse, below). Off: every
+    # call solves its whole batch again (transverse_batch), which is the definition
+    node_store = True
+
     def transverse(self, zf, z, ex, g, m, ft, smx, smt, cx, sh=None):
+        """The transverse solve of transverse_batch, with the same numbers bit for bit, without
+        solving a node again that was solved before with the same inputs (the layers are
+        split anew at every evaluation of a state, and each split evaluates every layer
+        again: a node is asked for some ten times over). See NodeStore."""
+        if not self.node_store:
+            return self.transverse_batch(zf, z, ex, g, m, ft, smx, smt, cx, sh)
+        sec = self.sec
+        sts = self.stirrups_at(zf, self.rho_width(zf, self.node_width(z)))
+        cols = [self.law_index(zf, z).astype(float), ex,
+                np.zeros_like(zf) if sh is None else sh, g, m, ft, smx, smt, cx,
+                sec.tab(sec.t_rhocrit, zf), np.interp(zf, self.epy_z, self.epy)]
+        for _st, rho, fac in sts:
+            cols += [rho, fac]
+        if self._nodes is None:
+            self._nodes = NodeStore(self, [st for st, _r, _f in sts])
+        return self._nodes.solve(np.ascontiguousarray(np.stack(cols, axis=1)))
+
+    def transverse_batch(self, zf, z, ex, g, m, ft, smx, smt, cx, sh=None):
         """The transverse strain of every node, from the condition that there is no total
         stress across the member: concrete fcy and the stirrups balance (thesis 7-2). sh is
         the concrete's shrinkage or thermal strain at each node: the concrete works on the
-        transverse strain less it, the stirrups on the whole of it [B 004a8b20, 0046aaa0]."""
+        transverse strain less it, the stirrups on the whole of it [B 004a8b20, 0046aaa0].
+        Every node of the call is solved together and the closing in stops for all of them
+        at once, so a node's last digits depend on the nodes it was asked for with."""
         sec = self.sec
         sts = self.stirrups_at(zf, self.rho_width(zf, self.node_width(z)))
         rcrit = sec.tab(sec.t_rhocrit, zf)
@@ -920,6 +945,209 @@ class Analysis:
 # Solving a load stage and stepping through the response (no shear)
 # ---------------------------------------------------------------------------------------------
 JUMP_TOL = 1e-4
+
+
+class NodeStore:
+    """The transverse solves of the nodes of one analysis, kept by node, so that a node asked
+    for again with the same inputs is not solved again. It gives what
+    Analysis.transverse_batch gives, bit for bit (tests/test_speed.py; tools/same.py).
+
+    transverse_batch closes in on every node of a call together and stops for all of them
+    at the same pass: the first at which every bracketed node is out of balance by less
+    than 1e-7 MPa, or every bracket is narrower than 1e-12, or the fortieth. Each node's own
+    sequence of tries depends on nothing but its own inputs; only the pass at which it is
+    read depends on the other nodes of the call. So the sequence is kept by node (the try,
+    how far out of balance, the bracket's width at every pass so far, and the bracket to
+    go on from), the pass at which a call stops is worked out from the kept sequences of
+    its nodes, taken further only where they are too short, and each node's result is its
+    state at that pass, evaluated once and kept.
+
+    A node is known by its inputs: its concrete, the longitudinal strain, the shrinkage
+    strain, the shear strain, the bond parameter, the cracking strength, the two crack
+    spacings, the crack check's limit, the stirrups' critical ratio, their plastic strain,
+    and each stirrup type's ratio and factor there. Nothing else enters the solve."""
+
+    PASSES = 40
+    CAP = 20000              # nodes kept; past that the store is emptied
+
+    def __init__(self, an: "Analysis", stirrups):
+        self.an = an
+        self.stirrups = stirrups
+        mag = 1e-6 * 1.7 ** np.arange(0, 21)
+        self.ladder = np.concatenate([-mag[::-1][6:], [0.0], mag])
+        self.clear()
+
+    def clear(self):
+        self.ids = {}
+        self.n = 0
+        self.cols = None
+        self.rows = {}           # (node, pass) -> row of the kept results
+        self.fields = None
+        self.nrows = 0
+
+    def _grow(self, ncol):
+        cap = 1024 if self.cols is None else 2 * len(self.cols)
+
+        def more(a, shape, dtype=float, fill=0):
+            new = np.full((cap,) + shape, fill, dtype=dtype)
+            if a is not None:
+                new[: len(a)] = a
+            return new
+        first = self.cols is None
+        self.cols = more(self.cols, (ncol,))
+        self.lo = more(None if first else self.lo, ())
+        self.hi = more(None if first else self.hi, ())
+        self.flo = more(None if first else self.flo, ())
+        self.fhi = more(None if first else self.fhi, ())
+        self.ey0 = more(None if first else self.ey0, ())
+        self.ok = more(None if first else self.ok, (), bool, False)
+        self.done = more(None if first else self.done, (), np.int64)
+        self.x = more(None if first else self.x, (self.PASSES,))
+        self.off = more(None if first else self.off, (self.PASSES,))
+        self.gap = more(None if first else self.gap, (self.PASSES,))
+
+    def _run(self, ids, ey):
+        """Total transverse stress at nodes ids for ey of shape (n,) or (n, k), and the
+        nodes' states by concrete, as transverse_batch's own evaluation."""
+        an, sec = self.an, self.an.sec
+        c = self.cols[ids]
+        n = len(ids)
+        shp = ey.shape
+        k = 1 if ey.ndim == 1 else shp[1]
+        eyf = ey.reshape(n, k)
+        tot = np.empty((n, k))
+        outs = []
+        idx = c[:, 0]
+        for j, law in enumerate(sec.laws):
+            sel = idx == j
+            if not sel.any():
+                outs.append(None)
+                continue
+            rep = lambda a: np.repeat(a[sel], k)
+            eyl = eyf[sel].ravel()
+            subs = [(st, rep(c[:, 11 + 2 * i]), rep(c[:, 12 + 2 * i]))
+                    for i, st in enumerate(self.stirrups)]
+            st_tot, st_res, _ = an.stirrup_stress(subs, eyl, rep(c[:, 9]), rep(c[:, 10]))
+            o = nodelib.evaluate(law, rep(c[:, 1]), eyl - rep(c[:, 2]), rep(c[:, 3]),
+                                 rep(c[:, 4]), rep(c[:, 5]), rep(c[:, 6]), rep(c[:, 7]),
+                                 rep(c[:, 8]), st_res)
+            tot[sel] = (o.fcy + st_tot).reshape(-1, k)
+            outs.append((sel, o))
+        return tot.reshape(shp), outs
+
+    def _bracket(self, ids):
+        """New nodes: the ladder of transverse strains scanned for the first change of sign."""
+        n = len(ids)
+        ladder = self.cols[ids, 2][:, None] + self.ladder[None, :]
+        f, _ = self._run(ids, ladder)
+        pos = f > 0
+        first = np.argmax(pos, axis=1)
+        none = ~pos.any(axis=1)
+        first = np.where(none, ladder.shape[1] - 1, first)
+        first = np.maximum(first, 1)
+        rows = np.arange(n)
+        lo, hi = ladder[rows, first - 1], ladder[rows, first]
+        flo, fhi = f[rows, first - 1], f[rows, first]
+        self.lo[ids], self.hi[ids], self.flo[ids], self.fhi[ids] = lo, hi, flo, fhi
+        self.ok[ids] = (flo <= 0) & (fhi > 0)
+        self.ey0[ids] = np.where(np.abs(flo) < np.abs(fhi), lo, hi)
+        self.done[ids] = 0
+
+    def _advance(self, ids, it):
+        """Pass it of the closing in, for nodes that have had it passes."""
+        lo, hi, flo, fhi = self.lo[ids], self.hi[ids], self.flo[ids], self.fhi[ids]
+        with np.errstate(divide="ignore", invalid="ignore"):
+            x = np.where(fhi != flo, lo - flo * (hi - lo) / (fhi - flo), 0.5 * (lo + hi))
+        if it % 3 == 2:
+            x = 0.5 * (lo + hi)
+        x = np.clip(x, np.minimum(lo, hi), np.maximum(lo, hi))
+        fx, _ = self._run(ids, x)
+        neg = fx <= 0
+        lo = np.where(neg, x, lo)
+        flo = np.where(neg, fx, flo)
+        hi = np.where(~neg, x, hi)
+        fhi = np.where(~neg, fx, fhi)
+        self.lo[ids], self.hi[ids], self.flo[ids], self.fhi[ids] = lo, hi, flo, fhi
+        self.x[ids, it] = x
+        self.off[ids, it] = np.abs(fx)
+        self.gap[ids, it] = np.abs(hi - lo)
+        self.done[ids] = it + 1
+
+    def solve(self, table):
+        """(the nodes' states, their transverse strains) for the rows of table, one row a
+        node: the inputs in the order Analysis.transverse stacks them."""
+        if self.n > self.CAP:
+            self.clear()
+        n, ncol = table.shape
+        ids = np.empty(n, dtype=np.int64)
+        new = []
+        known = self.ids
+        for i in range(n):
+            key = table[i].tobytes()
+            j = known.get(key)
+            if j is None:
+                j = known[key] = self.n
+                self.n += 1
+                new.append(i)
+            ids[i] = j
+        if new:
+            while self.cols is None or self.n > len(self.cols):
+                self._grow(ncol)
+            fresh = ids[new]
+            self.cols[fresh] = table[new]
+            self._bracket(fresh)
+        mine = np.unique(ids)
+        live = mine[self.ok[mine]]
+        stop = 0
+        if len(live):
+            for it in range(self.PASSES):
+                short = live[self.done[live] <= it]
+                if len(short):
+                    self._advance(short, it)
+                stop = it
+                if np.max(self.off[live, it]) < 1e-7 or np.max(self.gap[live, it]) < 1e-12:
+                    break
+        # each node's result at that pass (a node with no bracket: as it was left)
+        at = np.where(self.ok[ids], stop, -1)
+        rows = np.empty(n, dtype=np.int64)
+        lack = {}
+        for i in range(n):
+            key = (int(ids[i]), int(at[i]))
+            r = self.rows.get(key)
+            if r is None:
+                r = lack.get(key)
+                if r is None:
+                    r = lack[key] = self.nrows + len(lack)
+            rows[i] = r
+        if lack:
+            who = np.array([k[0] for k in lack], dtype=np.int64)
+            when = np.array([k[1] for k in lack], dtype=np.int64)
+            ey = np.where(when >= 0, self.x[who, np.maximum(when, 0)], self.ey0[who])
+            _, outs = self._run(who, ey)
+            r0 = self.nrows
+            self.nrows += len(lack)
+            self.rows.update(lack)
+            if self.fields is None:
+                self.fields = {"ey": np.zeros(1024)}
+            for name, a in self.fields.items():
+                if self.nrows > len(a):
+                    b = np.zeros(max(2 * len(a), self.nrows), dtype=a.dtype)
+                    b[: len(a)] = a
+                    self.fields[name] = b
+            self.fields["ey"][r0: self.nrows] = ey
+            for got in outs:
+                if got is None:
+                    continue
+                sel, o = got
+                where = r0 + np.flatnonzero(sel)
+                for name, val in o.__dict__.items():
+                    a = self.fields.get(name)
+                    if a is None:
+                        a = self.fields[name] = np.zeros(len(self.fields["ey"]), dtype=val.dtype)
+                    a[where] = val
+        f = self.fields
+        return (nodelib.NodeOut(**{name: a[rows] for name, a in f.items() if name != "ey"}),
+                f["ey"][rows])
 
 
 def _root(f, x0, dx, tol, maxit=80):

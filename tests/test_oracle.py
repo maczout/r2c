@@ -27,6 +27,7 @@ import pytest
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
 
 import compare  # noqa: E402
+import same  # noqa: E402
 import verify  # noqa: E402
 from r2c import inputs, record, run, stages  # noqa: E402
 
@@ -167,9 +168,25 @@ SLOW = {
 }
 
 
+def _read(folder, case):
+    ref = record.read(folder / f"{case}.r2x.txt")
+    ref.case = case
+    return ref
+
+
 def _solve(ref, path=None):
+    """r2c's record of the case. Every development case solved here is also held to the
+    hash of its whole record (tests/oracle/records.json, tools/same.py): a speed change
+    changes no result (owner, 2026-11-26). Hashes made on another machine are not held."""
     res = run.solve(path, **verify.options(ref.header))
-    return record.decode(res.record_bytes(stages.ALL))
+    data = res.record_bytes(stages.ALL)
+    want = same.expected(getattr(ref, "case", ""))
+    if want is not None and same.here():
+        assert same.digest(data) == want, (
+            f"{ref.case}: r2c's record is not the one in tests/oracle/records.json. A speed "
+            "change must leave every record as it was; a change of result rewrites the "
+            "hashes in its own commit (python tools/same.py RUN --write)")
+    return record.decode(data)
 
 
 def _check(ref, sub, peak_limit, curve_limit):
@@ -183,21 +200,21 @@ def _check(ref, sub, peak_limit, curve_limit):
 
 @pytest.mark.parametrize("case", sorted(PHASE_A))
 def test_phase_a(case, oracle_dir):
-    ref = record.read(oracle_dir / f"{case}.r2x.txt")
+    ref = _read(oracle_dir, case)
     _check(ref, _solve(ref), *PHASE_A[case])
 
 
 @pytest.mark.parked
 @pytest.mark.parametrize("case", sorted(BUILT_IN))
 def test_built_in_section(case, parked_dir):
-    ref = record.read(parked_dir / f"{case}.r2x.txt")
+    ref = _read(parked_dir, case)
     _check(ref, _solve(ref), *BUILT_IN[case])
 
 
 @pytest.mark.parked
 @pytest.mark.parametrize("case", SAMPLES)
 def test_response_samples_are_read(case, parked_dir, response_dir):
-    ref = record.read(parked_dir / f"{case}.r2x.txt")
+    ref = _read(parked_dir, case)
     opt = verify.options(ref.header)
     su = run.setup(response_dir / ref.header["input-name"], initial=opt["initial"],
                    increment=opt["increment"])
@@ -208,25 +225,25 @@ def test_response_samples_are_read(case, parked_dir, response_dir):
 @pytest.mark.slow
 @pytest.mark.parametrize("case", sorted(SLOW))
 def test_shear(case, oracle_dir):
-    ref = record.read(oracle_dir / f"{case}.r2x.txt")
+    ref = _read(oracle_dir, case)
     _check(ref, _solve(ref), *SLOW[case])
 
 
 @pytest.mark.parametrize("case", sorted(SETTINGS))
 def test_settings(case, oracle_dir):
-    ref = record.read(oracle_dir / f"{case}.r2x.txt")
+    ref = _read(oracle_dir, case)
     _check(ref, _solve(ref), *SETTINGS[case])
 
 
 @pytest.mark.slow
 @pytest.mark.parametrize("case", sorted(SETTINGS_SLOW))
 def test_settings_shear(case, oracle_dir):
-    ref = record.read(oracle_dir / f"{case}.r2x.txt")
+    ref = _read(oracle_dir, case)
     _check(ref, _solve(ref), *SETTINGS_SLOW[case])
 
 
 def _define(case, oracle_dir, define_dirs, limits):
-    ref = record.read(oracle_dir / f"{case}.r2x.txt")
+    ref = _read(oracle_dir, case)
     path = verify.find_input(ref.header["input-name"], ref.header["input-sha256"], define_dirs)
     if path is None:
         pytest.skip(f"{ref.header['input-name']} is not under R2C_DEFINE_DIR")
@@ -258,7 +275,7 @@ def test_scope_cases(case, parked_dir, scope_dirs):
 
 
 def _scope(case, folder, scope_dirs, limits):
-    ref = record.read(folder / f"{case}.r2x.txt")
+    ref = _read(folder, case)
     path = verify.find_input(ref.header["input-name"], ref.header["input-sha256"], scope_dirs)
     if path is None:
         pytest.skip(f"{ref.header['input-name']} is not under R2C_SCOPE_DIR")
@@ -326,7 +343,7 @@ GENERATED = _generated()
 @pytest.mark.parametrize("case", sorted(GENERATED))
 def test_wider_cases(case, oracle_dir):
     import os
-    ref = record.read(oracle_dir / f"{case}.r2x.txt")
+    ref = _read(oracle_dir, case)
     dirs = [Path(d) for d in (os.environ.get(k) for k in
                               ("R2C_RESPONSE_DIR", "R2C_DEFINE_DIR", "R2C_SCOPE_DIR")) if d]
     path = None
