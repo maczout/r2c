@@ -901,12 +901,13 @@ def write_summary() -> int:
         raise SystemExit("heldout/totals.json has no run yet")
     text = SUMMARY.read_text(encoding="utf-8")
     block = summary_block(totals)
+    finish = read_totals(FINISH_TOTALS)
     if BEGIN in text:
         text = re.sub(re.escape(BEGIN) + r".*?" + re.escape(END), lambda _m: block, text,
                       flags=re.S)
-    else:
+    elif not (finish["runs"] and FBEGIN in text):
+        # the sign-off page has the two sets side by side in place of the trend
         raise SystemExit(f"docs/summary.md has no {BEGIN} ... {END} block to fill")
-    finish = read_totals(FINISH_TOTALS)
     if finish["runs"] and FBEGIN in text:
         fb = finish_block(totals, read_repeat(), finish, read_repeat(FINISH_REPEAT))
         text = re.sub(re.escape(FBEGIN) + r".*?" + re.escape(FEND), lambda _m: fb, text,

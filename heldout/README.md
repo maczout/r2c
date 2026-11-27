@@ -15,9 +15,13 @@ What "good" is judged on (`docs/brief.md`): cases the developer has not tuned ag
   The solution threshold for priorities 1 to 3 is this score less 3 points.
 
 - `finish-manifest.json`: the second set, for the finish (owner, 2026-11-25). The same
-  form, frozen the same way, in an archive of its own. It is not scored in any way until
-  the finishing steps: `tools/heldout.py score --set finish` refuses, and no total of it
-  exists.
+  form, frozen the same way, in an archive of its own. It was not scored in any way
+  until the owner started the finishing steps (2026-11-26); it was then scored once.
+- `finish-totals.json`, `finish-repeatability.json`: that one score, and Response
+  against itself on the second set's inputs, in totals only.
+
+**Both sets were opened case by case at the finish** (the brief, "Finishing"), into
+files outside the repository. They are spent: further work on accuracy needs a new set.
 
 The recipe itself (the text edits that derive each input) is in `tools/heldout.py`. The
 captures, the inputs and every per-case result are in an archive outside the repository.

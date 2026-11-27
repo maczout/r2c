@@ -96,7 +96,14 @@ def check_summary(say) -> None:
         if h in got and items(got[h]) > most:
             say("FAIL", f"summary: {items(got[h])} items under \"{h[3:]}\", at most {most}")
     totals = heldout.read_totals()
-    if totals["runs"] and heldout.summary_block(totals) not in text:
+    finish = heldout.read_totals(heldout.FINISH_TOTALS)
+    if finish["runs"]:
+        # the sign-off page: the two sets side by side, in place of the first set's trend
+        block = heldout.finish_block(totals, heldout.read_repeat(), finish,
+                                     heldout.read_repeat(heldout.FINISH_REPEAT))
+    else:
+        block = heldout.summary_block(totals)
+    if totals["runs"] and block not in text:
         say("FAIL", "summary: the held-out totals are not what tools/heldout.py writes from "
                     "heldout/totals.json (rerun python tools/heldout.py summary)")
     elif not missing:

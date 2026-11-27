@@ -10,9 +10,10 @@ in for the other in a workflow, and r2x serves as the oracle that r2c is compare
 
 **What it is good for, in one paragraph.** Without shear (moment, axial load, or both)
 r2c gives Response-2000's answer: on sections it was never tuned against, every case was
-inside ±5 % on every check, stage for stage. With shear it gives Response's curve up to
-the peak (the peak load, the rising branch, the stress state under moment and axial load,
-the crack widths) on every such case; the shear-related profiles over the depth at the
+inside ±5 % on every check, stage for stage. With shear it gives Response's curve as far
+as Response's own response goes (the peak load there, the rising branch, the crack widths)
+on every such case, but on about one in six it then carries on to a higher peak than
+Response reports (see below); the shear-related profiles over the depth at the
 peak, and how the response ends after it, agree on about three cases in five and three in
 four, and there Response does not agree with itself either when an input changes by next
 to nothing. The numbers, the cases they were measured on and an independent assessor's
@@ -105,10 +106,14 @@ numbers.
   about one case in four. This was the lowest priority and was not worked on.
 - **With shear, r2c carries on where Response stops early.** On sections that fail in
   flexure with some shear, Response's solve often gives up while the load is still
-  rising, and its response ends there with no failure. r2c finds further states and can
-  reach a peak several per cent higher than Response reports. Up to Response's last
-  stage the two agree. This is deliberate (the owner's decision); if you need Response's
-  number, it is the load at Response's last stage, not r2c's peak.
+  rising, and its response ends there. r2c finds further states and its peak can stand
+  well above the one Response reports: on 6 of the 40 cases with shear it was never tuned
+  against, by 5 to 32 %. Up to Response's last stage the two agree, and Response's lower
+  figure is its repeatable answer. This is deliberate (the owner's decision), and
+  **r2c's record does not mark where Response stopped**: if you need Response's
+  strength, do not take r2c's peak for it where r2c's response has a sudden jump in load
+  or a long tail of closely spaced stages. Whether r2c's higher figure is the better
+  answer has not been checked.
 - **A circular column, or any section that stays uniform, under axial load alone:** after
   the peak r2c keeps a uniform response and Response does not. Deliberate.
 - **With shear r2c is slow**: minutes for a case, longer than r2x on most.

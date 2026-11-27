@@ -75,6 +75,11 @@ tuned against. It is frozen; its recipe and hashes are committed (`heldout/manif
   about 20 more cases, frozen the same way in an archive of its own. It is not scored in
   any way until the finishing steps: `tools/heldout.py score` refuses it, r2c is not run
   on its inputs, its captures are not opened. Everything above holds for it too.
+- **At the finish** (owner, 2026-11-26: "start the finishing steps"): the second set was
+  scored once (`heldout/finish-totals.json`) and both sets were opened case by case, for
+  the independent assessor (`tools/opened.py`, into files outside the repository;
+  `docs/assessment.md`). Both sets are spent as held-out sets. Per-case tables are still
+  not committed; the assessor's findings name cases and sizes, as written.
 - **Each log says whether the rule was kept**, since it rests on instruction.
 - **Floor:** a fall in any area's total is reported to the owner in the summary, even if
   the overall total rises.
