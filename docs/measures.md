@@ -104,13 +104,24 @@ and stays there (cracking, for one), stays assessed.
 (`docs/brief.md`). The checks on that case that follow from it are outside target and are
 counted as such; the override says they are not chased, not that they pass.
 
-**With shear, where Response's solve gives up and r2c carries on** (owner, 2026-11-25):
-r2c keeps carrying on, and such a case is compared up to Response's last stage. The owner's
-decision is the comparison; how such a case is told from the two records is the developer's
-reading, the same for the development and the held-out set (`tools/compare.py`,
+**With shear, where Response's solve gives up and r2c carries on** (owner, 2026-11-25;
+narrowed 2026-11-27): r2c keeps carrying on, and such a case is compared up to Response's
+last stage. Since 2026-11-27 the override holds only where a trace of Response confirms a
+numerical give-up, and priority 1 with shear is reported with no case cut first and cut
+second. The owner's decision is the comparison; how such a case is told is the developer's
+reading, the same for the development and the held-out sets (`tools/compare.py`,
 `carried_on`). It is such a case when all of these hold:
 
 - the case has shear;
+- a trace of Response's own stage control on the case (`tools/rtrace.py`, read by
+  `tools/traceend.py`) shows a numerical give-up: after the last stage Response kept, its
+  tries ran down to the smallest step, and every one of them failed in the solve of the
+  global strains or had not settled after 16 passes. A case is not cut where there is no
+  trace, where the trace does not reach the capture's last stage, where one of those tries
+  is a solved state that Response refused on its state code (the web crushing, a stirrup
+  past rupture), or where Response ended on a stage it kept, of its own accord. The
+  endings are kept by the capture's control curves: `tests/oracle/trace-ends.json` for the
+  development set, a file in each held-out archive for its set;
 - Response's last stage carries at least 0.8 of its peak load, so its response was not
   ended by its own test on a load that has fallen;
 - r2c's curve passes Response's last stage at the same place (within `curve_pct`, as the
@@ -122,9 +133,12 @@ r2c's curve is then cut at its point nearest Response's last stage, and peak, ri
 branch, ending and shape are measured on the cut curve. The views are compared with r2c's
 stages up to the first one at or past that point. Where Response's last stage is its
 peak, nothing is left after the peak on either curve and the ending counts as the same.
-What the records cannot show: whether
-Response ended on one of its strain limits rather than by giving up. r2c has the same
-limits, so in the same state it would end there too.
+
+Every comparison that is cut is also kept as it is with no cut (`compare.uncut`), and the
+held-out scorer records both totals. What the measure cannot show: whether r2c carried on
+by the override (its copy of Response's solve gave up there and its own went on, which
+its record then marks: `response-last-stage`) or because its copy did not fail where
+Response's did. `python tools/marks.py` counts the two.
 
 ## The regression limits
 

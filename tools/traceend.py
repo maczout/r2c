@@ -31,7 +31,7 @@ read gives each traced case its ending, from the tries after the last stage Resp
                    by its own tests
   not shown        the trace stops before the capture's last stage, or has another ending
 
---write puts {case: ending} into FILE (tests/oracle/trace-ends.json for the development
+--write puts each case's ending, with the hash of its capture's control curves, into FILE (tests/oracle/trace-ends.json for the development
 set; a file in the archive for a held-out set, whose cases are not named in the
 repository). --list prints the cases; without it only the counts.
 """
@@ -147,7 +147,11 @@ def read(a) -> int:
         names = sorted(n for n, e in ends.items() if e == kind)
         print(f"{kind}: {len(names)}" + (("  " + " ".join(names)) if a.list and names else ""))
     if a.write:
-        Path(a.write).write_text(json.dumps(dict(sorted(ends.items())), indent=1) + "\n")
+        # kept by the capture's control curves too, which is what the measure looks it up by
+        refs = {n: p for n, p, _h, _r in shear_cases(a.refs)}
+        out = {n: {"ending": e, "curves": cmp.fingerprint(record.read(refs[n]))}
+               for n, e in sorted(ends.items())}
+        Path(a.write).write_text(json.dumps(out, indent=1) + "\n")
     return 0
 
 

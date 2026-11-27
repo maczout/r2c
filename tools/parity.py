@@ -154,7 +154,10 @@ def option_values(theirs, ours) -> tuple[int, list[str]]:
 # input's hash, which tools/verify.py's records lack where r2c used its built-in Newbeam
 MACHINE = {"r2x-version", "wine-version", "disclaimer", "response-exe-sha256",
            "response-files-sha256", "response-verified", "r2c-version", "kernel",
-           "input-sha256"}
+           "input-sha256",
+           # r2c's own lines on where Response would stop (owner, 2026-11-27: a required
+           # part of r2c's record; r2x's cannot have them)
+           "response-last-stage", "response-peak-stage", "response-ending", "ending"}
 NUMBER = re.compile(r"-?\d+(\.\d+)?([eE][-+]?\d+)?")
 
 

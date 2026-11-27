@@ -613,6 +613,9 @@ def score(a, ap) -> int:
         p = out / c["name"] / "results.json"
         return c["name"], (json.loads(p.read_text()).get(c["name"], {}) if p.exists() else {})
 
+    # how a trace of Response shows each case to have ended, for the cut (owner, 2026-11-27;
+    # tools/traceend.py): per case, so it stays in the archive
+    os.environ["R2C_TRACE_ENDS"] = str(archive / "trace-ends.json")
     with ThreadPoolExecutor(max_workers=max(a.jobs, 1)) as ex:
         results = dict(ex.map(one, cases))
     (out / "results.json").write_text(json.dumps(results, indent=1))
@@ -620,6 +623,10 @@ def score(a, ap) -> int:
     recipe = {c["name"]: c for c in CASES}
     counted = tally([dict(recipe[c["name"]], area=c["area"]) for c in cases], results, acc)
     kinds = counted.pop("kinds")
+    # with no case cut (owner, 2026-11-27: reported first)
+    import compare as cmp
+    counted["uncut"] = tally([{"name": c["name"], "area": c["area"]} for c in cases],
+                             {n: cmp.uncut(r) for n, r in results.items()}, acc)["totals"]
     run = dict(label=label, date=dt.date.today().isoformat(),
                commit=(commit if rc == 0 else "") + ("+dirty" if dirty else ""),
                cases={t: sum(c["area"] == t for c in cases) for t in AREAS.values()},
@@ -739,7 +746,9 @@ def text_totals(run: dict) -> str:
         out.append(f"  {title} ({run['cases'][t]} cases, {run['unsolved'][t]} not solved by "
                    "r2c and counted outside):")
         for p, (n, of) in run["totals"][t].items():
-            out.append(f"    priority {p}: {pct(n, of)}")
+            whole = run.get("uncut", {}).get(t, {}).get(p)
+            out.append(f"    priority {p}: " + (f"{pct(*whole)} with no case cut; " if whole
+                                                 and whole != [n, of] else "") + pct(n, of))
     return "\n".join(out)
 
 
@@ -756,11 +765,11 @@ def check_totals(totals: dict) -> None:
     if set(totals) != {"runs"}:
         raise ValueError("only \"runs\" is allowed at the top")
     for r in totals["runs"]:
-        if set(r) != {"label", "date", "commit", "cases", "totals", "unsolved"}:
+        if set(r) - {"uncut"} != {"label", "date", "commit", "cases", "totals", "unsolved"}:
             raise ValueError(f"run {r.get('label')!r}: fields other than the totals'")
         if set(r["cases"]) != set(AREA_TITLES) or set(r["unsolved"]) != set(AREA_TITLES):
             raise ValueError(f"run {r['label']!r}: areas other than the two")
-        for t, by in r["totals"].items():
+        for t, by in [*r["totals"].items(), *r.get("uncut", {}).items()]:
             for p, v in by.items():
                 if not (t in AREA_TITLES and p in "1234" and len(v) == 2
                         and all(isinstance(x, int) for x in v) and 0 <= v[0] <= v[1]):

@@ -176,6 +176,41 @@ def _rising(c):
 # told from the two records; the reading below is the developer's (docs/measures.md).
 GAVE_UP_LOAD = 0.8   # Response's own end test on the load: under this x the largest so far
 
+# The override narrowed (owner, 2026-11-27): "r2c carries on only where a trace of Response
+# confirms a numerical give-up", and "a trace decides" the case where Response ended of its
+# own accord. So a case is compared up to Response's last stage only where a trace of
+# Response's own stage control on that case (tools/rtrace.py, read by tools/traceend.py)
+# shows the give-up. The endings are kept by the reference's control curves:
+# tests/oracle/trace-ends.json for the development set, and for a set whose cases are not
+# named in the repository the files named in R2C_TRACE_ENDS (separated like a path).
+TRACE_GAVE_UP = "gave up"
+TRACE_ENDS = None       # {fingerprint of a reference's control curves: ending}
+
+
+def fingerprint(ref) -> str:
+    """What a trace's ending is kept by: the SHA-256 of the reference's control sections."""
+    import hashlib
+    return hashlib.sha256(b"".join(ref.sections[k] for k in sorted(ref.sections)
+                                   if k.startswith("control/"))).hexdigest()
+
+
+def trace_end(ref) -> str | None:
+    """How a trace of Response shows the reference's response to have ended; None where
+    there is no trace of the case."""
+    global TRACE_ENDS
+    if TRACE_ENDS is None:
+        import json
+        import os
+        from pathlib import Path
+        TRACE_ENDS = {}
+        files = [Path(__file__).resolve().parents[1] / "tests" / "oracle" / "trace-ends.json"]
+        files += [Path(f) for f in os.environ.get("R2C_TRACE_ENDS", "").split(os.pathsep) if f]
+        for f in files:
+            if f.exists():
+                for v in json.loads(f.read_text()).values():
+                    TRACE_ENDS[v["curves"]] = v["ending"]
+    return TRACE_ENDS.get(fingerprint(ref))
+
 
 def carried_on(ref, sub, key, limit):
     """Where along the subject's curve the reference's last stage lies, if this is a case
@@ -185,6 +220,10 @@ def carried_on(ref, sub, key, limit):
 
     It is such a case when all of these hold:
     * the case has shear (the override is about shear responses);
+    * a trace of Response's own stage control on the case shows a numerical give-up
+      (trace_end; owner, 2026-11-27): with no trace, or one that shows a state refused
+      for a crushing web, an end of Response's own accord or anything else, the case is
+      not cut;
     * the reference's last stage carries at least GAVE_UP_LOAD of its peak load: its
       response was not ended by Response's end test on a load that has fallen (under 0.8 of
       the largest so far with a failure in the section, docs/kernel.md, "The end of the
@@ -196,7 +235,7 @@ def carried_on(ref, sub, key, limit):
       place as the reference's (beyond the target, or the printed precision where that is
       coarser): a subject that ends where the reference ends has not carried on."""
     import report
-    if report.group(ref.header) != "shear":
+    if report.group(ref.header) != "shear" or trace_end(ref) != TRACE_GAVE_UP:
         return None
     a, b = _curve(ref, key), _curve(sub, key)
     if len(a) < 2 or len(b) < 2:
@@ -213,6 +252,13 @@ def carried_on(ref, sub, key, limit):
     if np.hypot((b[-1, 0] - a[-1, 0]) / xs, (b[-1, 1] - a[-1, 1]) / pk) <= max(limit, floor):
         return None
     return float(pos[0])
+
+
+def uncut(res: dict) -> dict:
+    """A comparison's result as it is with no case cut (owner, 2026-11-27: priority 1 with
+    shear is reported uncut first and cut second): the result itself where the case was
+    not compared up to the reference's last stage, else what compare() put beside it."""
+    return dict(res, **res["uncut"]) if "uncut" in res else res
 
 
 def cut(c, upto):
@@ -669,6 +715,17 @@ def compare_views(ref, sub, ref_stage, sub_stage, t=None):
 
 
 def compare(ref, sub, views=False):
+    """The comparison of a subject's record with the reference's. Where the subject is
+    compared up to the reference's last stage (carried_on), the result has under "uncut"
+    what differs when it is not: see uncut()."""
+    res = _compare(ref, sub, views, True)
+    if "upto" in res:
+        whole = _compare(ref, sub, views, False)
+        res["uncut"] = {k: v for k, v in whole.items() if res.get(k) != v}
+    return res
+
+
+def _compare(ref, sub, views, override):
     keys = [k for k in control_keys(ref) if k in control_keys(sub)]
     out = {
         "ref": {k: ref.header.get(k) for k in ("input-name", "units", "factors", "initial",
@@ -679,7 +736,7 @@ def compare(ref, sub, views=False):
     }
     # the override (owner, 2026-11-25): where the reference's solve gave up and the subject
     # carried on, the subject is compared up to the reference's last stage
-    upto = carried_on(ref, sub, keys[-1], same_place_limit(ref)) if keys else None
+    upto = carried_on(ref, sub, keys[-1], same_place_limit(ref)) if keys and override else None
     out["control"] = [compare_control(ref, sub, k, upto) for k in keys]
     if upto is not None:
         out["upto"] = {"sub_position": upto,
