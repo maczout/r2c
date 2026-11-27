@@ -210,14 +210,16 @@ def check_heldout(say, tracked: list[str]) -> None:
         if any(re.search(rf"(?<![\w-]){re.escape(n)}(?![\w-])", ftext) for n in names):
             say("FAIL", "held-out, the second set: its totals name a case (totals only)")
             return
-        if len(ft["runs"]) > 1:
-            say("FAIL", "held-out, the second set: scored more than once (it is scored "
-                        "once, at the finish)")
+        if len(ft["runs"]) > 2:
+            say("FAIL", "held-out, the second set: scored more than twice (once at the "
+                        "finish, and once after the change the owner asked for on "
+                        "2026-11-27)")
             return
         say("ok", f"held-out, the second set for the finish: {len(finish['cases'])} cases, "
                   f"frozen {finish.get('frozen')}, as frozen; "
-                  + ("scored once, at the finish, totals only" if ft["runs"]
-                     else "not scored"))
+                  + ({1: "scored once, at the finish, totals only",
+                      2: "scored at the finish and once after the owner's change of "
+                         "2026-11-27, totals only"}.get(len(ft["runs"]), "not scored")))
 
 
 def main(argv=None) -> int:
