@@ -121,11 +121,21 @@ def test_no_case_of_the_second_set_is_a_development_or_a_held_out_case():
         assert key(c) not in first
 
 
-def test_the_second_set_is_not_scored():
-    with pytest.raises(SystemExit):
-        heldout.main(["score", "/nowhere", "--set", "finish"])
+def test_the_second_set_is_scored_at_the_finish_in_totals_only():
+    # refused until the owner started the finishing steps (2026-11-26); its totals are in
+    # a file of their own, and the first set's file holds the first set's runs only
     assert all(sum(r["cases"].values()) == len(manifest()["cases"])
                for r in heldout.read_totals()["runs"])
+    finish = heldout.read_totals(heldout.FINISH_TOTALS)
+    heldout.check_totals(finish)
+    assert all(sum(r["cases"].values()) == len(finish_manifest()["cases"])
+               for r in finish["runs"])
+    for f in (heldout.FINISH_TOTALS, heldout.FINISH_REPEAT):
+        text = f.read_text() if f.exists() else ""
+        assert not any(c["name"] in text for c in heldout.FINISH_CASES)
+    rep = heldout.read_repeat(heldout.FINISH_REPEAT)
+    if rep is not None:
+        heldout.check_repeat(rep)
 
 
 # -- Response against itself, and the threshold made from it (owner, 2026-11-25) ---------------
@@ -152,8 +162,3 @@ def test_response_against_itself_is_recorded_in_totals_only():
     with pytest.raises(ValueError):
         heldout.check_repeat(dict(rep, cases_outside=["x"]))
     assert heldout.brief_block(rep) in (ROOT / "docs" / "brief.md").read_text(encoding="utf-8")
-
-
-def test_response_against_itself_is_refused_for_the_second_set():
-    with pytest.raises(SystemExit):
-        heldout.main(["repeat", "/nowhere", "--set", "finish"])

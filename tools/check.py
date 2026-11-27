@@ -189,8 +189,28 @@ def check_heldout(say, tracked: list[str]) -> None:
     if not (bad or leaked or named):
         say("ok", f"held-out: {len(cases)} cases, frozen {man.get('frozen')}, as frozen; "
                   f"totals only ({len(heldout.read_totals()['runs'])} run(s) recorded)")
+        ft = heldout.read_totals(heldout.FINISH_TOTALS)
+        fr = heldout.read_repeat(heldout.FINISH_REPEAT)
+        try:
+            heldout.check_totals(ft)
+            if fr is not None:
+                heldout.check_repeat(fr)
+        except ValueError as e:
+            say("FAIL", f"held-out, the second set: its totals: {e}")
+            return
+        ftext = "".join(f.read_text() for f in (heldout.FINISH_TOTALS, heldout.FINISH_REPEAT)
+                        if f.exists())
+        if any(re.search(rf"(?<![\w-]){re.escape(n)}(?![\w-])", ftext) for n in names):
+            say("FAIL", "held-out, the second set: its totals name a case (totals only)")
+            return
+        if len(ft["runs"]) > 1:
+            say("FAIL", "held-out, the second set: scored more than once (it is scored "
+                        "once, at the finish)")
+            return
         say("ok", f"held-out, the second set for the finish: {len(finish['cases'])} cases, "
-                  f"frozen {finish.get('frozen')}, as frozen; not scored")
+                  f"frozen {finish.get('frozen')}, as frozen; "
+                  + ("scored once, at the finish, totals only" if ft["runs"]
+                     else "not scored"))
 
 
 def main(argv=None) -> int:
