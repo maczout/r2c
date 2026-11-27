@@ -1,9 +1,9 @@
 {
  "run": {
   "r2c_version": "0.1.0",
-  "commit": "3946c4f3de3866da29b7ab76f78db5f95330a1cb",
+  "commit": "1a2b5bd06e294d65107de12343b6735fadd13837",
   "dirty": false,
-  "started": "2026-11-26T11:25:09-07:00",
+  "started": "2026-11-27T07:34:22-07:00",
   "host": "Makertyre",
   "machine": "Linux x86_64, 32 cores",
   "python": "3.12.3",
@@ -1400,8 +1400,8 @@
      "ref_stage": 135
     }
    ],
-   "seconds": 75.4,
-   "run": "3946c4f3de38",
+   "seconds": 74.9,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      0.239,
@@ -3055,8 +3055,8 @@
      "ref_stage": 12
     }
    ],
-   "seconds": 5.4,
-   "run": "3946c4f3de38",
+   "seconds": 6.5,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      0.233,
@@ -4630,8 +4630,8 @@
      "ref_stage": 10
     }
    ],
-   "seconds": 7.2,
-   "run": "3946c4f3de38",
+   "seconds": 8.7,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      0.239,
@@ -6234,7 +6234,7 @@
     }
    ],
    "seconds": 3.4,
-   "run": "3946c4f3de38",
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      0.241,
@@ -7722,8 +7722,8 @@
      "ref_stage": 52
     }
    ],
-   "seconds": 1.4,
-   "run": "3946c4f3de38",
+   "seconds": 2.1,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -9139,9 +9139,10 @@
      "ref_stage": 42
     }
    ],
-   "seconds": 104.0,
+   "seconds": 107.7,
    "carried_from": 39,
-   "run": "3946c4f3de38",
+   "ending": "as Response-2000's does: its solve gives up, and r2c's own solve finds no state beyond either",
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -10501,9 +10502,10 @@
      "ref_stage": 40
     }
    ],
-   "seconds": 246.2,
+   "seconds": 237.5,
    "carried_from": 41,
-   "run": "3946c4f3de38",
+   "response_last": 40,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -11908,8 +11910,8 @@
      "ref_stage": 60
     }
    ],
-   "seconds": 1.6,
-   "run": "3946c4f3de38",
+   "seconds": 1.5,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -13394,7 +13396,7 @@
     }
    ],
    "seconds": 1.3,
-   "run": "3946c4f3de38",
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -14794,9 +14796,10 @@
      "ref_stage": 55
     }
    ],
-   "seconds": 186.7,
+   "seconds": 172.6,
    "carried_from": 48,
-   "run": "3946c4f3de38",
+   "response_last": 47,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -16256,7 +16259,7 @@
     }
    ],
    "seconds": 1.2,
-   "run": "3946c4f3de38",
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -17719,8 +17722,8 @@
      "ref_stage": 36
     }
    ],
-   "seconds": 1.3,
-   "run": "3946c4f3de38",
+   "seconds": 0.8,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -19093,7 +19096,7 @@
     }
    ],
    "seconds": 0.1,
-   "run": "3946c4f3de38",
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      0.0,
@@ -20488,8 +20491,8 @@
      "ref_stage": 9
     }
    ],
-   "seconds": 2.4,
-   "run": "3946c4f3de38",
+   "seconds": 2.0,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      0.0,
@@ -21987,8 +21990,8 @@
      "ref_stage": 7
     }
    ],
-   "seconds": 1.9,
-   "run": "3946c4f3de38",
+   "seconds": 1.7,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      0.0,
@@ -23467,8 +23470,8 @@
      "ref_stage": 12
     }
    ],
-   "seconds": 1.9,
-   "run": "3946c4f3de38",
+   "seconds": 2.3,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      0.0,
@@ -24972,8 +24975,8 @@
      "ref_stage": 65
     }
    ],
-   "seconds": 2.0,
-   "run": "3946c4f3de38",
+   "seconds": 1.8,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      0.0,
@@ -26485,8 +26488,8 @@
      "ref_stage": 44
     }
    ],
-   "seconds": 2.3,
-   "run": "3946c4f3de38",
+   "seconds": 1.4,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      0.008,
@@ -27946,8 +27949,8 @@
      "ref_stage": 50
     }
    ],
-   "seconds": 1.6,
-   "run": "3946c4f3de38",
+   "seconds": 1.9,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -29699,9 +29702,10 @@
      "ref_stage": 48
     }
    ],
-   "seconds": 76.1,
+   "seconds": 81.2,
    "carried_from": 55,
-   "run": "3946c4f3de38",
+   "ending": "as Response-2000's does: its solve gives up, and r2c's own solve finds no state beyond either",
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -31173,8 +31177,8 @@
      "ref_stage": 9
     }
    ],
-   "seconds": 1.4,
-   "run": "3946c4f3de38",
+   "seconds": 1.5,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      0.017,
@@ -32924,7 +32928,7 @@
     }
    ],
    "seconds": 2.4,
-   "run": "3946c4f3de38",
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -34452,8 +34456,8 @@
      "ref_stage": 37
     }
    ],
-   "seconds": 1.5,
-   "run": "3946c4f3de38",
+   "seconds": 1.3,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.008,
@@ -34689,7 +34693,7 @@
     "peak-stage": "27"
    },
    "sub": {
-    "stage-count": "55",
+    "stage-count": "49",
     "peak-stage": "48"
    },
    "missing_control": [],
@@ -34716,7 +34720,7 @@
      "shape_same": false,
      "floor_pct": 0.06745456516263683,
      "rising_pct": 0.03435628610798355,
-     "post_peak_pct": 34.744833488360044
+     "post_peak_pct": 32.38447495651404
     },
     {
      "chart": "moment_phi",
@@ -34734,7 +34738,7 @@
      "shape_sub": [
       "cracking",
       "peak",
-      "ends standing still"
+      "ends at peak"
      ],
      "shape_same": false,
      "floor_pct": 0.17921155799796154,
@@ -35566,9 +35570,9 @@
      "ref_stage": 38
     }
    ],
-   "seconds": 48.4,
-   "carried_from": 49,
-   "run": "3946c4f3de38",
+   "seconds": 39.3,
+   "ending": "as Response-2000's does: it refuses a state whose web is crushing with the load still rising, and no smaller step is solved",
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.665,
@@ -35765,30 +35769,6 @@
     [
      1.259,
      1123.448
-    ],
-    [
-     1.259,
-     1123.178
-    ],
-    [
-     1.257,
-     1121.936
-    ],
-    [
-     1.26,
-     1122.677
-    ],
-    [
-     1.264,
-     1122.805
-    ],
-    [
-     1.266,
-     1123.075
-    ],
-    [
-     1.267,
-     1123.18
     ]
    ]
   },
@@ -37037,8 +37017,8 @@
      "ref_stage": 12
     }
    ],
-   "seconds": 1.7,
-   "run": "3946c4f3de38",
+   "seconds": 2.7,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.432,
@@ -38470,9 +38450,10 @@
      "ref_stage": 39
     }
    ],
-   "seconds": 81.2,
+   "seconds": 82.3,
    "carried_from": 38,
-   "run": "3946c4f3de38",
+   "ending": "as Response-2000's does: its solve gives up, and r2c's own solve finds no state beyond either",
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.432,
@@ -39825,9 +39806,10 @@
      "ref_stage": 48
     }
    ],
-   "seconds": 126.4,
+   "seconds": 126.3,
    "carried_from": 48,
-   "run": "3946c4f3de38",
+   "ending": "as Response-2000's does: its solve gives up, and r2c's own solve finds no state beyond either",
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.432,
@@ -41271,8 +41253,8 @@
      "ref_stage": 30
     }
    ],
-   "seconds": 2.2,
-   "run": "3946c4f3de38",
+   "seconds": 2.0,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.769,
@@ -43032,9 +43014,10 @@
      "ref_stage": 42
     }
    ],
-   "seconds": 115.0,
+   "seconds": 112.3,
    "carried_from": 42,
-   "run": "3946c4f3de38",
+   "ending": "as Response-2000's does: its solve gives up, and r2c's own solve finds no state beyond either",
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.769,
@@ -44093,9 +44076,10 @@
      "ref_stage": 50
     }
    ],
-   "seconds": 83.7,
+   "seconds": 92.4,
    "carried_from": 52,
-   "run": "3946c4f3de38",
+   "ending": "as Response-2000's does: its solve gives up, and r2c's own solve finds no state beyond either",
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.769,
@@ -45555,8 +45539,8 @@
      "ref_stage": 63
     }
    ],
-   "seconds": 2.5,
-   "run": "3946c4f3de38",
+   "seconds": 2.6,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.665,
@@ -47024,9 +47008,10 @@
      "ref_stage": 50
     }
    ],
-   "seconds": 58.3,
+   "seconds": 50.2,
    "carried_from": 46,
-   "run": "3946c4f3de38",
+   "response_last": 45,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.665,
@@ -48418,9 +48403,10 @@
      "ref_stage": 48
     }
    ],
-   "seconds": 103.0,
+   "seconds": 94.9,
    "carried_from": 48,
-   "run": "3946c4f3de38",
+   "ending": "as Response-2000's does: its solve gives up, and r2c's own solve finds no state beyond either",
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.665,
@@ -48628,8 +48614,8 @@
     "peak-stage": "65"
    },
    "sub": {
-    "stage-count": "91",
-    "peak-stage": "83"
+    "stage-count": "81",
+    "peak-stage": "80"
    },
    "missing_control": [],
    "control": [
@@ -48684,7 +48670,7 @@
    ],
    "upto": {
     "sub_position": 62.07583493965232,
-    "sub_stages": 91
+    "sub_stages": 81
    },
    "views_stages": [
     {
@@ -49510,9 +49496,61 @@
      "ref_stage": 65
     }
    ],
-   "seconds": 88.8,
-   "carried_from": 81,
-   "run": "3946c4f3de38",
+   "uncut": {
+    "control": [
+     {
+      "chart": "shear_gxy",
+      "ref_peak_load": 382.789,
+      "sub_peak_load": 388.537,
+      "ref_peak_x": 11.704,
+      "sub_peak_x": 31.899,
+      "peak_diff_pct": 1.5016105478475061,
+      "curve_max_diff_pct": 0.08462208550620415,
+      "curve_mean_diff_pct": 0.01311670871448106,
+      "shape_ref": [
+       "cracking",
+       "peak",
+       "ends at peak"
+      ],
+      "shape_sub": [
+       "cracking",
+       "peak",
+       "ends at peak"
+      ],
+      "shape_same": true,
+      "floor_pct": 0.0170961607005173,
+      "rising_pct": 0.08462208550620415,
+      "post_peak_pct": 172.55438070531787
+     },
+     {
+      "chart": "moment_phi",
+      "ref_peak_load": 1911.4,
+      "sub_peak_load": 1940.755,
+      "ref_peak_x": 18.479,
+      "sub_peak_x": 32.388,
+      "peak_diff_pct": 1.5357852882703786,
+      "curve_max_diff_pct": 0.03334343515955806,
+      "curve_mean_diff_pct": 0.003184200448692378,
+      "shape_ref": [
+       "cracking",
+       "peak",
+       "ends at peak"
+      ],
+      "shape_sub": [
+       "cracking",
+       "peak",
+       "ends at peak"
+      ],
+      "shape_same": true,
+      "floor_pct": 0.010823602271984152,
+      "rising_pct": 0.03334343515955806,
+      "post_peak_pct": 75.28489089496709
+     }
+    ]
+   },
+   "seconds": 42.4,
+   "ending": "as Response-2000's does: it refuses a state whose web is crushing with the load still rising, and no smaller step is solved",
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.665,
@@ -49837,46 +49875,6 @@
     [
      32.388,
      1940.755
-    ],
-    [
-     32.896,
-     1942.589
-    ],
-    [
-     33.133,
-     1943.42
-    ],
-    [
-     33.347,
-     1943.79
-    ],
-    [
-     33.57,
-     1943.617
-    ],
-    [
-     33.567,
-     1943.561
-    ],
-    [
-     33.56,
-     1943.101
-    ],
-    [
-     33.577,
-     1943.736
-    ],
-    [
-     33.581,
-     1943.033
-    ],
-    [
-     33.565,
-     1941.787
-    ],
-    [
-     33.538,
-     1937.853
     ]
    ]
   },
@@ -50770,9 +50768,10 @@
      "ref_stage": 14
     }
    ],
-   "seconds": 29.6,
+   "seconds": 28.9,
    "carried_from": 27,
-   "run": "3946c4f3de38",
+   "ending": "as Response-2000's does: its solve gives up, and r2c's own solve finds no state beyond either",
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.665,
@@ -52133,7 +52132,7 @@
     }
    ],
    "seconds": 2.0,
-   "run": "3946c4f3de38",
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.556,
@@ -53308,9 +53307,10 @@
      "ref_stage": 6
     }
    ],
-   "seconds": 125.3,
+   "seconds": 113.8,
    "carried_from": 32,
-   "run": "3946c4f3de38",
+   "ending": "as Response-2000's does: its solve gives up, and r2c's own solve finds no state beyond either",
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.665,
@@ -54689,8 +54689,8 @@
      "ref_stage": 50
     }
    ],
-   "seconds": 4.3,
-   "run": "3946c4f3de38",
+   "seconds": 3.5,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -7.284,
@@ -54938,18 +54938,18 @@
     "peak-stage": "146"
    },
    "sub": {
-    "stage-count": "149",
-    "peak-stage": "147"
+    "stage-count": "146",
+    "peak-stage": "145"
    },
    "missing_control": [],
    "control": [
     {
      "chart": "shear_gxy",
      "ref_peak_load": 114.717,
-     "sub_peak_load": 114.878,
+     "sub_peak_load": 114.752,
      "ref_peak_x": 17.156,
-     "sub_peak_x": 17.722,
-     "peak_diff_pct": 0.14034537165372296,
+     "sub_peak_x": 17.368,
+     "peak_diff_pct": 0.03050986340298002,
      "curve_max_diff_pct": 0.08994197644135218,
      "curve_mean_diff_pct": 0.003793063679443537,
      "shape_ref": [
@@ -54960,20 +54960,20 @@
      "shape_sub": [
       "cracking",
       "peak",
-      "ends standing still"
+      "ends at peak"
      ],
-     "shape_same": true,
+     "shape_same": false,
      "floor_pct": 0.011785357275673349,
      "rising_pct": 0.08994182735222651,
-     "post_peak_pct": 3.8122743855212047
+     "post_peak_pct": 1.2244708390872443
     },
     {
      "chart": "moment_phi",
      "ref_peak_load": 286.715,
-     "sub_peak_load": 287.194,
+     "sub_peak_load": 286.868,
      "ref_peak_x": 79.033,
-     "sub_peak_x": 80.533,
-     "peak_diff_pct": 0.1670648553441717,
+     "sub_peak_x": 79.518,
+     "peak_diff_pct": 0.0533630957571177,
      "curve_max_diff_pct": 0.020298388988052397,
      "curve_mean_diff_pct": 0.0005760399004882373,
      "shape_ref": [
@@ -54984,12 +54984,12 @@
      "shape_sub": [
       "cracking",
       "peak",
-      "ends standing still"
+      "ends at peak"
      ],
-     "shape_same": true,
+     "shape_same": false,
      "floor_pct": 0.002622902905060787,
      "rising_pct": 0.020298143514692762,
-     "post_peak_pct": 1.910598234291703
+     "post_peak_pct": 0.5330290608396417
     }
    ],
    "views_stages": [
@@ -56144,9 +56144,9 @@
      "ref_stage": 146
     }
    ],
-   "seconds": 72.9,
-   "carried_from": 146,
-   "run": "3946c4f3de38",
+   "seconds": 48.3,
+   "ending": "as Response-2000's does: it refuses a state whose web is crushing with the load still rising, and no smaller step is solved",
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -56731,18 +56731,6 @@
     [
      79.518,
      286.868
-    ],
-    [
-     80.203,
-     287.021
-    ],
-    [
-     80.533,
-     287.194
-    ],
-    [
-     80.605,
-     287.167
     ]
    ]
   },
@@ -57991,8 +57979,8 @@
      "ref_stage": 61
     }
    ],
-   "seconds": 3.6,
-   "run": "3946c4f3de38",
+   "seconds": 3.7,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      0.0,
@@ -59168,8 +59156,8 @@
      "ref_stage": 64
     }
    ],
-   "seconds": 3.1,
-   "run": "3946c4f3de38",
+   "seconds": 4.4,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -60374,8 +60362,8 @@
      "ref_stage": 7
     }
    ],
-   "seconds": 4.1,
-   "run": "3946c4f3de38",
+   "seconds": 4.6,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -61878,8 +61866,60 @@
      "ref_stage": 59
     }
    ],
-   "seconds": 35.1,
-   "run": "3946c4f3de38",
+   "uncut": {
+    "control": [
+     {
+      "chart": "shear_gxy",
+      "ref_peak_load": 251.031,
+      "sub_peak_load": 266.682,
+      "ref_peak_x": 11.809,
+      "sub_peak_x": 33.631,
+      "peak_diff_pct": 6.2346881460855474,
+      "curve_max_diff_pct": 0.17111155145639134,
+      "curve_mean_diff_pct": 0.006827849836646607,
+      "shape_ref": [
+       "cracking",
+       "peak",
+       "ends standing still"
+      ],
+      "shape_sub": [
+       "cracking",
+       "peak",
+       "ends at peak"
+      ],
+      "shape_same": false,
+      "floor_pct": 0.016093027710511135,
+      "rising_pct": 0.1711114278375044,
+      "post_peak_pct": 170.39964899391208
+     },
+     {
+      "chart": "moment_phi",
+      "ref_peak_load": 753.134,
+      "sub_peak_load": 799.976,
+      "ref_peak_x": 41.957,
+      "sub_peak_x": 84.305,
+      "peak_diff_pct": 6.219610321669183,
+      "curve_max_diff_pct": 0.23431992683831215,
+      "curve_mean_diff_pct": 0.004141533052813808,
+      "shape_ref": [
+       "cracking",
+       "peak",
+       "ends standing still"
+      ],
+      "shape_sub": [
+       "cracking",
+       "peak",
+       "ends at peak"
+      ],
+      "shape_same": false,
+      "floor_pct": 0.004732572777456231,
+      "rising_pct": 0.23431960321416861,
+      "post_peak_pct": 99.37708276266386
+     }
+    ]
+   },
+   "seconds": 32.2,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -63377,9 +63417,10 @@
      "ref_stage": 37
     }
    ],
-   "seconds": 106.9,
+   "seconds": 111.3,
    "carried_from": 41,
-   "run": "3946c4f3de38",
+   "ending": "as Response-2000's does: its solve gives up, and r2c's own solve finds no state beyond either",
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -64778,7 +64819,7 @@
     }
    ],
    "seconds": 1.2,
-   "run": "3946c4f3de38",
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -66255,7 +66296,7 @@
     }
    ],
    "seconds": 0.7,
-   "run": "3946c4f3de38",
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.653,
@@ -67715,8 +67756,8 @@
      "ref_stage": 14
     }
    ],
-   "seconds": 1.0,
-   "run": "3946c4f3de38",
+   "seconds": 1.2,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.495,
@@ -69162,8 +69203,8 @@
      "ref_stage": 47
     }
    ],
-   "seconds": 1.8,
-   "run": "3946c4f3de38",
+   "seconds": 1.9,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      0.429,
@@ -70574,8 +70615,8 @@
      "ref_stage": 48
     }
    ],
-   "seconds": 1.6,
-   "run": "3946c4f3de38",
+   "seconds": 1.5,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -72014,8 +72055,8 @@
      "ref_stage": 54
     }
    ],
-   "seconds": 1.0,
-   "run": "3946c4f3de38",
+   "seconds": 1.6,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      0.027,
@@ -73780,8 +73821,8 @@
      "ref_stage": 9
     }
    ],
-   "seconds": 2.0,
-   "run": "3946c4f3de38",
+   "seconds": 1.5,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -75275,7 +75316,7 @@
     }
    ],
    "seconds": 1.1,
-   "run": "3946c4f3de38",
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -76695,9 +76736,10 @@
      "ref_stage": 36
     }
    ],
-   "seconds": 64.4,
+   "seconds": 64.1,
    "carried_from": 39,
-   "run": "3946c4f3de38",
+   "ending": "as Response-2000's does: its solve gives up, and r2c's own solve finds no state beyond either",
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -78084,8 +78126,8 @@
      "ref_stage": 56
     }
    ],
-   "seconds": 1.4,
-   "run": "3946c4f3de38",
+   "seconds": 1.8,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -79544,8 +79586,8 @@
      "ref_stage": 56
     }
    ],
-   "seconds": 1.9,
-   "run": "3946c4f3de38",
+   "seconds": 1.6,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -81026,7 +81068,7 @@
     }
    ],
    "seconds": 1.1,
-   "run": "3946c4f3de38",
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -82504,7 +82546,7 @@
     }
    ],
    "seconds": 1.1,
-   "run": "3946c4f3de38",
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -83982,9 +84024,62 @@
      "ref_stage": 61
     }
    ],
-   "seconds": 117.5,
+   "uncut": {
+    "control": [
+     {
+      "chart": "shear_gxy",
+      "ref_peak_load": 385.917,
+      "sub_peak_load": 402.63,
+      "ref_peak_x": 18.073,
+      "sub_peak_x": 31.003,
+      "peak_diff_pct": 4.3307239639611685,
+      "curve_max_diff_pct": 0.48582168227518824,
+      "curve_mean_diff_pct": 0.04269541202275559,
+      "shape_ref": [
+       "cracking",
+       "peak",
+       "ends standing still"
+      ],
+      "shape_sub": [
+       "cracking",
+       "peak",
+       "ends standing still"
+      ],
+      "shape_same": true,
+      "floor_pct": 0.011076525216335762,
+      "rising_pct": 0.4858205578789577,
+      "post_peak_pct": 76.55657319858248
+     },
+     {
+      "chart": "moment_phi",
+      "ref_peak_load": 578.937,
+      "sub_peak_load": 604.281,
+      "ref_peak_x": 22.653,
+      "sub_peak_x": 34.378,
+      "peak_diff_pct": 4.37767840024043,
+      "curve_max_diff_pct": 0.5690963398901986,
+      "curve_mean_diff_pct": 0.0345161405073981,
+      "shape_ref": [
+       "cracking",
+       "peak",
+       "ends standing still"
+      ],
+      "shape_sub": [
+       "cracking",
+       "peak",
+       "ends standing still"
+      ],
+      "shape_same": true,
+      "floor_pct": 0.008835608804704922,
+      "rising_pct": 0.5690963398901986,
+      "post_peak_pct": 53.56943708032736
+     }
+    ]
+   },
+   "seconds": 129.1,
    "carried_from": 74,
-   "run": "3946c4f3de38",
+   "ending": "as Response-2000's does: its solve gives up, and r2c's own solve finds no state beyond either",
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -85523,8 +85618,8 @@
      "ref_stage": 52
     }
    ],
-   "seconds": 0.9,
-   "run": "3946c4f3de38",
+   "seconds": 0.8,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      0.031,
@@ -87290,8 +87385,8 @@
      "ref_stage": 12
     }
    ],
-   "seconds": 1.2,
-   "run": "3946c4f3de38",
+   "seconds": 1.1,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -88708,8 +88803,8 @@
      "ref_stage": 54
     }
    ],
-   "seconds": 1.4,
-   "run": "3946c4f3de38",
+   "seconds": 1.2,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -90181,8 +90276,8 @@
      "ref_stage": 15
     }
    ],
-   "seconds": 1.0,
-   "run": "3946c4f3de38",
+   "seconds": 0.9,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -91597,9 +91692,10 @@
      "ref_stage": 41
     }
    ],
-   "seconds": 52.4,
+   "seconds": 49.6,
    "carried_from": 48,
-   "run": "3946c4f3de38",
+   "ending": "as Response-2000's does: its solve gives up, and r2c's own solve finds no state beyond either",
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -93043,8 +93139,8 @@
      "ref_stage": 20
     }
    ],
-   "seconds": 1.5,
-   "run": "3946c4f3de38",
+   "seconds": 1.0,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -94182,9 +94278,62 @@
      "ref_stage": 67
     }
    ],
-   "seconds": 94.5,
+   "uncut": {
+    "control": [
+     {
+      "chart": "shear_gxy",
+      "ref_peak_load": 122.088,
+      "sub_peak_load": 124.275,
+      "ref_peak_x": 18.841,
+      "sub_peak_x": 23.847,
+      "peak_diff_pct": 1.7913308433261352,
+      "curve_max_diff_pct": 0.07812493418803504,
+      "curve_mean_diff_pct": 0.009840526017999063,
+      "shape_ref": [
+       "cracking",
+       "peak",
+       "ends at peak"
+      ],
+      "shape_sub": [
+       "cracking",
+       "peak",
+       "ends standing still"
+      ],
+      "shape_same": false,
+      "floor_pct": 0.01074080723124095,
+      "rising_pct": 0.07812493418803504,
+      "post_peak_pct": 27.280135866704015
+     },
+     {
+      "chart": "moment_phi",
+      "ref_peak_load": 305.245,
+      "sub_peak_load": 310.445,
+      "ref_peak_x": 41.541,
+      "sub_peak_x": 52.371,
+      "peak_diff_pct": 1.703549607692178,
+      "curve_max_diff_pct": 0.02696212640721929,
+      "curve_mean_diff_pct": 0.001828341565168496,
+      "shape_ref": [
+       "cracking",
+       "peak",
+       "ends at peak"
+      ],
+      "shape_sub": [
+       "cracking",
+       "peak",
+       "ends standing still"
+      ],
+      "shape_same": false,
+      "floor_pct": 0.0048589001341387515,
+      "rising_pct": 0.02696212640721929,
+      "post_peak_pct": 26.285675979429662
+     }
+    ]
+   },
+   "seconds": 96.6,
    "carried_from": 68,
-   "run": "3946c4f3de38",
+   "response_last": 67,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -95665,9 +95814,10 @@
      "ref_stage": 35
     }
    ],
-   "seconds": 63.8,
+   "seconds": 64.5,
    "carried_from": 42,
-   "run": "3946c4f3de38",
+   "ending": "as Response-2000's does: its solve gives up, and r2c's own solve finds no state beyond either",
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -97084,8 +97234,8 @@
      "ref_stage": 11
     }
    ],
-   "seconds": 1.8,
-   "run": "3946c4f3de38",
+   "seconds": 1.1,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -98574,8 +98724,8 @@
      "ref_stage": 14
     }
    ],
-   "seconds": 1.1,
-   "run": "3946c4f3de38",
+   "seconds": 1.8,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -100022,9 +100172,68 @@
      "ref_stage": 47
     }
    ],
-   "seconds": 111.8,
+   "uncut": {
+    "control": [
+     {
+      "chart": "shear_gxy",
+      "ref_peak_load": 127.075,
+      "sub_peak_load": 159.083,
+      "ref_peak_x": 1.253,
+      "sub_peak_x": 32.639,
+      "peak_diff_pct": 25.18827464096006,
+      "curve_max_diff_pct": 0.23599092742512873,
+      "curve_mean_diff_pct": 0.06484874477428412,
+      "shape_ref": [
+       "cracking",
+       "peak",
+       "ends falling"
+      ],
+      "shape_sub": [
+       "cracking",
+       "fall",
+       "fall",
+       "fall",
+       "fall",
+       "peak",
+       "ends standing still"
+      ],
+      "shape_same": false,
+      "floor_pct": 0.07458782247239193,
+      "rising_pct": 0.17257866505322325,
+      "post_peak_pct": 1211.184841442054
+     },
+     {
+      "chart": "moment_phi",
+      "ref_peak_load": 254.18,
+      "sub_peak_load": 318.166,
+      "ref_peak_x": 4.68,
+      "sub_peak_x": 57.602,
+      "peak_diff_pct": 25.17349909512943,
+      "curve_max_diff_pct": 0.00495695477070342,
+      "curve_mean_diff_pct": 0.000165231825690114,
+      "shape_ref": [
+       "cracking",
+       "peak",
+       "ends falling"
+      ],
+      "shape_sub": [
+       "cracking",
+       "fall",
+       "fall",
+       "peak",
+       "ends standing still"
+      ],
+      "shape_same": false,
+      "floor_pct": 0.03870020331653379,
+      "rising_pct": 0.0047620481739716,
+      "post_peak_pct": 1080.7780689551566
+     }
+    ]
+   },
+   "seconds": 104.6,
    "carried_from": 47,
-   "run": "3946c4f3de38",
+   "response_last": 46,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -101609,8 +101818,8 @@
      "ref_stage": 14
     }
    ],
-   "seconds": 1.1,
-   "run": "3946c4f3de38",
+   "seconds": 1.7,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -103110,8 +103319,8 @@
      "ref_stage": 11
     }
    ],
-   "seconds": 1.5,
-   "run": "3946c4f3de38",
+   "seconds": 1.1,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -104549,9 +104758,62 @@
      "ref_stage": 33
     }
    ],
-   "seconds": 194.9,
+   "uncut": {
+    "control": [
+     {
+      "chart": "shear_gxy",
+      "ref_peak_load": 127.285,
+      "sub_peak_load": 165.366,
+      "ref_peak_x": 1.453,
+      "sub_peak_x": 36.552,
+      "peak_diff_pct": 29.917900773853965,
+      "curve_max_diff_pct": 0.24456084733053868,
+      "curve_mean_diff_pct": 0.06649205518516972,
+      "shape_ref": [
+       "cracking",
+       "peak",
+       "ends standing still"
+      ],
+      "shape_sub": [
+       "cracking",
+       "peak",
+       "ends standing still"
+      ],
+      "shape_same": true,
+      "floor_pct": 0.07708730634403185,
+      "rising_pct": 0.19553816542627836,
+      "post_peak_pct": 1420.9625662731669
+     },
+     {
+      "chart": "moment_phi",
+      "ref_peak_load": 254.655,
+      "sub_peak_load": 330.731,
+      "ref_peak_x": 4.68,
+      "sub_peak_x": 63.872,
+      "peak_diff_pct": 29.87414344897999,
+      "curve_max_diff_pct": 0.0,
+      "curve_mean_diff_pct": 0.0,
+      "shape_ref": [
+       "cracking",
+       "peak",
+       "ends standing still"
+      ],
+      "shape_sub": [
+       "cracking",
+       "peak",
+       "ends standing still"
+      ],
+      "shape_same": true,
+      "floor_pct": 0.03910092971841243,
+      "rising_pct": 0.0,
+      "post_peak_pct": 1223.5582163089978
+     }
+    ]
+   },
+   "seconds": 185.4,
    "carried_from": 34,
-   "run": "3946c4f3de38",
+   "response_last": 33,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -106442,8 +106704,8 @@
      "ref_stage": 9
     }
    ],
-   "seconds": 1.5,
-   "run": "3946c4f3de38",
+   "seconds": 1.9,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -107942,8 +108204,8 @@
      "ref_stage": 12
     }
    ],
-   "seconds": 1.7,
-   "run": "3946c4f3de38",
+   "seconds": 2.2,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -109398,9 +109660,62 @@
      "ref_stage": 70
     }
    ],
-   "seconds": 167.0,
+   "uncut": {
+    "control": [
+     {
+      "chart": "shear_gxy",
+      "ref_peak_load": 118.781,
+      "sub_peak_load": 118.867,
+      "ref_peak_x": 26.724,
+      "sub_peak_x": 28.348,
+      "peak_diff_pct": 0.07240215185930285,
+      "curve_max_diff_pct": 0.1179967608876808,
+      "curve_mean_diff_pct": 0.015083569802431944,
+      "shape_ref": [
+       "cracking",
+       "peak",
+       "ends standing still"
+      ],
+      "shape_sub": [
+       "cracking",
+       "peak",
+       "ends falling"
+      ],
+      "shape_same": false,
+      "floor_pct": 0.007425134637763462,
+      "rising_pct": 0.19693903129218798,
+      "post_peak_pct": 22.201037828886744
+     },
+     {
+      "chart": "moment_phi",
+      "ref_peak_load": 356.537,
+      "sub_peak_load": 356.503,
+      "ref_peak_x": 63.042,
+      "sub_peak_x": 64.14,
+      "peak_diff_pct": -0.009536177170950509,
+      "curve_max_diff_pct": 0.09972411811072479,
+      "curve_mean_diff_pct": 0.006015610892843796,
+      "shape_ref": [
+       "cracking",
+       "peak",
+       "ends standing still"
+      ],
+      "shape_sub": [
+       "cracking",
+       "peak",
+       "ends falling"
+      ],
+      "shape_same": false,
+      "floor_pct": 0.003221699545831441,
+      "rising_pct": 0.09972411811072479,
+      "post_peak_pct": 22.579536451997193
+     }
+    ]
+   },
+   "seconds": 165.6,
    "carried_from": 68,
-   "run": "3946c4f3de38",
+   "response_last": 67,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -110883,9 +111198,10 @@
      "ref_stage": 31
     }
    ],
-   "seconds": 95.5,
+   "seconds": 95.1,
    "carried_from": 37,
-   "run": "3946c4f3de38",
+   "response_last": 36,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -112290,7 +112606,7 @@
     }
    ],
    "seconds": 1.6,
-   "run": "3946c4f3de38",
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -113738,8 +114054,8 @@
      "ref_stage": 60
     }
    ],
-   "seconds": 1.1,
-   "run": "3946c4f3de38",
+   "seconds": 1.8,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -115235,8 +115551,8 @@
      "ref_stage": 16
     }
    ],
-   "seconds": 1.1,
-   "run": "3946c4f3de38",
+   "seconds": 1.7,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -117042,8 +117358,8 @@
      "ref_stage": 13
     }
    ],
-   "seconds": 1.5,
-   "run": "3946c4f3de38",
+   "seconds": 2.5,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -118555,8 +118871,8 @@
      "ref_stage": 47
     }
    ],
-   "seconds": 1.2,
-   "run": "3946c4f3de38",
+   "seconds": 1.6,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -120037,9 +120353,62 @@
      "ref_stage": 36
     }
    ],
-   "seconds": 29.6,
+   "uncut": {
+    "control": [
+     {
+      "chart": "shear_gxy",
+      "ref_peak_load": 184.423,
+      "sub_peak_load": 184.423,
+      "ref_peak_x": 2.756,
+      "sub_peak_x": 2.756,
+      "peak_diff_pct": 0.0,
+      "curve_max_diff_pct": 0.13289192759166946,
+      "curve_mean_diff_pct": 0.035132255529946824,
+      "shape_ref": [
+       "cracking",
+       "peak",
+       "ends standing still"
+      ],
+      "shape_sub": [
+       "cracking",
+       "peak",
+       "ends falling"
+      ],
+      "shape_same": false,
+      "floor_pct": 0.047004992825826576,
+      "rising_pct": 1.1527829788485697,
+      "post_peak_pct": 0.2107054921146238
+     },
+     {
+      "chart": "moment_phi",
+      "ref_peak_load": 368.961,
+      "sub_peak_load": 368.919,
+      "ref_peak_x": 7.682,
+      "sub_peak_x": 7.537,
+      "peak_diff_pct": -0.011383316935944453,
+      "curve_max_diff_pct": 0.29337432704420036,
+      "curve_mean_diff_pct": 0.007939695189544913,
+      "shape_ref": [
+       "cracking",
+       "peak",
+       "ends standing still"
+      ],
+      "shape_sub": [
+       "cracking",
+       "peak",
+       "ends falling"
+      ],
+      "shape_same": false,
+      "floor_pct": 0.025197920839258005,
+      "rising_pct": 0.2931516539773968,
+      "post_peak_pct": 0.05247057726041792
+     }
+    ]
+   },
+   "seconds": 33.0,
    "carried_from": 52,
-   "run": "3946c4f3de38",
+   "response_last": 51,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -121455,9 +121824,10 @@
      "ref_stage": 39
     }
    ],
-   "seconds": 62.8,
+   "seconds": 70.1,
    "carried_from": 44,
-   "run": "3946c4f3de38",
+   "ending": "as Response-2000's does: its solve gives up, and r2c's own solve finds no state beyond either",
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -122880,7 +123250,7 @@
     }
    ],
    "seconds": 0.9,
-   "run": "3946c4f3de38",
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -124326,7 +124696,7 @@
     }
    ],
    "seconds": 1.2,
-   "run": "3946c4f3de38",
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -124606,18 +124976,18 @@
     "peak-stage": "134"
    },
    "sub": {
-    "stage-count": "146",
-    "peak-stage": "144"
+    "stage-count": "144",
+    "peak-stage": "143"
    },
    "missing_control": [],
    "control": [
     {
      "chart": "shear_gxy",
      "ref_peak_load": 92.43,
-     "sub_peak_load": 92.24275815120266,
+     "sub_peak_load": 94.109,
      "ref_peak_x": 19.073,
-     "sub_peak_x": 19.264337001603156,
-     "peak_diff_pct": -0.20257692177576755,
+     "sub_peak_x": 27.299,
+     "peak_diff_pct": 1.8165097911933221,
      "curve_max_diff_pct": 0.23257718362074417,
      "curve_mean_diff_pct": 0.018188266247082894,
      "shape_ref": [
@@ -124635,17 +125005,17 @@
      "shape_same": true,
      "floor_pct": 0.010706950958218697,
      "rising_pct": 0.23257718362074417,
-     "post_peak_pct": 1.0234317627856637
+     "post_peak_pct": 43.16726752356307
     },
     {
      "chart": "moment_phi",
      "ref_peak_load": -184.724,
-     "sub_peak_load": -184.5374011363114,
+     "sub_peak_load": -188.224,
      "ref_peak_x": -52.415,
-     "sub_peak_x": -52.418054051316396,
-     "peak_diff_pct": -0.10101495403336956,
-     "curve_max_diff_pct": 0.10118285957297277,
-     "curve_mean_diff_pct": 0.00764153895336385,
+     "sub_peak_x": -68.127,
+     "peak_diff_pct": 1.8947186072194193,
+     "curve_max_diff_pct": 0.10118285957296169,
+     "curve_mean_diff_pct": 0.007641538953363688,
      "shape_ref": [
       "fall",
       "cracking",
@@ -124660,14 +125030,10 @@
      ],
      "shape_same": true,
      "floor_pct": 0.003966334601695977,
-     "rising_pct": 0.10118285957297277,
-     "post_peak_pct": 0.0
+     "rising_pct": 0.1013191901638939,
+     "post_peak_pct": 30.035972420242018
     }
    ],
-   "upto": {
-    "sub_position": 130.99769667812072,
-    "sub_stages": 146
-   },
    "views_stages": [
     {
      "ref_stage": 8,
@@ -125793,9 +126159,9 @@
      "ref_stage": 134
     }
    ],
-   "seconds": 80.0,
-   "carried_from": 144,
-   "run": "3946c4f3de38",
+   "seconds": 69.6,
+   "ending": "as Response-2000's does: it refuses a state whose web is crushing with the load still rising, and no smaller step is solved",
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -126372,14 +126738,6 @@
     [
      -68.127,
      -188.224
-    ],
-    [
-     -74.362,
-     -189.85
-    ],
-    [
-     -72.325,
-     -89.151
     ]
    ]
   },
@@ -127613,8 +127971,8 @@
      "ref_stage": 53
     }
    ],
-   "seconds": 1.1,
-   "run": "3946c4f3de38",
+   "seconds": 1.6,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -128757,8 +129115,8 @@
      "ref_stage": 63
     }
    ],
-   "seconds": 1.3,
-   "run": "3946c4f3de38",
+   "seconds": 1.9,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -130263,8 +130621,8 @@
      "ref_stage": 56
     }
    ],
-   "seconds": 1.5,
-   "run": "3946c4f3de38",
+   "seconds": 1.7,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -131705,9 +132063,10 @@
      "ref_stage": 37
     }
    ],
-   "seconds": 78.0,
+   "seconds": 81.6,
    "carried_from": 40,
-   "run": "3946c4f3de38",
+   "ending": "as Response-2000's does: its solve gives up, and r2c's own solve finds no state beyond either",
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -133428,7 +133787,7 @@
     }
    ],
    "seconds": 2.5,
-   "run": "3946c4f3de38",
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -135231,8 +135590,8 @@
      "ref_stage": 15
     }
    ],
-   "seconds": 3.8,
-   "run": "3946c4f3de38",
+   "seconds": 2.4,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -137073,8 +137432,8 @@
      "ref_stage": 15
     }
    ],
-   "seconds": 3.0,
-   "run": "3946c4f3de38",
+   "seconds": 1.8,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -138612,8 +138971,8 @@
      "ref_stage": 60
     }
    ],
-   "seconds": 1.8,
-   "run": "3946c4f3de38",
+   "seconds": 1.1,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      0.005,
@@ -140420,8 +140779,8 @@
      "ref_stage": 13
     }
    ],
-   "seconds": 1.5,
-   "run": "3946c4f3de38",
+   "seconds": 1.1,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -141934,7 +142293,7 @@
     }
    ],
    "seconds": 1.2,
-   "run": "3946c4f3de38",
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -143719,9 +144078,67 @@
      "ref_stage": 112
     }
    ],
-   "seconds": 77.0,
+   "uncut": {
+    "control": [
+     {
+      "chart": "shear_gxy",
+      "ref_peak_load": 156.199,
+      "sub_peak_load": 156.248,
+      "ref_peak_x": 13.762,
+      "sub_peak_x": 6.769,
+      "peak_diff_pct": 0.031370239246075945,
+      "curve_max_diff_pct": 0.5076809235408695,
+      "curve_mean_diff_pct": 0.0636485380950013,
+      "shape_ref": [
+       "cracking",
+       "fall",
+       "fall",
+       "peak",
+       "ends standing still"
+      ],
+      "shape_sub": [
+       "cracking",
+       "fall",
+       "peak",
+       "ends falling"
+      ],
+      "shape_same": false,
+      "floor_pct": 0.014156431281437629,
+      "rising_pct": 0.5076420654999187,
+      "post_peak_pct": 1035.6894708205868
+     },
+     {
+      "chart": "moment_phi",
+      "ref_peak_load": 156.155,
+      "sub_peak_load": 156.187,
+      "ref_peak_x": 22.384,
+      "sub_peak_x": 20.023,
+      "peak_diff_pct": 0.02049245941533136,
+      "curve_max_diff_pct": 0.1677603760205704,
+      "curve_mean_diff_pct": 0.02812465416216495,
+      "shape_ref": [
+       "cracking",
+       "fall",
+       "peak",
+       "ends standing still"
+      ],
+      "shape_sub": [
+       "cracking",
+       "fall",
+       "peak",
+       "ends falling"
+      ],
+      "shape_same": false,
+      "floor_pct": 0.006388696378941375,
+      "rising_pct": 0.18434040274714059,
+      "post_peak_pct": 38.052291625395945
+     }
+    ]
+   },
+   "seconds": 76.3,
    "carried_from": 117,
-   "run": "3946c4f3de38",
+   "response_last": 116,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -146061,8 +146478,8 @@
      "ref_stage": 13
     }
    ],
-   "seconds": 2.1,
-   "run": "3946c4f3de38",
+   "seconds": 1.7,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -147614,8 +148031,8 @@
      "ref_stage": 224
     }
    ],
-   "seconds": 6.2,
-   "run": "3946c4f3de38",
+   "seconds": 5.4,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -149779,8 +150196,8 @@
      "ref_stage": 323
     }
    ],
-   "seconds": 7.0,
-   "run": "3946c4f3de38",
+   "seconds": 7.1,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -152340,8 +152757,8 @@
      "ref_stage": 56
     }
    ],
-   "seconds": 1.1,
-   "run": "3946c4f3de38",
+   "seconds": 1.7,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -154092,9 +154509,10 @@
      "ref_stage": 55
     }
    ],
-   "seconds": 144.3,
+   "seconds": 145.0,
    "carried_from": 59,
-   "run": "3946c4f3de38",
+   "ending": "as Response-2000's does: its solve gives up, and r2c's own solve finds no state beyond either",
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -155548,9 +155966,10 @@
      "ref_stage": 14
     }
    ],
-   "seconds": 90.6,
+   "seconds": 86.2,
    "carried_from": 52,
-   "run": "3946c4f3de38",
+   "ending": "as Response-2000's does: its solve gives up, and r2c's own solve finds no state beyond either",
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.999,
@@ -156966,9 +157385,62 @@
      "ref_stage": 37
     }
    ],
-   "seconds": 124.6,
+   "uncut": {
+    "control": [
+     {
+      "chart": "shear_gxy",
+      "ref_peak_load": 104.135,
+      "sub_peak_load": 125.782,
+      "ref_peak_x": 1.567,
+      "sub_peak_x": 26.303,
+      "peak_diff_pct": 20.787439381571986,
+      "curve_max_diff_pct": 0.22309378781917516,
+      "curve_mean_diff_pct": 0.049637028804618864,
+      "shape_ref": [
+       "cracking",
+       "peak",
+       "ends standing still"
+      ],
+      "shape_sub": [
+       "cracking",
+       "peak",
+       "ends at peak"
+      ],
+      "shape_same": false,
+      "floor_pct": 0.09330335111780226,
+      "rising_pct": 12.977655866273208,
+      "post_peak_pct": 1127.0201312178112
+     },
+     {
+      "chart": "moment_phi",
+      "ref_peak_load": 260.395,
+      "sub_peak_load": 314.46,
+      "ref_peak_x": 5.148,
+      "sub_peak_x": 56.959,
+      "peak_diff_pct": 20.762687455596307,
+      "curve_max_diff_pct": 0.0,
+      "curve_mean_diff_pct": 0.0,
+      "shape_ref": [
+       "cracking",
+       "peak",
+       "ends standing still"
+      ],
+      "shape_sub": [
+       "cracking",
+       "peak",
+       "ends standing still"
+      ],
+      "shape_same": true,
+      "floor_pct": 0.037335262126669946,
+      "rising_pct": 0.0,
+      "post_peak_pct": 964.2695435613774
+     }
+    ]
+   },
+   "seconds": 112.1,
    "carried_from": 38,
-   "run": "3946c4f3de38",
+   "response_last": 37,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -158513,9 +158985,62 @@
      "ref_stage": 86
     }
    ],
-   "seconds": 61.6,
+   "uncut": {
+    "control": [
+     {
+      "chart": "shear_gxy",
+      "ref_peak_load": 148.89,
+      "sub_peak_load": 152.669,
+      "ref_peak_x": 21.0,
+      "sub_peak_x": 29.412,
+      "peak_diff_pct": 2.5381153871986197,
+      "curve_max_diff_pct": 0.16081677318834392,
+      "curve_mean_diff_pct": 0.04235916879190954,
+      "shape_ref": [
+       "cracking",
+       "peak",
+       "ends at peak"
+      ],
+      "shape_sub": [
+       "cracking",
+       "peak",
+       "ends standing still"
+      ],
+      "shape_same": false,
+      "floor_pct": 0.00961807318003526,
+      "rising_pct": 0.16081677318834392,
+      "post_peak_pct": 40.62190268629141
+     },
+     {
+      "chart": "moment_phi",
+      "ref_peak_load": 297.68,
+      "sub_peak_load": 305.339,
+      "ref_peak_x": 38.977,
+      "sub_peak_x": 52.416,
+      "peak_diff_pct": 2.572897070679922,
+      "curve_max_diff_pct": 0.05120301808572668,
+      "curve_mean_diff_pct": 0.007397783627159257,
+      "shape_ref": [
+       "cracking",
+       "peak",
+       "ends standing still"
+      ],
+      "shape_sub": [
+       "cracking",
+       "peak",
+       "ends standing still"
+      ],
+      "shape_same": true,
+      "floor_pct": 0.00517502976952123,
+      "rising_pct": 0.05120301808572668,
+      "post_peak_pct": 34.57517174034494
+     }
+    ]
+   },
+   "seconds": 63.9,
    "carried_from": 65,
-   "run": "3946c4f3de38",
+   "response_last": 64,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -158811,10 +159336,10 @@
     {
      "chart": "shear_gxy",
      "ref_peak_load": 79.344,
-     "sub_peak_load": 79.34400128555859,
+     "sub_peak_load": 81.7,
      "ref_peak_x": 5.72,
-     "sub_peak_x": 5.722002195979796,
-     "peak_diff_pct": 1.6202341657395617e-06,
+     "sub_peak_x": 12.838,
+     "peak_diff_pct": 2.9693486590038427,
      "curve_max_diff_pct": 0.08873450464942478,
      "curve_mean_diff_pct": 0.014233176046956187,
      "shape_ref": [
@@ -158825,22 +159350,22 @@
      "shape_sub": [
       "cracking",
       "peak",
-      "ends at peak"
+      "ends falling"
      ],
-     "shape_same": true,
+     "shape_same": false,
      "floor_pct": 0.03505577619712633,
      "rising_pct": 0.08873450464942478,
-     "post_peak_pct": 0.03500342625770229
+     "post_peak_pct": 198.6576455718692
     },
     {
      "chart": "moment_phi",
      "ref_peak_load": 317.537,
-     "sub_peak_load": 317.5360048767863,
+     "sub_peak_load": 326.901,
      "ref_peak_x": 26.019,
-     "sub_peak_x": 26.019005708231195,
-     "peak_diff_pct": -0.0003133881134072605,
+     "sub_peak_x": 46.094,
+     "peak_diff_pct": 2.948947681687499,
      "curve_max_diff_pct": 0.0015697551230076658,
-     "curve_mean_diff_pct": 3.4887092920031044e-05,
+     "curve_mean_diff_pct": 3.4887092920256064e-05,
      "shape_ref": [
       "cracking",
       "peak",
@@ -158849,18 +159374,14 @@
      "shape_sub": [
       "cracking",
       "peak",
-      "ends at peak"
+      "ends falling"
      ],
-     "shape_same": true,
+     "shape_same": false,
      "floor_pct": 0.007712452210499856,
      "rising_pct": 0.0015697551230076658,
-     "post_peak_pct": 0.0
+     "post_peak_pct": 119.92911783297204
     }
    ],
-   "upto": {
-    "sub_position": 62.00000219378601,
-    "sub_stages": 76
-   },
    "views_stages": [
     {
      "ref_stage": 11,
@@ -159688,9 +160209,10 @@
      "ref_stage": 62
     }
    ],
-   "seconds": 124.9,
+   "seconds": 113.7,
    "carried_from": 73,
-   "run": "3946c4f3de38",
+   "response_last": 72,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -161509,9 +162031,10 @@
      "ref_stage": 54
     }
    ],
-   "seconds": 97.6,
+   "seconds": 102.7,
    "carried_from": 53,
-   "run": "3946c4f3de38",
+   "ending": "as Response-2000's does: its solve gives up, and r2c's own solve finds no state beyond either",
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      0.005,
@@ -162976,7 +163499,7 @@
     }
    ],
    "seconds": 1.0,
-   "run": "3946c4f3de38",
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -164099,9 +164622,10 @@
      "ref_stage": 39
     }
    ],
-   "seconds": 46.9,
+   "seconds": 42.7,
    "carried_from": 40,
-   "run": "3946c4f3de38",
+   "response_last": 39,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -165514,7 +166038,7 @@
     }
    ],
    "seconds": 0.8,
-   "run": "3946c4f3de38",
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      0.089,
@@ -166929,9 +167453,10 @@
      "ref_stage": 129
     }
    ],
-   "seconds": 94.2,
+   "seconds": 87.1,
    "carried_from": 44,
-   "run": "3946c4f3de38",
+   "ending": "as Response-2000's does: its solve gives up, and r2c's own solve finds no state beyond either",
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -168671,9 +169196,10 @@
      "ref_stage": 42
     }
    ],
-   "seconds": 76.3,
+   "seconds": 72.9,
    "carried_from": 44,
-   "run": "3946c4f3de38",
+   "ending": "as Response-2000's does: its solve gives up, and r2c's own solve finds no state beyond either",
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -169736,9 +170262,10 @@
      "ref_stage": 42
     }
    ],
-   "seconds": 82.1,
+   "seconds": 91.8,
    "carried_from": 56,
-   "run": "3946c4f3de38",
+   "ending": "as Response-2000's does: its solve gives up, and r2c's own solve finds no state beyond either",
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.234,
@@ -171208,8 +171735,8 @@
      "ref_stage": 16
     }
    ],
-   "seconds": 0.8,
-   "run": "3946c4f3de38",
+   "seconds": 0.7,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      0.174,
@@ -172288,9 +172815,10 @@
      "ref_stage": 44
     }
    ],
-   "seconds": 155.4,
+   "seconds": 153.7,
    "carried_from": 83,
-   "run": "3946c4f3de38",
+   "ending": "as Response-2000's does: its solve gives up, and r2c's own solve finds no state beyond either",
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.07,
@@ -173826,9 +174354,10 @@
      "ref_stage": 52
     }
    ],
-   "seconds": 109.2,
+   "seconds": 112.4,
    "carried_from": 52,
-   "run": "3946c4f3de38",
+   "ending": "as Response-2000's does: its solve gives up, and r2c's own solve finds no state beyond either",
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      0.042,
@@ -174928,9 +175457,10 @@
      "ref_stage": 38
     }
    ],
-   "seconds": 73.1,
+   "seconds": 71.1,
    "carried_from": 52,
-   "run": "3946c4f3de38",
+   "ending": "as Response-2000's does: its solve gives up, and r2c's own solve finds no state beyond either",
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.117,
@@ -176030,9 +176560,10 @@
      "ref_stage": 38
     }
    ],
-   "seconds": 79.4,
+   "seconds": 71.9,
    "carried_from": 52,
-   "run": "3946c4f3de38",
+   "ending": "as Response-2000's does: its solve gives up, and r2c's own solve finds no state beyond either",
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.117,
@@ -177791,8 +178322,8 @@
      "ref_stage": 13
     }
    ],
-   "seconds": 1.4,
-   "run": "3946c4f3de38",
+   "seconds": 1.6,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -179270,7 +179801,7 @@
     }
    ],
    "seconds": 0.7,
-   "run": "3946c4f3de38",
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -180293,9 +180824,10 @@
      "ref_stage": 41
     }
    ],
-   "seconds": 75.3,
+   "seconds": 76.4,
    "carried_from": 41,
-   "run": "3946c4f3de38",
+   "ending": "as Response-2000's does: its solve gives up, and r2c's own solve finds no state beyond either",
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -181687,9 +182219,10 @@
      "ref_stage": 39
     }
    ],
-   "seconds": 58.2,
+   "seconds": 57.4,
    "carried_from": 47,
-   "run": "3946c4f3de38",
+   "ending": "as Response-2000's does: its solve gives up, and r2c's own solve finds no state beyond either",
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      0.042,
@@ -183081,8 +183614,8 @@
      "ref_stage": 34
     }
    ],
-   "seconds": 0.7,
-   "run": "3946c4f3de38",
+   "seconds": 0.8,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      0.0,
@@ -184423,8 +184956,8 @@
      "ref_stage": 29
     }
    ],
-   "seconds": 38.3,
-   "run": "3946c4f3de38",
+   "seconds": 41.2,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -186104,7 +186637,7 @@
     }
    ],
    "seconds": 1.3,
-   "run": "3946c4f3de38",
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.017,
@@ -187628,7 +188161,7 @@
     }
    ],
    "seconds": 4.1,
-   "run": "3946c4f3de38",
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      0.169,
@@ -189063,7 +189596,7 @@
     }
    ],
    "seconds": 1.0,
-   "run": "3946c4f3de38",
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -190844,7 +191377,7 @@
     }
    ],
    "seconds": 1.6,
-   "run": "3946c4f3de38",
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -192639,8 +193172,8 @@
      "ref_stage": 49
     }
    ],
-   "seconds": 0.9,
-   "run": "3946c4f3de38",
+   "seconds": 1.3,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -194371,9 +194904,66 @@
      "ref_stage": 48
     }
    ],
-   "seconds": 16.1,
+   "uncut": {
+    "control": [
+     {
+      "chart": "shear_gxy",
+      "ref_peak_load": 42.041,
+      "sub_peak_load": 42.021,
+      "ref_peak_x": 0.623,
+      "sub_peak_x": 0.464,
+      "peak_diff_pct": -0.0475726076924812,
+      "curve_max_diff_pct": 1.2539049208693076,
+      "curve_mean_diff_pct": 0.3215115869762417,
+      "shape_ref": [
+       "cracking",
+       "fall",
+       "peak",
+       "ends falling"
+      ],
+      "shape_sub": [
+       "cracking",
+       "fall",
+       "peak",
+       "ends falling"
+      ],
+      "shape_same": true,
+      "floor_pct": 0.058638646699935223,
+      "rising_pct": 2.5338800865705022,
+      "post_peak_pct": 63.17013102244455
+     },
+     {
+      "chart": "moment_phi",
+      "ref_peak_load": 84.143,
+      "sub_peak_load": 84.097,
+      "ref_peak_x": 16.477,
+      "sub_peak_x": 16.496,
+      "peak_diff_pct": -0.05466883757413746,
+      "curve_max_diff_pct": 0.1583128338450953,
+      "curve_mean_diff_pct": 0.009899638180026078,
+      "shape_ref": [
+       "fall",
+       "cracking",
+       "peak",
+       "ends falling"
+      ],
+      "shape_sub": [
+       "fall",
+       "cracking",
+       "peak",
+       "ends falling"
+      ],
+      "shape_same": true,
+      "floor_pct": 0.012069972165551966,
+      "rising_pct": 0.5996710108217663,
+      "post_peak_pct": 3.495340067470884
+     }
+    ]
+   },
+   "seconds": 16.0,
    "carried_from": 42,
-   "run": "3946c4f3de38",
+   "response_last": 41,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -196125,8 +196715,8 @@
      "ref_stage": 13
     }
    ],
-   "seconds": 1.1,
-   "run": "3946c4f3de38",
+   "seconds": 1.0,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      0.032,
@@ -197929,8 +198519,8 @@
      "ref_stage": 8
     }
    ],
-   "seconds": 1.7,
-   "run": "3946c4f3de38",
+   "seconds": 2.0,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -199723,7 +200313,7 @@
     }
    ],
    "seconds": 1.5,
-   "run": "3946c4f3de38",
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -201556,8 +202146,8 @@
      "ref_stage": 17
     }
    ],
-   "seconds": 1.5,
-   "run": "3946c4f3de38",
+   "seconds": 2.5,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -203030,9 +203620,10 @@
      "ref_stage": 40
     }
    ],
-   "seconds": 73.8,
+   "seconds": 71.3,
    "carried_from": 44,
-   "run": "3946c4f3de38",
+   "ending": "as Response-2000's does: its solve gives up, and r2c's own solve finds no state beyond either",
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -204455,9 +205046,62 @@
      "ref_stage": 65
     }
    ],
-   "seconds": 233.9,
+   "uncut": {
+    "control": [
+     {
+      "chart": "shear_gxy",
+      "ref_peak_load": 195.726,
+      "sub_peak_load": 202.753,
+      "ref_peak_x": 14.351,
+      "sub_peak_x": 30.266,
+      "peak_diff_pct": 3.590223066940512,
+      "curve_max_diff_pct": 0.10529505976917483,
+      "curve_mean_diff_pct": 0.014864808040119769,
+      "shape_ref": [
+       "cracking",
+       "peak",
+       "ends standing still"
+      ],
+      "shape_sub": [
+       "cracking",
+       "peak",
+       "ends standing still"
+      ],
+      "shape_same": true,
+      "floor_pct": 0.013836596354690442,
+      "rising_pct": 0.10529462341253362,
+      "post_peak_pct": 125.22615861445607
+     },
+     {
+      "chart": "moment_phi",
+      "ref_peak_load": 293.706,
+      "sub_peak_load": 304.167,
+      "ref_peak_x": 33.77,
+      "sub_peak_x": 61.364,
+      "peak_diff_pct": 3.5617249902964034,
+      "curve_max_diff_pct": 0.13980444426373143,
+      "curve_mean_diff_pct": 0.01123081109524726,
+      "shape_ref": [
+       "cracking",
+       "peak",
+       "ends standing still"
+      ],
+      "shape_sub": [
+       "cracking",
+       "peak",
+       "ends standing still"
+      ],
+      "shape_same": true,
+      "floor_pct": 0.0059400837671515945,
+      "rising_pct": 0.13980364879094118,
+      "post_peak_pct": 90.17172367998253
+     }
+    ]
+   },
+   "seconds": 245.6,
    "carried_from": 68,
-   "run": "3946c4f3de38",
+   "ending": "as Response-2000's does: its solve gives up, and r2c's own solve finds no state beyond either",
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -205934,9 +206578,62 @@
      "ref_stage": 59
     }
    ],
-   "seconds": 98.1,
+   "uncut": {
+    "control": [
+     {
+      "chart": "shear_gxy",
+      "ref_peak_load": 107.551,
+      "sub_peak_load": 108.669,
+      "ref_peak_x": 8.52,
+      "sub_peak_x": 11.58,
+      "peak_diff_pct": 1.0395068386160937,
+      "curve_max_diff_pct": 0.06829426167490098,
+      "curve_mean_diff_pct": 0.010308658558426024,
+      "shape_ref": [
+       "cracking",
+       "peak",
+       "ends at peak"
+      ],
+      "shape_sub": [
+       "cracking",
+       "peak",
+       "ends falling"
+      ],
+      "shape_same": false,
+      "floor_pct": 0.02354771964069568,
+      "rising_pct": 0.06829426167490098,
+      "post_peak_pct": 76.71462296499116
+     },
+     {
+      "chart": "moment_phi",
+      "ref_peak_load": 322.61,
+      "sub_peak_load": 326.026,
+      "ref_peak_x": 35.253,
+      "sub_peak_x": 46.094,
+      "peak_diff_pct": 1.0588636434084489,
+      "curve_max_diff_pct": 0.004634176635285916,
+      "curve_mean_diff_pct": 0.000120645825338773,
+      "shape_ref": [
+       "cracking",
+       "peak",
+       "ends standing still"
+      ],
+      "shape_sub": [
+       "cracking",
+       "peak",
+       "ends falling"
+      ],
+      "shape_same": false,
+      "floor_pct": 0.005701613504984178,
+      "rising_pct": 0.004637746570605813,
+      "post_peak_pct": 66.54378803245778
+     }
+    ]
+   },
+   "seconds": 96.2,
    "carried_from": 62,
-   "run": "3946c4f3de38",
+   "response_last": 61,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -207394,9 +208091,62 @@
      "ref_stage": 87
     }
    ],
-   "seconds": 56.2,
+   "uncut": {
+    "control": [
+     {
+      "chart": "shear_gxy",
+      "ref_peak_load": 263.734,
+      "sub_peak_load": 273.248,
+      "ref_peak_x": 14.584,
+      "sub_peak_x": 28.542,
+      "peak_diff_pct": 3.6074226303775814,
+      "curve_max_diff_pct": 0.2666070372909078,
+      "curve_mean_diff_pct": 0.031158567640314272,
+      "shape_ref": [
+       "cracking",
+       "peak",
+       "ends standing still"
+      ],
+      "shape_sub": [
+       "cracking",
+       "peak",
+       "ends falling"
+      ],
+      "shape_same": false,
+      "floor_pct": 0.01358418389141197,
+      "rising_pct": 0.26660339302619185,
+      "post_peak_pct": 98.9861231336801
+     },
+     {
+      "chart": "moment_phi",
+      "ref_peak_load": 263.788,
+      "sub_peak_load": 273.003,
+      "ref_peak_x": 28.405,
+      "sub_peak_x": 45.834,
+      "peak_diff_pct": 3.4933355573414917,
+      "curve_max_diff_pct": 0.2036634204686818,
+      "curve_mean_diff_pct": 0.02167470286376871,
+      "shape_ref": [
+       "cracking",
+       "peak",
+       "ends standing still"
+      ],
+      "shape_sub": [
+       "cracking",
+       "peak",
+       "ends falling"
+      ],
+      "shape_same": false,
+      "floor_pct": 0.007040801371342743,
+      "rising_pct": 0.20366284536819118,
+      "post_peak_pct": 60.517096752746646
+     }
+    ]
+   },
+   "seconds": 57.4,
    "carried_from": 92,
-   "run": "3946c4f3de38",
+   "response_last": 91,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -208969,9 +209719,10 @@
      "ref_stage": 73
     }
    ],
-   "seconds": 60.2,
+   "seconds": 60.7,
    "carried_from": 39,
-   "run": "3946c4f3de38",
+   "response_last": 38,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.047,
@@ -210419,8 +211170,8 @@
      "ref_stage": 37
     }
    ],
-   "seconds": 6.8,
-   "run": "3946c4f3de38",
+   "seconds": 5.7,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.07,
@@ -211456,8 +212207,8 @@
      "ref_stage": 36
     }
    ],
-   "seconds": 8.5,
-   "run": "3946c4f3de38",
+   "seconds": 8.2,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.094,
@@ -212503,9 +213254,62 @@
      "ref_stage": 58
     }
    ],
-   "seconds": 115.6,
+   "uncut": {
+    "control": [
+     {
+      "chart": "shear_gxy",
+      "ref_peak_load": 155.487,
+      "sub_peak_load": 160.48,
+      "ref_peak_x": 6.177,
+      "sub_peak_x": 13.802,
+      "peak_diff_pct": 3.2112009364126872,
+      "curve_max_diff_pct": 0.07632531760488871,
+      "curve_mean_diff_pct": 0.012953563996961927,
+      "shape_ref": [
+       "cracking",
+       "peak",
+       "ends standing still"
+      ],
+      "shape_sub": [
+       "cracking",
+       "peak",
+       "ends falling"
+      ],
+      "shape_same": false,
+      "floor_pct": 0.03239848019725649,
+      "rising_pct": 0.07631433298979289,
+      "post_peak_pct": 177.71379003387713
+     },
+     {
+      "chart": "moment_phi",
+      "ref_peak_load": 311.018,
+      "sub_peak_load": 320.933,
+      "ref_peak_x": 27.454,
+      "sub_peak_x": 50.704,
+      "peak_diff_pct": 3.187918384144976,
+      "curve_max_diff_pct": 0.026604669087764356,
+      "curve_mean_diff_pct": 0.001176032167365618,
+      "shape_ref": [
+       "cracking",
+       "peak",
+       "ends at peak"
+      ],
+      "shape_sub": [
+       "cracking",
+       "peak",
+       "ends falling"
+      ],
+      "shape_same": false,
+      "floor_pct": 0.007313239323752547,
+      "rising_pct": 0.026604669087764356,
+      "post_peak_pct": 124.10473185908324
+     }
+    ]
+   },
+   "seconds": 112.8,
    "carried_from": 65,
-   "run": "3946c4f3de38",
+   "response_last": 64,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -212805,10 +213609,10 @@
     {
      "chart": "shear_gxy",
      "ref_peak_load": 106.214,
-     "sub_peak_load": 106.214,
+     "sub_peak_load": 109.622,
      "ref_peak_x": 4.638,
-     "sub_peak_x": 4.64,
-     "peak_diff_pct": 0.0,
+     "sub_peak_x": 8.699,
+     "peak_diff_pct": 3.208616566554316,
      "curve_max_diff_pct": 0.11974832157228218,
      "curve_mean_diff_pct": 0.014820162048575912,
      "shape_ref": [
@@ -212819,20 +213623,20 @@
      "shape_sub": [
       "cracking",
       "peak",
-      "ends at peak"
+      "ends falling"
      ],
-     "shape_same": true,
+     "shape_same": false,
      "floor_pct": 0.04316312764948526,
      "rising_pct": 0.11974832157228218,
-     "post_peak_pct": 0.04312203536005477
+     "post_peak_pct": 131.56905176126733
     },
     {
      "chart": "moment_phi",
      "ref_peak_load": 318.577,
-     "sub_peak_load": 318.577,
+     "sub_peak_load": 328.847,
      "ref_peak_x": 26.019,
-     "sub_peak_x": 26.019,
-     "peak_diff_pct": 0.0,
+     "sub_peak_x": 46.094,
+     "peak_diff_pct": 3.22371043735109,
      "curve_max_diff_pct": 0.0,
      "curve_mean_diff_pct": 0.0,
      "shape_ref": [
@@ -212843,18 +213647,14 @@
      "shape_sub": [
       "cracking",
       "peak",
-      "ends at peak"
+      "ends falling"
      ],
-     "shape_same": true,
+     "shape_same": false,
      "floor_pct": 0.007712284564570848,
      "rising_pct": 0.0,
-     "post_peak_pct": 0.0
+     "post_peak_pct": 114.45732490589182
     }
    ],
-   "upto": {
-    "sub_position": 57.0,
-    "sub_stages": 66
-   },
    "views_stages": [
     {
      "ref_stage": 11,
@@ -213709,8 +214509,8 @@
      "ref_stage": 57
     }
    ],
-   "seconds": 19.8,
-   "run": "3946c4f3de38",
+   "seconds": 23.3,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -215190,8 +215990,8 @@
      "ref_stage": 37
     }
    ],
-   "seconds": 10.7,
-   "run": "3946c4f3de38",
+   "seconds": 11.6,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.07,
@@ -216543,9 +217343,10 @@
      "ref_stage": 42
     }
    ],
-   "seconds": 119.7,
+   "seconds": 108.4,
    "carried_from": 37,
-   "run": "3946c4f3de38",
+   "response_last": 36,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -218234,8 +219035,8 @@
      "ref_stage": 30
     }
    ],
-   "seconds": 2.9,
-   "run": "3946c4f3de38",
+   "seconds": 3.4,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      0.0,
@@ -219592,8 +220393,8 @@
      "ref_stage": 57
     }
    ],
-   "seconds": 4.0,
-   "run": "3946c4f3de38",
+   "seconds": 4.6,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.45,
@@ -221364,9 +222165,10 @@
      "ref_stage": 37
     }
    ],
-   "seconds": 64.4,
+   "seconds": 61.1,
    "carried_from": 38,
-   "run": "3946c4f3de38",
+   "ending": "as Response-2000's does: its solve gives up, and r2c's own solve finds no state beyond either",
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -222749,8 +223551,8 @@
      "ref_stage": 59
     }
    ],
-   "seconds": 1.6,
-   "run": "3946c4f3de38",
+   "seconds": 1.4,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -224197,9 +224999,10 @@
      "ref_stage": 38
     }
    ],
-   "seconds": 105.1,
+   "seconds": 120.0,
    "carried_from": 37,
-   "run": "3946c4f3de38",
+   "ending": "as Response-2000's does: its solve gives up, and r2c's own solve finds no state beyond either",
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -225591,7 +226394,7 @@
     }
    ],
    "seconds": 1.0,
-   "run": "3946c4f3de38",
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -227032,9 +227835,10 @@
      "ref_stage": 38
     }
    ],
-   "seconds": 66.3,
+   "seconds": 57.5,
    "carried_from": 43,
-   "run": "3946c4f3de38",
+   "ending": "as Response-2000's does: its solve gives up, and r2c's own solve finds no state beyond either",
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -228449,8 +229253,8 @@
      "ref_stage": 14
     }
    ],
-   "seconds": 1.3,
-   "run": "3946c4f3de38",
+   "seconds": 1.1,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -229900,9 +230704,10 @@
      "ref_stage": 30
     }
    ],
-   "seconds": 35.7,
+   "seconds": 34.7,
    "carried_from": 43,
-   "run": "3946c4f3de38",
+   "response_last": 42,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -231306,8 +232111,8 @@
      "ref_stage": 64
     }
    ],
-   "seconds": 2.1,
-   "run": "3946c4f3de38",
+   "seconds": 1.3,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -232771,9 +233576,10 @@
      "ref_stage": 39
     }
    ],
-   "seconds": 57.6,
+   "seconds": 50.8,
    "carried_from": 43,
-   "run": "3946c4f3de38",
+   "ending": "as Response-2000's does: its solve gives up, and r2c's own solve finds no state beyond either",
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -234164,8 +234970,8 @@
      "ref_stage": 59
     }
    ],
-   "seconds": 1.2,
-   "run": "3946c4f3de38",
+   "seconds": 1.1,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -235603,9 +236409,10 @@
      "ref_stage": 33
     }
    ],
-   "seconds": 102.5,
+   "seconds": 90.2,
    "carried_from": 33,
-   "run": "3946c4f3de38",
+   "ending": "as Response-2000's does: its solve gives up, and r2c's own solve finds no state beyond either",
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -236996,9 +237803,9 @@
      "ref_stage": 30
     }
    ],
-   "seconds": 117.2,
-   "carried_from": 59,
-   "run": "3946c4f3de38",
+   "seconds": 65.5,
+   "ending": "as Response-2000's does: it refuses a state whose web is crushing with the load still rising, and no smaller step is solved",
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -238483,8 +239290,8 @@
      "ref_stage": 4
     }
    ],
-   "seconds": 1.1,
-   "run": "3946c4f3de38",
+   "seconds": 1.4,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -238748,12 +239555,12 @@
     {
      "chart": "shear_gxy",
      "ref_peak_load": 57.85,
-     "sub_peak_load": 57.86301665208328,
+     "sub_peak_load": 58.188,
      "ref_peak_x": 12.275,
-     "sub_peak_x": 12.22001181760749,
-     "peak_diff_pct": 0.022500695044563833,
-     "curve_max_diff_pct": 0.47784538543461863,
-     "curve_mean_diff_pct": 0.04673594087300005,
+     "sub_peak_x": 12.562,
+     "peak_diff_pct": 0.58426966292135,
+     "curve_max_diff_pct": 0.2292173371825901,
+     "curve_mean_diff_pct": 0.03595328324653242,
      "shape_ref": [
       "cracking",
       "fall",
@@ -238766,22 +239573,22 @@
       "cracking",
       "fall",
       "peak",
-      "ends at peak"
+      "ends standing still"
      ],
      "shape_same": false,
      "floor_pct": 0.016652134279606833,
-     "rising_pct": 0.47784538543461863,
-     "post_peak_pct": 0.0
+     "rising_pct": 2.398500153388969,
+     "post_peak_pct": 0.5338539850379822
     },
     {
      "chart": "moment_phi",
      "ref_peak_load": 57.824,
-     "sub_peak_load": 57.81702352778218,
+     "sub_peak_load": 58.196,
      "ref_peak_x": -0.015,
-     "sub_peak_x": -0.015000322298386102,
-     "peak_diff_pct": -0.012065011444754676,
-     "curve_max_diff_pct": 2.1837960253331827,
-     "curve_mean_diff_pct": 0.15909355592164828,
+     "sub_peak_x": -0.019,
+     "peak_diff_pct": 0.6433314886552295,
+     "curve_max_diff_pct": 1.8626868123880318,
+     "curve_mean_diff_pct": 0.10215228327943837,
      "shape_ref": [
       "fall",
       "fall",
@@ -238792,18 +239599,13 @@
       "fall",
       "fall",
       "peak",
-      "ends at peak"
+      "ends standing still"
      ],
-     "shape_same": true,
+     "shape_same": false,
      "floor_pct": 4.347827462712793,
-     "rising_pct": 2.1837960253331827,
-     "post_peak_pct": 0.0
+     "rising_pct": 2.3172828506385676
     }
    ],
-   "upto": {
-    "sub_position": 50.00010743279537,
-    "sub_stages": 58
-   },
    "views_stages": [
     {
      "ref_stage": 12,
@@ -239932,9 +240734,9 @@
      "ref_stage": 52
     }
    ],
-   "seconds": 103.0,
-   "carried_from": 58,
-   "run": "3946c4f3de38",
+   "seconds": 58.7,
+   "ending": "as Response-2000's does: it refuses a state whose web is crushing with the load still rising, and no smaller step is solved",
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -241407,7 +242209,7 @@
     }
    ],
    "seconds": 1.1,
-   "run": "3946c4f3de38",
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -241690,7 +242492,7 @@
      "shape_same": true,
      "floor_pct": 0.023250049093179914,
      "rising_pct": 0.00029991826946991956,
-     "post_peak_pct": 0.684157554761707
+     "post_peak_pct": 7.902302920457717
     },
     {
      "chart": "moment_phi",
@@ -241714,13 +242516,9 @@
      "shape_same": true,
      "floor_pct": 0.0037855708407952163,
      "rising_pct": 0.0002999192479389495,
-     "post_peak_pct": 0.6974507621231507
+     "post_peak_pct": 5.8971275958557205
     }
    ],
-   "upto": {
-    "sub_position": 63.519403465010576,
-    "sub_stages": 65
-   },
    "views_stages": [
     {
      "ref_stage": 11,
@@ -242846,8 +243644,8 @@
      "ref_stage": 69
     }
    ],
-   "seconds": 22.4,
-   "run": "3946c4f3de38",
+   "seconds": 19.7,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -244301,9 +245099,10 @@
      "ref_stage": 51
     }
    ],
-   "seconds": 81.9,
+   "seconds": 80.4,
    "carried_from": 57,
-   "run": "3946c4f3de38",
+   "ending": "as Response-2000's does: its solve gives up, and r2c's own solve finds no state beyond either",
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      0.0,
@@ -245075,7 +245874,7 @@
     }
    ],
    "seconds": 0.0,
-   "run": "3946c4f3de38",
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -246287,9 +247086,10 @@
      "ref_stage": 54
     }
    ],
-   "seconds": 79.8,
+   "seconds": 74.9,
    "carried_from": 49,
-   "run": "3946c4f3de38",
+   "ending": "as Response-2000's does: its solve gives up, and r2c's own solve finds no state beyond either",
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -247424,8 +248224,8 @@
      "ref_stage": 15
     }
    ],
-   "seconds": 1.8,
-   "run": "3946c4f3de38",
+   "seconds": 2.1,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      0.0,
@@ -248656,8 +249456,8 @@
      "ref_stage": 67
     }
    ],
-   "seconds": 1.3,
-   "run": "3946c4f3de38",
+   "seconds": 1.7,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -249865,8 +250665,8 @@
      "ref_stage": 69
     }
    ],
-   "seconds": 1.7,
-   "run": "3946c4f3de38",
+   "seconds": 1.8,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -251363,9 +252163,62 @@
      "ref_stage": 49
     }
    ],
-   "seconds": 50.1,
+   "uncut": {
+    "control": [
+     {
+      "chart": "shear_gxy",
+      "ref_peak_load": 696.588,
+      "sub_peak_load": 696.682,
+      "ref_peak_x": 2.913,
+      "sub_peak_x": 2.91,
+      "peak_diff_pct": 0.013494346730068697,
+      "curve_max_diff_pct": 0.03274983232834519,
+      "curve_mean_diff_pct": 0.008034334062360527,
+      "shape_ref": [
+       "cracking",
+       "peak",
+       "ends falling"
+      ],
+      "shape_sub": [
+       "cracking",
+       "peak",
+       "ends falling"
+      ],
+      "shape_same": true,
+      "floor_pct": 0.02268012559586545,
+      "rising_pct": 0.017626960758134514,
+      "post_peak_pct": 168.7507838754627
+     },
+     {
+      "chart": "moment_phi",
+      "ref_peak_load": 1391.823,
+      "sub_peak_load": 1392.06,
+      "ref_peak_x": 3.768,
+      "sub_peak_x": 3.768,
+      "peak_diff_pct": 0.017028027270698402,
+      "curve_max_diff_pct": 0.01702714205678463,
+      "curve_mean_diff_pct": 0.000755709482579319,
+      "shape_ref": [
+       "cracking",
+       "peak",
+       "ends falling"
+      ],
+      "shape_sub": [
+       "cracking",
+       "peak",
+       "ends falling"
+      ],
+      "shape_same": true,
+      "floor_pct": 0.021070865039793427,
+      "rising_pct": 0.01702241212653215,
+      "post_peak_pct": 118.12467411420575
+     }
+    ]
+   },
+   "seconds": 55.6,
    "carried_from": 86,
-   "run": "3946c4f3de38",
+   "response_last": 85,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -252960,8 +253813,8 @@
      "ref_stage": 14
     }
    ],
-   "seconds": 1.5,
-   "run": "3946c4f3de38",
+   "seconds": 2.2,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -254794,8 +255647,8 @@
      "ref_stage": 6
     }
    ],
-   "seconds": 1.8,
-   "run": "3946c4f3de38",
+   "seconds": 2.5,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -256584,9 +257437,10 @@
      "ref_stage": 17
     }
    ],
-   "seconds": 33.9,
+   "seconds": 37.4,
    "carried_from": 41,
-   "run": "3946c4f3de38",
+   "response_last": 40,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -257996,7 +258850,7 @@
     }
    ],
    "seconds": 1.6,
-   "run": "3946c4f3de38",
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -259486,8 +260340,8 @@
      "ref_stage": 12
     }
    ],
-   "seconds": 1.6,
-   "run": "3946c4f3de38",
+   "seconds": 1.7,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -259759,7 +260613,7 @@
     "peak-stage": "55"
    },
    "sub": {
-    "stage-count": "78",
+    "stage-count": "77",
     "peak-stage": "76"
    },
    "missing_control": [],
@@ -259815,7 +260669,7 @@
    ],
    "upto": {
     "sub_position": 54.454743068231835,
-    "sub_stages": 78
+    "sub_stages": 77
    },
    "views_stages": [
     {
@@ -260632,9 +261486,61 @@
      "ref_stage": 55
     }
    ],
-   "seconds": 132.2,
-   "carried_from": 77,
-   "run": "3946c4f3de38",
+   "uncut": {
+    "control": [
+     {
+      "chart": "shear_gxy",
+      "ref_peak_load": 527.942,
+      "sub_peak_load": 589.371,
+      "ref_peak_x": 11.28,
+      "sub_peak_x": 30.451,
+      "peak_diff_pct": 11.635558451496562,
+      "curve_max_diff_pct": 0.019165027578895683,
+      "curve_mean_diff_pct": 0.0035712977429109647,
+      "shape_ref": [
+       "cracking",
+       "peak",
+       "ends at peak"
+      ],
+      "shape_sub": [
+       "cracking",
+       "peak",
+       "ends standing still"
+      ],
+      "shape_same": false,
+      "floor_pct": 0.017734543024455825,
+      "rising_pct": 0.019165027578895683,
+      "post_peak_pct": 179.6785565930869
+     },
+     {
+      "chart": "moment_phi",
+      "ref_peak_load": 2111.493,
+      "sub_peak_load": 2357.232,
+      "ref_peak_x": 18.103,
+      "sub_peak_x": 38.803,
+      "peak_diff_pct": 11.63816313859435,
+      "curve_max_diff_pct": 0.007746800690772417,
+      "curve_mean_diff_pct": 0.00043239768640589496,
+      "shape_ref": [
+       "cracking",
+       "peak",
+       "ends at peak"
+      ],
+      "shape_sub": [
+       "cracking",
+       "peak",
+       "ends at peak"
+      ],
+      "shape_same": true,
+      "floor_pct": 0.011048298649304008,
+      "rising_pct": 0.007746800690772417,
+      "post_peak_pct": 114.93643170674743
+     }
+    ]
+   },
+   "seconds": 60.0,
+   "ending": "as Response-2000's does: it refuses a state whose web is crushing with the load still rising, and no smaller step is solved",
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -260943,10 +261849,6 @@
     [
      38.803,
      2357.232
-    ],
-    [
-     37.579,
-     2259.242
     ]
    ]
   },
@@ -262183,8 +263085,8 @@
      "ref_stage": 66
     }
    ],
-   "seconds": 2.2,
-   "run": "3946c4f3de38",
+   "seconds": 1.5,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      0.012,
@@ -264012,8 +264914,8 @@
      "ref_stage": 19
     }
    ],
-   "seconds": 2.9,
-   "run": "3946c4f3de38",
+   "seconds": 1.9,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -265513,8 +266415,63 @@
      "ref_stage": 110
     }
    ],
-   "seconds": 27.9,
-   "run": "3946c4f3de38",
+   "uncut": {
+    "control": [
+     {
+      "chart": "shear_gxy",
+      "ref_peak_load": 264.516,
+      "sub_peak_load": 264.407,
+      "ref_peak_x": 8.493,
+      "sub_peak_x": 8.428,
+      "peak_diff_pct": -0.04120733717432491,
+      "curve_max_diff_pct": 0.3461933212332306,
+      "curve_mean_diff_pct": 0.03222336161810019,
+      "shape_ref": [
+       "fall",
+       "cracking",
+       "peak",
+       "ends standing still"
+      ],
+      "shape_sub": [
+       "fall",
+       "cracking",
+       "peak",
+       "ends falling"
+      ],
+      "shape_same": false,
+      "floor_pct": 0.023224938480006157,
+      "rising_pct": 12.980455565128565,
+      "post_peak_pct": 1.7163190503581245
+     },
+     {
+      "chart": "moment_phi",
+      "ref_peak_load": -794.729,
+      "sub_peak_load": -793.091,
+      "ref_peak_x": -30.975,
+      "sub_peak_x": -30.376,
+      "peak_diff_pct": -0.2061079940457733,
+      "curve_max_diff_pct": 1.944770165161226,
+      "curve_mean_diff_pct": 0.030248277761507878,
+      "shape_ref": [
+       "fall",
+       "cracking",
+       "peak",
+       "ends at peak"
+      ],
+      "shape_sub": [
+       "fall",
+       "cracking",
+       "peak",
+       "ends falling"
+      ],
+      "shape_same": false,
+      "floor_pct": 0.006461722411740024,
+      "rising_pct": 88.12662543315083
+     }
+    ]
+   },
+   "seconds": 27.4,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -265842,10 +266799,10 @@
     {
      "chart": "shear_gxy",
      "ref_peak_load": 196.953,
-     "sub_peak_load": 196.95398121015515,
+     "sub_peak_load": 201.423,
      "ref_peak_x": 6.193,
-     "sub_peak_x": 6.210994608953911,
-     "peak_diff_pct": 0.0004981950796109086,
+     "sub_peak_x": 7.589,
+     "peak_diff_pct": 2.269577005681558,
      "curve_max_diff_pct": 0.17763150414365037,
      "curve_mean_diff_pct": 0.019318896776631456,
      "shape_ref": [
@@ -265858,20 +266815,20 @@
       "fall",
       "cracking",
       "peak",
-      "ends at peak"
+      "ends falling"
      ],
-     "shape_same": true,
+     "shape_same": false,
      "floor_pct": 0.032310487389177134,
-     "rising_pct": 0.17763150414365037,
-     "post_peak_pct": 0.2905641111589053
+     "rising_pct": 16.572080921410095,
+     "post_peak_pct": 22.655546180117124
     },
     {
      "chart": "moment_phi",
      "ref_peak_load": -788.139,
-     "sub_peak_load": -788.1439255342054,
+     "sub_peak_load": -806.192,
      "ref_peak_x": -25.396,
-     "sub_peak_x": -25.39598048504369,
-     "peak_diff_pct": 0.0006249575525924525,
+     "sub_peak_x": -30.943,
+     "peak_diff_pct": 2.290585797682896,
      "curve_max_diff_pct": 0.019243891073259477,
      "curve_mean_diff_pct": 0.0010830452051660494,
      "shape_ref": [
@@ -265884,18 +266841,14 @@
       "fall",
       "cracking",
       "peak",
-      "ends at peak"
+      "ends falling"
      ],
-     "shape_same": true,
+     "shape_same": false,
      "floor_pct": 0.007879343344426205,
      "rising_pct": 0.019285938140356507,
-     "post_peak_pct": 0.0006296639846304532
+     "post_peak_pct": 92.96576061024717
     }
    ],
-   "upto": {
-    "sub_position": 104.99996847341468,
-    "sub_stages": 117
-   },
    "views_stages": [
     {
      "ref_stage": 10,
@@ -267063,8 +268016,8 @@
      "ref_stage": 10
     }
    ],
-   "seconds": 32.1,
-   "run": "3946c4f3de38",
+   "seconds": 32.0,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -269063,9 +270016,10 @@
      "ref_stage": 47
     }
    ],
-   "seconds": 100.0,
+   "seconds": 96.8,
    "carried_from": 52,
-   "run": "3946c4f3de38",
+   "ending": "as Response-2000's does: its solve gives up, and r2c's own solve finds no state beyond either",
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.0,
@@ -270522,8 +271476,8 @@
      "ref_stage": 15
     }
    ],
-   "seconds": 1.8,
-   "run": "3946c4f3de38",
+   "seconds": 1.5,
+   "run": "1a2b5bd06e29",
    "sub_curve": [
     [
      -0.006,
