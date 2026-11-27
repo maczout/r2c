@@ -28,6 +28,10 @@ THIN = 0.05          # mm: half the layer Response-2000 puts across a step [B 00
 THIN_WIDTH = 10.0    # mm: the change of width from which it does [B 00434eb0]
 
 
+# How the tries on a stage ran out, with shear (shear.stop_kind; run._ending)
+GAVE_UP, REFUSED, UNTOLD = "gave up", "refused", "not told apart"
+
+
 class SolveError(RuntimeError):
     """No equilibrium state was found for a load stage."""
 

@@ -101,6 +101,11 @@ def one(args):
     if res.carried_from is not None:
         # the owner's override took over from Response's own solve at this stage count
         result["carried_from"] = res.carried_from
+    if res.response_last is not None:
+        # r2c's record marks this stage as the one where Response's response would end
+        result["response_last"] = res.response_last
+    if res.ending:
+        result["ending"] = res.ending
     (out / f"{name}.json").write_text(json.dumps(result, indent=1))
     return name, result
 

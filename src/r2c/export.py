@@ -89,6 +89,20 @@ def control(key: str, stages: list[Stage], u: Units, gam_avg=None, axis: float =
     raise KeyError(key)
 
 
+def flag(stage: int, keys, stages: list[Stage], u: Units, gam_avg=None, axis: float = 0.0) -> bytes:
+    """The stage at which Response-2000's own response would end, flagged in the data of a
+    record whose response goes past it: the stage number, and its point on each control
+    chart as that chart prints it. r2c's own section; Response exports nothing like it."""
+    out = ["  Response-2000's last stage", "  =========================", "",
+           f"  Stage\t\t: {stage}", ""]
+    for k in keys:
+        rows = control(k, stages[stage:stage + 1], u,
+                       None if gam_avg is None else gam_avg[stage:stage + 1], axis)
+        lines = rows.decode("latin-1").split(EOL)
+        out += [f"  Chart\t\t: {k}", lines[8], lines[10], ""]
+    return (EOL.join(out)).encode("latin-1")
+
+
 # -- detail views -----------------------------------------------------------------------------
 def envelope(st: Stage, before: Stage | None):
     """The grey envelopes behind the transverse and shear strain charts, as Response-2000
