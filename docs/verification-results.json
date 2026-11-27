@@ -1,9 +1,9 @@
 {
  "run": {
-  "r2c_version": "0.1.0",
-  "commit": "1a2b5bd06e294d65107de12343b6735fadd13837",
+  "r2c_version": "1.0.0",
+  "commit": "694b477fcb8f28f902c3e7589ce209e5af9d88ba",
   "dirty": false,
-  "started": "2026-11-27T07:34:22-07:00",
+  "started": "2026-11-27T11:04:51-07:00",
   "host": "Makertyre",
   "machine": "Linux x86_64, 32 cores",
   "python": "3.12.3",
@@ -1400,8 +1400,8 @@
      "ref_stage": 135
     }
    ],
-   "seconds": 74.9,
-   "run": "1a2b5bd06e29",
+   "seconds": 68.6,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      0.239,
@@ -3055,8 +3055,8 @@
      "ref_stage": 12
     }
    ],
-   "seconds": 6.5,
-   "run": "1a2b5bd06e29",
+   "seconds": 6.7,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      0.233,
@@ -4630,8 +4630,8 @@
      "ref_stage": 10
     }
    ],
-   "seconds": 8.7,
-   "run": "1a2b5bd06e29",
+   "seconds": 9.0,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      0.239,
@@ -6234,7 +6234,7 @@
     }
    ],
    "seconds": 3.4,
-   "run": "1a2b5bd06e29",
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      0.241,
@@ -7723,7 +7723,7 @@
     }
    ],
    "seconds": 2.1,
-   "run": "1a2b5bd06e29",
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -9139,10 +9139,10 @@
      "ref_stage": 42
     }
    ],
-   "seconds": 107.7,
+   "seconds": 104.7,
    "carried_from": 39,
-   "ending": "as Response-2000's does: its solve gives up, and r2c's own solve finds no state beyond either",
-   "run": "1a2b5bd06e29",
+   "ending": "where r2c's copy of Response-2000's stage control stops: its solve fails, and r2c's own solve finds no state beyond either",
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -10502,10 +10502,10 @@
      "ref_stage": 40
     }
    ],
-   "seconds": 237.5,
+   "seconds": 235.9,
    "carried_from": 41,
-   "response_last": 40,
-   "run": "1a2b5bd06e29",
+   "carried_stage": 40,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -11911,7 +11911,7 @@
     }
    ],
    "seconds": 1.5,
-   "run": "1a2b5bd06e29",
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -13396,7 +13396,7 @@
     }
    ],
    "seconds": 1.3,
-   "run": "1a2b5bd06e29",
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -14796,10 +14796,10 @@
      "ref_stage": 55
     }
    ],
-   "seconds": 172.6,
+   "seconds": 175.7,
    "carried_from": 48,
-   "response_last": 47,
-   "run": "1a2b5bd06e29",
+   "carried_stage": 47,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -16259,7 +16259,7 @@
     }
    ],
    "seconds": 1.2,
-   "run": "1a2b5bd06e29",
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -17723,7 +17723,7 @@
     }
    ],
    "seconds": 0.8,
-   "run": "1a2b5bd06e29",
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -19096,7 +19096,7 @@
     }
    ],
    "seconds": 0.1,
-   "run": "1a2b5bd06e29",
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      0.0,
@@ -20491,8 +20491,8 @@
      "ref_stage": 9
     }
    ],
-   "seconds": 2.0,
-   "run": "1a2b5bd06e29",
+   "seconds": 1.9,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      0.0,
@@ -21990,8 +21990,8 @@
      "ref_stage": 7
     }
    ],
-   "seconds": 1.7,
-   "run": "1a2b5bd06e29",
+   "seconds": 1.8,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      0.0,
@@ -23470,8 +23470,8 @@
      "ref_stage": 12
     }
    ],
-   "seconds": 2.3,
-   "run": "1a2b5bd06e29",
+   "seconds": 1.8,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      0.0,
@@ -24975,8 +24975,8 @@
      "ref_stage": 65
     }
    ],
-   "seconds": 1.8,
-   "run": "1a2b5bd06e29",
+   "seconds": 2.4,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      0.0,
@@ -26489,7 +26489,7 @@
     }
    ],
    "seconds": 1.4,
-   "run": "1a2b5bd06e29",
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      0.008,
@@ -27949,8 +27949,8 @@
      "ref_stage": 50
     }
    ],
-   "seconds": 1.9,
-   "run": "1a2b5bd06e29",
+   "seconds": 1.5,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -29702,10 +29702,10 @@
      "ref_stage": 48
     }
    ],
-   "seconds": 81.2,
+   "seconds": 73.8,
    "carried_from": 55,
-   "ending": "as Response-2000's does: its solve gives up, and r2c's own solve finds no state beyond either",
-   "run": "1a2b5bd06e29",
+   "ending": "where r2c's copy of Response-2000's stage control stops: its solve fails, and r2c's own solve finds no state beyond either",
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -31177,8 +31177,8 @@
      "ref_stage": 9
     }
    ],
-   "seconds": 1.5,
-   "run": "1a2b5bd06e29",
+   "seconds": 1.0,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      0.017,
@@ -32927,8 +32927,8 @@
      "ref_stage": 68
     }
    ],
-   "seconds": 2.4,
-   "run": "1a2b5bd06e29",
+   "seconds": 1.5,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -34456,8 +34456,8 @@
      "ref_stage": 37
     }
    ],
-   "seconds": 1.3,
-   "run": "1a2b5bd06e29",
+   "seconds": 1.0,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.008,
@@ -35570,9 +35570,9 @@
      "ref_stage": 38
     }
    ],
-   "seconds": 39.3,
-   "ending": "as Response-2000's does: it refuses a state whose web is crushing with the load still rising, and no smaller step is solved",
-   "run": "1a2b5bd06e29",
+   "seconds": 39.8,
+   "ending": "where r2c's copy of Response-2000's stage control stops: it refuses a state whose web is crushing with the load still rising, and no smaller step is solved",
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.665,
@@ -37017,8 +37017,8 @@
      "ref_stage": 12
     }
    ],
-   "seconds": 2.7,
-   "run": "1a2b5bd06e29",
+   "seconds": 1.6,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.432,
@@ -38450,10 +38450,10 @@
      "ref_stage": 39
     }
    ],
-   "seconds": 82.3,
+   "seconds": 85.8,
    "carried_from": 38,
-   "ending": "as Response-2000's does: its solve gives up, and r2c's own solve finds no state beyond either",
-   "run": "1a2b5bd06e29",
+   "ending": "where r2c's copy of Response-2000's stage control stops: its solve fails, and r2c's own solve finds no state beyond either",
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.432,
@@ -39806,10 +39806,10 @@
      "ref_stage": 48
     }
    ],
-   "seconds": 126.3,
+   "seconds": 127.9,
    "carried_from": 48,
-   "ending": "as Response-2000's does: its solve gives up, and r2c's own solve finds no state beyond either",
-   "run": "1a2b5bd06e29",
+   "ending": "where r2c's copy of Response-2000's stage control stops: its solve fails, and r2c's own solve finds no state beyond either",
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.432,
@@ -41253,8 +41253,8 @@
      "ref_stage": 30
     }
    ],
-   "seconds": 2.0,
-   "run": "1a2b5bd06e29",
+   "seconds": 1.9,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.769,
@@ -43014,10 +43014,10 @@
      "ref_stage": 42
     }
    ],
-   "seconds": 112.3,
+   "seconds": 113.8,
    "carried_from": 42,
-   "ending": "as Response-2000's does: its solve gives up, and r2c's own solve finds no state beyond either",
-   "run": "1a2b5bd06e29",
+   "ending": "where r2c's copy of Response-2000's stage control stops: its solve fails, and r2c's own solve finds no state beyond either",
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.769,
@@ -44076,10 +44076,10 @@
      "ref_stage": 50
     }
    ],
-   "seconds": 92.4,
+   "seconds": 89.0,
    "carried_from": 52,
-   "ending": "as Response-2000's does: its solve gives up, and r2c's own solve finds no state beyond either",
-   "run": "1a2b5bd06e29",
+   "ending": "where r2c's copy of Response-2000's stage control stops: its solve fails, and r2c's own solve finds no state beyond either",
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.769,
@@ -45539,8 +45539,8 @@
      "ref_stage": 63
     }
    ],
-   "seconds": 2.6,
-   "run": "1a2b5bd06e29",
+   "seconds": 1.8,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.665,
@@ -47008,10 +47008,10 @@
      "ref_stage": 50
     }
    ],
-   "seconds": 50.2,
+   "seconds": 58.4,
    "carried_from": 46,
-   "response_last": 45,
-   "run": "1a2b5bd06e29",
+   "carried_stage": 45,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.665,
@@ -48403,10 +48403,10 @@
      "ref_stage": 48
     }
    ],
-   "seconds": 94.9,
+   "seconds": 103.2,
    "carried_from": 48,
-   "ending": "as Response-2000's does: its solve gives up, and r2c's own solve finds no state beyond either",
-   "run": "1a2b5bd06e29",
+   "ending": "where r2c's copy of Response-2000's stage control stops: its solve fails, and r2c's own solve finds no state beyond either",
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.665,
@@ -49548,9 +49548,9 @@
      }
     ]
    },
-   "seconds": 42.4,
-   "ending": "as Response-2000's does: it refuses a state whose web is crushing with the load still rising, and no smaller step is solved",
-   "run": "1a2b5bd06e29",
+   "seconds": 39.7,
+   "ending": "where r2c's copy of Response-2000's stage control stops: it refuses a state whose web is crushing with the load still rising, and no smaller step is solved",
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.665,
@@ -50768,10 +50768,10 @@
      "ref_stage": 14
     }
    ],
-   "seconds": 28.9,
+   "seconds": 28.4,
    "carried_from": 27,
-   "ending": "as Response-2000's does: its solve gives up, and r2c's own solve finds no state beyond either",
-   "run": "1a2b5bd06e29",
+   "ending": "where r2c's copy of Response-2000's stage control stops: its solve fails, and r2c's own solve finds no state beyond either",
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.665,
@@ -52131,8 +52131,8 @@
      "ref_stage": 20
     }
    ],
-   "seconds": 2.0,
-   "run": "1a2b5bd06e29",
+   "seconds": 1.9,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.556,
@@ -53307,10 +53307,10 @@
      "ref_stage": 6
     }
    ],
-   "seconds": 113.8,
+   "seconds": 111.9,
    "carried_from": 32,
-   "ending": "as Response-2000's does: its solve gives up, and r2c's own solve finds no state beyond either",
-   "run": "1a2b5bd06e29",
+   "ending": "where r2c's copy of Response-2000's stage control stops: its solve fails, and r2c's own solve finds no state beyond either",
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.665,
@@ -54690,7 +54690,7 @@
     }
    ],
    "seconds": 3.5,
-   "run": "1a2b5bd06e29",
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -7.284,
@@ -56144,9 +56144,9 @@
      "ref_stage": 146
     }
    ],
-   "seconds": 48.3,
-   "ending": "as Response-2000's does: it refuses a state whose web is crushing with the load still rising, and no smaller step is solved",
-   "run": "1a2b5bd06e29",
+   "seconds": 50.9,
+   "ending": "where r2c's copy of Response-2000's stage control stops: it refuses a state whose web is crushing with the load still rising, and no smaller step is solved",
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -57979,8 +57979,8 @@
      "ref_stage": 61
     }
    ],
-   "seconds": 3.7,
-   "run": "1a2b5bd06e29",
+   "seconds": 4.8,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      0.0,
@@ -59156,8 +59156,8 @@
      "ref_stage": 64
     }
    ],
-   "seconds": 4.4,
-   "run": "1a2b5bd06e29",
+   "seconds": 3.0,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -60362,8 +60362,8 @@
      "ref_stage": 7
     }
    ],
-   "seconds": 4.6,
-   "run": "1a2b5bd06e29",
+   "seconds": 4.3,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -61918,8 +61918,8 @@
      }
     ]
    },
-   "seconds": 32.2,
-   "run": "1a2b5bd06e29",
+   "seconds": 30.5,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -63417,10 +63417,10 @@
      "ref_stage": 37
     }
    ],
-   "seconds": 111.3,
+   "seconds": 112.5,
    "carried_from": 41,
-   "ending": "as Response-2000's does: its solve gives up, and r2c's own solve finds no state beyond either",
-   "run": "1a2b5bd06e29",
+   "ending": "where r2c's copy of Response-2000's stage control stops: its solve fails, and r2c's own solve finds no state beyond either",
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -64818,8 +64818,8 @@
      "ref_stage": 59
     }
    ],
-   "seconds": 1.2,
-   "run": "1a2b5bd06e29",
+   "seconds": 1.4,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -66296,7 +66296,7 @@
     }
    ],
    "seconds": 0.7,
-   "run": "1a2b5bd06e29",
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.653,
@@ -67756,8 +67756,8 @@
      "ref_stage": 14
     }
    ],
-   "seconds": 1.2,
-   "run": "1a2b5bd06e29",
+   "seconds": 0.9,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.495,
@@ -69203,8 +69203,8 @@
      "ref_stage": 47
     }
    ],
-   "seconds": 1.9,
-   "run": "1a2b5bd06e29",
+   "seconds": 1.4,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      0.429,
@@ -70615,8 +70615,8 @@
      "ref_stage": 48
     }
    ],
-   "seconds": 1.5,
-   "run": "1a2b5bd06e29",
+   "seconds": 1.2,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -72055,8 +72055,8 @@
      "ref_stage": 54
     }
    ],
-   "seconds": 1.6,
-   "run": "1a2b5bd06e29",
+   "seconds": 1.0,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      0.027,
@@ -73821,8 +73821,8 @@
      "ref_stage": 9
     }
    ],
-   "seconds": 1.5,
-   "run": "1a2b5bd06e29",
+   "seconds": 1.2,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -75315,8 +75315,8 @@
      "ref_stage": 25
     }
    ],
-   "seconds": 1.1,
-   "run": "1a2b5bd06e29",
+   "seconds": 1.0,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -76736,10 +76736,10 @@
      "ref_stage": 36
     }
    ],
-   "seconds": 64.1,
+   "seconds": 63.2,
    "carried_from": 39,
-   "ending": "as Response-2000's does: its solve gives up, and r2c's own solve finds no state beyond either",
-   "run": "1a2b5bd06e29",
+   "ending": "where r2c's copy of Response-2000's stage control stops: its solve fails, and r2c's own solve finds no state beyond either",
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -78126,8 +78126,8 @@
      "ref_stage": 56
     }
    ],
-   "seconds": 1.8,
-   "run": "1a2b5bd06e29",
+   "seconds": 1.1,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -79586,8 +79586,8 @@
      "ref_stage": 56
     }
    ],
-   "seconds": 1.6,
-   "run": "1a2b5bd06e29",
+   "seconds": 1.2,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -81067,8 +81067,8 @@
      "ref_stage": 56
     }
    ],
-   "seconds": 1.1,
-   "run": "1a2b5bd06e29",
+   "seconds": 1.2,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -82546,7 +82546,7 @@
     }
    ],
    "seconds": 1.1,
-   "run": "1a2b5bd06e29",
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -84076,10 +84076,10 @@
      }
     ]
    },
-   "seconds": 129.1,
+   "seconds": 114.8,
    "carried_from": 74,
-   "ending": "as Response-2000's does: its solve gives up, and r2c's own solve finds no state beyond either",
-   "run": "1a2b5bd06e29",
+   "ending": "where r2c's copy of Response-2000's stage control stops: its solve fails, and r2c's own solve finds no state beyond either",
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -85618,8 +85618,8 @@
      "ref_stage": 52
     }
    ],
-   "seconds": 0.8,
-   "run": "1a2b5bd06e29",
+   "seconds": 0.9,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      0.031,
@@ -87385,8 +87385,8 @@
      "ref_stage": 12
     }
    ],
-   "seconds": 1.1,
-   "run": "1a2b5bd06e29",
+   "seconds": 1.2,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -88803,8 +88803,8 @@
      "ref_stage": 54
     }
    ],
-   "seconds": 1.2,
-   "run": "1a2b5bd06e29",
+   "seconds": 1.3,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -90277,7 +90277,7 @@
     }
    ],
    "seconds": 0.9,
-   "run": "1a2b5bd06e29",
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -91692,10 +91692,10 @@
      "ref_stage": 41
     }
    ],
-   "seconds": 49.6,
+   "seconds": 54.7,
    "carried_from": 48,
-   "ending": "as Response-2000's does: its solve gives up, and r2c's own solve finds no state beyond either",
-   "run": "1a2b5bd06e29",
+   "ending": "where r2c's copy of Response-2000's stage control stops: its solve fails, and r2c's own solve finds no state beyond either",
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -93140,7 +93140,7 @@
     }
    ],
    "seconds": 1.0,
-   "run": "1a2b5bd06e29",
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -94330,10 +94330,10 @@
      }
     ]
    },
-   "seconds": 96.6,
+   "seconds": 92.2,
    "carried_from": 68,
-   "response_last": 67,
-   "run": "1a2b5bd06e29",
+   "carried_stage": 67,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -95814,10 +95814,10 @@
      "ref_stage": 35
     }
    ],
-   "seconds": 64.5,
+   "seconds": 57.6,
    "carried_from": 42,
-   "ending": "as Response-2000's does: its solve gives up, and r2c's own solve finds no state beyond either",
-   "run": "1a2b5bd06e29",
+   "ending": "where r2c's copy of Response-2000's stage control stops: its solve fails, and r2c's own solve finds no state beyond either",
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -97235,7 +97235,7 @@
     }
    ],
    "seconds": 1.1,
-   "run": "1a2b5bd06e29",
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -98724,8 +98724,8 @@
      "ref_stage": 14
     }
    ],
-   "seconds": 1.8,
-   "run": "1a2b5bd06e29",
+   "seconds": 1.1,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -100230,10 +100230,10 @@
      }
     ]
    },
-   "seconds": 104.6,
+   "seconds": 109.0,
    "carried_from": 47,
-   "response_last": 46,
-   "run": "1a2b5bd06e29",
+   "carried_stage": 46,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -101818,8 +101818,8 @@
      "ref_stage": 14
     }
    ],
-   "seconds": 1.7,
-   "run": "1a2b5bd06e29",
+   "seconds": 1.0,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -103319,8 +103319,8 @@
      "ref_stage": 11
     }
    ],
-   "seconds": 1.1,
-   "run": "1a2b5bd06e29",
+   "seconds": 1.3,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -104810,10 +104810,10 @@
      }
     ]
    },
-   "seconds": 185.4,
+   "seconds": 187.2,
    "carried_from": 34,
-   "response_last": 33,
-   "run": "1a2b5bd06e29",
+   "carried_stage": 33,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -106704,8 +106704,8 @@
      "ref_stage": 9
     }
    ],
-   "seconds": 1.9,
-   "run": "1a2b5bd06e29",
+   "seconds": 2.0,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -108204,8 +108204,8 @@
      "ref_stage": 12
     }
    ],
-   "seconds": 2.2,
-   "run": "1a2b5bd06e29",
+   "seconds": 1.3,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -109712,10 +109712,10 @@
      }
     ]
    },
-   "seconds": 165.6,
+   "seconds": 176.1,
    "carried_from": 68,
-   "response_last": 67,
-   "run": "1a2b5bd06e29",
+   "carried_stage": 67,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -111198,10 +111198,10 @@
      "ref_stage": 31
     }
    ],
-   "seconds": 95.1,
+   "seconds": 90.7,
    "carried_from": 37,
-   "response_last": 36,
-   "run": "1a2b5bd06e29",
+   "carried_stage": 36,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -112605,8 +112605,8 @@
      "ref_stage": 48
     }
    ],
-   "seconds": 1.6,
-   "run": "1a2b5bd06e29",
+   "seconds": 1.0,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -114054,8 +114054,8 @@
      "ref_stage": 60
     }
    ],
-   "seconds": 1.8,
-   "run": "1a2b5bd06e29",
+   "seconds": 1.2,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -115551,8 +115551,8 @@
      "ref_stage": 16
     }
    ],
-   "seconds": 1.7,
-   "run": "1a2b5bd06e29",
+   "seconds": 1.0,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -117358,8 +117358,8 @@
      "ref_stage": 13
     }
    ],
-   "seconds": 2.5,
-   "run": "1a2b5bd06e29",
+   "seconds": 1.5,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -118871,8 +118871,8 @@
      "ref_stage": 47
     }
    ],
-   "seconds": 1.6,
-   "run": "1a2b5bd06e29",
+   "seconds": 1.0,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -120405,10 +120405,10 @@
      }
     ]
    },
-   "seconds": 33.0,
+   "seconds": 26.9,
    "carried_from": 52,
-   "response_last": 51,
-   "run": "1a2b5bd06e29",
+   "carried_stage": 51,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -121824,10 +121824,10 @@
      "ref_stage": 39
     }
    ],
-   "seconds": 70.1,
+   "seconds": 65.7,
    "carried_from": 44,
-   "ending": "as Response-2000's does: its solve gives up, and r2c's own solve finds no state beyond either",
-   "run": "1a2b5bd06e29",
+   "ending": "where r2c's copy of Response-2000's stage control stops: its solve fails, and r2c's own solve finds no state beyond either",
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -123250,7 +123250,7 @@
     }
    ],
    "seconds": 0.9,
-   "run": "1a2b5bd06e29",
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -124695,8 +124695,8 @@
      "ref_stage": 65
     }
    ],
-   "seconds": 1.2,
-   "run": "1a2b5bd06e29",
+   "seconds": 1.1,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -126159,9 +126159,9 @@
      "ref_stage": 134
     }
    ],
-   "seconds": 69.6,
-   "ending": "as Response-2000's does: it refuses a state whose web is crushing with the load still rising, and no smaller step is solved",
-   "run": "1a2b5bd06e29",
+   "seconds": 69.1,
+   "ending": "where r2c's copy of Response-2000's stage control stops: it refuses a state whose web is crushing with the load still rising, and no smaller step is solved",
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -127971,8 +127971,8 @@
      "ref_stage": 53
     }
    ],
-   "seconds": 1.6,
-   "run": "1a2b5bd06e29",
+   "seconds": 0.9,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -129115,8 +129115,8 @@
      "ref_stage": 63
     }
    ],
-   "seconds": 1.9,
-   "run": "1a2b5bd06e29",
+   "seconds": 1.1,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -130621,8 +130621,8 @@
      "ref_stage": 56
     }
    ],
-   "seconds": 1.7,
-   "run": "1a2b5bd06e29",
+   "seconds": 1.0,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -132063,10 +132063,10 @@
      "ref_stage": 37
     }
    ],
-   "seconds": 81.6,
+   "seconds": 73.9,
    "carried_from": 40,
-   "ending": "as Response-2000's does: its solve gives up, and r2c's own solve finds no state beyond either",
-   "run": "1a2b5bd06e29",
+   "ending": "where r2c's copy of Response-2000's stage control stops: its solve fails, and r2c's own solve finds no state beyond either",
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -133786,8 +133786,8 @@
      "ref_stage": 11
     }
    ],
-   "seconds": 2.5,
-   "run": "1a2b5bd06e29",
+   "seconds": 2.0,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -135590,8 +135590,8 @@
      "ref_stage": 15
     }
    ],
-   "seconds": 2.4,
-   "run": "1a2b5bd06e29",
+   "seconds": 2.3,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -137432,8 +137432,8 @@
      "ref_stage": 15
     }
    ],
-   "seconds": 1.8,
-   "run": "1a2b5bd06e29",
+   "seconds": 2.0,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -138971,8 +138971,8 @@
      "ref_stage": 60
     }
    ],
-   "seconds": 1.1,
-   "run": "1a2b5bd06e29",
+   "seconds": 1.3,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      0.005,
@@ -140779,8 +140779,8 @@
      "ref_stage": 13
     }
    ],
-   "seconds": 1.1,
-   "run": "1a2b5bd06e29",
+   "seconds": 1.8,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -142292,8 +142292,8 @@
      "ref_stage": 14
     }
    ],
-   "seconds": 1.2,
-   "run": "1a2b5bd06e29",
+   "seconds": 1.3,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -144135,10 +144135,10 @@
      }
     ]
    },
-   "seconds": 76.3,
+   "seconds": 72.0,
    "carried_from": 117,
-   "response_last": 116,
-   "run": "1a2b5bd06e29",
+   "carried_stage": 116,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -146478,8 +146478,8 @@
      "ref_stage": 13
     }
    ],
-   "seconds": 1.7,
-   "run": "1a2b5bd06e29",
+   "seconds": 1.8,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -148031,8 +148031,8 @@
      "ref_stage": 224
     }
    ],
-   "seconds": 5.4,
-   "run": "1a2b5bd06e29",
+   "seconds": 4.6,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -150196,8 +150196,8 @@
      "ref_stage": 323
     }
    ],
-   "seconds": 7.1,
-   "run": "1a2b5bd06e29",
+   "seconds": 5.2,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -152757,8 +152757,8 @@
      "ref_stage": 56
     }
    ],
-   "seconds": 1.7,
-   "run": "1a2b5bd06e29",
+   "seconds": 1.3,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -154509,10 +154509,10 @@
      "ref_stage": 55
     }
    ],
-   "seconds": 145.0,
+   "seconds": 134.4,
    "carried_from": 59,
-   "ending": "as Response-2000's does: its solve gives up, and r2c's own solve finds no state beyond either",
-   "run": "1a2b5bd06e29",
+   "ending": "where r2c's copy of Response-2000's stage control stops: its solve fails, and r2c's own solve finds no state beyond either",
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -155966,10 +155966,10 @@
      "ref_stage": 14
     }
    ],
-   "seconds": 86.2,
+   "seconds": 83.9,
    "carried_from": 52,
-   "ending": "as Response-2000's does: its solve gives up, and r2c's own solve finds no state beyond either",
-   "run": "1a2b5bd06e29",
+   "ending": "where r2c's copy of Response-2000's stage control stops: its solve fails, and r2c's own solve finds no state beyond either",
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.999,
@@ -157437,10 +157437,10 @@
      }
     ]
    },
-   "seconds": 112.1,
+   "seconds": 110.5,
    "carried_from": 38,
-   "response_last": 37,
-   "run": "1a2b5bd06e29",
+   "carried_stage": 37,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -159037,10 +159037,10 @@
      }
     ]
    },
-   "seconds": 63.9,
+   "seconds": 68.4,
    "carried_from": 65,
-   "response_last": 64,
-   "run": "1a2b5bd06e29",
+   "carried_stage": 64,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -160209,10 +160209,10 @@
      "ref_stage": 62
     }
    ],
-   "seconds": 113.7,
+   "seconds": 114.5,
    "carried_from": 73,
-   "response_last": 72,
-   "run": "1a2b5bd06e29",
+   "carried_stage": 72,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -162031,10 +162031,10 @@
      "ref_stage": 54
     }
    ],
-   "seconds": 102.7,
+   "seconds": 97.6,
    "carried_from": 53,
-   "ending": "as Response-2000's does: its solve gives up, and r2c's own solve finds no state beyond either",
-   "run": "1a2b5bd06e29",
+   "ending": "where r2c's copy of Response-2000's stage control stops: its solve fails, and r2c's own solve finds no state beyond either",
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      0.005,
@@ -163499,7 +163499,7 @@
     }
    ],
    "seconds": 1.0,
-   "run": "1a2b5bd06e29",
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -164622,10 +164622,10 @@
      "ref_stage": 39
     }
    ],
-   "seconds": 42.7,
+   "seconds": 44.6,
    "carried_from": 40,
-   "response_last": 39,
-   "run": "1a2b5bd06e29",
+   "carried_stage": 39,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -166037,8 +166037,8 @@
      "ref_stage": 51
     }
    ],
-   "seconds": 0.8,
-   "run": "1a2b5bd06e29",
+   "seconds": 0.9,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      0.089,
@@ -167453,10 +167453,10 @@
      "ref_stage": 129
     }
    ],
-   "seconds": 87.1,
+   "seconds": 89.7,
    "carried_from": 44,
-   "ending": "as Response-2000's does: its solve gives up, and r2c's own solve finds no state beyond either",
-   "run": "1a2b5bd06e29",
+   "ending": "where r2c's copy of Response-2000's stage control stops: its solve fails, and r2c's own solve finds no state beyond either",
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -169196,10 +169196,10 @@
      "ref_stage": 42
     }
    ],
-   "seconds": 72.9,
+   "seconds": 63.6,
    "carried_from": 44,
-   "ending": "as Response-2000's does: its solve gives up, and r2c's own solve finds no state beyond either",
-   "run": "1a2b5bd06e29",
+   "ending": "where r2c's copy of Response-2000's stage control stops: its solve fails, and r2c's own solve finds no state beyond either",
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -170262,10 +170262,10 @@
      "ref_stage": 42
     }
    ],
-   "seconds": 91.8,
+   "seconds": 81.4,
    "carried_from": 56,
-   "ending": "as Response-2000's does: its solve gives up, and r2c's own solve finds no state beyond either",
-   "run": "1a2b5bd06e29",
+   "ending": "where r2c's copy of Response-2000's stage control stops: its solve fails, and r2c's own solve finds no state beyond either",
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.234,
@@ -171735,8 +171735,8 @@
      "ref_stage": 16
     }
    ],
-   "seconds": 0.7,
-   "run": "1a2b5bd06e29",
+   "seconds": 0.5,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      0.174,
@@ -172815,10 +172815,10 @@
      "ref_stage": 44
     }
    ],
-   "seconds": 153.7,
+   "seconds": 144.9,
    "carried_from": 83,
-   "ending": "as Response-2000's does: its solve gives up, and r2c's own solve finds no state beyond either",
-   "run": "1a2b5bd06e29",
+   "ending": "where r2c's copy of Response-2000's stage control stops: its solve fails, and r2c's own solve finds no state beyond either",
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.07,
@@ -174354,10 +174354,10 @@
      "ref_stage": 52
     }
    ],
-   "seconds": 112.4,
+   "seconds": 118.7,
    "carried_from": 52,
-   "ending": "as Response-2000's does: its solve gives up, and r2c's own solve finds no state beyond either",
-   "run": "1a2b5bd06e29",
+   "ending": "where r2c's copy of Response-2000's stage control stops: its solve fails, and r2c's own solve finds no state beyond either",
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      0.042,
@@ -175457,10 +175457,10 @@
      "ref_stage": 38
     }
    ],
-   "seconds": 71.1,
+   "seconds": 69.5,
    "carried_from": 52,
-   "ending": "as Response-2000's does: its solve gives up, and r2c's own solve finds no state beyond either",
-   "run": "1a2b5bd06e29",
+   "ending": "where r2c's copy of Response-2000's stage control stops: its solve fails, and r2c's own solve finds no state beyond either",
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.117,
@@ -176560,10 +176560,10 @@
      "ref_stage": 38
     }
    ],
-   "seconds": 71.9,
+   "seconds": 70.5,
    "carried_from": 52,
-   "ending": "as Response-2000's does: its solve gives up, and r2c's own solve finds no state beyond either",
-   "run": "1a2b5bd06e29",
+   "ending": "where r2c's copy of Response-2000's stage control stops: its solve fails, and r2c's own solve finds no state beyond either",
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.117,
@@ -178322,8 +178322,8 @@
      "ref_stage": 13
     }
    ],
-   "seconds": 1.6,
-   "run": "1a2b5bd06e29",
+   "seconds": 1.3,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -179801,7 +179801,7 @@
     }
    ],
    "seconds": 0.7,
-   "run": "1a2b5bd06e29",
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -180824,10 +180824,10 @@
      "ref_stage": 41
     }
    ],
-   "seconds": 76.4,
+   "seconds": 74.3,
    "carried_from": 41,
-   "ending": "as Response-2000's does: its solve gives up, and r2c's own solve finds no state beyond either",
-   "run": "1a2b5bd06e29",
+   "ending": "where r2c's copy of Response-2000's stage control stops: its solve fails, and r2c's own solve finds no state beyond either",
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -182219,10 +182219,10 @@
      "ref_stage": 39
     }
    ],
-   "seconds": 57.4,
+   "seconds": 61.3,
    "carried_from": 47,
-   "ending": "as Response-2000's does: its solve gives up, and r2c's own solve finds no state beyond either",
-   "run": "1a2b5bd06e29",
+   "ending": "where r2c's copy of Response-2000's stage control stops: its solve fails, and r2c's own solve finds no state beyond either",
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      0.042,
@@ -183614,8 +183614,8 @@
      "ref_stage": 34
     }
    ],
-   "seconds": 0.8,
-   "run": "1a2b5bd06e29",
+   "seconds": 0.5,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      0.0,
@@ -184956,8 +184956,8 @@
      "ref_stage": 29
     }
    ],
-   "seconds": 41.2,
-   "run": "1a2b5bd06e29",
+   "seconds": 38.6,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -186636,8 +186636,8 @@
      "ref_stage": 17
     }
    ],
-   "seconds": 1.3,
-   "run": "1a2b5bd06e29",
+   "seconds": 1.6,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.017,
@@ -188160,8 +188160,8 @@
      "ref_stage": 46
     }
    ],
-   "seconds": 4.1,
-   "run": "1a2b5bd06e29",
+   "seconds": 6.0,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      0.169,
@@ -189596,7 +189596,7 @@
     }
    ],
    "seconds": 1.0,
-   "run": "1a2b5bd06e29",
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -191377,7 +191377,7 @@
     }
    ],
    "seconds": 1.6,
-   "run": "1a2b5bd06e29",
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -193172,8 +193172,8 @@
      "ref_stage": 49
     }
    ],
-   "seconds": 1.3,
-   "run": "1a2b5bd06e29",
+   "seconds": 0.9,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -194960,10 +194960,10 @@
      }
     ]
    },
-   "seconds": 16.0,
+   "seconds": 17.8,
    "carried_from": 42,
-   "response_last": 41,
-   "run": "1a2b5bd06e29",
+   "carried_stage": 41,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -196716,7 +196716,7 @@
     }
    ],
    "seconds": 1.0,
-   "run": "1a2b5bd06e29",
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      0.032,
@@ -198519,8 +198519,8 @@
      "ref_stage": 8
     }
    ],
-   "seconds": 2.0,
-   "run": "1a2b5bd06e29",
+   "seconds": 2.7,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -200312,8 +200312,8 @@
      "ref_stage": 20
     }
    ],
-   "seconds": 1.5,
-   "run": "1a2b5bd06e29",
+   "seconds": 1.2,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -202146,8 +202146,8 @@
      "ref_stage": 17
     }
    ],
-   "seconds": 2.5,
-   "run": "1a2b5bd06e29",
+   "seconds": 1.5,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -203620,10 +203620,10 @@
      "ref_stage": 40
     }
    ],
-   "seconds": 71.3,
+   "seconds": 69.0,
    "carried_from": 44,
-   "ending": "as Response-2000's does: its solve gives up, and r2c's own solve finds no state beyond either",
-   "run": "1a2b5bd06e29",
+   "ending": "where r2c's copy of Response-2000's stage control stops: its solve fails, and r2c's own solve finds no state beyond either",
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -205098,10 +205098,10 @@
      }
     ]
    },
-   "seconds": 245.6,
+   "seconds": 230.0,
    "carried_from": 68,
-   "ending": "as Response-2000's does: its solve gives up, and r2c's own solve finds no state beyond either",
-   "run": "1a2b5bd06e29",
+   "ending": "where r2c's copy of Response-2000's stage control stops: its solve fails, and r2c's own solve finds no state beyond either",
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -206630,10 +206630,10 @@
      }
     ]
    },
-   "seconds": 96.2,
+   "seconds": 94.6,
    "carried_from": 62,
-   "response_last": 61,
-   "run": "1a2b5bd06e29",
+   "carried_stage": 61,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -208143,10 +208143,10 @@
      }
     ]
    },
-   "seconds": 57.4,
+   "seconds": 57.3,
    "carried_from": 92,
-   "response_last": 91,
-   "run": "1a2b5bd06e29",
+   "carried_stage": 91,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -209719,10 +209719,10 @@
      "ref_stage": 73
     }
    ],
-   "seconds": 60.7,
+   "seconds": 56.5,
    "carried_from": 39,
-   "response_last": 38,
-   "run": "1a2b5bd06e29",
+   "carried_stage": 38,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.047,
@@ -211170,8 +211170,8 @@
      "ref_stage": 37
     }
    ],
-   "seconds": 5.7,
-   "run": "1a2b5bd06e29",
+   "seconds": 5.8,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.07,
@@ -212207,8 +212207,8 @@
      "ref_stage": 36
     }
    ],
-   "seconds": 8.2,
-   "run": "1a2b5bd06e29",
+   "seconds": 7.2,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.094,
@@ -213306,10 +213306,10 @@
      }
     ]
    },
-   "seconds": 112.8,
+   "seconds": 105.6,
    "carried_from": 65,
-   "response_last": 64,
-   "run": "1a2b5bd06e29",
+   "carried_stage": 64,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -214509,8 +214509,8 @@
      "ref_stage": 57
     }
    ],
-   "seconds": 23.3,
-   "run": "1a2b5bd06e29",
+   "seconds": 21.5,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -215990,8 +215990,8 @@
      "ref_stage": 37
     }
    ],
-   "seconds": 11.6,
-   "run": "1a2b5bd06e29",
+   "seconds": 9.5,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.07,
@@ -217343,10 +217343,10 @@
      "ref_stage": 42
     }
    ],
-   "seconds": 108.4,
+   "seconds": 110.6,
    "carried_from": 37,
-   "response_last": 36,
-   "run": "1a2b5bd06e29",
+   "carried_stage": 36,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -219035,8 +219035,8 @@
      "ref_stage": 30
     }
    ],
-   "seconds": 3.4,
-   "run": "1a2b5bd06e29",
+   "seconds": 4.4,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      0.0,
@@ -220393,8 +220393,8 @@
      "ref_stage": 57
     }
    ],
-   "seconds": 4.6,
-   "run": "1a2b5bd06e29",
+   "seconds": 4.0,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.45,
@@ -222165,10 +222165,10 @@
      "ref_stage": 37
     }
    ],
-   "seconds": 61.1,
+   "seconds": 60.2,
    "carried_from": 38,
-   "ending": "as Response-2000's does: its solve gives up, and r2c's own solve finds no state beyond either",
-   "run": "1a2b5bd06e29",
+   "ending": "where r2c's copy of Response-2000's stage control stops: its solve fails, and r2c's own solve finds no state beyond either",
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -223551,8 +223551,8 @@
      "ref_stage": 59
     }
    ],
-   "seconds": 1.4,
-   "run": "1a2b5bd06e29",
+   "seconds": 1.0,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -224999,10 +224999,10 @@
      "ref_stage": 38
     }
    ],
-   "seconds": 120.0,
+   "seconds": 106.6,
    "carried_from": 37,
-   "ending": "as Response-2000's does: its solve gives up, and r2c's own solve finds no state beyond either",
-   "run": "1a2b5bd06e29",
+   "ending": "where r2c's copy of Response-2000's stage control stops: its solve fails, and r2c's own solve finds no state beyond either",
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -226393,8 +226393,8 @@
      "ref_stage": 59
     }
    ],
-   "seconds": 1.0,
-   "run": "1a2b5bd06e29",
+   "seconds": 0.9,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -227835,10 +227835,10 @@
      "ref_stage": 38
     }
    ],
-   "seconds": 57.5,
+   "seconds": 55.0,
    "carried_from": 43,
-   "ending": "as Response-2000's does: its solve gives up, and r2c's own solve finds no state beyond either",
-   "run": "1a2b5bd06e29",
+   "ending": "where r2c's copy of Response-2000's stage control stops: its solve fails, and r2c's own solve finds no state beyond either",
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -229254,7 +229254,7 @@
     }
    ],
    "seconds": 1.1,
-   "run": "1a2b5bd06e29",
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -230704,10 +230704,10 @@
      "ref_stage": 30
     }
    ],
-   "seconds": 34.7,
+   "seconds": 28.4,
    "carried_from": 43,
-   "response_last": 42,
-   "run": "1a2b5bd06e29",
+   "carried_stage": 42,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -232112,7 +232112,7 @@
     }
    ],
    "seconds": 1.3,
-   "run": "1a2b5bd06e29",
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -233576,10 +233576,10 @@
      "ref_stage": 39
     }
    ],
-   "seconds": 50.8,
+   "seconds": 53.2,
    "carried_from": 43,
-   "ending": "as Response-2000's does: its solve gives up, and r2c's own solve finds no state beyond either",
-   "run": "1a2b5bd06e29",
+   "ending": "where r2c's copy of Response-2000's stage control stops: its solve fails, and r2c's own solve finds no state beyond either",
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -234971,7 +234971,7 @@
     }
    ],
    "seconds": 1.1,
-   "run": "1a2b5bd06e29",
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -236409,10 +236409,10 @@
      "ref_stage": 33
     }
    ],
-   "seconds": 90.2,
+   "seconds": 89.3,
    "carried_from": 33,
-   "ending": "as Response-2000's does: its solve gives up, and r2c's own solve finds no state beyond either",
-   "run": "1a2b5bd06e29",
+   "ending": "where r2c's copy of Response-2000's stage control stops: its solve fails, and r2c's own solve finds no state beyond either",
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -237803,9 +237803,9 @@
      "ref_stage": 30
     }
    ],
-   "seconds": 65.5,
-   "ending": "as Response-2000's does: it refuses a state whose web is crushing with the load still rising, and no smaller step is solved",
-   "run": "1a2b5bd06e29",
+   "seconds": 69.7,
+   "ending": "where r2c's copy of Response-2000's stage control stops: it refuses a state whose web is crushing with the load still rising, and no smaller step is solved",
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -239290,8 +239290,8 @@
      "ref_stage": 4
     }
    ],
-   "seconds": 1.4,
-   "run": "1a2b5bd06e29",
+   "seconds": 1.1,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -240734,9 +240734,9 @@
      "ref_stage": 52
     }
    ],
-   "seconds": 58.7,
-   "ending": "as Response-2000's does: it refuses a state whose web is crushing with the load still rising, and no smaller step is solved",
-   "run": "1a2b5bd06e29",
+   "seconds": 58.1,
+   "ending": "where r2c's copy of Response-2000's stage control stops: it refuses a state whose web is crushing with the load still rising, and no smaller step is solved",
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -242209,7 +242209,7 @@
     }
    ],
    "seconds": 1.1,
-   "run": "1a2b5bd06e29",
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -243644,8 +243644,8 @@
      "ref_stage": 69
     }
    ],
-   "seconds": 19.7,
-   "run": "1a2b5bd06e29",
+   "seconds": 19.3,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -245099,10 +245099,10 @@
      "ref_stage": 51
     }
    ],
-   "seconds": 80.4,
+   "seconds": 72.8,
    "carried_from": 57,
-   "ending": "as Response-2000's does: its solve gives up, and r2c's own solve finds no state beyond either",
-   "run": "1a2b5bd06e29",
+   "ending": "where r2c's copy of Response-2000's stage control stops: its solve fails, and r2c's own solve finds no state beyond either",
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      0.0,
@@ -245874,7 +245874,7 @@
     }
    ],
    "seconds": 0.0,
-   "run": "1a2b5bd06e29",
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -247086,10 +247086,10 @@
      "ref_stage": 54
     }
    ],
-   "seconds": 74.9,
+   "seconds": 73.4,
    "carried_from": 49,
-   "ending": "as Response-2000's does: its solve gives up, and r2c's own solve finds no state beyond either",
-   "run": "1a2b5bd06e29",
+   "ending": "where r2c's copy of Response-2000's stage control stops: its solve fails, and r2c's own solve finds no state beyond either",
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -248224,8 +248224,8 @@
      "ref_stage": 15
     }
    ],
-   "seconds": 2.1,
-   "run": "1a2b5bd06e29",
+   "seconds": 1.7,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      0.0,
@@ -249456,8 +249456,8 @@
      "ref_stage": 67
     }
    ],
-   "seconds": 1.7,
-   "run": "1a2b5bd06e29",
+   "seconds": 1.6,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -250665,8 +250665,8 @@
      "ref_stage": 69
     }
    ],
-   "seconds": 1.8,
-   "run": "1a2b5bd06e29",
+   "seconds": 1.7,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -252215,10 +252215,10 @@
      }
     ]
    },
-   "seconds": 55.6,
+   "seconds": 56.2,
    "carried_from": 86,
-   "response_last": 85,
-   "run": "1a2b5bd06e29",
+   "carried_stage": 85,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -253813,8 +253813,8 @@
      "ref_stage": 14
     }
    ],
-   "seconds": 2.2,
-   "run": "1a2b5bd06e29",
+   "seconds": 1.4,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -255647,8 +255647,8 @@
      "ref_stage": 6
     }
    ],
-   "seconds": 2.5,
-   "run": "1a2b5bd06e29",
+   "seconds": 2.0,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -257437,10 +257437,10 @@
      "ref_stage": 17
     }
    ],
-   "seconds": 37.4,
+   "seconds": 38.0,
    "carried_from": 41,
-   "response_last": 40,
-   "run": "1a2b5bd06e29",
+   "carried_stage": 40,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -258849,8 +258849,8 @@
      "ref_stage": 12
     }
    ],
-   "seconds": 1.6,
-   "run": "1a2b5bd06e29",
+   "seconds": 1.7,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -260340,8 +260340,8 @@
      "ref_stage": 12
     }
    ],
-   "seconds": 1.7,
-   "run": "1a2b5bd06e29",
+   "seconds": 1.6,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -261538,9 +261538,9 @@
      }
     ]
    },
-   "seconds": 60.0,
-   "ending": "as Response-2000's does: it refuses a state whose web is crushing with the load still rising, and no smaller step is solved",
-   "run": "1a2b5bd06e29",
+   "seconds": 52.9,
+   "ending": "where r2c's copy of Response-2000's stage control stops: it refuses a state whose web is crushing with the load still rising, and no smaller step is solved",
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -263086,7 +263086,7 @@
     }
    ],
    "seconds": 1.5,
-   "run": "1a2b5bd06e29",
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      0.012,
@@ -264914,8 +264914,8 @@
      "ref_stage": 19
     }
    ],
-   "seconds": 1.9,
-   "run": "1a2b5bd06e29",
+   "seconds": 3.0,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -266470,8 +266470,8 @@
      }
     ]
    },
-   "seconds": 27.4,
-   "run": "1a2b5bd06e29",
+   "seconds": 27.0,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -268016,8 +268016,8 @@
      "ref_stage": 10
     }
    ],
-   "seconds": 32.0,
-   "run": "1a2b5bd06e29",
+   "seconds": 36.8,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -270016,10 +270016,10 @@
      "ref_stage": 47
     }
    ],
-   "seconds": 96.8,
+   "seconds": 93.9,
    "carried_from": 52,
-   "ending": "as Response-2000's does: its solve gives up, and r2c's own solve finds no state beyond either",
-   "run": "1a2b5bd06e29",
+   "ending": "where r2c's copy of Response-2000's stage control stops: its solve fails, and r2c's own solve finds no state beyond either",
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.0,
@@ -271476,8 +271476,8 @@
      "ref_stage": 15
     }
    ],
-   "seconds": 1.5,
-   "run": "1a2b5bd06e29",
+   "seconds": 1.6,
+   "run": "694b477fcb8f",
    "sub_curve": [
     [
      -0.006,
