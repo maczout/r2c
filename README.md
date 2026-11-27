@@ -8,19 +8,27 @@ r2c is the counterpart of [r2x](https://github.com/maczout/r2x), which drives Re
 itself. The two have the same command line and write the same record format, so one can stand
 in for the other in a workflow, and r2x serves as the oracle that r2c is compared against.
 
-**Status: 0.1.0, a first pass.** Flexure and axial load follow Response closely, stage for
-stage in most cases. Shear follows it up to the peak in the cases tried, and less well after
-it; some shear responses end early. `docs/verification-results.md` has the numbers, case by case, and
-`docs/verification.md` what they mean and what falls short; https://maczout.github.io/r2c/
-shows the same results as pictures. Read both before relying on a
-result.
+**What it is good for, in one paragraph.** Without shear (moment, axial load, or both)
+r2c gives Response-2000's answer: on sections it was never tuned against, every case was
+inside ±5 % on every check, stage for stage. With shear it gives Response's curve up to
+the peak (the peak load, the rising branch, the stress state under moment and axial load,
+the crack widths) on every such case; the shear-related profiles over the depth at the
+peak, and how the response ends after it, agree on about three cases in five and three in
+four, and there Response does not agree with itself either when an input changes by next
+to nothing. The numbers, the cases they were measured on and an independent assessor's
+findings are in `docs/summary.md`; https://maczout.github.io/r2c/ shows the development
+results as pictures. Read "Known limitations" below before relying on a result.
 
 r2c is not affiliated with the authors of Response-2000 and does not check designs. Its results
 are its own; the engineer who uses them is responsible for that use.
 
 ## Install
 
-    pip install -e .          # Python 3.10 or later; needs numpy
+    git clone https://github.com/maczout/r2c
+    cd r2c
+    pip install -e .          # Python 3.10 or later; needs numpy and nothing else
+
+Nothing of Response-2000 is needed to run r2c, and nothing of it is in this repository.
 
 ## Use
 
@@ -30,29 +38,42 @@ are its own; the engineer who uses them is responsible for that use.
     r2c solve beam.rsp --initial=-500,0,0 --increment 0,1,1 --stage all --out results
     r2c solve --help
 
+The section itself is drawn and saved in Response-2000 (or written as its XML); r2c reads
+that file and never edits it. Loads are N, M, V: tension positive, compression on top
+positive; only the signs and ratio of an increment matter. A negative value needs the `=`
+form (`--initial=-500,0,0`).
+
 Each input gives one record, `NAME.r2x.txt`, in the output folder: the control charts over all
 load stages and the detail-view charts of the stages asked for, as text in the form of
 Response's own "Copy Chart Data". The options are r2x's: `--units`, `--factors`, `--initial`,
 `--increment`, `--more-detail`, `--stage`, `--views`, `--out`, `--stdout`, `--overwrite`, `-p`,
 `-q`. Exit status: 0 solved, 1 failed, 2 usage error, 3 input out of scope.
 
-### Differences from r2x
+## How it differs from r2x
+
+[r2x](https://github.com/maczout/r2x) runs Response-2000 itself (under Wine) and reads its
+charts; r2c computes the response with its own kernel, written from the thesis and from
+how the program itself calculates. The command line and the record are the same, so one
+can stand in for the other.
 
 | | r2x | r2c |
 |---|---|---|
-| What solves | Response-2000 1.9.7 under Wine | r2c's own kernel |
-| `solve` | as above | same options and record |
+| What solves | Response-2000 1.9.7 under Wine | r2c's own kernel (Python, numpy) |
+| Needs | Response-2000, Wine | nothing else |
+| `solve` | as above | same options, same record format |
 | `--report` | Response's report pages | not available (usage error) |
 | `define`, sessions, `setup` | yes | no |
 | `health` | checks Wine and Response | prints the version |
 | Record header | `r2x-version`, Response and Wine identification | `r2c-version`, `kernel: r2c` |
-| Time for a solve | a few seconds, mostly starting Response under Wine (4.3 s for the Newbeam, moment only, peak-only capture); 25 to 75 s with `--stage all`, nearly all of it reading charts | 1 to 20 s without shear; 1.5 to 4 min with shear |
+| Time, without shear | 25 to 75 s reading every stage | a second or two (faster on every case measured) |
+| Time, with shear | about a minute reading every stage | one to several minutes: slower than r2x on most cases, up to about five times |
+| With shear, where Response's solve gives up before any failure | the response ends there, as Response's does | r2c carries on to a failure (see below) |
+| Inputs outside Response's manual that Response still solves | solved | refused (exit status 3) |
 
-Charts have the same titles, units, number formats and row layout as Response's exports. The
-numbers differ where the kernel differs (docs/verification.md), and the number of load stages
-can differ after the peak.
+Charts have the same titles, units, number formats and row layout as Response's exports.
+`docs/parity.md` lists every difference of interface found.
 
-### Scope
+## Scope
 
 In: Response-2000 as documented in its manual (Appendix A of Bentz's thesis). Sections
 Response-2000 saves as XML (`.rsp`, `.r2t`): any solid outline, several concrete types, bars
@@ -62,10 +83,43 @@ More Detail. `docs/scope.md` lists every input and where r2c stands on it.
 
 Out (exit status 3): the older text format (`Ver_0.8`), hollow sections, long-term effects
 (creep, relaxation), strain discontinuity, draped tendons, the Hsu softening models with Tamai
-tension stiffening, what is not in the manual (compression softening 4, 16 and 17, a segmental
-curve for reinforcing steel), and what r2x also leaves out: interaction diagrams, member
-response, pushover. What Response itself rejects is an input error: curved outline rows in a
-file, a shape without an outline. Negative shear is refused, as in Response.
+tension stiffening, tension stiffening turned off, what is not in the manual (compression
+softening 4, 16 and 17, a segmental curve for reinforcing steel), and what r2x also leaves
+out: interaction diagrams, member response, pushover. What Response itself rejects is an
+input error: curved outline rows in a file, a shape without an outline. Negative shear is
+refused, as in Response.
+
+## Known limitations
+
+In plain language; `docs/deviations.md` has the full list and `docs/summary.md` the
+numbers.
+
+- **With shear, the profiles over the depth at the peak can differ from Response's by
+  more than 5 %** (shear stress and strain, shear on the crack, principal tension,
+  stirrup and bond charts), on about two cases in five, while the peak load and the curve
+  up to it agree. Near a flat peak the two programs settle on slightly different states.
+  Response itself does not hold these profiles when a concrete strength changes by a
+  twentieth of a per cent. Use the peak and the curve; treat a profile at the peak of a
+  shear response as indicative.
+- **With shear, the response after the peak and where it ends** differ from Response's on
+  about one case in four. This was the lowest priority and was not worked on.
+- **With shear, r2c carries on where Response stops early.** On sections that fail in
+  flexure with some shear, Response's solve often gives up while the load is still
+  rising, and its response ends there with no failure. r2c finds further states and can
+  reach a peak several per cent higher than Response reports. Up to Response's last
+  stage the two agree. This is deliberate (the owner's decision); if you need Response's
+  number, it is the load at Response's last stage, not r2c's peak.
+- **A circular column, or any section that stays uniform, under axial load alone:** after
+  the peak r2c keeps a uniform response and Response does not. Deliberate.
+- **With shear r2c is slow**: minutes for a case, longer than r2x on most.
+- **Some inputs Response solves are refused** (the "Out" list above), and four kinds of
+  input on which Response gives up part-way are solved by r2c.
+- **The number and place of load stages can differ from Response's after the peak**, and
+  in a few places before it (a section cracked from the start; More Detail at its most).
+  The curves agree; the stages are not the same ones.
+- r2c was checked against Response-2000 1.9.7 only, on rectangular beams, a T-beam, a
+  circular column, a prestressed I-girder, slab strips and five of Response's sample
+  sections. A section unlike all of these has not been checked.
 
 ## Layout
 
@@ -86,14 +140,15 @@ file, a shape without an outline. Negative shear is refused, as in Response.
     tools/decompile.py     a routine of Response's binary, from a Ghidra project kept elsewhere
     tools/capture.py       rebuild the archive of full oracle captures with r2x
     tools/check.py         checks before pushing: the record follows the brief
-    tools/heldout.py       the held-out set: its recipe, its capture, its totals-only scorer
+    tools/heldout.py       the held-out sets: their recipe, their capture, their totals-only scorer
     tests/oracle/          the development set: records captured from Response-2000 with r2x
     tests/oracle/parked/   more development cases, not run by default
-    heldout/               the held-out set: the frozen manifest and the totals
+    heldout/               the two held-out sets: the frozen manifests and the totals
     docs/kernel.md         what the kernel does and where each rule comes from
     docs/verification-results.md   the results, generated
     docs/brief.md          the owner's brief: the goal, the priorities, the rules
-    docs/summary.md        one page: held-out totals, what changed, known deviations
+    docs/summary.md        the sign-off page: what r2c is good for, the held-out totals, the assessor's findings
+    docs/assessment.md     the independent assessor's findings, with the developer's answers
     docs/measures.md       how a result is judged: the tolerances and the checks
     docs/deviations.md     known deviations, in plain language
     docs/status.md         where the work stands, for the developer
