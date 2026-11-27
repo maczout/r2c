@@ -11,8 +11,8 @@ The front page (owner, 2026-11-24) is a snapshot of accuracy, in this order:
 
 1. priority 1 on the held-out set for each area, against the solution threshold, with its
    trend across the recorded scorings (heldout/totals.json; totals only, nothing per case);
-2. the latest held-out totals, priority by area; then, since the owner made speed part of
-   the threshold (2026-11-26), r2c's time beside r2x's on the development cases
+2. the latest held-out totals, priority by area; then, a reported measure and not a
+   target (owner, 2026-11-26), r2c's time beside r2x's on the development cases
    (tests/oracle/r2x-times.json), by area and by what r2x reads;
 3. the control curves of the development cases that are outside target on a check of the
    control curve (peak, rising branch, shape, ending), worst first: by the highest priority
@@ -502,7 +502,7 @@ ${trend(t)}</div>`; }
  }
  if ((D.speed || []).length) {
   H += `<h2>Speed: r2c against r2x on the same input</h2>
-<p class="sub">Part of the threshold since 2026-11-26: on every case r2c takes no longer than r2x. <b>Development cases</b> (the held-out set keeps nothing per case), both programs timed on the same machine: r2c's solve, and r2x's whole command, either reading the detail views of every stage (as the comparison here is made) or the peak stage alone (r2x's default; which of the two is meant is with the owner).</p>
+<p class="sub">A reported measure, not a target (owner, 2026-11-26); the bar is r2x reading every stage. <b>Development cases</b> (the held-out set keeps nothing per case), both programs timed on the same machine: r2c's solve, and r2x's whole command, either reading the detail views of every stage (as the comparison here is made) or the peak stage alone (r2x's default).</p>
 <div class="scroll"><table class="pa"><tr><th>Cases</th><th>r2x reads</th><th>r2c no slower</th><th>r2c, median</th><th>r2x, median</th><th>Slowest case</th></tr>`;
   for (const r of D.speed) H += `<tr><td>${esc(r.area)}</td><td>${esc(r.reads)}</td><td class="c">${r.within} of ${r.of} · ${f(100 * r.within / r.of, 0)} %</td><td class="c">${f(r.r2c, 1)} s</td><td class="c">${f(r.r2x, 1)} s</td><td class="c">${f(r.worst, 1)} times r2x's</td></tr>`;
   H += `</table></div>`;

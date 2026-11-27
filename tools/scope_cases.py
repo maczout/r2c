@@ -22,7 +22,7 @@ held-out set draws on (Response's sample files under other loads; materials, sha
 reinforcement and loads on the four sections), none of them a held-out case, so that what
 keeps the held-out totals down has a development case like it. Group X (increment 4): more
 of the kinds the held-out scorer reports outside target (its --kinds), again none of them a
-held-out case.
+held-out case. Group Y (increment 8): the kinds outside priorities 1 and 3 with shear.
 """
 
 from __future__ import annotations
@@ -208,6 +208,27 @@ CASES = [
     case("X", "newbeam-n1000-v", "newbeam", "0,0,1", initial="-1000,0,0"),
     case("X", "newbeam-st150-n400-v", "newbeam-st150", "0,0,1", initial="-400,0,0"),
     case("X", "newbeam-st2leg200-n300-v", "newbeam-st2leg200", "0,0,1", initial="-300,0,0"),
+    # increment 8: the kinds outside priorities 1 and 3 with shear at increment 7's score
+    # (rectangular beams and I-girders at M/V of 2 m or more, the T-beam under negative
+    # moment and shear, axial compression then shear alone), none of them a held-out case
+    case("Y", "newbeam-m25v", "newbeam", "0,2.5,1"),
+    case("Y", "newbeam-fc65-m2v", "newbeam-fc65", "0,2,1"),
+    case("Y", "newbeam-fc80-m3v", "newbeam-fc80", "0,3,1"),
+    case("Y", "newbeam-fc30-m25v", "newbeam-fc30", "0,2.5,1"),
+    case("Y", "newbeam-st150-m3v", "newbeam-st150", "0,3,1"),
+    case("Y", "newbeam-st2leg200-m3v", "newbeam-st2leg200", "0,3,1"),
+    case("Y", "newbeam-fy600-m2v", "newbeam-fy600", "0,2,1"),
+    case("Y", "tbeam-negm3v", "tbeam", "0,-3,1"),
+    case("Y", "tbeam-negm4v", "tbeam", "0,-4,1"),
+    case("Y", "tbeam-fc30-negm2v", "tbeam-fc30", "0,-2,1"),
+    case("Y", "igirder-m25v", "igirder", "0,2.5,1"),
+    case("Y", "igirder-m5v", "igirder", "0,5,1"),
+    case("Y", "igirder-dep5-m3v", "igirder-dep5", "0,3,1"),
+    case("Y", "igirder-fc45-m2v", "igirder-fc45", "0,2,1"),
+    case("Y", "newbeam-st150-n300-v", "newbeam-st150", "0,0,1", initial="-300,0,0"),
+    case("Y", "newbeam-n500-v", "newbeam", "0,0,1", initial="-500,0,0"),
+    case("Y", "newbeam-fc30-mv", "newbeam-fc30", "0,1,1"),
+    case("Y", "newbeam-st150-m15v", "newbeam-st150", "0,1.5,1"),
 ]
 
 
@@ -238,7 +259,7 @@ def main(argv=None) -> int:
     ap.add_argument("--inputs", nargs="*", default=[], help="folders with the present inputs")
     ap.add_argument("--fixtures", default=str(ROOT / "tests" / "oracle"))
     ap.add_argument("--only", nargs="*", help="case names (default: all without a fixture)")
-    ap.add_argument("--group", choices=("A", "B", "W", "X"), help="only this group")
+    ap.add_argument("--group", choices=("A", "B", "W", "X", "Y"), help="only this group")
     ap.add_argument("--jobs", type=int, default=1, help="captures at once (default: 1)")
     ap.add_argument("--list", action="store_true", help="list the cases and stop")
     a = ap.parse_args(argv)

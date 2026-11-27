@@ -102,6 +102,10 @@ class Analysis:
             set(sec.tz.tolist())
             | {z + d * (THIN if float(z) in self.thin_side else STEP)
                for z in self.steps for d in (-1.0, 1.0)}))
+        if self.own_start_profile:
+            # the stations of the program's table of the uncracked section's profile
+            self.shape_z = np.array(sorted(set(self.shape_z.tolist())
+                                           | set(self._profile_stations().tolist())))
         self.shape_z0 = self.shape_z.copy()      # the profile's base grid
         self.shape = self._elastic_shape()
         self.max_layers = 220
@@ -114,6 +118,8 @@ class Analysis:
         self.dead = np.zeros(len(sec.layers), dtype=bool)   # ruptured at a crack
         self.last_ey = None
         self._nodes = None      # the nodes' transverse solves so far (NodeStore)
+        self._flags = {}        # where the transverse solve of a split's node starts
+        self._own = {}          # the nodes solved in this evaluation of the section
         self._layers = {}       # the nodes of the layers between given bounds (layer_nodes)
         self._path = None       # the heights the last splitting asked for (warm)
         self._visited = None    # while the layers are being split: the heights asked for
@@ -161,12 +167,38 @@ class Analysis:
                     break
         return np.array(bd)
 
-    def _elastic_shape(self) -> np.ndarray:
-        """Shear strain profile of the uncracked section (VQ/Ib), scaled to a mean of one."""
+    # The profile of the uncracked section as the program makes it [B 004357d0]
+    # (docs/kernel.md, "The profile the first stage starts from"): a table at stations a
+    # twenty-first of the depth apart, straight between, brought to a mean of one by its
+    # own integral. Off: on the profile's own fine grid, the mean weighted by the width
+    own_start_profile = True
+
+    def _profile_stations(self) -> np.ndarray:
+        """Heights of the program's table of the uncracked profile: from the top of each
+        row of the outline down in steps of a twenty-first of the section's depth, and the
+        row's two ends (at a step in width, the point just to each side of it)."""
         sec = self.sec
-        z = self.shape_z
+        step = sec.h / 21.0
+        steps = {float(z) for z in self.steps}
+        pts = {sec.zbot, sec.ztop}
+        for z1, z2, *_ in sec.segs:
+            for k in range(1, int((z1 - z2) / step) + 1):
+                z = z1 - k * step
+                if z > z2 + 1e-9:
+                    pts.add(z)
+            for z in (z1, z2):
+                if z not in steps:
+                    pts.add(z)
+        for z in steps:
+            d = THIN if z in self.thin_side else STEP
+            pts.update((z - d, z + d))
+        return np.array(sorted(pts))
+
+    def _first_moment_profile(self, z) -> np.ndarray:
+        """VQ/Ib without its constants at heights z, ascending: the first moment about the
+        centroid of the area above each height, over the width there; nothing at the faces."""
+        sec = self.sec
         b = np.maximum(sec.width(z), 1e-9)
-        # first moment of the area above z about the centroid
         q = np.zeros_like(z)
         for i in range(len(z) - 2, -1, -1):
             zz = np.linspace(z[i], z[i + 1], 5)
@@ -174,6 +206,21 @@ class Analysis:
             q[i] = q[i + 1] + np.trapezoid(bb * (zz - sec.zc), zz)
         tau = q / b
         tau[0] = tau[-1] = 0.0
+        return tau
+
+    def _elastic_shape(self) -> np.ndarray:
+        """Shear strain profile of the uncracked section (VQ/Ib), scaled to a mean of one."""
+        sec = self.sec
+        z = self.shape_z
+        if self.own_start_profile:
+            zs = self._profile_stations()
+            tau = self._first_moment_profile(zs)
+            mean = np.trapezoid(tau, zs) / sec.h
+            if not mean > 0:
+                return np.ones_like(z)
+            return np.interp(z, zs, tau / mean)
+        b = np.maximum(sec.width(z), 1e-9)
+        tau = self._first_moment_profile(z)
         mean = np.trapezoid(tau * b, z) / np.trapezoid(b, z)
         return tau / mean if mean > 0 else np.ones_like(z)
 
@@ -274,10 +321,28 @@ class Analysis:
             ep = np.where(np.asarray(det.rhov) > 0, ep, 0.0)
             self.epy_z, self.epy = zu, ep[iu]
             return
-        # r2c's own: the largest so far, on the fixed heights of the tables
+        # r2c's own: the largest so far, on the fixed heights of the tables; with the two
+        # sides of a step in width kept apart (epy_sides), those heights and a point just
+        # to each side of every step, as the shear strain profile has them
         ep = np.where((np.asarray(det.rhov) > 0) & (ep > 1e-9), ep, 0.0)
-        old = np.interp(sec.tz, self.epy_z, self.epy)
-        self.epy_z, self.epy = sec.tz, np.maximum(old, np.interp(sec.tz, zu, ep[iu]))
+        grid = self.shape_z0 if self.epy_sides else sec.tz
+        old = np.interp(grid, self.epy_z, self.epy)
+        self.epy_z, self.epy = grid, np.maximum(old, np.interp(grid, zu, ep[iu]))
+
+    # The stirrups' plastic strain is kept apart on the two sides of a step in width: the
+    # nodes of the thin layer across a step do not take the plastic strain of the yielded
+    # stirrups of the web beside them (docs/kernel.md; trial of increment 7). Off: the
+    # table has no point at a step and is read straight across it
+    epy_sides = True
+
+    def epy_at(self, zf):
+        """The stirrups' plastic strain at heights zf; the middle node of the thin layer
+        across a step is read on the side it belongs to."""
+        zr = np.array(zf, dtype=float)
+        if self.epy_sides:
+            for zs, side in self.thin_side.items():
+                zr[np.abs(zr - zs) < 1e-9] = zs + side
+        return np.interp(zr, self.epy_z, self.epy)
 
     def commit(self, e0, phi):
         """Record what an accepted load stage leaves behind: the bars that have ruptured, and
@@ -593,6 +658,8 @@ class Analysis:
         solving a node again that was solved before with the same inputs (the layers are
         split anew at every evaluation of a state, and each split evaluates every layer
         again: a node is asked for some ten times over). See NodeStore."""
+        if self.own_transverse:
+            return self.transverse_own(zf, z, ex, g, m, ft, smx, smt, cx, sh)
         if not self.node_store:
             return self.transverse_batch(zf, z, ex, g, m, ft, smx, smt, cx, sh)
         table = self._table(zf, z, ex, g, m, ft, smx, smt, cx, sh)
@@ -604,7 +671,7 @@ class Analysis:
         sts = self.stirrups_at(zf, self.rho_width(zf, self.node_width(z)))
         cols = [self.law_index(zf, z).astype(float), ex,
                 np.zeros_like(zf) if sh is None else sh, g, m, ft, smx, smt, cx,
-                sec.tab(sec.t_rhocrit, zf), np.interp(zf, self.epy_z, self.epy)]
+                sec.tab(sec.t_rhocrit, zf), self.epy_at(zf)]
         for _st, rho, fac in sts:
             cols += [rho, fac]
         if self._nodes is None:
@@ -640,6 +707,113 @@ class Analysis:
             by.setdefault(z.shape[1:] if z.ndim == 2 else (), []).append(z)
         self._path = [np.unique(np.concatenate(zs, axis=0), axis=0) for zs in by.values()]
 
+    # Response's own transverse solve of a node [B 004a8b20, 0046b690, 004a9d90]
+    # (docs/kernel.md, "The transverse solve of a node"). Off: the first state in balance
+    # on a ladder of transverse strains, closed in on to 1e-7 MPa (as before increment 8)
+    own_transverse = True
+
+    def transverse_own(self, zf, z, ex, g, m, ft, smx, smt, cx, sh=None):
+        """The transverse strain of every node as the program finds it: from where the node
+        starts (the strain the concrete is unstrained at; for a node made by a split of a
+        layer, the mean of the two nodes it lies between), by steps on the node's secant
+        stiffness, until the stress across the member is under a thousandth of the node's
+        shear stress plus 1 Pa. A node solved in this evaluation of the section is not
+        solved again: it keeps the state it came to."""
+        sec = self.sec
+        table = self._table(zf, z, ex, g, m, ft, smx, smt, cx, sh)
+        sts = self.stirrups_at(zf, self.rho_width(zf, self.node_width(z)))
+        rcrit = sec.tab(sec.t_rhocrit, zf)
+        epy = self.epy_at(zf)
+        idx = self.law_index(zf, z)
+        n = len(zf)
+        off = np.zeros(n) if sh is None else np.asarray(sh, dtype=float)
+        kept = self._own
+        starts = self._flags
+        keys = [row.tobytes() for row in table]
+        ey = off.copy()
+        act = np.ones(n, dtype=bool)
+        zr = np.asarray(z).ravel()
+        for i, k in enumerate(keys):
+            v = kept.get(k)
+            if v is not None:
+                ey[i] = v
+                act[i] = False
+            else:
+                s = starts.get(round(float(zr[i]), 7))
+                if s is not None:
+                    ey[i] = s
+        # the stirrups' own stiffness and the strain they are unstrained at
+        ks0 = np.zeros(n)
+        pre = np.zeros(n)
+        rho_t = np.zeros(n)
+        for st, rho, fac in sts:
+            ks0 += rho * st.steel.E * st.steel.phi
+            pre += rho * st.prestrain
+            rho_t += rho
+        lc = np.where(rho_t > 0, pre / np.maximum(rho_t, 1e-30), 0.0) - epy
+
+        def run(e):
+            tot = np.empty(n)
+            stt = np.empty(n)
+            outs = []
+            for j, law in enumerate(sec.laws):
+                sel = idx == j
+                if not sel.any():
+                    outs.append(None)
+                    continue
+                subs = [(st, rho[sel], fac[sel]) for st, rho, fac in sts]
+                st_tot, st_res, _ = self.stirrup_stress(subs, e[sel], rcrit[sel], epy[sel])
+                o = nodelib.evaluate(law, ex[sel], e[sel] - off[sel], g[sel], m[sel], ft[sel],
+                                     smx[sel], smt[sel], cx[sel], st_res)
+                tot[sel] = o.fcy + st_tot
+                stt[sel] = st_tot
+                outs.append(o)
+            if len(sec.laws) == 1:
+                return tot, stt, outs[0]
+            fields = {}
+            for j, o in enumerate(outs):
+                if o is None:
+                    continue
+                sel = idx == j
+                for name, val in o.__dict__.items():
+                    fields.setdefault(name, np.zeros(n, dtype=val.dtype))[sel] = val
+            return tot, stt, nodelib.NodeOut(**fields)
+
+        ecphi = np.array([law.Ec * law.phi for law in sec.laws])[idx]
+        tot, stt, out = run(ey)
+        act &= np.abs(tot) > 1e-3 * np.abs(out.v) + 1e-9
+        share = 1.0
+        count = 0
+        while act.any():
+            with np.errstate(divide="ignore", invalid="ignore"):
+                e1m = np.where(np.abs(out.e1) > 1e-10, out.f1 / out.e1, ecphi)
+                e2m = np.where(np.abs(out.e2) > 1e-10, out.f2 / out.e2, ecphi)
+                gm = e1m * e2m / (e1m + e2m + 1e-6) + 1e-6
+                s_ = np.sin(out.theta)
+                c_ = np.cos(out.theta)
+                s2, c2, sc = s_ * s_, c_ * c_, s_ * c_
+                d21 = (e1m + e2m) * s2 * c2 - 4.0 * gm * s2 * c2
+                d22 = e1m * c2 * c2 + e2m * s2 * s2 + 4.0 * gm * s2 * c2
+                d23 = sc * (e1m * c2 - e2m * s2) - 2.0 * gm * sc * (c2 - s2)
+                es = ey + lc
+                ks = np.where(np.abs(es) > 1e-6, stt / es, ks0)
+                den = d22 + ks
+                new = off - (d21 * ex + d23 * g + ks * (off + lc)) / den
+            act &= np.isfinite(new) & (den > 1e-6)
+            if not act.any():
+                break
+            ey = np.where(act, share * new + (1.0 - share) * ey, ey)
+            tot, stt, out = run(ey)
+            count += 1
+            if count == 15:
+                share = 0.5
+            elif count > 30:
+                break
+            act &= np.abs(tot) > 1e-3 * np.abs(out.v) + 1e-6
+        for i, k in enumerate(keys):
+            kept.setdefault(k, float(ey[i]))
+        return out, ey
+
     def transverse_batch(self, zf, z, ex, g, m, ft, smx, smt, cx, sh=None):
         """The transverse strain of every node, from the condition that there is no total
         stress across the member: concrete fcy and the stirrups balance (thesis 7-2). sh is
@@ -650,7 +824,7 @@ class Analysis:
         sec = self.sec
         sts = self.stirrups_at(zf, self.rho_width(zf, self.node_width(z)))
         rcrit = sec.tab(sec.t_rhocrit, zf)
-        epy = np.interp(zf, self.epy_z, self.epy)
+        epy = self.epy_at(zf)
         idx = self.law_index(zf, z)
         n = len(zf)
 
@@ -767,7 +941,10 @@ class Analysis:
         es, fs = self.steel(e0, phi)
         f1cx = self.crack_check(e0, phi, es, fs)
         hmin = sec.h / 1024.0
-        self.warm(e0, phi, gam, f1cx)
+        self._flags = {}
+        self._own = {}
+        if not self.own_transverse:
+            self.warm(e0, phi, gam, f1cx)
         self._visited = []
         try:
             return self._refine(e0, phi, gam, f1cx, hmin, before)
@@ -788,12 +965,21 @@ class Analysis:
             z, _b = self.layer_nodes()
             if len(z) >= self.max_layers - 2 or done.all():
                 break
-            out, *_ = self.eval_nodes(e0, phi, gam, z, f1cx, lean=True)
+            out, *_r = self.eval_nodes(e0, phi, gam, z, f1cx, lean=True)
+            eyl = _r[-1]
             f1 = out.f1.reshape(z.shape)
             f2 = out.f2.reshape(z.shape)
             over = (out.e1 - out.ecr).reshape(z.shape)
             zq = np.stack([0.75 * z[:, 0] + 0.25 * z[:, 2], 0.25 * z[:, 0] + 0.75 * z[:, 2]],
                           axis=1)
+            if self.own_transverse and self.shear:
+                # a node made by a split starts from the mean of the transverse strains
+                # of the two nodes it lies between [B 004a9d90]
+                ey3 = eyl.reshape(z.shape)
+                st = np.stack([0.5 * (ey3[:, 0] + ey3[:, 1]), 0.5 * (ey3[:, 1] + ey3[:, 2])],
+                              axis=1)
+                for zz, s_ in zip(zq.ravel(), st.ravel()):
+                    self._flags[round(float(zz), 7)] = float(s_)
             oq, *_ = self.eval_nodes(e0, phi, gam, zq, f1cx, lean=True)
             q1 = oq.f1.reshape(zq.shape)
             q2 = oq.f2.reshape(zq.shape)
@@ -858,7 +1044,7 @@ class Analysis:
             tot, _res, rho_t = self.stirrup_stress(
                 self.stirrups_at(zz, self.rho_width(zz, b.ravel()[sel])), ey,
                                                    sec.tab(sec.t_rhocrit, zz),
-                                                   np.interp(zz, self.epy_z, self.epy))
+                                                   self.epy_at(zz))
             has = rho_t > 0
             fsy[has] = tot[has] / rho_t[has]
             # at a crack the stirrups also carry what the concrete carries between cracks

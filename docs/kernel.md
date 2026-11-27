@@ -118,7 +118,7 @@ offsets at the two faces, not from nothing: under the thermal gradient the upper
 straight from 0.3 mm/m at the top to nothing at the bottom, the lower one the parabola.
 r2c: `export.envelope`.
 
-*Not cloned:* the program's transverse solve stops at a tolerance, and in the shrinkage
+*Not cloned before increment 8* (now "The transverse solve of a node", under "The node"): the program's transverse solve stops at a tolerance, and in the shrinkage
 case its stirrup stresses at the nodes of the compression zone differ by up to 0.6 MPa in
 59 where the solution is the same at every node (r2c: −59.06 at each). The Transverse
 Average Bond chart, which is the difference between neighbours, shows 0.05 to 0.07 MPa
@@ -147,7 +147,7 @@ there on a chart of 1.06 (6.1 %, a Should check at the last stage: `docs/summary
   capped at 25 mm [T, B]. vci,max = 0.18√fc′/(0.31 + 24w/(a + 16)) [T].
 * The material factor multiplies every concrete stress.
 
-### The concrete's stiffness [B `004ac190`], read 2026-11-26 (increment 7): written, off
+### The concrete's stiffness [B `004ac190`], read 2026-11-26 (increment 7); on since increment 8
 
 Source: the concrete set-up `004ac190` (the material factor is the global the tension's
 slope is multiplied by in `004ac960`). No thesis equation: the thesis gives Ec only as
@@ -158,8 +158,8 @@ The stiffness the concrete has up to cracking is the stress the compression rout
 one millionth, divided by the strain. The cracking strain is the cracking strength over
 that stiffness plus 1 Pa. So in tension the concrete is a millionth less stiff than the
 compression curve's own secant at that strain. r2c divides by the material factor
-alone. The rule is written (`materials.OWN_MODULUS`, in `ConcreteLaw`'s set-up) and
-**off**: see the end of this section.
+alone before increment 8 (`materials.OWN_MODULUS`, in `ConcreteLaw`'s set-up; off:
+the secant itself).
 
 Why a millionth shows: where one principal strain is tensile and the other compressive
 and both are small, the terms of the node's stiffness that couple the shear strain with
@@ -189,7 +189,7 @@ What was left after it: at the very first step, with no shear strain at all, Res
 V-by-shear-strain term is 1989208877 and r2c's 1990492051 (0.064 % apart). That is the
 profile the first stage starts from, next.
 
-### The profile the first stage starts from [B `004357d0`, `0041e840`], read 2026-11-26 (increment 7): not in the kernel
+### The profile the first stage starts from [B `004357d0`, `0041e840`], read 2026-11-26 (increment 7); on since increment 8
 
 Source: the routine that makes the profile of the uncracked section, `004357d0` (read in
 the decompiler). The hold at the nodes afterwards is the profile update `0041e840`; that
@@ -219,16 +219,17 @@ both columns):
 | V by shear strain, stage 2, first step | 1989229803 | 1989219894 | 1989229803 |
 | N by shear strain, stage 2, first step | −6468.64 | −6468.12 | −6468.64 |
 
-**Not in the kernel.** It is written on the branch `trial/i7-start-profile`
-(`Analysis.own_start_profile`, `Analysis._profile_stations`, `Shear.hold_profile`), with
-the concrete's stiffness rule on. With both on, on all 164 development cases
-(*measured*, `tools/byprio.py`): without shear no case changes side; with shear two
-cases leave priority 1 (the I-girder at M/V = 3 m and Newbeam from a US-units file at
-1 m) and one leaves priority 2, none comes inside. Not checked: sections with a step in
-width (the routine adds a point at a step, the value above times the ratio of the
-widths), and whether the stage under constant loads holds the profile where those loads
-include shear. Merge it with the concrete's stiffness rule, when the cases that fall
-have been read at the stage where they part from Response.
+**On since increment 8** (`Analysis.own_start_profile`, `Analysis._profile_stations`,
+`Shear.hold_profile`), with the concrete's stiffness rule and the two rules that
+follow. Each alone or the two of increment 7 together sent development cases outside
+(*measured*, increment 7's log); the cases that fell were read at the stage where they
+parted from Response, which gave the next two rules. With all four on, on all 164
+development cases (*measured*, `tools/byprio.py` against the run without them): without
+shear no case changes side; with shear priority 1 goes from 55 to 54 of 60, priority 2
+from 28 to 31, priority 3 stays at 51. Not checked: sections with a step in width (the
+routine adds a point at a step, the value above times the ratio of the widths), and
+whether the stage under constant loads holds the profile where those loads include
+shear.
 
 Why it is off (*measured*, all 164 development cases, `tools/verify.py` with the rule
 on, `tools/byprio.py` and `tools/changes.py` against the run without it): 162 records
@@ -243,6 +244,113 @@ differ is the shear stiffness, 2.5 %, at the 26th stage). So the rule is right a
 case that sits on an edge fell the wrong way; it was not turned on in the increment
 that found it because the held-out set is scored once. Turn it on with the I-girder at
 3 m read at the stage where the two part.
+
+### The profile a stage is put back to [B `0041c060`], read 2026-11-26; on since increment 8 (`Shear.rebuilt_profile`, `Shear.profile_of_nodes`)
+
+Source: `0041c060` (private listing), called by `004190a0` (a stage put back to the one
+before after a failed try) and by `00415e30` (the stage a closing in on an event starts
+from: the stage before the one set aside, or the one set aside where the event is an
+un-cracking; and each stage already there that the control passes over). No thesis
+equation.
+
+What it does (*read*): with the stage's shear strain at 1e-7 or more in size, the
+profile's table is emptied and filled from the stage's own nodes: for every layer a
+point at its top node and one at its middle node, and at the end the bottom node of the
+last layer; each point's value is the node's shear strain over the stage's shear
+strain. No bringing to a mean of one, nothing from the table that was there. With a
+shear strain under 1e-7 (and not zero) the table of the uncracked section (`004357d0`)
+is made instead; with none at all the table is emptied and then that table made.
+
+What it means: the nodes carry the profile the stage was solved on, read at the stage's
+own layers; the table between passes was left by an update at another state's layers
+and by the starting table's stations. Read straight between this stage's tops and
+middles it is not the same curve, so the stage put in starts a few tenths of a per cent
+of profile error away from where the stage it copies ended. r2c put back the profile
+the stage was solved on as it was, on its whole grid (`Stage.profile`).
+
+*Measured* (Newbeam from a US-units file at M/V = 1 ft; Response's tries from the
+running program, the log of 2026-11-24; r2c with both rules of
+the two rules before it on; load in kips, profile error in per cent, passes):
+
+| Try | Response | r2c before | r2c with the rule |
+|---|---|---|---|
+| 5th stage, 0.2778 rad/km | 27.93, 0.04, 1 | 27.92, 0.04, 1 | 27.92, 0.04, 1 |
+| put in before the cracked 6th, 0.2911 | 29.27, 0.22, 1 | 29.26, 0.04, 1 | 29.26, 0.22, 1 |
+| 0.3018 | 30.27, 0.88, 2 (cracked) | 30.33, 0.04, 1 (uncracked) | 30.25, 0.84, 2 (cracked) |
+| put in, 0.2932 | 29.49, 0.22, 1 | (another path) | 29.48, 0.22, 1 |
+| put in, 0.2950 | 29.66, 0.22, 1 | | 29.65, 0.22, 1 |
+| put in, 0.2963 | 29.80, 0.22, 1 | | 29.78, 0.22, 1 |
+| 12th stage, 0.4111 | 31.56, 0.96, 6 | (11th) 31.59, 0.97, 6 | 31.58, 1.00, 6 |
+
+*Inferred*, not read: that the node's field at +0x10 is its shear strain and the layer
+record's two heights are the top and the middle node's (the numbers above agree with
+that reading). Not checked: a section with a step in width, where a layer's bottom
+node, which the table leaves out, is on the other side of the step from the next
+layer's top node.
+
+### The stirrups' plastic strain at a step in width [O; the binary's test read at `00440ea0`], 2026-11-26; on since increment 8 (`Analysis.epy_sides`, `Analysis.epy_at`)
+
+What was asked: on the I-girder at M/V = 3 m r2c's tries end on "no state (singular
+stiffness)" at 3.6 to 4.0 rad/km, where Response keeps its stages and first fails a try
+at 4.83 rad/km.
+
+What the binary does, read in the decompiler (`00440ea0`, its last block): the test for
+concrete crushed inside the depth is, layer by layer and for each of the layer's three
+nodes, the node's principal compressive strain less its offset (node +0x20 less +0xf0)
+against the strain at peak stress of the layer's concrete (concrete +8, unsoftened, not
+factored); it is made only where the top node of the first layer and the bottom node of
+the last are not past it themselves. Where a node is, the range is set to the top and
+the bottom of the section each divided by 100: a hundredth of the depth about the
+origin of heights, not an empty range. r2c's test (`Shear.crush_marks`) is the same
+strain against the same strain; r2c leaves an empty range, so every term of its
+stiffness is zero, where the program's has the stiffness of that sliver. Written in
+increment 8 and **off** (`Shear.sliver`: the range from the bottom over 100 to the top
+over 100, heights from the centroid, which is *inferred*): with it, on the 60
+development cases with shear of that day, four leave priority 1 and none comes in
+(*measured*, `tools/trial.py --set Shear.sliver=1`, `tools/byprio.py`). Either the
+origin of heights is another, or what the step routine does on that range is not what
+r2c's does; the kernel's own note on the stale range says the program's stiffness is
+singular on it. It is not what parts the two programs here.
+
+What parts them (*measured*, the capture of every stage against r2c's record, both rules
+of increment 7 on; `tools/viewlines.py --raw`, the nodes at the top of the bottom
+flange, 316.9 mm below the centroid): the three nodes r2c finds crushed are the middle
+and the flange-side node of the thin layer across the step from the web (150 mm) to the
+bottom flange (450 mm), with a shear strain of 34 mm/m and a transverse strain of 25
+mm/m in the pass that tips, where every other node is under 9. Up to the 35th stage the
+two programs agree at those nodes to three or four digits (shear strain 1.2734 against
+1.2740 mm/m at the 34th; stirrup stress 110.2 against 110.4 MPa at the 35th). At the
+35th stage the web's stirrups reach yield. From the 36th, Response's stirrup stress at
+the thin layer's nodes goes on rising elastically with their own transverse strain
+(129.9, 145.7, 162.4, 170.7 MPa at stages 36, 37, 38, 40, for 0.65 to 0.90 mm/m, which
+is 200 000 MPa times the strain), and r2c's falls while its strain rises (115.8, 79.4,
+61.4, -139.8 MPa for 0.72 to 2.99 mm/m): r2c's stirrups there unload from a plastic
+strain they never had. r2c keeps the stirrups' plastic strain on the fixed heights of
+the tables, which on this section has no height between 191.9 mm (flange) and 202.0 mm
+(web), and reads it straight between: the thin layer's nodes at 199.95 and 200.0 mm
+take about four fifths of the plastic strain of the web's yielded stirrups. Their
+transverse strain then runs away over the stages (6.9 mm/m against Response's 1.0 at
+the 41st), the shear strain with it (8.2 against 2.9), and within a pass of a later try
+they pass the strain at peak stress and empty the range.
+
+The rule (`Analysis.epy_sides`, `Analysis.epy_at`): the plastic strain is kept on the heights of the shear
+strain profile's base grid, which has a point just to each side of every step, and the
+middle node of the thin layer is read on the side it belongs to. r2c's own, like the
+table it corrects; the evidence is Response's chart of the stirrups' stress at those
+nodes.
+
+*Measured* when it was tried (six development cases, `tools/verify.py`, `tools/byprio.py`):
+against the run with the two rules of increment 7 on, the I-girder at M/V = 3 m comes
+back inside priority 1 (the override takes over at 50 stages, not 43), the I-girder
+with stronger concrete at 3 m comes inside priorities 2 and 3 and no longer needs the
+comparison up to Response's last stage, and the I-girder with deeper strands at 2 m
+comes inside priorities 2 and 3; the I-girder at 1 m, the T-beam at 4 m and Newbeam at
+1 m do not change side. On the six: priority 1 from 4 to 5, priority 2 from 2 to 4,
+priority 3 from 2 to 4, priority 4 at 4. Against the run of record of increment 7 (no
+rule on): priority 2 from 2 to 4, priority 3 from 3 to 4, nothing down. Not run: the
+other 158 cases (every section with a step in width and stirrups will change once the
+web's stirrups yield; Newbeam and the column have no step). Open: what the program
+does with the sliver of a range (r2c still empties it); a step where the stirrups end.
 
 ### Compression softening [B `004ad9c0`, set-up `004ac190`]
 
@@ -634,6 +742,93 @@ strain of 0.660 mm/m where sin²α = 0.652, and 110.1 MPa at 0.569 mm/m where it
 (measured, column with M/V = 1 m, stage 30; the hoop's radius is half the depth between
 `disttop` and `distbot`). The plastic strain a stirrup unloads from (Reinforcement, above)
 is kept in the hoop's own strain.
+
+### The transverse solve of a node [B `004a8b20`, `0046b690`, `004a7fa0`, `004a9d90`], read 2026-11-26 (increment 8): on (`Analysis.own_transverse`, `Analysis.transverse_own`)
+
+What r2c did: for every node, scan a ladder of transverse strains from compression to
+tension for the first change of sign of the stress across the member, and close in on
+that state to 1e-7 MPa. Where a node has more than one state in balance (uncracked, and
+cracked with the stirrups working), that is always the uncracked one.
+
+What the binary does (*read*):
+
+- **Where a node starts.** A node of the base layers starts from the transverse strain at
+  which its concrete is unstrained (the offset; zero without shrinkage or temperature)
+  [`004a9d90`, through `004a8fb0`, which returns its argument]. A node made when a layer
+  is split (the middle of a half layer) starts from the mean of the transverse strains,
+  as solved, of the two nodes at the ends of that half [`004a9d90`: the two nodes' field
+  at +8, summed, times 0.5, written to the new node's +8 before its solve]. A node is
+  solved once in an evaluation of the section and keeps that state while the layers are
+  split further.
+- **The step** [`004a8b20`, with the stiffness of `0046b690` (its second form) and the
+  stirrups' part added by `004a7fa0`]. The node is evaluated at its transverse strain.
+  Secant moduli in the principal directions, E1 = f1/ε1 and E2 = f2/ε2 on the concrete's
+  own strains (the concrete's stiffness times the material factor where the strain is
+  under 1e-10), a shear modulus G = E1·E2/(E1 + E2 + 1 Pa) + 1 Pa; turned to the
+  member's axes they give the row of the stress across the member, D21, D22, D23 (with
+  4·G·s²c² in D21 and D22 and 2·G·sc·(c² − s²) in D23). The stirrups add their secant
+  stiffness (their stress over their strain, ratio times; their tangent where the strain
+  is under 1e-6). The new transverse strain is the one at which that secant system has
+  no stress across the member: εy = εsh − (D21·εx + D23·γ + Ks·(εsh + c)) / (D22 + Ks),
+  with εx the concrete's own and c the stirrups' strain offset.
+- **When it stops.** Before any step: if the stress across the member is no more than a
+  thousandth of the node's shear stress plus 0.001 Pa, the node stays where it started.
+  Otherwise steps are taken until it is no more than a thousandth of the shear stress
+  plus 1 Pa. Whole steps for the first fifteen, half steps after, 31 at most; a system
+  with D22 + Ks of 1 Pa or less ends it.
+
+What it means. The node's state is in balance only to a thousandth of its shear stress.
+And where a node has two states in balance, which one it comes to depends on where it
+starts: a node made by a split next to a cracked node starts at half that node's
+transverse strain, is cracked there, and comes to the cracked state though its
+uncracked state is in balance too. So the cracked zone of a section that has just
+cracked is wider in the program than the heights where the uncracked strain passes the
+cracking strain, by as far as the splitting carries it: up to the next boundary of a
+base layer, or to where the start no longer cracks the node.
+
+r2c: `Analysis.transverse_own` (every node of a call together, each stopping on its own
+test; the count of steps is the same for every node, so a node's result does not depend
+on the nodes it is asked for with); `Analysis._flags` holds the start of each node made
+by a split (set in `_refine` from the solved strains of the half's ends), `Analysis._own`
+the transverse strain of every node solved in this evaluation, by the node's inputs;
+both are emptied when the layers are built again. The solves kept by node (`NodeStore`)
+and the nodes solved ahead (`warm`) are not used with it.
+
+*Measured* (Newbeam under shear alone, Response's tries from the running program with
+every step's stiffness, `tools/rtrace.py --steps --matrix`, 2026-11-26; r2c with the four
+rules of the start of increment 8 on). At the first cracked evaluation (shear strain
+0.1033 mm/m at the uncracked strains): unbalanced axial force, Response 10 110 N, r2c
+before 9 696, with the rule 10 115; dV/dγ 1.318e9, 1.353e9, 1.3183e9. At the marginal
+one (0.0968 mm/m): 3 304, 2 660, 3 303.7. Load and profile error of every pass of the
+first cracked stage: Response 192.3044, 189.6928, 188.4416, 187.4605, 186.4852, 186.1230
+kN; r2c with the rule the same six to the last digit (before: 192.66 ... 186.39). Every
+try up to and including the peak (16 stages) has Response's load to the digits printed,
+its profile error and its number of passes; before, they parted at the first cracked
+try (186.39 for 186.12, and 7 passes for 6 at the stage that makes the fall of load at
+cracking: 185.49 kN for 184.69, which is the fall of 1.8 % for 2.15 % in
+`docs/deviations.md`).
+
+Not cloned: the uniaxial routine for a node with next to no shear strain is still
+applied after the solve (`lone_nodes`), not in place of it; the transverse clamping
+term of the step (the table at +0x22f, zero on every development case) is left out; a
+hoop's strain factor is not in the stirrups' secant.
+
+*Measured* on the 60 development cases with shear of the start of increment 8
+(`tools/verify.py`, `tools/byprio.py` against the run with the four rules on; this rule
+and the joined response below, without the twelfth-pass rule): priorities 1 to 4 at 55,
+38, 53 of 60 and 37 of 59, from 54, 31, 51 and 36. Shear alone on Newbeam comes inside
+priorities 1 to 3; Newbeam from a US-units file at M/V = 1 ft comes back inside
+priority 1; Newbeam at M/V = 0.5 m leaves priority 1 and the column under 3000 kN
+leaves priority 3. Without shear only a case with shrinkage or a thermal strain goes
+through the transverse solve: the records of the shrinkage and thermal-gradient cases
+change, with no check changing side on those two; the others cannot change.
+
+Speed: the solve takes a handful of steps a node in place of a ladder of 27 strains and
+up to 40 closings in, and a node is solved once an evaluation. Shear alone on Newbeam:
+26 s for the whole response where the kept solves took 35 s (one case, a busy machine).
+On the set it is the other way: without the solves kept between evaluations a case
+with shear takes about twice as long (*measured*, `tools/times.py`, both runs on a busy
+machine; r2c's standing beside r2x is generated into the brief).
 
 ## Layers [T 7-3; B `00434eb0`, `004a9d90`, `004a9be0`]
 
@@ -1388,7 +1583,8 @@ Response from 13.66 to 65 mm/m and the try fails. Not found: which term of `0042
 The pass routine's tests were set against the listing once more [`00418af0`]: one was
 not on record. Under control of the shear strain, from the twelfth pass, a stage whose
 top or bottom fibre is within a fifth of its cracking strain is kept as it is once its
-error is under 50 % [`004156b0`]. Not in r2c; no traced case shows it deciding a try.
+error is under 50 % [`004156b0`]. Written in increment 8: "A stage kept as it is from the
+twelfth pass", below.
 
 ### The global solve with shear [B `004276a0`, `004267c0`], read 2026-11-22: on since increment 6
 
@@ -1447,7 +1643,7 @@ and −1 m, and the I-girder at 3 m (two concretes):
   uncracked stage on is small and steady: the four terms that couple the shear strain
   with the axial load and the moment are about 1 % apart (−38306 against −37891 N per
   unit shear strain on Newbeam's second pass). Found in increment 7: the concrete's
-  stiffness itself ("The concrete's stiffness", under "Concrete": written, off); with
+  stiffness itself ("The concrete's stiffness", under "Concrete"); with
   it the terms are within 0.01 to 0.08 %. What had been ruled out before: the node's routine
   `0046b940`, set against r2c's term by term, and the stirrups' share of the transverse
   stiffness.
@@ -1692,6 +1888,48 @@ Besides: a stage with less than 1 % of the load of the one before is dropped; of
 stages in a row with no load, one is dropped; the response ends after 327 solves. The stage
 Response shows when the solve ends is the one with the largest load.
 
+### A stage kept as it is from the twelfth pass [B `00418af0`, `004156b0`], written 2026-11-26 (increment 8): on
+
+Switch: `Shear.fibre_take`.
+
+*Read* (2026-11-25, set against the listing again 2026-11-26): after each pass, under
+control of the shear strain and from the twelfth pass on, the routine tests the top node
+of the first layer and the bottom node of the last: is the concrete's own longitudinal
+strain there within a fifth of the cracking strain (the one not lowered by compression,
+`004ff4e0`)? Where it is at either, and the solve closed, the stage is not converged
+(error 1 % or more), fewer than 16 passes are done and the error is under 50 %, the
+stage is accepted as it is, by the same path as a converged one.
+
+*Measured* (Newbeam under shear alone, with the transverse solve above): the first stage
+after the peak, Response kept, 207.44 kN, error 15.15 %, 12 passes; r2c without the rule
+193.93, 10.46 %, 16 passes (its first twelve passes are Response's, 220.7075 to 207.4385
+against 220.7075 to 207.4378); with it 207.44, 15.15 %, 12. Three more stages of that
+response end on the twelfth pass in Response.
+
+On the 78 development cases with shear (*measured*, `tools/trial.py --set
+Shear.fibre_take=0` beside the full run, `tools/byprio.py`): no case changes side on
+priorities 1 to 3 with it; on priority 4 Newbeam with stirrups at 150 mm under 200 kN
+of compression, then shear, is inside without it and outside with it, and under shear
+alone the override no longer applies with it. On because it is the binary's rule.
+
+Open after both: at the first step of the try after that stage the two stiffnesses are
+the same; at its third, where Response's depth range with stiffness has moved (top at
+245.5 mm, then 248.7 mm, of 300), r2c's unbalanced force is 2.6 % off. The top fibre is
+cracking in flexure there: read the range of `00440ea0` at that state next.
+
+### The response that carries on, joined [r2c's own; the owner's override]
+
+Switch: `run.JOIN` (on). Where
+Response's solve has given up, r2c's earlier solve finds nothing beyond the last stage
+from there, and the response that solve finds from the start passes that stage and goes
+on, the result was the whole of that other response. Now the stages kept before
+Response's solve gave up stay, and the other response's stages from the place where it
+passes the last of them are put after; `carried_from` is the number of stages kept
+before the join, not 0. So the part compared with Response is the one found Response's
+way. *Measured* on the five cases that were whole other responses with the four rules
+on: Newbeam under a moment, then shear, comes back inside priority 3; the other four
+do not change side.
+
 ## What is kept between evaluations, for speed [O], 2026-11-26 (increment 7)
 
 None of this is a rule of the calculation: each gives the numbers the plain routine
@@ -1699,6 +1937,9 @@ gives, bit for bit, and the owner's rule is that a speed change changes no resul
 (`docs/brief.md`, 2026-11-26). Held to that by `tests/test_speed.py`, `tools/shadow.py`
 (every transverse solve of a run done both ways and compared as bits) and
 `tests/oracle/records.json` with `tools/same.py` (the hash of every development record).
+Since increment 8 the solves kept by node and the nodes solved ahead are not used with
+shear: the program's own transverse solve of a node ("The node") depends on where the
+node starts, so a node is solved once an evaluation and not kept between them.
 
 - **The nodes' transverse solves are kept by node** (`NodeStore`,
   `Analysis.transverse`; the plain routine is `Analysis.transverse_batch`). The layers

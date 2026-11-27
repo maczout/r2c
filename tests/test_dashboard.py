@@ -78,7 +78,7 @@ def test_curve_misses_carry_the_priority():
 
 
 def test_the_front_page_sets_r2c_s_time_beside_r2x_s():
-    # owner, 2026-11-26: speed is part of the threshold; the page shows it by area and by
+    # owner, 2026-11-26: speed is reported (not a target); the page shows it by area and by
     # what r2x reads, from the committed times
     import json
     from pathlib import Path

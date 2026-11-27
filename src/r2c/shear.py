@@ -121,8 +121,17 @@ class Shear(Flexure):
         if marks is None:
             marks = self.crush_marks(e2, idx)
         if not marks[0] and not marks[1] and marks[2]:
-            zlo, zhi = ztop, zbot
+            if self.sliver:
+                zlo, zhi = zbot / 100.0, ztop / 100.0
+            else:
+                zlo, zhi = ztop, zbot
         return zlo, zhi
+
+    # Where concrete is crushed inside the depth with both faces sound the program leaves
+    # the top and the bottom of the section each divided by 100 as the range [B 00440ea0,
+    # its last block], not an empty one. Off: the empty range (every term of the stiffness
+    # zero, so the try has no state)
+    sliver = False
 
     def crush_marks(self, e2, idx):
         """Whether the concrete is past its strain at peak stress at the top node, at the
@@ -357,6 +366,27 @@ class Shear(Flexure):
         tau[0, 0] = 0.0
         tau[-1, 2] = 0.0
         return z, t["out"].v.reshape(z.shape), tau, t, (de0, dphi, dgam)
+
+    def hold_profile(self):
+        """After the stage under the constant loads the profile is held at the nodes of
+        that stage's layers, straight between, and brought to a mean of one by Simpson's
+        rule over each layer's three nodes, as the update leaves any profile [B 0041e840;
+        docs/kernel.md, "The profile the first stage starts from"]."""
+        an, sec = self.an, self.sec
+        z, _b = an.layer_nodes()
+        zp = an.profile_z(z)
+        new = np.interp(zp, an.shape_z, an.shape)
+        new[0, 0] = 0.0
+        new[-1, 2] = 0.0
+        dzl = z[:, 0] - z[:, 2]
+        mean = float(np.sum(dzl * (new[:, 0] + 4.0 * new[:, 1] + new[:, 2]) / 6.0)) / sec.h
+        if not math.isfinite(mean) or mean == 0.0:
+            return
+        new = new / min(max(mean, 0.1), 10.0)
+        zf = zp.ravel()[::-1]
+        zz, ii = np.unique(zf, return_index=True)
+        grid = np.unique(np.concatenate([an.shape_z0, zz]))
+        an.shape_z, an.shape = grid, np.interp(grid, zz, new.ravel()[::-1][ii])
 
     def update_profile(self, z, vstate, tau, t, gam, relax=1.0):
         """The shear strain profile for the next pass, as Response-2000 updates it
@@ -679,6 +709,29 @@ class Shear(Flexure):
             an.set_profile(keep)
             raise
 
+    # A stage kept as it is from the twelfth pass [B 004156b0]. Off: every pass up to
+    # the sixteenth (as before increment 8)
+    fibre_take = True
+
+    def _fibre_near_cracking(self, e0, phi) -> bool:
+        """Is the concrete's own strain at the top or at the bottom fibre within a fifth
+        of the cracking strain there (the one not lowered by compression)?"""
+        an, sec = self.an, self.sec
+        def law_at(z):
+            for z1, z2, _b1, _b2, law in sec.segs:
+                if z2 - 1e-9 <= z <= z1 + 1e-9:
+                    return law
+            return sec.conc0
+
+        for zz in (sec.ztop, sec.zbot):
+            law = law_at(zz)
+            zf = np.array([float(zz)])
+            ex = float(an.strain(e0, phi, zf)[0] - sec.shrinkage(zf)[0])
+            ecr = float(law.crack_strain(np.interp(zz, sec.tz, an.t_ft)))
+            if abs(ex - ecr) < 0.2 * ecr:
+                return True
+        return False
+
     # Response's tests on every pass of a stage [B 00418af0]: written, off until verified
     pass_code = False
     # r2c's own: a solve of the global strains that has not closed is carried on from when
@@ -709,6 +762,7 @@ class Shear(Flexure):
         saved_shape = an.profile()
         self.evals = 0
         self.tried = 0          # passes begun on this try, for the stage control
+        taken = False
         info = None
         ok = False
         err = 1.0
@@ -756,6 +810,13 @@ class Shear(Flexure):
                 self.half_steps, self.step_share = True, 0.5
             if getattr(self, "debug", False):
                 print(f"   pass {passes}: lam={lam:.4f} profile err={err:.6f}")
+            if self.fibre_take and self.mode == "gam" and 12 <= passes < self.passes \
+                    and self.profile_tol <= err < 0.5 and self._fibre_near_cracking(e0, phi):
+                # under control of the shear strain, from the twelfth pass: a stage with
+                # its top or bottom fibre within a fifth of its cracking strain is kept as
+                # it is once its error is under a half [B 00418af0, 004156b0]
+                taken = True
+                break
             if self.pass_code and ctx is not None:
                 # the state code of this pass's state, acted on at once [B 00418af0]
                 code = self.state_code(Stage(e0, phi, gam, lam, n, m, v,
@@ -810,14 +871,33 @@ class Shear(Flexure):
         st.gam_avg = float(num / den) if abs(den) > 1e-9 else 0.0
         st.perr = err
         st.passes = passes
+        st.taken = taken
         st.codes = codes
         st.failed = failed
-        st.profile = an.profile()        # the profile the stage leaves for the next one
+        st.profile = self.profile_of_nodes() if self.rebuilt_profile else an.profile()
         # the stage keeps the profile of its own state, which is what is put back when
         # a later stage fails or is put in between [B 0041c060]; the next stage starts
         # from the last update, converged or not [B 00418af0]
         an.set_profile(left)
         return st
+
+    # The profile that is put back from a stage is made anew from the stage's own nodes
+    # [B 0041c060]: each node's shear strain over the stage's, at the top and the middle
+    # node of every layer and at the bottom node of the last, straight between. So what
+    # the profile had between those heights (it was left by an update on another stage's
+    # layers) is not carried. Off: the profile the stage was solved on, as it was
+    rebuilt_profile = True
+
+    def profile_of_nodes(self):
+        an = self.an
+        z, _b = an.layer_nodes()
+        zp = an.profile_z(z)
+        val = np.interp(zp, an.shape_z, an.shape)
+        zs = np.concatenate([zp[:, 0], zp[:, 1], zp[-1:, 2]])
+        vs = np.concatenate([val[:, 0], val[:, 1], val[-1:, 2]])
+        zz, ii = np.unique(zs, return_index=True)
+        grid = np.unique(np.concatenate([an.shape_z0, zz]))
+        return grid, np.interp(grid, zz, vs[ii])
 
     def more_detail(self, stages, peak, limit):
         # between stages found in the first control variable
@@ -1012,6 +1092,8 @@ class Shear(Flexure):
         st0.control, st0.cmode = self.control_of(st0), self.mode
         st0.profile = an.profile()
         self.accept(st0)
+        if an.own_start_profile:
+            self.hold_profile()
         unit = lambda: 1e-3 if self.mode == "phi" else 1.0     # Response's rad/m against rad/mm
         d0 = self.base_step(self.mode)
         mult = 1.0
@@ -1095,7 +1177,7 @@ class Shear(Flexure):
                 st.cmode = self.mode
                 code = self.state_code(st)
                 if st.perr >= self.profile_tol and st.perr > self.profile_accept \
-                        and st.lam > peak:
+                        and st.lam > peak and not getattr(st, "taken", False):
                     ok = False          # not converged after 16 passes, with the load above
                 if code != 0 and mult >= 0.5:
                     ok = False

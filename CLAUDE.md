@@ -131,15 +131,17 @@ summary.
 
 - an area's held-out total falls, and it cannot be recovered in the same increment;
 - you want a new override, or a change to a measure or the tolerance;
-- you judge that the solution threshold is reached, or that the approach has plateaued (two
-  increments in a row with no gain in any area's held-out total). The threshold (owner,
-  2026-11-25), on the held-out set, for each area and priority 1 to 3: Response's own
-  score there against itself after every concrete strength is raised by 0.05 %, less 3
-  points (`heldout/repeatability.json`, the values in the brief); priority 4 is reported
-  only. Priority 1 without shear keeps 99 % (owner, 2026-11-26). Speed is part of it
-  (owner, 2026-11-26): on every case r2c's run time is no more than r2x's on the same
-  input, on the same machine (`tools/r2xtimes.py`, `tests/oracle/r2x-times.json`). When
-  it is reached, ask before starting the finishing steps.
+- you judge that the solution threshold is reached, or that the approach has plateaued:
+  an increment that gains nothing on a live target (owner, 2026-11-26). The threshold
+  (owner, 2026-11-25), on the held-out set, for each area and priority 1 to 3: Response's
+  own score there against itself after every concrete strength is raised by 0.05 %, less
+  3 points (`heldout/repeatability.json`, the values in the brief); priority 1 without
+  shear keeps 99 %. The live targets (owner, 2026-11-26) are the cells of it not yet
+  met: priorities 1 and 3 with shear. Reported and not targets: priority 2 with shear,
+  beside Response's own score; priority 4; and speed, r2c's run time beside r2x's on the
+  same input and machine with r2x reading every stage (`tools/r2xtimes.py`,
+  `tests/oracle/r2x-times.json`). No compiled routines. When the live targets are met
+  or the plateau rule fires, ask before starting the finishing steps.
 
 Asking means: say it under "Needed from the owner" in `docs/summary.md` and in the pull
 request, with a suggested answer, stop that line of work, and carry on with something

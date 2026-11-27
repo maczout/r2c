@@ -104,9 +104,15 @@
    "peak": 6.3,
    "all": 46.3
   },
+  "igirder-dep5-m3v": {
+   "all": 53.4
+  },
   "igirder-fc45-m": {
    "peak": 5.0,
    "all": 81.8
+  },
+  "igirder-fc45-m2v": {
+   "all": 46.3
   },
   "igirder-fc45-m3v": {
    "all": 54.9
@@ -115,9 +121,15 @@
    "peak": 4.9,
    "all": 86.1
   },
+  "igirder-m25v": {
+   "all": 58.3
+  },
   "igirder-m3v": {
    "peak": 6.8,
    "all": 53.8
+  },
+  "igirder-m5v": {
+   "all": 68.0
   },
   "igirder-mv": {
    "peak": 5.4,
@@ -238,6 +250,12 @@
    "peak": 4.9,
    "all": 63.4
   },
+  "newbeam-fc30-m25v": {
+   "all": 68.5
+  },
+  "newbeam-fc30-mv": {
+   "all": 38.8
+  },
   "newbeam-fc45-cmod1-m": {
    "peak": 4.9,
    "all": 64.1
@@ -258,6 +276,9 @@
    "peak": 4.9,
    "all": 74.4
   },
+  "newbeam-fc65-m2v": {
+   "all": 35.6
+  },
   "newbeam-fc65-negm": {
    "peak": 5.0,
    "all": 81.5
@@ -265,6 +286,9 @@
   "newbeam-fc80-m": {
    "peak": 5.0,
    "all": 75.7
+  },
+  "newbeam-fc80-m3v": {
+   "all": 77.6
   },
   "newbeam-fc80-mv": {
    "peak": 7.3,
@@ -289,6 +313,9 @@
   "newbeam-fy600-m": {
    "peak": 5.1,
    "all": 77.4
+  },
+  "newbeam-fy600-m2v": {
+   "all": 52.7
   },
   "newbeam-fy600-mv": {
    "peak": 5.9,
@@ -373,6 +400,9 @@
    "peak": 9.4,
    "all": 49.2
   },
+  "newbeam-m25v": {
+   "all": 39.5
+  },
   "newbeam-m2v": {
    "peak": 20.6,
    "all": 96.1
@@ -418,6 +448,9 @@
   "newbeam-n500-m2v": {
    "peak": 6.3,
    "all": 54.5
+  },
+  "newbeam-n500-v": {
+   "all": 44.0
   },
   "newbeam-ncomp-v": {
    "peak": 9.9,
@@ -491,6 +524,12 @@
    "peak": 6.4,
    "all": 44.4
   },
+  "newbeam-st150-m15v": {
+   "all": 69.2
+  },
+  "newbeam-st150-m3v": {
+   "all": 60.5
+  },
   "newbeam-st150-mv": {
    "peak": 7.0,
    "all": 89.8
@@ -499,12 +538,18 @@
    "peak": 7.6,
    "all": 77.7
   },
+  "newbeam-st150-n300-v": {
+   "all": 39.4
+  },
   "newbeam-st150-n400-v": {
    "peak": 5.6,
    "all": 38.8
   },
   "newbeam-st2leg200-m2v": {
    "all": 60.1
+  },
+  "newbeam-st2leg200-m3v": {
+   "all": 56.1
   },
   "newbeam-st2leg200-n300-v": {
    "peak": 5.6,
@@ -622,6 +667,9 @@
    "peak": 5.0,
    "all": 70.9
   },
+  "tbeam-fc30-negm2v": {
+   "all": 44.5
+  },
   "tbeam-kgcm-m": {
    "peak": 5.0,
    "all": 67.7
@@ -641,6 +689,12 @@
    "peak": 4.9,
    "all": 70.3
   },
+  "tbeam-negm3v": {
+   "all": 103.6
+  },
+  "tbeam-negm4v": {
+   "all": 97.2
+  },
   "tbeam-negmv": {
    "all": 47.9
   },
@@ -657,7 +711,7 @@
    "what": "wall-clock seconds of one r2x.worker command, start to exit"
   },
   "all": {
-   "when": "2026-11-26T08:14:22-07:00",
+   "when": "2026-11-26T11:49:43-07:00",
    "machine": "Linux x86_64, 32 cores",
    "jobs": 6,
    "what": "wall-clock seconds of one r2x.worker command, start to exit"

@@ -207,7 +207,17 @@ def _carries_on(driver, stages, again, other) -> bool:
     if best > CARRY_TOL or at >= len(curve) - 1 - 1e-9:
         return False
     lx, ly = curve[-1]
-    return math.hypot(lx - gx, ly - gy) > CARRY_TOL
+    if math.hypot(lx - gx, ly - gy) <= CARRY_TOL:
+        return False
+    driver.joined_at = int(math.floor(at)) + 1      # the first of the other's stages beyond
+    return True
+
+
+# Where the response of r2c's own solve from the start is the one that carries on, the
+# stages kept before Response's solve gave up stay, and the other response's stages beyond
+# the place where it passes the last of them are put after them. Off: the whole response
+# is the other one (as before increment 8)
+JOIN = True
 
 
 def solve(path: str | Path | None = None, *, units: str | None = None,
@@ -245,8 +255,13 @@ def solve(path: str | Path | None = None, *, units: str | None = None,
         except SolveError:
             other = []
         if other and _carries_on(driver, stages, again, other):
-            driver, stages = again, other
-            driver.carried_from = 0     # the whole response is r2c's own solve's
+            if JOIN:
+                again.carried_from = len(stages)
+                stages = stages + other[driver.joined_at:]
+                driver = again
+            else:
+                driver, stages = again, other
+                driver.carried_from = 0     # the whole response is r2c's own solve's
     peak = peak_stage(stages, shown_incr)
 
     presses = 0

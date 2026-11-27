@@ -133,16 +133,19 @@ works on the development set; they are not the target.
 
 ## Speed (owner, 2026-11-26)
 
-Part of the solution threshold since 2026-11-26 (`docs/brief.md`): on every case, r2c's
-run time is no more than r2x's on the same input, measured on the same machine.
+A reported measure, not a target (owner, 2026-11-26, the second answer of that day;
+between the two it was part of the solution threshold): r2c's run time beside r2x's on
+the same input, measured on the same machine, with r2x reading every stage. No compiled
+routines in r2c. r2c's standing is generated into the brief and shown on the results
+page.
 
 - r2x's time: the wall-clock seconds of one `r2x.worker` command on the case, start to
   exit, with the case's own options (`python tools/r2xtimes.py measure`; recorded for the
   development set in `tests/oracle/r2x-times.json`). Two readings are recorded: with the
   detail views of every stage, as the development captures were made and as
   `tools/verify.py` has r2c write them, and with the detail views of the peak stage
-  alone, r2x's default. Which of the two the threshold means is with the owner
-  (`docs/summary.md`); until answered, the first is the one reported.
+  alone, r2x's default. The bar for the reported measure is the first (owner,
+  2026-11-26).
 - r2c's time: the seconds `tools/verify.py` records for the solve of the case.
 - `python tools/r2xtimes.py compare VERIFY_OUT` counts the cases within, by area.
 - A speed change changes no result: `tests/oracle/records.json` (the hash of r2c's whole
