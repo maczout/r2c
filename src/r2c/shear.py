@@ -1009,6 +1009,8 @@ class Shear(Flexure):
         crush = (np.abs(o.f2 - o.f2max) < 0.015 * np.abs(o.f2max)) | (o.e2 < -e0s)
         shear = np.abs(o.v) > 0.0
         n = len(crush)
+        if self.code_by_layers and n % 2 == 1:
+            return self._web_code(st, crush, shear, e0s)
         if crush[0] or crush[-1]:
             # the crushing zone that starts at that face is flexure's; beyond it, any
             # crushing node that carries shear is the web's
@@ -1022,6 +1024,36 @@ class Shear(Flexure):
             if zone and st.v > 0.0:
                 return 3
         elif (crush & shear).any():
+            return 3
+        far = min(-0.01, -5.0 * float(np.max(e0s)))
+        if o.e2[0] >= far and o.e2[-1] >= far:
+            return 3 if bool(np.all(o.e2 <= -e0s)) else 0
+        return 2
+
+    # The web-crushing code as the routine has it [B 004204b0], read again 2026-11-27
+    # (docs/kernel.md, "The state code, layer by layer"): the scan goes layer by layer, a
+    # layer counts as crushing only where one of its three nodes is crushing and carries
+    # shear, and a node solved as uniaxial (next to no shear strain) carries none. Off:
+    # node by node, with every crushing node keeping the zone going.
+    code_by_layers = False
+
+    def _web_code(self, st: Stage, crush, shear, e0s) -> int:
+        """Codes 3, 2 and 0 of state_code, with the scan layer by layer."""
+        d, o = st.detail, st.detail.out
+        if d.lone is not None:
+            shear = shear & ~np.asarray(d.lone)
+        hit = [bool((crush[i:i + 3] & shear[i:i + 3]).any()) for i in range(0, len(crush) - 1, 2)]
+        if crush[0] or crush[-1]:
+            # from the face that is crushing (the top first): the layers that crush and
+            # carry shear, without a break, are flexure's; one more after a break is the web
+            zone = True
+            for h in (hit if crush[0] else reversed(hit)):
+                if h and not zone:
+                    return 3
+                zone = zone and h
+            if crush[0] and zone and st.v > 0.0:
+                return 3
+        elif any(hit):
             return 3
         far = min(-0.01, -5.0 * float(np.max(e0s)))
         if o.e2[0] >= far and o.e2[-1] >= far:
