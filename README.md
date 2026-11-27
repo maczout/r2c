@@ -8,14 +8,26 @@ r2c is the counterpart of [r2x](https://github.com/maczout/r2x), which drives Re
 itself. The two have the same command line and write the same record format, so one can stand
 in for the other in a workflow, and r2x serves as the oracle that r2c is compared against.
 
-**What it is good for, in one paragraph.** Without shear (moment, axial load, or both)
+**What it is signed off for** (the owner, a structural engineer, 2026-11-27; version 1.0.0):
+
+- **Signed off: without shear** (moment, axial load, or both), as a stand-in for
+  Response-2000.
+- **Signed off: with shear, the control curves up to Response-2000's peak.** As far as
+  Response's own response goes, r2c's curve is Response's.
+- **Not signed off: strength with shear past Response-2000's last stage.** With shear
+  Response often stops while the load is still rising. r2c sometimes carries on to a
+  higher peak, and it cannot reliably tell you where Response stopped. Do not take r2c's
+  peak with shear for Response's strength without reading "Known limitations".
+
+**The numbers behind that, in one paragraph.** Without shear (moment, axial load, or both)
 r2c gives Response-2000's answer: on sections it was never tuned against, every case was
 inside ±5 % on every check, stage for stage. With shear, taking r2c's whole response as it
 stands, the peak, the rising branch and the stress-state profiles were inside on 22 of 28
 and 11 of 12 such cases; cut at Response's last stage where a trace of Response shows its
-solve gave up there, on 26 of 28 and 12 of 12. The difference is that on about one case
-in six r2c carries on to a higher peak than Response reports (see "Where Response would
-stop" and "Known limitations"). The shear-related profiles over the depth at the
+solve gave up there, on 26 of 28 and 12 of 12. The owner's target for this (93.4 %) is held
+to the first reading, with no case cut, and is **not met**. The difference is that on about one
+case in six r2c carries on to a higher peak than Response reports (see "Where r2c carried
+on" and "Known limitations"). The shear-related profiles over the depth at the
 peak, and how the response ends after it, agree on about three cases in five and three in
 four, and there Response does not agree with itself either when an input changes by next
 to nothing. The numbers, the cases they were measured on and an independent assessor's
@@ -67,35 +79,38 @@ can stand in for the other.
 | `--report` | Response's report pages | not available (usage error) |
 | `define`, sessions, `setup` | yes | no |
 | `health` | checks Wine and Response | prints the version |
-| Record header | `r2x-version`, Response and Wine identification | `r2c-version`, `kernel: r2c`; with shear, where it applies, `response-last-stage`, `response-peak-stage`, `response-ending` or `ending` (see "Where Response would stop") |
+| Record header | `r2x-version`, Response and Wine identification | `r2c-version`, `kernel: r2c`; with shear, where it applies, `carried-on-stage`, `carried-on-peak-stage`, `carried-on` or `ending` (see "Where r2c carried on") |
 | Time, without shear | 25 to 75 s reading every stage | a second or two (faster on every case measured) |
 | Time, with shear | about a minute reading every stage | one to several minutes: slower than r2x on most cases, up to about five times |
-| With shear, where Response's solve gives up numerically before any failure | the response ends there, as Response's does | r2c carries on to a failure and marks the stage in its record (see below) |
-| With shear, where Response refuses a state whose web is crushing | the response ends there | meant to end there too, with the reason in the record; on most such cases r2c does not see the crushing and goes on (a known limitation) |
+| With shear, where Response's solve gives up numerically before any failure | the response ends there, as Response's does | r2c carries on to a failure where its own copy of Response's solve fails too, and marks that stage in its record (see below); the mark is often not at Response's last stage |
+| With shear, where Response refuses a state whose web is crushing | the response ends there | meant to end there too, with the reason in the record; on most such cases r2c does not see the crushing and goes on (a known limitation, and the next work planned) |
 | Inputs outside Response's manual that Response still solves | solved | refused (exit status 3) |
 
 Charts have the same titles, units, number formats and row layout as Response's exports.
-`docs/parity.md` lists every difference of interface found.
+`docs/parity.md` lists every difference of interface found, and `docs/output.md` says what
+a program that reads r2c's records may rely on in version 1.
 
-## Where Response would stop
+## Where r2c carried on
 
 With shear, Response-2000's response often ends while the load is still rising: its solve
-of a load stage gives up, or it refuses a state whose web is crushing. r2c's record says
-what it did about it:
+of a load stage gives up, or it refuses a state whose web is crushing. r2c has its own
+copy of that part of Response, and its record says what the copy did. It says what r2c
+knows about its own run. **It does not say where Response itself stops.**
 
-- `response-last-stage: N` in the header (with `response-peak-stage` and
-  `response-ending`), and a section `response/last-stage` with that stage's point on each
-  control chart: r2c's copy of Response's stage control gave up numerically after stage N,
-  which is where Response's response would end, and the stages after N are r2c's own
-  solve's. `peak-stage` is the peak of the whole response; **Response's strength is the
-  peak up to stage N** (`response-peak-stage`).
-- `ending: as Response-2000's does: ...` in the header: r2c ended where Response's tries
-  ran out, and why (a state refused for a crushing web; a refusal that cannot be told
-  from a give-up; a give-up beyond which r2c finds nothing either).
-- Neither line: the response ended by Response's own tests, or r2c did not notice a
-  place where Response would stop. **The mark is r2c's reading, not Response's word**: on
-  some sections r2c goes past the stage where Response itself stops without marking it
-  (see "Known limitations").
+- `carried-on-stage: N` in the header (with `carried-on-peak-stage` and `carried-on`),
+  and a section `carried-on/stage` with that stage's point on each control chart: after
+  stage N r2c's copy of Response's solve failed on every try, and r2c carried on with its
+  own solve. The stages after N are that solve's. `peak-stage` is the peak of the whole
+  response; `carried-on-peak-stage` is the peak up to stage N.
+- `ending: where r2c's copy of Response-2000's stage control stops: ...` in the header:
+  the copy ran out of tries, r2c did not carry on, and the line says why (a state refused
+  for a crushing web; a refusal that cannot be told from a failure of the solve; a
+  failure beyond which r2c finds nothing either).
+- Neither line: r2c's copy never ran out of tries. Response may still have stopped
+  earlier than r2c did.
+
+How good a guide the mark is to Response's last stage is under "Known limitations": not
+a reliable one.
 
 ## Scope
 
@@ -127,21 +142,34 @@ numbers.
   shear response as indicative.
 - **With shear, the response after the peak and where it ends** differ from Response's on
   about one case in four. This was the lowest priority and was not worked on.
-- **With shear, r2c's peak can stand above Response's, and the record does not always
-  say so.** On sections that fail in flexure with some shear, Response's response often
+- **With shear, r2c's peak can stand above Response's, and the record does not reliably
+  say so. This use is not signed off.** On sections that fail in flexure with some shear, Response's response often
   ends while the load is still rising: its solve gives up, or it refuses a state whose
   web is crushing. Up to that stage the two programs agree, and Response's figure is its
   repeatable answer. r2c is meant to carry on only past a numerical give-up, to mark that
   stage in its record, and to end where Response refuses a crushing web. It does so only
-  in part. On the 40 cases with shear it was never tuned against, r2c went past
-  Response's last stage on 15: its record marks that stage on 5, marks a later or
-  earlier stage on 5, and has no mark on 5; and on 2 of the 3 where Response refused a
-  crushing web r2c went on. Its peak was 5 to 32 % above Response's on 6 of the 40. So:
-  where the record has `response-last-stage`, take the peak up to that stage
-  (`response-peak-stage`) as Response's strength; where it has not, do not take r2c's
-  peak for Response's strength if the response has a sudden jump in load or a long tail
-  of closely spaced stages. Whether r2c's higher figure is the better answer has not
-  been checked.
+  in part, because it can mark only where its own copy of Response's solve fails, and
+  the copy does not always fail where Response does. On the 40 cases with shear it was
+  never tuned against, r2c went past Response's last stage on 15: the mark
+  (`carried-on-stage`) is at that stage on 5, at a later or earlier stage on 5, and
+  absent on 5; and on 2 of the 3 where Response refused a crushing web r2c went on. Its
+  peak was 5 to 32 % above Response's on 6 of the 40. So: **the mark is unreliable as a
+  sign of where Response stops.** Where the record has `carried-on-stage`, the peak up
+  to it (`carried-on-peak-stage`) is the better guess at Response's strength, and it is
+  a guess. Where it has not, do not take r2c's peak for Response's strength if the
+  response has a sudden jump in load or a long tail of closely spaced stages. To know
+  Response's strength with shear, run Response (r2x). Whether r2c's higher figure is
+  the better answer has not been checked.
+- **Where Response refuses a state whose web is crushing, r2c mostly does not see it**
+  and goes on. The rule is read from the program and written, but it is switched off: as
+  written it ends other cases too early. It is the first work planned after this
+  version.
+- **The owner's target for the peak, rising branch and stress-state profiles with shear
+  is not met**: 79 % and 92 % of the two sets of unseen cases, taking r2c's whole
+  response, against 93.4 %.
+- **The Shear Stress chart at the first stage (the initial load) has one line where
+  Response's has two**; the missing one is zero unless the initial load has a shear
+  (`docs/output.md` lists this and two smaller gaps in what the record carries).
 - **A circular column, or any section that stays uniform, under axial load alone:** after
   the peak r2c keeps a uniform response and Response does not. Deliberate.
 - **With shear r2c is slow**: minutes for a case, longer than r2x on most.
@@ -178,6 +206,7 @@ numbers.
     tests/oracle/parked/   more development cases, not run by default
     heldout/               the two held-out sets: the frozen manifests and the totals
     docs/kernel.md         what the kernel does and where each rule comes from
+    docs/output.md         the record: what a program that reads it may rely on in version 1
     docs/verification-results.md   the results, generated
     docs/brief.md          the owner's brief: the goal, the priorities, the rules
     docs/summary.md        the sign-off page: what r2c is good for, the held-out totals, the assessor's findings

@@ -1,17 +1,16 @@
-# r2c: the sign-off page
+# r2c: the handover page
 
-For the owner, 2026-11-27, after your five answers of that day (increment 10). **Without shear: signed off** (yours).
-With shear the work is stopped for your sign-off.
+For the owner, 2026-11-27, after your four answers and the handover list of that day (increment 11). **Version
+1.0.0 is tagged (`v1.0.0`) for r2.** No kernel change; no result changed.
 
 ## What r2c is good for, and what it is not
 
-- **Without shear: a stand-in for Response** (signed off). All 37 held-out cases inside on every check.
-- **With shear, as far as Response's own response goes: yes.** Peak and rising branch agree on all 40 held-out cases
-  (the assessor's count at the finish).
-- **With shear, r2c's peak is not always Response's strength, and its record says so only sometimes.** r2c goes past
-  Response's last stage on 15 of the 40 held-out cases; its record marks that stage on 5, marks another stage on 5
-  and has no mark on 5 (`tools/marks.py`). On 6 of the 40 its peak is 5 to 32 % above Response's (the assessor's).
-- **With shear, profiles at the peak: indicative.** After the peak: no.
+- **Signed off (yours): without shear, as a stand-in for Response.** All 37 held-out cases inside on every check.
+- **Signed off (yours): with shear, the control curves up to Response's peak.** Peak and rising branch agree on all
+  40 held-out cases as far as Response's own response goes (the assessor's count at the finish).
+- **Not signed off: strength with shear past Response's last stage.** r2c goes past it on 15 of the 40; its mark is
+  at that stage on 5, elsewhere on 5, absent on 5. On 6 of the 40 its peak is 5 to 32 % above Response's.
+- **Priority 1 with shear, held to the uncut reading: not met** (79 % and 92 % against 93.4 %).
 
 ## Held-out totals
 
@@ -34,33 +33,37 @@ Cases inside target on every check of the priority. Both sets as scored once aft
 Cases: first set moment and axial 27 (0 not solved by r2c), shear 28 (0 not solved by r2c); second set moment and axial 10 (0 not solved by r2c), shear 12 (0 not solved by r2c). A case not solved counts as outside.
 <!-- finish:end -->
 
-`python tools/heldout.py score`, each set once after the change. **Falls, all from cuts withdrawn by the narrowed
-measure** (increment 8's records under today's measure give today's totals; `tools/uncut.py`): with shear, priority 1
-cut 28 to 26 of 28 (under its threshold by half a point) and priority 4 20 to 18 and 9 to 8. Uncut and all other
-totals: unchanged. **Interface parity: complete except accepted refusals** (15, and 4 inputs).
+`python tools/heldout.py score`. The first set was scored once more at the end of this increment: every total the
+same as increment 10's. The second set was not scored again. **Interface parity: complete except accepted
+refusals** (15, and 4 inputs).
 
 ## What changed
 
-- **The record marks where Response would stop** (header lines and a flagged section), and says why r2c ends there.
-- **The override narrowed**, in r2c and in the measure (a trace must show the give-up; 30 more cases traced).
-- **Why r2c misses the crushing refusal: found in part** (the state code scans layer by layer); written, off.
+- **The mark renamed to what r2c can know**: `carried-on-stage` (with `carried-on-peak-stage`, `carried-on`, a
+  section `carried-on/stage`). Every development record is otherwise byte for byte what it was (`tools/same.py`).
+- **The record documented as stable for version 1** (`docs/output.md`): what r2 may rely on, and what it may not.
+- **r2c's whole records set beside r2x's whole captures**, every chart at every stage of 182 cases
+  (`tools/carries.py`, `docs/output-check.md`): all there, with Response's headings and formats, but for three gaps.
 
 ## Needed from the owner
 
-1. **Sign off with shear, or name what is still needed.** Suggested: not yet for strength with shear. The mark you
-   required is at Response's last stage on 5 of 15 held-out cases, and on 2 of the 3 where a trace shows Response
-   refusing a crushing web r2c still goes past. The lead above is the next work, on a new held-out set.
-2. **Which reading of priority 1 with shear is held to the 93.4 %?** Suggested: uncut (79 % and 92 %: not met).
-3. **Is this reading of "a trace confirms" right?** r2c cannot trace Response on a user's input: it carries on where
-   every one of its own copy's tries failed numerically, the ending traces show. Suggested: yes.
+1. **The three gaps in what the record carries** (`docs/output.md`): at the initial load Response's Shear Stress
+   chart has a second line, zero unless the initial load has a shear, and r2c's has not; under an initial shear
+   with none in the increment r2c never writes it; with no increment the second stage's two strain charts differ
+   in their lines. Suggested: fix the first two in a 1.0.1 before r2's comparison view draws that chart (the
+   export, not the kernel; stage 0 of every record changes).
+2. **The tag is on this branch's last commit, before the merge.** Suggested: merge with a merge commit, as
+   before, and the tag stands; if you want changes first, say so and the tag is moved.
+3. **The `ending` line was reworded too** (it said "as Response-2000's does"; it now says where r2c's copy
+   stopped). Not in your answer 3, done in its spirit. Suggested: keep.
 
 ## Top known deviations
 
-- **With shear, r2c goes past Response's last stage unmarked** where its copy of Response's solve does not fail.
-- **Where Response refuses a crushing web, r2c mostly does not see it** (the layer-by-layer rule, off).
+- **With shear, r2c goes past Response's last stage and its mark is unreliable** (not signed off).
+- **Where Response refuses a crushing web, r2c mostly does not see it**: the next job, after r2's comparison view.
 - **With shear, the views at a peak that does not settle** (most of priority 2).
 - **The transverse bond chart near the bottom of the stirrups**, about half of it a rule not found.
 - **With shear r2c is slower than r2x on most cases**; how a response with shear ends (priority 4).
 
 Full list: `docs/deviations.md`. The assessment: `docs/assessment.md`. Results: https://maczout.github.io/r2c/
-(`branches/dev-i10/`).
+(`branches/dev-i11/`).

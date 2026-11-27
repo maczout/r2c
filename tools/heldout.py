@@ -835,6 +835,9 @@ def finish_block(first: dict, rep1: dict | None, finish: dict, rep2: dict | None
     scored = (f"Both sets as scored once after the change of {b['date']} (r2c at "
               f"{b['commit']}); the second set's score before it, its first, was "
               f"{finish['runs'][0]['date']}."
+              + ("" if a["commit"] == b["commit"] else
+                 f" The first set's column is its last score ({a['label']}, {a['date']}, r2c "
+                 f"at {a['commit']}); the second set was not scored again.")
               if both else
               "The second set was scored "
               f"once, for the first time, at the finish ({b['date']}, r2c at {b['commit']}); "

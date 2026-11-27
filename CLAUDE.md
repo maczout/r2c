@@ -169,6 +169,7 @@ else. Everything else, decide and note in the log.
 | Each kernel rule and its source | `docs/kernel.md` |
 | The held-out set and the second one for the finish: recipe, hashes, totals; Response against itself and the threshold | `heldout/`, `tools/heldout.py` |
 | Interface parity with r2x | `tools/parity.py` |
+| The record as r2c's public interface from 1.0.0: what a reader may rely on; whether it carries what r2x's does | `docs/output.md`, `tools/carries.py`, `docs/output-check.md` (generated) |
 | Development results against Response (generated) | `docs/verification-results.md`, https://maczout.github.io/r2c/ |
 | What happened in each increment | `docs/log/` |
 | The earlier record (closed 2026-11-24; not referred to) | `docs/history.md`, `docs/history/` |

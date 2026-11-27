@@ -15,11 +15,21 @@ measured on the development results (`docs/verification-results.md`) unless mark
   r2c cannot know either before solving. Accepted by the owner as known differences
   (2026-11-25): parity is complete except accepted refusals.
 - **r2c's record has lines that r2x's has not.** With shear, where they apply: the
-  header lines `response-last-stage`, `response-peak-stage`, `response-ending` and
-  `ending`, and a section `response/last-stage`, on where Response's own response would
-  stop. Required by the owner (2026-11-27); the parity check leaves them out of what it
+  header lines `carried-on-stage`, `carried-on-peak-stage`, `carried-on` and
+  `ending`, and a section `carried-on/stage`, on where r2c's own copy of Response's
+  solve failed and what r2c did then (`docs/output.md`). Required by the owner
+  (2026-11-27), and renamed the same day to what r2c can know: they do not say where
+  Response itself stops; the parity check leaves them out of what it
   compares (`tools/parity.py`). A reader of r2x's records that looks sections up by
   name is not affected; one that takes every section for a chart is.
+- **What r2x's record carries and r2c's does not** (`docs/output.md`,
+  `docs/output-check.md`; `python tools/carries.py`): at the initial load Response's
+  Shear Stress chart has a second line that r2c's has not (zero unless the initial load
+  has a shear); under an initial shear with no shear in the increment Response keeps
+  that line at later stages and r2c never writes it; and with no increment at all the
+  second stage's Shear Strain and Transverse Strain charts have envelope lines in r2c
+  and a single line in Response. Found at the handover by reading whole records, not
+  fixtures; left as they are (no change to results in that increment).
 - **`define` and `--report` of r2x are not in r2c.** Both work through Response's own
   windows. The owner's decision (2026-11-24): not part of the command line that is
   compared.
@@ -32,7 +42,10 @@ measured on the development results (`docs/verification-results.md`) unless mark
   `docs/brief.md`): r2c carries on only where Response's solve gives up numerically; where
   Response refuses a state whose web is crushing, or the two cannot be told apart, r2c
   ends there too and its record says why; and where r2c goes past, its record marks the
-  stage (`response-last-stage` in the header, a section `response/last-stage`). What r2c
+  stage. The mark is named for what r2c can know (owner, 2026-11-27, later that day):
+  the stage after which its own copy of Response's solve failed and r2c carried on
+  (`carried-on-stage` in the header, a section `carried-on/stage`). **Strength with
+  shear past Response's last stage is not signed off.** What r2c
   does (`docs/kernel.md`, "Where Response's response ends and r2c's goes on"): its copy of
   Response's stage control keeps why each try failed, and when the tries run out it
   carries on only if every one of them failed numerically; the record then marks that
@@ -41,7 +54,8 @@ measured on the development results (`docs/verification-results.md`) unless mark
     load, and the record marks the stage: the override at work, as decided.
   - r2c's copy does not fail where Response's solve gave up: r2c goes on unknowing, and
     its record has no mark there, or marks a later stage where the copy did give up. The
-    requirement that the record marks the stage is not met on these cases. It is the
+    mark says what the copy did and is no guide to Response's last stage on these cases
+    (the README's limitations say so). It is the
     difference on stages that do not settle (below), seen at the end of a response.
   - Response refuses a state whose web is crushing and r2c's state at the same curvature
     is not read as crushing, so r2c does not end there. The cause is found in part: the
