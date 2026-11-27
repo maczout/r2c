@@ -73,9 +73,9 @@ SUBS`; `docs/deviations.md`): the record marks the stage where r2c's *copy* of
 Response's stage control gives up. On the cases where r2c goes past Response's last
 stage (25 development, 15 held-out) that is Response's last stage on 5 and 5, another
 stage on 9 and 5, and there is no mark on 11 and 5; and of the 6 development cases where
-a trace shows Response refusing a crushing web, r2c ends on a crushing web on 2, some
-stages after Response, and goes on on 4; it also ends that way on 5 cases where the
-trace shows something else. On the held-out sets 2 records end that way, and on 2 of
+a trace shows Response refusing a crushing web, r2c ends where Response does on 1,
+ends on a crushing web some stages after Response on 2, and goes on on 3; it also ends
+on a crushing web on 5 cases where the trace shows something else. On the held-out sets 2 records end that way, and on 2 of
 the 3 cases with such a trace r2c goes past. Where to start:
 
 - **Which nodes are uniaxial** (`docs/kernel.md`, "The state code, layer by layer";
