@@ -57,10 +57,12 @@ rest: not opened.
 
 THE SECOND SET, FOR THE FINISH (owner, 2026-11-25; `--set finish`): about 20 more cases of
 the same spread, with values of their own, built and frozen the same way into an archive of
-its own and into heldout/finish-manifest.json. It is "not scored in any way until the
-finishing steps": `score --set finish` refuses, and nothing here runs r2c on its cases. The
-held-out rule covers it whole. Do not remove the refusal before the owner starts the
-finishing steps.
+its own and into heldout/finish-manifest.json. It was "not scored in any way until the
+finishing steps", and `score --set finish` refused it until the owner started them
+(2026-11-26). Since then `score ARCHIVE2 --set finish --record LABEL` writes its totals to
+heldout/finish-totals.json and `repeat ARCHIVE2 --set finish --record` Response against
+itself on its inputs to heldout/finish-repeatability.json; `summary` sets them beside the
+first set's.
 
 `build` needs r2x importable (PYTHONPATH=R2X/src) and one Wine prefix per job
 (~/.cache/r2x/prefix-scope-K, as tools/scope_cases.py uses them).
@@ -91,6 +93,8 @@ MANIFEST = ROOT / "heldout" / "manifest.json"
 FINISH_MANIFEST = ROOT / "heldout" / "finish-manifest.json"
 TOTALS = ROOT / "heldout" / "totals.json"
 REPEAT = ROOT / "heldout" / "repeatability.json"
+FINISH_TOTALS = ROOT / "heldout" / "finish-totals.json"
+FINISH_REPEAT = ROOT / "heldout" / "finish-repeatability.json"
 REPEAT_BY = 0.05    # per cent added to every concrete strength (owner, 2026-11-25)
 MARGIN = 3.0        # points under Response's own score: the threshold (owner, 2026-11-25)
 SUMMARY = ROOT / "docs" / "summary.md"
@@ -121,8 +125,8 @@ KEPT = {"moment-axial": {"1": 99.0}}
 REPORTED = {"shear": ("2",)}
 
 
-def read_repeat() -> dict | None:
-    return json.loads(REPEAT.read_text()) if REPEAT.exists() else None
+def read_repeat(path: Path = REPEAT) -> dict | None:
+    return json.loads(path.read_text()) if path.exists() else None
 
 
 def thresholds(rep: dict | None) -> dict:
@@ -367,6 +371,8 @@ FINISH_CASES = [
 RECIPES = {**H, **F}
 # the two sets: the cases of each and where each is frozen
 SETS = {"heldout": (CASES, MANIFEST), "finish": (FINISH_CASES, FINISH_MANIFEST)}
+# where each set's totals and its Response-against-itself totals are recorded
+OUTPUTS = {"heldout": (TOTALS, REPEAT), "finish": (FINISH_TOTALS, FINISH_REPEAT)}
 PRESENT = {"newbeam": "input.r2t", "tbeam": "tbeam.r2t", "column": "column.r2t",
            "igirder": "igirder.r2t"}
 
@@ -490,10 +496,11 @@ def build(a, ap) -> int:
 # score: totals only
 # ---------------------------------------------------------------------------------------
 
-def verify_frozen(archive: Path) -> list[dict]:
-    man = json.loads(MANIFEST.read_text())
+def verify_frozen(archive: Path, which: str = "heldout") -> list[dict]:
+    manifest = SETS[which][1]
+    man = json.loads(manifest.read_text())
     if man["frozen_sha256"] != digest(man["cases"]):
-        raise SystemExit("heldout/manifest.json is not as frozen")
+        raise SystemExit(f"heldout/{manifest.name} is not as frozen")
     for c in man["cases"]:
         fx = archive / "fixtures" / f"{c['name']}.r2x.txt"
         if not fx.exists() or sha256(fx) != c["capture_sha256"]:
@@ -584,11 +591,10 @@ def tally(cases: list[dict], results: dict, acc: dict) -> dict:
 def score(a, ap) -> int:
     import report
 
-    if a.set != "heldout":
-        ap.error("the second set is not scored in any way until the finishing steps (owner, "
-                 "2026-11-25; CLAUDE.md, \"The held-out rule\")")
+    # the second set: refused until the owner started the finishing steps (2026-11-26)
+    CASES, totals_file = SETS[a.set][0], OUTPUTS[a.set][0]
     archive = outside_repo(ap, a.archive)
-    cases = verify_frozen(archive)
+    cases = verify_frozen(archive, a.set)
     rc, commit = subprocess.getstatusoutput(f"git -C {ROOT} rev-parse --short=12 HEAD")
     dirty = bool(subprocess.getoutput(f"git -C {ROOT} status --porcelain -- src"))
     label = a.record or "unrecorded"
@@ -624,11 +630,11 @@ def score(a, ap) -> int:
     if a.record:
         if dirty:
             raise SystemExit("not recorded: src/ has uncommitted changes")
-        totals = read_totals()
+        totals = read_totals(totals_file)
         totals["runs"].append(run)
         check_totals(totals)
-        TOTALS.write_text(json.dumps(totals, indent=1) + "\n")
-        print(f"recorded as \"{label}\" in heldout/totals.json")
+        totals_file.write_text(json.dumps(totals, indent=1) + "\n")
+        print(f"recorded as \"{label}\" in heldout/{totals_file.name}")
     return 0
 
 
@@ -644,10 +650,8 @@ def repeat(a, ap) -> int:
     import verify
     from r2c import record
 
-    if a.set != "heldout":
-        ap.error("the second set is not scored in any way until the finishing steps")
     archive = outside_repo(ap, a.archive)
-    cases = verify_frozen(archive)
+    cases = verify_frozen(archive, a.set)
     out = archive / "repeat"
     (out / "inputs").mkdir(parents=True, exist_ok=True)
     prefixes: queue.Queue = queue.Queue()
@@ -692,8 +696,8 @@ def repeat(a, ap) -> int:
            "totals": counted["totals"], "unsolved": counted["unsolved"]}
     print(text_repeat(rep))
     if a.record:
-        REPEAT.write_text(json.dumps(rep, indent=1) + "\n")
-        print("recorded in heldout/repeatability.json")
+        OUTPUTS[a.set][1].write_text(json.dumps(rep, indent=1) + "\n")
+        print(f"recorded in heldout/{OUTPUTS[a.set][1].name}")
     return 0
 
 
@@ -743,8 +747,8 @@ def text_totals(run: dict) -> str:
 # the committed totals
 # ---------------------------------------------------------------------------------------
 
-def read_totals() -> dict:
-    return json.loads(TOTALS.read_text()) if TOTALS.exists() else {"runs": []}
+def read_totals(path: Path = TOTALS) -> dict:
+    return json.loads(path.read_text()) if path.exists() else {"runs": []}
 
 
 def check_totals(totals: dict) -> None:
@@ -799,6 +803,46 @@ def summary_block(totals: dict, rep: dict | None = None) -> str:
     out += ["", "Cases: " + ", ".join(
         f"{AREA_TITLES[t].lower()} {last['cases'][t]} ({last['unsolved'][t]} not solved by "
         "r2c, counted outside)" for t in AREA_TITLES) + ".", END]
+    return "\n".join(out)
+
+
+FBEGIN, FEND = "<!-- finish:begin -->", "<!-- finish:end -->"
+
+
+def finish_block(first: dict, rep1: dict | None, finish: dict, rep2: dict | None) -> str:
+    """The second set's totals beside the first set's (the finishing steps; owner,
+    2026-11-26): for each area and priority, r2c on the first set at its last score, r2c
+    on the second set at its only score, and Response against itself on each."""
+    a, b = first["runs"][-1], finish["runs"][-1]
+    names = {"1": "1: peak, rising branch, shape; stress-state views",
+             "2": "2: endings without shear; shear-related views",
+             "3": "3: cracking-related views", "4": "4: endings with shear"}
+    th = thresholds(rep1)
+
+    def own(rep, t, p):
+        return pct(*rep["totals"][t][p]) if rep and p in rep["totals"][t] else "not measured"
+    out = [FBEGIN, "<!-- Generated by tools/heldout.py summary. Do not edit: rerun it. -->", "",
+           "Cases inside target on every check of the priority. The second set was scored "
+           f"once, for the first time, at the finish ({b['date']}, r2c at {b['commit']}); "
+           f"the first set's column is its last score ({a['label']}). Response against "
+           f"itself: every concrete strength raised by {REPEAT_BY:g} %, on each set's own "
+           "inputs. The threshold is the one made from the first set.", "",
+           "| Area | Priority | First set: r2c | First set: Response against itself | "
+           "Second set: r2c | Second set: Response against itself | Threshold |",
+           "|---|---|---:|---:|---:|---:|---:|"]
+    for t, title in AREA_TITLES.items():
+        for p in ("1", "2", "3", "4"):
+            if p not in a["totals"][t] and p not in b["totals"][t]:
+                continue
+            cell = lambda r: pct(*r["totals"][t][p]) if p in r["totals"][t] else ""
+            goal = f"{th[t][p]:g} %" if p in th[t] else "reported only"
+            out.append(f"| {title} | {names[p]} | {cell(a)} | {own(rep1, t, p)} | {cell(b)} | "
+                       f"{own(rep2, t, p)} | {goal} |")
+    out += ["", "Cases: first set " + ", ".join(
+        f"{AREA_TITLES[t].lower()} {a['cases'][t]} ({a['unsolved'][t]} not solved by r2c)"
+        for t in AREA_TITLES) + "; second set " + ", ".join(
+        f"{AREA_TITLES[t].lower()} {b['cases'][t]} ({b['unsolved'][t]} not solved by r2c)"
+        for t in AREA_TITLES) + ". A case not solved counts as outside.", FEND]
     return "\n".join(out)
 
 
@@ -857,11 +901,17 @@ def write_summary() -> int:
         raise SystemExit("heldout/totals.json has no run yet")
     text = SUMMARY.read_text(encoding="utf-8")
     block = summary_block(totals)
+    finish = read_totals(FINISH_TOTALS)
     if BEGIN in text:
         text = re.sub(re.escape(BEGIN) + r".*?" + re.escape(END), lambda _m: block, text,
                       flags=re.S)
-    else:
+    elif not (finish["runs"] and FBEGIN in text):
+        # the sign-off page has the two sets side by side in place of the trend
         raise SystemExit(f"docs/summary.md has no {BEGIN} ... {END} block to fill")
+    if finish["runs"] and FBEGIN in text:
+        fb = finish_block(totals, read_repeat(), finish, read_repeat(FINISH_REPEAT))
+        text = re.sub(re.escape(FBEGIN) + r".*?" + re.escape(FEND), lambda _m: fb, text,
+                      flags=re.S)
     SUMMARY.write_text(text, encoding="utf-8")
     print("docs/summary.md: totals block rewritten")
     rep = read_repeat()
@@ -897,8 +947,8 @@ def main(argv=None) -> int:
                     help="score: also print the cases outside target by kind (section type "
                          "and loading path), with no names or values")
     ap.add_argument("--set", choices=tuple(SETS), default="heldout",
-                    help="list, build: the held-out set (the default) or the second one, "
-                         "for the finish, which is built and frozen but not scored")
+                    help="the held-out set (the default) or the second one, for the "
+                         "finish (scored since the owner started the finishing steps)")
     ap.add_argument("--dry-freeze", action="store_true",
                     help="build: capture, but do not write the manifest")
     a = ap.parse_args(argv)

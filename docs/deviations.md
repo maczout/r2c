@@ -31,6 +31,18 @@ measured on the development results (`docs/verification-results.md`) unless mark
   shear"). Of the cases that were compared up to Response's last stage before, all but
   one still are; on that one (Newbeam with elasto-plastic tension stiffening) neither
   solve finds a settled state beyond Response's last stage, and r2c now ends there too.
+  **What the finish showed** (the independent assessor, `docs/assessment.md`; counted
+  again with `tools/uncut.py`): the cut is what holds priority 1 with shear on about one
+  held-out case in six, where r2c's whole response peaks well above Response's; r2c's
+  record does not mark where Response stopped; and Response's lower figure is repeatable.
+  Two kinds are cut alike and only the first is the override at work: r2c's copy of
+  Response's solve gives up where Response's does and r2c's earlier solve takes over
+  with a jump in load; or r2c's copy does not fail where Response's does and simply goes
+  on, which is an open difference between the programs. In some of the second kind
+  Response stops because it finds the web crushing with the load still rising, where
+  r2c's state at the same curvature does not crush; the cause is not found. And one
+  development case (Newbeam under shear, then moment) is cut though Response ended of
+  its own accord: a fault of the rule, put to the owner.
 - **With shear under axial compression, just after the web cracks, Response's response
   ends on a collapsed state and r2c's does not** (Newbeam with closed stirrups under
   axial compression and shear alone). Both programs hover at the cracking load for ten
@@ -73,6 +85,10 @@ measured on the development results (`docs/verification-results.md`) unless mark
   generated into the brief beside Response's own score.
 - **The T-beam with material factors, steel stress at a crack at the peak:** Response
   gives its yielded bottom bars no value at the crack and r2c gives their average stress.
+- **The Transverse Average Bond chart near the bottom of the stirrups, at the peak with
+  shear**: r2c lower than Response over a few points. The most frequent single miss on
+  the held-out sets; on about half of those cases it is there in Response's own state
+  too, so a rule of that chart that r2c does not have, not looked for.
 - **How a response with shear ends.** r2c's last stages and Response's differ on about two
   in five shear cases, now that a case where Response's solve gives up is compared up to
   Response's last stage. This is the lowest priority and has not been worked on.

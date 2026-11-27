@@ -19,7 +19,7 @@ For the developer: what exists now and how to work on it. The owner reads
   `carried_from` of a case's verify results say where it took over (0: the whole
   response is r2c's earlier solve's). Switches for rules that are written and off are
   listed in `docs/kernel.md` (`Shear.pass_code`, `Analysis.own_stirrup_history`,
-  `Shear.stale_marks`, `Shear.sliver`). A node's transverse strain is solved the way the
+  `Shear.stale_marks`, `Shear.sliver`; each decided at the finish: kept, off). A node's transverse strain is solved the way the
   program solves it (`Analysis.own_transverse`, since increment 8), where the answer
   depends on where the node starts; what was kept between evaluations for speed (the
   nodes' transverse solves by node, `NodeStore`) is therefore not used with shear. It
@@ -40,22 +40,40 @@ For the developer: what exists now and how to work on it. The owner reads
 - **The held-out set**: `heldout/` (the frozen manifest and the totals), built and scored by
   `tools/heldout.py`. See "The held-out rule" in `CLAUDE.md` before touching anything.
   **The second set, for the finish** (`heldout/finish-manifest.json`, 22 cases, frozen
-  2026-11-25) is built the same way with `--set finish` and is not scored until the
-  finishing steps: the scorer refuses it.
+  2026-11-25) was built the same way with `--set finish` and scored once, at the
+  finish (`heldout/finish-totals.json`, `heldout/finish-repeatability.json`).
 - **Known deviations**: `docs/deviations.md`.
 
 ## Next
 
-The live targets (owner, 2026-11-26): priorities 1 and 3 with shear against their
-thresholds, 93.4 and 86.3 % (27 and 25 of 28 held-out cases). **Both are met at
-increment 8's score**: with shear 28, 16, 25 of 28 on priorities 1 to 3 and 20 of 27 on
-priority 4; without shear 27 of 27 on each. The developer has stopped and asked before
-the finishing steps (`docs/summary.md`); nothing below is to be started as a finishing
-step without the owner's word. Reported and not targets: priority 2 with shear (16 of
-28; Response against itself 18) and speed (the brief's generated standing). Outside
-priority 3 with shear on the held-out set, by kind: a prestressed I-girder and a
-rectangular beam at M/V of 2 m or more, and a rectangular beam under axial compression,
-then moment and shear at M/V under 2 m.
+**The finishing steps are done and the work is stopped for the owner's sign-off**
+(`docs/summary.md`, which is now the sign-off page; `docs/assessment.md` has the
+independent assessor's findings with the developer's answers). Both held-out sets have
+been opened case by case, so **neither is held out any longer**: a further increment on
+accuracy needs a new held-out set first (`tools/heldout.py build` with a new recipe),
+and must not tune against the cases of the two spent sets as if they were unseen.
+
+Standing at the finish, kernel unchanged since increment 8: the first set with shear 28,
+16, 25 of 28 on priorities 1 to 3 and 20 of 27 on priority 4, without shear 27 of 27 on
+each; the second set, scored once, with shear 12, 7, 12 of 12 and 9 of 12, without shear
+10 of 10 on each. One case of the second set (the I-girder at M/V = 2.5 m) has the same
+input and loading as a development case added in increment 8 after the set was frozen;
+it is counted as scored and named in the summary.
+
+What the opened sets show (`python tools/sources.py` on the scorer's runs, outside the
+repository): of 37 view checks outside target at assessed stages with shear, 28 are
+inside when r2c is put into Response's own state (the path, not a rule), 7 are not
+(five of them the Transverse Average Bond chart at the peak, on the Liping sample under
+axial compression, Newbeam with heavy closed stirrups, Newbeam with stirrups at 200 mm,
+the column under compression at M/V = 1.5 m and Newbeam under a moment then shear; the
+T-beam's steel stress at a crack with material factors, item 8 below; the I-girder's
+principal tensile stress at M/V = 4 m), and 2 need the driver.
+
+Tools of the finish: `python tools/opened.py ARCHIVE --set heldout|finish --out FILE`
+(a held-out set case by case, into a file outside the repository), `python
+tools/gaveup.py REFS SUBS [--traces DIR]` (each condition of the rule that tells where
+Response's solve gave up, on the records). Rules written and off: `docs/kernel.md`,
+"Rules written and off: what was decided for each".
 
 If work on accuracy goes on, in this order:
 

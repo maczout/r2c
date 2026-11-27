@@ -568,7 +568,7 @@ Response makes each spacing as a table of points over the depth and reads it lin
 between them (`004b6a30`); `0043fa20` makes both when the section is set up. A spacing
 the user gives is used as it is, at every height.
 
-**Longitudinal** (written, off: see the end of this section).
+**Longitudinal** (in use: see the end of this section).
 
 *A layer's term* [`0043f570`], the 0.1·db/ρ of the CEB expression. Every layer counts
 with a weight that is its area at the layer's own height and falls linearly with
@@ -1040,8 +1040,7 @@ A-5 (the slopes of the compressive stress, below); Liping LB1 is refused since D
 not looked at again.
 
 **The slopes of the compressive stress [B `004ac960`, called from `0046b940`], read
-2026-11-24 (step A-5): written, off** (`Shear.own_slopes`, `ConcreteLaw.compression_slopes`;
-`docs/summary.md`, D69). Until now r2c took the two slopes along the principal compression
+2026-11-24 (step A-5): in use since step A-6** (`Shear.own_slopes`, `ConcreteLaw.compression_slopes`). Until now r2c took the two slopes along the principal compression
 as differences of its own stress relation. The program has them in closed form, and its
 form is not everywhere the relation's slope:
 
@@ -1087,7 +1086,7 @@ first (a shear of 2 kN on the I-girder). What is left after it: Maekawa (7) 40 s
 1.5 to 2.0 % against Response's 0.5; Mehlhorn (6) 10; Porasz-Collins (13) 7. Not looked
 into (one approach, D68).
 
-Why it is off: on the 38 cases 27 checks come inside and 5 go outside, and one of the five
+Why it was off at first: on the 38 cases 27 checks come inside and 5 go outside, and one of the five
 is a Must, the shape of Newbeam with elasto-plastic tension stiffening
 (`docs/verification.md`, "Step A-5"). The no-regression bound keeps it off until the owner
 decides (D69).
@@ -1731,7 +1730,7 @@ shear-related views (priority 2: 28 to 24) and leaves the other totals as they w
 are an inference and the routine that keeps them was not read: read it before turning
 this on.
 
-### The shear strain profile between passes [B], read 2026-11-22 (step A-1c): written, off
+### The shear strain profile between passes [B], read 2026-11-22 (step A-1c): in use, but for the tests on every pass
 
 What the program does to the shear strain profile within a stage, when it reports a stage
 as not solved, and what it carries from one stage to the next (`0041e840`, `0041fe20`,
@@ -1799,7 +1798,8 @@ node strains (`0041c060`: each node's shear strain over the stage's; the profile
 uncracked section where the stage's shear strain is under 10⁻⁷). r2c puts back the
 profile a stage left behind, which for a converged stage is the update after it, and
 after a stage that has not converged it starts the next from the profile that stage was
-solved on. Written, with the update, as `Shear.own_profile`, off.
+solved on. In use since increment 8 as `Shear.rebuilt_profile` ("The profile a stage is
+put back to", above); the switch it was first written under, `Shear.own_profile`, is gone.
 
 **The step factor of the global solve** [`004276a0`; a correction to "The global solve
 with shear", above, which had "whole steps (half steps with the relaxation flag)"].
@@ -1811,7 +1811,7 @@ stays one half for the rest of the response, under control of the axial strain, 
 M/V is between 0.15 and 0.75 of the depth (`00419250`), after a change of control
 variable (`004162d0`) and after the reset of the profile above. The limit of 50 steps is
 100 in the single-state solve. In r2c since step A-1c as part of `Shear.own_solve`
-(`step_share`, `half_steps`), which stays off: without it r2c's writing of that solve
+(`step_share`, `half_steps`), on since increment 6: without it r2c's writing of that solve
 ran to its 50 steps at states where the program goes on.
 
 **Measured, each switched on by itself** (2026-11-22, one machine; the 24 cases against
@@ -1966,6 +1966,27 @@ node starts, so a node is solved once an evaluation and not kept between them.
   of a call is on one side** (`ConcreteLaw.stress`).
 
 `Analysis.node_store`, `Analysis.warm_ahead` and `NodeStore.light` turn each off.
+
+## Rules written and off: what was decided for each (the finish, 2026-11-27)
+
+Four rules are in the kernel behind a switch that is off. Each was looked at again at
+the finish, with no change to the kernel (owner, 2026-11-26: no kernel changes in that
+increment). All four are **kept, off**: each is the binary's own rule or an observation
+of the running program, each changes results only at stages that do not settle, and each
+is where work on those stages would start. None is deleted, because the reading behind
+it would have to be done again; none is turned on, because on the development set each
+loses cases as it stands. Try one without editing the source: `python tools/trial.py OUT
+--set Class.name=1 --only NAMES`.
+
+| Switch | What it is | Source | Why it is off | Before turning it on |
+|---|---|---|---|---|
+| `Analysis.own_stirrup_history` | The stirrups' plastic strain as a table that belongs to a stage, replaced when a stage is kept ("The history of the stirrups") | read in the binary | Newbeam's rising branch at M/V = 0.5 m goes outside with it (*measured*, 2026-11-22, 17 cases); not measured again since Response's own solve of a stage and of a node came on | measure it again on the present set: the case it lost on is now one of the stages that do not settle |
+| `Shear.pass_code` | The state code and the fall of load tested on every pass of a stage, not once at its end ("The shear strain profile between passes", "The tests on every pass") | read in the binary | 7 checks outside, none inside, all at the peak of Newbeam at M/V = 0.5 m (*measured*, 2026-11-22, 24 cases); partly overtaken by "A stage kept as it is from the twelfth pass", which is on | read the two together: the twelfth-pass rule is one of these tests |
+| `Shear.stale_marks` | After a try that ran away into crushed concrete, the next try's first step is taken on the depth range that try left ("The first step after a try that ran away") | seen in the running program; the routine that keeps the marks was not read (*inferred*) | priority 2 falls by four cases on the cases with shear (*measured*, increment 7), and priority 4 with the node solve (increment 8) | read the routine that leaves the nodes as they are when a stage is put back |
+| `Shear.sliver` | Where concrete is crushed inside the depth the range with stiffness is a hundredth of the depth, not empty ("The stirrups' plastic strain at a step in width", its note on `00440ea0`) | the test read in the binary; the origin of heights *inferred* | four cases leave priority 1, none comes in (*measured*, increment 8) | read the origin of heights in `00440ea0`'s last block and what the step routine does on that range |
+
+Two comments in the source still point at the earlier record for these (`D39` in
+`solver.py`); this section is where they are decided.
 
 ## Inferred or fitted values, in one place
 

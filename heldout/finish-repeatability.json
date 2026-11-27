@@ -1,0 +1,47 @@
+{
+ "what": "Response-2000 with every concrete strength raised by 0.05 %, compared with Response as it is by the measure r2c is held to; cases inside target on every check of the priority",
+ "date": "2026-11-26",
+ "by_per_cent": 0.05,
+ "cases": {
+  "moment-axial": 10,
+  "shear": 12
+ },
+ "totals": {
+  "moment-axial": {
+   "1": [
+    7,
+    10
+   ],
+   "2": [
+    10,
+    10
+   ],
+   "3": [
+    9,
+    10
+   ]
+  },
+  "shear": {
+   "1": [
+    10,
+    12
+   ],
+   "2": [
+    5,
+    12
+   ],
+   "3": [
+    8,
+    12
+   ],
+   "4": [
+    9,
+    10
+   ]
+  }
+ },
+ "unsolved": {
+  "moment-axial": 0,
+  "shear": 0
+ }
+}
