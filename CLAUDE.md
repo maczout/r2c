@@ -80,6 +80,10 @@ tuned against. It is frozen; its recipe and hashes are committed (`heldout/manif
   the independent assessor (`tools/opened.py`, into files outside the repository;
   `docs/assessment.md`). Both sets are spent as held-out sets. Per-case tables are still
   not committed; the assessor's findings name cases and sizes, as written.
+- **After the finish** (owner, 2026-11-27): both sets were scored once more after the
+  override was narrowed and the record made to mark where Response stops. How a trace of
+  Response shows each of their cases to have ended is per-case and stays in the archives
+  (`trace-ends.json` there; `tools/traceend.py`).
 - **Each log says whether the rule was kept**, since it rests on instruction.
 - **Floor:** a fall in any area's total is reported to the owner in the summary, even if
   the overall total rises.

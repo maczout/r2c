@@ -16,7 +16,8 @@ What "good" is judged on (`docs/brief.md`): cases the developer has not tuned ag
 
 - `finish-manifest.json`: the second set, for the finish (owner, 2026-11-25). The same
   form, frozen the same way, in an archive of its own. It was not scored in any way
-  until the owner started the finishing steps (2026-11-26); it was then scored once.
+  until the owner started the finishing steps (2026-11-26); it was then scored once, and
+  once more after the change the owner asked for on 2026-11-27 (as the first set was).
 - `finish-totals.json`, `finish-repeatability.json`: that one score, and Response
   against itself on the second set's inputs, in totals only.
 

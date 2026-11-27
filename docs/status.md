@@ -17,9 +17,17 @@ For the developer: what exists now and how to work on it. The owner reads
   "carry on" override is a step of its own (`Shear.carry_on`, `run._carries_on`;
   `docs/kernel.md`, "The global solve with shear"): `Result.carried_from` and the
   `carried_from` of a case's verify results say where it took over (0: the whole
-  response is r2c's earlier solve's). Switches for rules that are written and off are
+  response is r2c's earlier solve's). **Narrowed, and marked in the record** (owner,
+  2026-11-27; `docs/kernel.md`, "Where Response's response ends and r2c's goes on"): the
+  stage control keeps why each try failed, r2c carries on only where every one of them
+  failed numerically (`shear.stop_kind`, `Shear.stop`), and ends as Response does where
+  one is a state refused for a crushing web or the two cannot be told apart. The record
+  then has `response-last-stage`, `response-peak-stage`, `response-ending` and a section
+  `response/last-stage` (r2c goes past), or `ending` (r2c ends as Response does, and
+  why); `Result.response_last`, `Result.ending`. Switches for rules that are written and off are
   listed in `docs/kernel.md` (`Shear.pass_code`, `Analysis.own_stirrup_history`,
-  `Shear.stale_marks`, `Shear.sliver`; each decided at the finish: kept, off). A node's transverse strain is solved the way the
+  `Shear.stale_marks`, `Shear.sliver`; each decided at the finish: kept, off; and
+  `Shear.code_by_layers`, the state code read again in increment 10, off). A node's transverse strain is solved the way the
   program solves it (`Analysis.own_transverse`, since increment 8), where the answer
   depends on where the node starts; what was kept between evaluations for speed (the
   nodes' transverse solves by node, `NodeStore`) is therefore not used with shear. It
@@ -40,25 +48,54 @@ For the developer: what exists now and how to work on it. The owner reads
 - **The held-out set**: `heldout/` (the frozen manifest and the totals), built and scored by
   `tools/heldout.py`. See "The held-out rule" in `CLAUDE.md` before touching anything.
   **The second set, for the finish** (`heldout/finish-manifest.json`, 22 cases, frozen
-  2026-11-25) was built the same way with `--set finish` and scored once, at the
-  finish (`heldout/finish-totals.json`, `heldout/finish-repeatability.json`).
+  2026-11-25) was built the same way with `--set finish` and scored at the
+  finish, and once more after the owner's change of 2026-11-27 (`heldout/finish-totals.json`, `heldout/finish-repeatability.json`).
 - **Known deviations**: `docs/deviations.md`.
 
 ## Next
 
-**The finishing steps are done and the work is stopped for the owner's sign-off**
-(`docs/summary.md`, which is now the sign-off page; `docs/assessment.md` has the
-independent assessor's findings with the developer's answers). Both held-out sets have
-been opened case by case, so **neither is held out any longer**: a further increment on
+**Without shear r2c is signed off (owner, 2026-11-27). With shear the work is stopped
+for the owner's sign-off** (`docs/summary.md`; `docs/assessment.md` has the independent
+assessor's findings with the developer's answers). Both held-out sets were opened case
+by case at the finish, so **neither is held out any longer**: a further increment on
 accuracy needs a new held-out set first (`tools/heldout.py build` with a new recipe),
 and must not tune against the cases of the two spent sets as if they were unseen.
 
-Standing at the finish, kernel unchanged since increment 8: the first set with shear 28,
-16, 25 of 28 on priorities 1 to 3 and 20 of 27 on priority 4, without shear 27 of 27 on
-each; the second set, scored once, with shear 12, 7, 12 of 12 and 9 of 12, without shear
-10 of 10 on each. One case of the second set (the I-girder at M/V = 2.5 m) has the same
-input and loading as a development case added in increment 8 after the set was frozen;
-it is counted as scored and named in the summary.
+Standing after increment 10 (both sets scored once after the change): without shear 27
+of 27 and 10 of 10 on each priority. With shear, priority 1 with no case cut 22 of 28
+and 11 of 12, cut 26 of 28 and 12 of 12; priorities 2 and 3 at 16 and 25 of 28, 7 and
+12 of 12; priority 4 at 18 of 27 and 8 of 12 cut. The cut totals fell from the finish
+because the measure cuts fewer cases (a trace of Response must show the give-up); the
+records of increment 8 under today's measure give the same totals.
+
+**What the owner's requirements of 2026-11-27 still lack** (`python tools/marks.py REFS
+SUBS`; `docs/deviations.md`): the record marks the stage where r2c's *copy* of
+Response's stage control gives up. On the cases where r2c goes past Response's last
+stage (25 development, 15 held-out) that is Response's last stage on 5 and 5, another
+stage on 9 and 5, and there is no mark on 11 and 5; and of the 6 development cases where
+a trace shows Response refusing a crushing web, r2c ends on a crushing web on 2, some
+stages after Response, and goes on on 4; it also ends that way on 5 cases where the
+trace shows something else. On the held-out sets 2 records end that way, and on 2 of
+the 3 cases with such a trace r2c goes past. Where to start:
+
+- **Which nodes are uniaxial** (`docs/kernel.md`, "The state code, layer by layer";
+  `Shear.code_by_layers`, written, off). The binary's scan for web crushing goes layer
+  by layer and a crushing node that carries no shear ends the flexural zone. With
+  r2c's uniaxial nodes (`Detail.lone`) counted as carrying none, Newbeam at M/V = 4 m
+  and Newbeam with two-leg stirrups at 200 mm at M/V = 3 m end exactly where Response
+  refuses them, and six other cases end 6 to 16 stages early. Read what `004a7b60`
+  stores as a node's shear stress and the whole test at the head of `004a8b20`, and
+  hold `Detail.lone` to the Stirrup Stress chart of a section with prestrained
+  stirrups.
+- **Where r2c's copy does not fail where Response's solve gave up**: item 1 below.
+
+How Response ended each traced case: `python tools/traceend.py read REFS TRACE_DIRS
+--list` (the development set's endings are in `tests/oracle/trace-ends.json`, which the
+measure reads; a held-out set's are in its archive, `trace-ends.json`, given to the
+scorer's runs by `R2C_TRACE_ENDS`). A new development case with shear whose Response
+capture ends at 0.8 of its peak or more needs a trace before it can be cut:
+`python tools/traceend.py make tests/oracle OUT --inputs FOLDERS --response-dir DIR
+--have TRACE_DIRS`, then `read ... --write tests/oracle/trace-ends.json`.
 
 What the opened sets show (`python tools/sources.py` on the scorer's runs, outside the
 repository): of 37 view checks outside target at assessed stages with shear, 28 are
@@ -72,7 +109,9 @@ principal tensile stress at M/V = 4 m), and 2 need the driver.
 Tools of the finish: `python tools/opened.py ARCHIVE --set heldout|finish --out FILE`
 (a held-out set case by case, into a file outside the repository), `python
 tools/gaveup.py REFS SUBS [--traces DIR]` (each condition of the rule that tells where
-Response's solve gave up, on the records). Rules written and off: `docs/kernel.md`,
+Response's solve gave up, on the records), `python tools/uncut.py REFS SUBS` (the
+totals with no case cut), `python tools/marks.py REFS SUBS` (whether r2c's record marks
+Response's last stage where it goes past it). Rules written and off: `docs/kernel.md`,
 "Rules written and off: what was decided for each".
 
 If work on accuracy goes on, in this order:

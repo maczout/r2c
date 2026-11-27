@@ -10,10 +10,12 @@ in for the other in a workflow, and r2x serves as the oracle that r2c is compare
 
 **What it is good for, in one paragraph.** Without shear (moment, axial load, or both)
 r2c gives Response-2000's answer: on sections it was never tuned against, every case was
-inside ±5 % on every check, stage for stage. With shear it gives Response's curve as far
-as Response's own response goes (the peak load there, the rising branch, the crack widths)
-on every such case, but on about one in six it then carries on to a higher peak than
-Response reports (see below); the shear-related profiles over the depth at the
+inside ±5 % on every check, stage for stage. With shear, taking r2c's whole response as it
+stands, the peak, the rising branch and the stress-state profiles were inside on 22 of 28
+and 11 of 12 such cases; cut at Response's last stage where a trace of Response shows its
+solve gave up there, on 26 of 28 and 12 of 12. The difference is that on about one case
+in six r2c carries on to a higher peak than Response reports (see "Where Response would
+stop" and "Known limitations"). The shear-related profiles over the depth at the
 peak, and how the response ends after it, agree on about three cases in five and three in
 four, and there Response does not agree with itself either when an input changes by next
 to nothing. The numbers, the cases they were measured on and an independent assessor's
@@ -65,14 +67,35 @@ can stand in for the other.
 | `--report` | Response's report pages | not available (usage error) |
 | `define`, sessions, `setup` | yes | no |
 | `health` | checks Wine and Response | prints the version |
-| Record header | `r2x-version`, Response and Wine identification | `r2c-version`, `kernel: r2c` |
+| Record header | `r2x-version`, Response and Wine identification | `r2c-version`, `kernel: r2c`; with shear, where it applies, `response-last-stage`, `response-peak-stage`, `response-ending` or `ending` (see "Where Response would stop") |
 | Time, without shear | 25 to 75 s reading every stage | a second or two (faster on every case measured) |
 | Time, with shear | about a minute reading every stage | one to several minutes: slower than r2x on most cases, up to about five times |
-| With shear, where Response's solve gives up before any failure | the response ends there, as Response's does | r2c carries on to a failure (see below) |
+| With shear, where Response's solve gives up numerically before any failure | the response ends there, as Response's does | r2c carries on to a failure and marks the stage in its record (see below) |
+| With shear, where Response refuses a state whose web is crushing | the response ends there | meant to end there too, with the reason in the record; on most such cases r2c does not see the crushing and goes on (a known limitation) |
 | Inputs outside Response's manual that Response still solves | solved | refused (exit status 3) |
 
 Charts have the same titles, units, number formats and row layout as Response's exports.
 `docs/parity.md` lists every difference of interface found.
+
+## Where Response would stop
+
+With shear, Response-2000's response often ends while the load is still rising: its solve
+of a load stage gives up, or it refuses a state whose web is crushing. r2c's record says
+what it did about it:
+
+- `response-last-stage: N` in the header (with `response-peak-stage` and
+  `response-ending`), and a section `response/last-stage` with that stage's point on each
+  control chart: r2c's copy of Response's stage control gave up numerically after stage N,
+  which is where Response's response would end, and the stages after N are r2c's own
+  solve's. `peak-stage` is the peak of the whole response; **Response's strength is the
+  peak up to stage N** (`response-peak-stage`).
+- `ending: as Response-2000's does: ...` in the header: r2c ended where Response's tries
+  ran out, and why (a state refused for a crushing web; a refusal that cannot be told
+  from a give-up; a give-up beyond which r2c finds nothing either).
+- Neither line: the response ended by Response's own tests, or r2c did not notice a
+  place where Response would stop. **The mark is r2c's reading, not Response's word**: on
+  some sections r2c goes past the stage where Response itself stops without marking it
+  (see "Known limitations").
 
 ## Scope
 
@@ -104,16 +127,21 @@ numbers.
   shear response as indicative.
 - **With shear, the response after the peak and where it ends** differ from Response's on
   about one case in four. This was the lowest priority and was not worked on.
-- **With shear, r2c carries on where Response stops early.** On sections that fail in
-  flexure with some shear, Response's solve often gives up while the load is still
-  rising, and its response ends there. r2c finds further states and its peak can stand
-  well above the one Response reports: on 6 of the 40 cases with shear it was never tuned
-  against, by 5 to 32 %. Up to Response's last stage the two agree, and Response's lower
-  figure is its repeatable answer. This is deliberate (the owner's decision), and
-  **r2c's record does not mark where Response stopped**: if you need Response's
-  strength, do not take r2c's peak for it where r2c's response has a sudden jump in load
-  or a long tail of closely spaced stages. Whether r2c's higher figure is the better
-  answer has not been checked.
+- **With shear, r2c's peak can stand above Response's, and the record does not always
+  say so.** On sections that fail in flexure with some shear, Response's response often
+  ends while the load is still rising: its solve gives up, or it refuses a state whose
+  web is crushing. Up to that stage the two programs agree, and Response's figure is its
+  repeatable answer. r2c is meant to carry on only past a numerical give-up, to mark that
+  stage in its record, and to end where Response refuses a crushing web. It does so only
+  in part. On the 40 cases with shear it was never tuned against, r2c went past
+  Response's last stage on 15: its record marks that stage on 5, marks a later or
+  earlier stage on 5, and has no mark on 5; and on 2 of the 3 where Response refused a
+  crushing web r2c went on. Its peak was 5 to 32 % above Response's on 6 of the 40. So:
+  where the record has `response-last-stage`, take the peak up to that stage
+  (`response-peak-stage`) as Response's strength; where it has not, do not take r2c's
+  peak for Response's strength if the response has a sudden jump in load or a long tail
+  of closely spaced stages. Whether r2c's higher figure is the better answer has not
+  been checked.
 - **A circular column, or any section that stays uniform, under axial load alone:** after
   the peak r2c keeps a uniform response and Response does not. Deliberate.
 - **With shear r2c is slow**: minutes for a case, longer than r2x on most.
