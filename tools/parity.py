@@ -155,9 +155,9 @@ def option_values(theirs, ours) -> tuple[int, list[str]]:
 MACHINE = {"r2x-version", "wine-version", "disclaimer", "response-exe-sha256",
            "response-files-sha256", "response-verified", "r2c-version", "kernel",
            "input-sha256",
-           # r2c's own lines on where Response would stop (owner, 2026-11-27: a required
-           # part of r2c's record; r2x's cannot have them)
-           "response-last-stage", "response-peak-stage", "response-ending", "ending"}
+           # r2c's own lines on where its copy of Response's solve failed (owner,
+           # 2026-11-27: a required part of r2c's record; r2x's cannot have them)
+           "carried-on-stage", "carried-on-peak-stage", "carried-on", "ending"}
 NUMBER = re.compile(r"-?\d+(\.\d+)?([eE][-+]?\d+)?")
 
 

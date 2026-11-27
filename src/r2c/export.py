@@ -90,10 +90,10 @@ def control(key: str, stages: list[Stage], u: Units, gam_avg=None, axis: float =
 
 
 def flag(stage: int, keys, stages: list[Stage], u: Units, gam_avg=None, axis: float = 0.0) -> bytes:
-    """The stage at which Response-2000's own response would end, flagged in the data of a
-    record whose response goes past it: the stage number, and its point on each control
+    """The last stage before r2c's copy of Response-2000's solve failed and r2c carried
+    on, flagged in the data of the record: the stage number, and its point on each control
     chart as that chart prints it. r2c's own section; Response exports nothing like it."""
-    out = ["  Response-2000's last stage", "  =========================", "",
+    out = ["  The stage r2c carried on from", "  =============================", "",
            f"  Stage\t\t: {stage}", ""]
     for k in keys:
         rows = control(k, stages[stage:stage + 1], u,

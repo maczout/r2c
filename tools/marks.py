@@ -14,12 +14,13 @@ last stage at 0.8 of its peak or more, r2c's curve passing it at the same place,
 beyond, the two ends apart), and prints, by how a trace of Response shows the case to have
 ended (tools/traceend.py):
 
-  marked there      r2c's record has response-last-stage, and that stage is at the same
+  marked there      r2c's record has carried-on-stage, and that stage is at the same
                     place as Response's last stage (within the target on the curves)
   marked elsewhere  it has the line, at another place: its copy gave up later or earlier
   not marked        it has no such line: r2c went past without its copy giving up
 
-and how many records say that r2c ended as Response does, by the reason given (the
+and how many records say that r2c ended where its copy of Response's stage control
+stopped, by the reason given (the
 header's "ending"). --list names the cases (on a held-out set: at the finish only).
 Nothing is assessed: there is no target on the marks.
 """
@@ -47,7 +48,7 @@ def mark(ref, sub) -> str | None:
     if c is None or c["ratio"] < cmp.GAVE_UP_LOAD or c["off"] > c["limit"] \
             or c["beyond"] <= 1e-9 or c["apart"] <= c["limit"]:
         return None
-    at = sub.header.get("response-last-stage")
+    at = sub.header.get("carried-on-stage")
     if at is None:
         return "not marked"
     key = [k for k in cmp.control_keys(ref) if k in cmp.control_keys(sub)][-1]
@@ -83,7 +84,8 @@ def main(argv=None) -> int:
         names = sorted(k for k, v in past.items() if v == (trace, m))
         print(f"  trace of Response: {trace}; {m}: {n}"
               + ("  " + " ".join(names) if a.list else ""))
-    print(f"r2c's record says it ends as Response's does on {len(ends)}")
+    print(f"r2c's record says it ends where its copy of Response's stage control stops on "
+          f"{len(ends)}")
     for why, n in sorted(Counter(ends.values()).items()):
         names = sorted(k for k, v in ends.items() if v == why)
         print(f"  {why}: {n}" + ("  " + " ".join(names) if a.list else ""))

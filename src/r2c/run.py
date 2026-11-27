@@ -53,11 +53,13 @@ class Result:
     # the number of stages kept when the owner's override took over from Response's own
     # solve (Shear.carry_on); None where it did not
     carried_from: int | None = None
-    # The stage at which Response-2000's own response would end, where r2c's goes past it
-    # (owner, 2026-11-27: a required part of the record); None where r2c does not go past
-    response_last: int | None = None
-    # Why the response ends where it does, where it ends because Response's tries on a
-    # stage ran out and r2c ends as Response does; None for every other ending
+    # The last stage before r2c's own copy of Response-2000's solve failed and r2c carried
+    # on (owner, 2026-11-27: a required part of the record, named for what r2c can know;
+    # it is not a claim about where Response itself stops); None where r2c did not carry on
+    carried_stage: int | None = None
+    # Why the response ends where it does, where it ends because the tries of r2c's copy
+    # of Response's stage control ran out and r2c did not carry on; None for every other
+    # ending
     ending: str | None = None
 
     def header(self, views, detail) -> dict[str, str]:
@@ -73,11 +75,11 @@ class Result:
         h["views"] = viewlib.format_views(views)
         h["stage-count"] = str(len(self.stages))
         h["peak-stage"] = str(self.peak)
-        if self.response_last is not None:
-            h["response-last-stage"] = str(self.response_last)
-            h["response-peak-stage"] = str(
-                peak_stage(self.stages[: self.response_last + 1], self.increment))
-            h["response-ending"] = WENT_PAST
+        if self.carried_stage is not None:
+            h["carried-on-stage"] = str(self.carried_stage)
+            h["carried-on-peak-stage"] = str(
+                peak_stage(self.stages[: self.carried_stage + 1], self.increment))
+            h["carried-on"] = CARRIED_ON
         if self.ending:
             h["ending"] = self.ending
         h["detail-stages"] = stagelib.format_ranges(detail)
@@ -102,35 +104,37 @@ class Result:
                 done += 1
                 if on_stage:
                     on_stage(i, done, len(detail))
-        if self.response_last is not None:
-            sections.append((RESPONSE_LAST, export.flag(
-                self.response_last, keys, self.stages, self.units, self.gam_avg,
+        if self.carried_stage is not None:
+            sections.append((CARRIED_STAGE, export.flag(
+                self.carried_stage, keys, self.stages, self.units, self.gam_avg,
                 self.section.zaxial - self.section.zc)))
         return record.encode(self.header(views, detail), sections)
 
 
-# The record of a response with shear that goes past the stage where Response-2000's own
-# would end (owner, 2026-11-27; docs/kernel.md, "Where Response's response ends and r2c's
-# goes on"): two header lines, and the stage flagged in a section of its own
-RESPONSE_LAST = "response/last-stage"
-WENT_PAST = ("r2c's copy of Response-2000's stage control gives up after this stage (every "
-             "further try fails numerically), which is where Response-2000's response would "
-             "end; the stages after it are r2c's own solve's (the owner's override), and "
-             "peak-stage is of the whole response")
+# The record of a response with shear in which r2c's own copy of Response-2000's solve
+# failed and r2c carried on (owner, 2026-11-27; docs/kernel.md, "Where Response's response
+# ends and r2c's goes on"): three header lines, and the stage flagged in a section of its
+# own. The names say what r2c knows; where Response itself stops, r2c does not know.
+CARRIED_STAGE = "carried-on/stage"
+CARRIED_ON = ("after this stage every further try of r2c's copy of Response-2000's stage "
+              "control failed numerically, and r2c carried on with its own solve (the "
+              "owner's override); the stages after it are that solve's, and peak-stage is "
+              "of the whole response. Response-2000's own response may end at another "
+              "stage")
+STOPPED = "where r2c's copy of Response-2000's stage control stops: "
 ENDINGS = {
-    REFUSED: "as Response-2000's does: it refuses a state whose web is crushing with "
-                   "the load still rising, and no smaller step is solved",
-    UNTOLD: "as Response-2000's does: its tries on the next stage ran out, and a state "
-                  "it refuses cannot be told from a give-up of its solve",
-    "fallen": "as Response-2000's does: its solve gives up with the load already under 0.8 "
-              "of the largest",
-    "nothing": "as Response-2000's does: its solve gives up, and r2c's own solve finds no "
-               "state beyond either",
+    REFUSED: STOPPED + "it refuses a state whose web is crushing with the load still "
+                       "rising, and no smaller step is solved",
+    UNTOLD: STOPPED + "its tries on the next stage ran out, and a state it refuses cannot "
+                      "be told from a failure of its solve",
+    "fallen": STOPPED + "its solve fails with the load already under 0.8 of the largest",
+    "nothing": STOPPED + "its solve fails, and r2c's own solve finds no state beyond "
+                         "either",
 }
 
 
 def _ending(driver, stages):
-    """(response_last, ending) of a response, from where the tries of Response's own
+    """(carried_stage, ending) of a response, from where the tries of Response's own
     solve ran out (Shear.stop) and what r2c did then."""
     stop = getattr(driver, "stop", None)
     if stop is None:
@@ -317,8 +321,8 @@ def solve(path: str | Path | None = None, *, units: str | None = None,
                 driver, stages = again, other
                 driver.carried_from = 0     # the whole response is r2c's own solve's
     peak = peak_stage(stages, shown_incr)
-    response_last, ending = _ending(driver, stages)
-    marked = stages[response_last] if response_last is not None else None
+    carried_stage, ending = _ending(driver, stages)
+    marked = stages[carried_stage] if carried_stage is not None else None
 
     presses = 0
     want = more_detail
@@ -336,6 +340,6 @@ def solve(path: str | Path | None = None, *, units: str | None = None,
         notes.append(f"More Detail refined the solve {presses} times, not {want}")
     gam = [getattr(s, "gam_avg", s.gam) for s in stages]
     if marked is not None:
-        response_last = next(i for i, s in enumerate(stages) if s is marked)   # More Detail
+        carried_stage = next(i for i, s in enumerate(stages) if s is marked)   # More Detail
     return Result(name, sha, u, fac, shown_initial, shown_incr, presses, sec, stages, peak, gam,
-                  notes, getattr(driver, "carried_from", None), response_last, ending)
+                  notes, getattr(driver, "carried_from", None), carried_stage, ending)

@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 # Not published to PyPI; install from GitHub.
 name = "r2c"
-version = "0.1.0"
+version = "1.0.0"
 description = "Sectional response of reinforced concrete: a Python clone of Response-2000's analysis"
 readme = "README.md"
 license = "MIT"
