@@ -22,9 +22,12 @@ For the developer: what exists now and how to work on it. The owner reads
   stage control keeps why each try failed, r2c carries on only where every one of them
   failed numerically (`shear.stop_kind`, `Shear.stop`), and ends as Response does where
   one is a state refused for a crushing web or the two cannot be told apart. The record
-  then has `response-last-stage`, `response-peak-stage`, `response-ending` and a section
-  `response/last-stage` (r2c goes past), or `ending` (r2c ends as Response does, and
-  why); `Result.response_last`, `Result.ending`. Switches for rules that are written and off are
+  then has `carried-on-stage`, `carried-on-peak-stage`, `carried-on` and a section
+  `carried-on/stage` (r2c's copy of Response's solve failed and r2c carried on), or
+  `ending` (the copy stopped and r2c did not carry on, and why); `Result.carried_stage`,
+  `Result.ending`. The names say what r2c knows, not where Response stops (owner,
+  2026-11-27). **The record is r2c's public interface, what r2 builds on from 0.9.0**: `docs/output.md`
+  says what is fixed; until 1.0.0 a change to that raises the minor version (0.10.0), and so does an addition. Switches for rules that are written and off are
   listed in `docs/kernel.md` (`Shear.pass_code`, `Analysis.own_stirrup_history`,
   `Shear.stale_marks`, `Shear.sliver`; each decided at the finish: kept, off; and
   `Shear.code_by_layers`, the state code read again in increment 10, off). A node's transverse strain is solved the way the
@@ -54,21 +57,43 @@ For the developer: what exists now and how to work on it. The owner reads
 
 ## Next
 
-**Without shear r2c is signed off (owner, 2026-11-27). With shear the work is stopped
-for the owner's sign-off** (`docs/summary.md`; `docs/assessment.md` has the independent
-assessor's findings with the developer's answers). Both held-out sets were opened case
-by case at the finish, so **neither is held out any longer**: a further increment on
-accuracy needs a new held-out set first (`tools/heldout.py build` with a new recipe),
-and must not tune against the cases of the two spent sets as if they were unseen.
+**Version 0.9.0 is handed over to r2** (tag `v0.9.0`; owner, 2026-11-27). Signed off:
+without shear, as a stand-in for Response; with shear, the control curves up to
+Response's peak. Not signed off: strength with shear past Response's last stage. Priority
+1 with shear is held to the uncut reading and is not met (`docs/brief.md`).
 
-Standing after increment 10 (both sets scored once after the change): without shear 27
+**1.0.0 (owner, 2026-11-27)** is reached when r2 is implemented and the owner has signed
+off validation of the test set through it. Until then versions are 0.x: a change to
+anything `docs/output.md` fixes raises the minor version, as an addition does.
+
+**The first r2c work r2 needs (owner, 2026-11-27): the three gaps in what the record
+carries beside r2x's** (`docs/output.md`, "What r2x's record carries that r2c's does
+not", 1 to 3). They are in `export.py` and not in the kernel: a second line of the Shear
+Stress chart at stage 0 (zero unless the initial load has a shear); that line with its
+values beyond stage 0 under an initial shear with none in the increment; and the lines
+of the Shear Strain and Transverse Strain charts at the second stage of an increment of
+0,0,0. The first changes stage 0 of every record, so the records' hashes are rewritten
+in its own commit (`tools/same.py --write`), and the second's values are a result nobody
+has compared yet: hold them to Response's on the one development case that has it.
+`python tools/carries.py ARCHIVE VERIFY_OUT` shows when the gaps are closed
+(`docs/output-check.md`). This comes **before the crushing-web rule**.
+
+**After that (owner, 2026-11-27): the crushing-web refusal rule**, written and off
+(`Shear.code_by_layers`; "Which nodes are uniaxial" below is where to start). It is the
+first kernel work, **after r2's comparison view exists**, and not before; and it needs **a
+new held-out set first** (`tools/heldout.py build` with a new recipe). Both present sets
+were opened case by case at the finish (`docs/assessment.md`), so neither is held out
+any longer, and their cases must not be tuned against as if they were unseen. Until
+then: no kernel work. What r2 reads is `docs/output.md`.
+
+Standing (both sets scored once after the change of increment 10; the first set once more at the end of increment 11, the same): without shear 27
 of 27 and 10 of 10 on each priority. With shear, priority 1 with no case cut 22 of 28
 and 11 of 12, cut 26 of 28 and 12 of 12; priorities 2 and 3 at 16 and 25 of 28, 7 and
 12 of 12; priority 4 at 18 of 27 and 8 of 12 cut. The cut totals fell from the finish
 because the measure cuts fewer cases (a trace of Response must show the give-up); the
 records of increment 8 under today's measure give the same totals.
 
-**What the owner's requirements of 2026-11-27 still lack** (`python tools/marks.py REFS
+**What the mark does and does not show** (`python tools/marks.py REFS
 SUBS`; `docs/deviations.md`): the record marks the stage where r2c's *copy* of
 Response's stage control gives up. On the cases where r2c goes past Response's last
 stage (25 development, 15 held-out) that is Response's last stage on 5 and 5, another
@@ -79,7 +104,7 @@ on a crushing web on 5 cases where the trace shows something else. On the held-o
 the 3 cases with such a trace r2c goes past. Where to start:
 
 - **Which nodes are uniaxial** (`docs/kernel.md`, "The state code, layer by layer";
-  `Shear.code_by_layers`, written, off). The binary's scan for web crushing goes layer
+  `Shear.code_by_layers`, written, off). **This is the next kernel job.** The binary's scan for web crushing goes layer
   by layer and a crushing node that carries no shear ends the flexural zone. With
   r2c's uniaxial nodes (`Detail.lone`) counted as carrying none, Newbeam at M/V = 4 m
   and Newbeam with two-leg stirrups at 200 mm at M/V = 3 m end exactly where Response
@@ -111,7 +136,10 @@ Tools of the finish: `python tools/opened.py ARCHIVE --set heldout|finish --out 
 tools/gaveup.py REFS SUBS [--traces DIR]` (each condition of the rule that tells where
 Response's solve gave up, on the records), `python tools/uncut.py REFS SUBS` (the
 totals with no case cut), `python tools/marks.py REFS SUBS` (whether r2c's record marks
-Response's last stage where it goes past it). Rules written and off: `docs/kernel.md`,
+Response's last stage where it goes past it), `python tools/carries.py ARCHIVE
+VERIFY_OUT` (whether r2c's whole record carries what r2x's whole capture does, chart by
+chart and stage by stage), `python tools/same.py BEFORE AFTER --what` (where two runs'
+records differ, by header key and section). Rules written and off: `docs/kernel.md`,
 "Rules written and off: what was decided for each".
 
 If work on accuracy goes on, in this order:

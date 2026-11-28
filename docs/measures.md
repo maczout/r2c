@@ -137,7 +137,7 @@ peak, nothing is left after the peak on either curve and the ending counts as th
 Every comparison that is cut is also kept as it is with no cut (`compare.uncut`), and the
 held-out scorer records both totals. What the measure cannot show: whether r2c carried on
 by the override (its copy of Response's solve gave up there and its own went on, which
-its record then marks: `response-last-stage`) or because its copy did not fail where
+its record then marks: `carried-on-stage`) or because its copy did not fail where
 Response's did. `python tools/marks.py` counts the two.
 
 ## The regression limits

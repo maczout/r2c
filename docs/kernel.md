@@ -1954,12 +1954,16 @@ state with the loads reversed). When the tries run out (the multiplier under 0.0
 What the record then says (`run._ending`, `Result.header`, `export.flag`):
 
 * where r2c goes past (the override acted and stages follow): the header lines
-  `response-last-stage` (the stage's number, as `peak-stage` counts), `response-peak-stage`
-  (the peak of the stages up to it) and `response-ending` (what happened, in words), and a
-  section `response/last-stage` with the stage's number and its point on each control
-  chart. After More Detail the number is that stage's new one.
+  `carried-on-stage` (the stage's number, as `peak-stage` counts), `carried-on-peak-stage`
+  (the peak of the stages up to it) and `carried-on` (what happened, in words), and a
+  section `carried-on/stage` with the stage's number and its point on each control
+  chart. After More Detail the number is that stage's new one. The names say what r2c
+  knows, that its own copy of Response's solve failed after that stage and r2c carried
+  on; they were `response-last-stage` and so on for one increment, which claimed to be
+  where Response stops, and the owner had them renamed (2026-11-27).
 * where r2c ends because the tries ran out: the header line `ending`, with the reason
-  (the web crushing; not told apart; a give-up with the load under 0.8 of the largest;
+  after a fixed lead ("where r2c's copy of Response-2000's stage control stops:"; the
+  web crushing; not told apart; a give-up with the load under 0.8 of the largest;
   a give-up beyond which r2c's own solve finds nothing either).
 * every other response has none of these lines, and its record is byte for byte what it
   was.

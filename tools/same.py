@@ -3,6 +3,9 @@
 
     python tools/same.py RUN              hold a verify run's records to the committed hashes
     python tools/same.py BEFORE AFTER     compare two verify runs' records, byte for byte
+                                          (--what: where each differing record differs,
+                                          by header key and section, for a change that
+                                          is meant to touch the record's own lines only)
     python tools/same.py RUN --write      record the run's hashes (after a change of result)
 
 Answers the owner's rule for speed (2026-11-26): r2c is made faster without changing a
@@ -30,6 +33,7 @@ from pathlib import Path
 import numpy as np
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "src"))
 RECORDS = ROOT / "tests" / "oracle" / "records.json"
 
 
@@ -56,13 +60,30 @@ def here() -> bool:
 
 
 def digest(data: bytes) -> str:
-    """The hash of a record without the line that names the input file: the same input is
-    found under one name by tools/verify.py and under another by the tests (the Quick
-    Define sections are all called hand.r2t in r2x), and the name is no result."""
-    head, sep, rest = data.partition(b"\ninput-name:")
-    if sep:
-        data = head + rest[rest.index(b"\n"):]
+    """The hash of a record without the line that names the input file and the line with
+    r2c's version: the same input is found under one name by tools/verify.py and under
+    another by the tests (the Quick Define sections are all called hand.r2t in r2x), and
+    neither the name nor the version number is a result (a release changes no hash)."""
+    for key in (b"\ninput-name:", b"\nr2c-version:"):
+        head, sep, rest = data.partition(key)
+        if sep:
+            data = head + rest[rest.index(b"\n"):]
     return hashlib.sha256(data).hexdigest()
+
+
+def what_differs(before: Path, after: Path) -> str:
+    """In words, where two records of one case differ: header keys and section names."""
+    from r2c import record
+    a, b = record.read(before), record.read(after)
+    keys = sorted(k for k in set(a.header) | set(b.header)
+                  if k not in ("input-name", "r2c-version") and a.header.get(k) != b.header.get(k))
+    secs = sorted(n for n in set(a.sections) | set(b.sections)
+                  if a.sections.get(n) != b.sections.get(n))
+    charts = [n for n in secs if n.startswith(("control/", "stage/"))]
+    other = [n for n in secs if n not in charts]
+    return (f"header {', '.join(keys) or 'the same'}; "
+            f"{len(charts)} chart sections differ"
+            + (f"; other sections {', '.join(other)}" if other else ""))
 
 
 def expected(name: str) -> str | None:
@@ -79,6 +100,7 @@ def main(argv=None) -> int:
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("run", nargs="+")
     ap.add_argument("--write", action="store_true")
+    ap.add_argument("--what", action="store_true")
     a = ap.parse_args(argv)
     if any("heldout" in r or "finish" in r for r in a.run) or len(a.run) > 2:
         raise SystemExit(__doc__)
@@ -103,8 +125,16 @@ def main(argv=None) -> int:
     print(f"{len(both)} development records compared with {what}: "
           f"{len(both) - len(differ)} identical, {len(differ)} differ"
           + (f"; {len(absent)} not in the run" if absent else ""))
+    kinds: dict[str, list[str]] = {}
     for n in differ:
-        print(f"  differs: {n}")
+        if a.what and len(a.run) == 2:
+            w = what_differs(Path(a.run[0]) / f"{n}.r2x.txt", Path(a.run[1]) / f"{n}.r2x.txt")
+            kinds.setdefault(w, []).append(n)
+        else:
+            print(f"  differs: {n}")
+    for w, names in sorted(kinds.items()):
+        print(f"  {len(names)} differ in: {w}")
+        print("    " + " ".join(names))
     return 1 if differ else 0
 
 
