@@ -8,7 +8,7 @@ r2c is the counterpart of [r2x](https://github.com/maczout/r2x), which drives Re
 itself. The two have the same command line and write the same record format, so one can stand
 in for the other in a workflow, and r2x serves as the oracle that r2c is compared against.
 
-**What it is signed off for** (the owner, a structural engineer, 2026-11-27; version 1.0.0):
+**What it is signed off for** (the owner, a structural engineer, 2026-11-27; version 0.9.0):
 
 - **Signed off: without shear** (moment, axial load, or both), as a stand-in for
   Response-2000.
@@ -83,12 +83,12 @@ can stand in for the other.
 | Time, without shear | 25 to 75 s reading every stage | a second or two (faster on every case measured) |
 | Time, with shear | about a minute reading every stage | one to several minutes: slower than r2x on most cases, up to about five times |
 | With shear, where Response's solve gives up numerically before any failure | the response ends there, as Response's does | r2c carries on to a failure where its own copy of Response's solve fails too, and marks that stage in its record (see below); the mark is often not at Response's last stage |
-| With shear, where Response refuses a state whose web is crushing | the response ends there | meant to end there too, with the reason in the record; on most such cases r2c does not see the crushing and goes on (a known limitation, and the next work planned) |
+| With shear, where Response refuses a state whose web is crushing | the response ends there | meant to end there too, with the reason in the record; on most such cases r2c does not see the crushing and goes on (a known limitation; the work is planned) |
 | Inputs outside Response's manual that Response still solves | solved | refused (exit status 3) |
 
 Charts have the same titles, units, number formats and row layout as Response's exports.
 `docs/parity.md` lists every difference of interface found, and `docs/output.md` says what
-a program that reads r2c's records may rely on in version 1.
+a program that reads r2c's records may rely on from version 0.9.0.
 
 ## Where r2c carried on
 
@@ -162,14 +162,15 @@ numbers.
   the better answer has not been checked.
 - **Where Response refuses a state whose web is crushing, r2c mostly does not see it**
   and goes on. The rule is read from the program and written, but it is switched off: as
-  written it ends other cases too early. It is the first work planned after this
-  version.
+  written it ends other cases too early. It is the first work planned on the
+  calculation, after the gaps in the record (below) are closed.
 - **The owner's target for the peak, rising branch and stress-state profiles with shear
   is not met**: 79 % and 92 % of the two sets of unseen cases, taking r2c's whole
   response, against 93.4 %.
 - **The Shear Stress chart at the first stage (the initial load) has one line where
   Response's has two**; the missing one is zero unless the initial load has a shear
-  (`docs/output.md` lists this and two smaller gaps in what the record carries).
+  (`docs/output.md` lists this and two smaller gaps in what the record carries). Closing
+  the three is the first work planned after this version.
 - **A circular column, or any section that stays uniform, under axial load alone:** after
   the peak r2c keeps a uniform response and Response does not. Deliberate.
 - **With shear r2c is slow**: minutes for a case, longer than r2x on most.
@@ -206,7 +207,7 @@ numbers.
     tests/oracle/parked/   more development cases, not run by default
     heldout/               the two held-out sets: the frozen manifests and the totals
     docs/kernel.md         what the kernel does and where each rule comes from
-    docs/output.md         the record: what a program that reads it may rely on in version 1
+    docs/output.md         the record: what a program that reads it may rely on
     docs/verification-results.md   the results, generated
     docs/brief.md          the owner's brief: the goal, the priorities, the rules
     docs/summary.md        the sign-off page: what r2c is good for, the held-out totals, the assessor's findings

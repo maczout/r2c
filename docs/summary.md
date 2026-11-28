@@ -1,7 +1,8 @@
 # r2c: the handover page
 
-For the owner, 2026-11-27, after your four answers and the handover list of that day (increment 11). **Version
-1.0.0 is tagged (`v1.0.0`) for r2.** No kernel change; no result changed.
+For the owner, 2026-11-27, after your answers and handover list of that day (increment 11). **Version 0.9.0 is
+tagged (`v0.9.0`) for r2**; 1.0.0 is when r2 is implemented and you have signed off validation of the test set
+through it (your decision). No kernel change; no result changed.
 
 ## What r2c is good for, and what it is not
 
@@ -41,26 +42,26 @@ refusals** (15, and 4 inputs).
 
 - **The mark renamed to what r2c can know**: `carried-on-stage` (with `carried-on-peak-stage`, `carried-on`, a
   section `carried-on/stage`). Every development record is otherwise byte for byte what it was (`tools/same.py`).
-- **The record documented as stable for version 1** (`docs/output.md`): what r2 may rely on, and what it may not.
+- **The record documented as what r2 builds on from 0.9.0** (`docs/output.md`): what r2 may rely on, what it may
+  not, and that until 1.0.0 a change to what is fixed raises the minor version (0.10.0).
 - **r2c's whole records set beside r2x's whole captures**, every chart at every stage of 182 cases
   (`tools/carries.py`, `docs/output-check.md`): all there, with Response's headings and formats, but for three gaps.
 
 ## Needed from the owner
 
-1. **The three gaps in what the record carries** (`docs/output.md`): at the initial load Response's Shear Stress
-   chart has a second line, zero unless the initial load has a shear, and r2c's has not; under an initial shear
-   with none in the increment r2c never writes it; with no increment the second stage's two strain charts differ
-   in their lines. Suggested: fix the first two in a 1.0.1 before r2's comparison view draws that chart (the
-   export, not the kernel; stage 0 of every record changes).
-2. **The tag is on this branch's last commit, before the merge.** Suggested: merge with a merge commit, as
-   before, and the tag stands; if you want changes first, say so and the tag is moved.
+1. **The tag `v0.9.0` is on this branch's last commit, before the merge.** Suggested: merge with a merge commit,
+   as before, and the tag stands; if you want changes first, say so and the tag is moved.
+2. **Which version closes the three gaps in the record** (yours: the first r2c work r2 needs, before the
+   crushing-web rule). The first adds a line to a chart at stage 0 of every record; `docs/output.md` fixes a
+   chart's form as Response's export, so it reads as a correction. Suggested: 0.9.1; 0.10.0 if you read it otherwise.
 3. **The `ending` line was reworded too** (it said "as Response-2000's does"; it now says where r2c's copy
    stopped). Not in your answer 3, done in its spirit. Suggested: keep.
 
 ## Top known deviations
 
 - **With shear, r2c goes past Response's last stage and its mark is unreliable** (not signed off).
-- **Where Response refuses a crushing web, r2c mostly does not see it**: the next job, after r2's comparison view.
+- **Where Response refuses a crushing web, r2c mostly does not see it**: the next kernel job, after the three gaps
+  in the record are closed and r2's comparison view exists.
 - **With shear, the views at a peak that does not settle** (most of priority 2).
 - **The transverse bond chart near the bottom of the stirrups**, about half of it a rule not found.
 - **With shear r2c is slower than r2x on most cases**; how a response with shear ends (priority 4).

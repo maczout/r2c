@@ -307,6 +307,20 @@ instruction; the values are those of the standing block above and of
 22 of 28 (79 %) on the first held-out set and 11 of 12 (92 %) on the second, against
 93.4 %. Priority 3 with shear and every priority without shear are met on both sets.
 
+**2026-11-27**, on the version handed over (the owner's decision, recorded by the
+developer at the owner's instruction):
+
+1. The version handed over is 0.9.0, not 1.0.0. This replaces "v1.0.0" in c above.
+2. **1.0.0 is reached when r2 is implemented and the owner has signed off validation of
+   the test set through it.**
+3. The record as `docs/output.md` describes it is what r2 builds on from 0.9.0. Until
+   1.0.0 a change to anything that page fixes raises the minor version (0.10.0);
+   additions are a minor version as before. At 1.0.0 the page becomes the interface of
+   1.x.
+4. The three gaps in what the record carries beside r2x's (`docs/output.md`) are the
+   first r2c work r2 needs. They come before the crushing-web refusal rule of answer 4
+   above, which stays as it is otherwise.
+
 ## First increment
 
 This increment changes how the work is governed, with the owner's approval.

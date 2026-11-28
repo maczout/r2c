@@ -1,8 +1,8 @@
 # r2c's output: what a reader may rely on
 
-**Stable for r2c 1.x.** This page is r2c's contract with whatever reads its records (r2
-first). It says what is fixed for version 1, what is not, and where r2c's record differs
-from r2x's. The framing is r2x's raw record format, version 1 (`docs/raw-format.md` in
+**What r2 builds on, from r2c 0.9.0.** This page is r2c's contract with whatever reads
+its records (r2 first). It says what is fixed, what is not, how a change to either shows
+in the version, and where r2c's record differs from r2x's. The framing is r2x's raw record format, version 1 (`docs/raw-format.md` in
 r2x 0.5.0); `src/r2c/record.py` reads and writes it and is r2x's module, standard library
 only.
 
@@ -14,7 +14,7 @@ standard error and are not part of the contract. Exit status: 0 solved, 1 failed
 error, 3 input out of scope. A solve that fails or is refused leaves no record (the file
 is written under a temporary name and renamed when complete).
 
-## Fixed for 1.x
+## Fixed
 
 **Framing.** First line `r2x-raw 1`. Header lines `key: value`, an empty line, then
 sections (`section NAME LENGTH`, LENGTH bytes, CRLF), then `end`. Every line ends in CRLF.
@@ -89,14 +89,14 @@ r2c goes past it (README, "Known limitations").
 - Neither: the response ended by the tests r2c has of Response's own (a fall of load,
   rupture, crushing), or without shear.
 
-Fixed for 1.x: the keys, when they are present, the meaning of N, the section's name and
+Fixed: the keys, when they are present, the meaning of N, the section's name and
 the three kinds of line in it. A reader that takes every section for a chart must skip
 `carried-on/stage`; one that looks sections up by name is not affected.
 
 ## Not fixed
 
 - **The values.** A later version may compute a different response for the same input.
-  What 1.0.0 gives is described in the README ("Known limitations") and measured in
+  What 0.9.0 gives is described in the README ("Known limitations") and measured in
   `docs/verification-results.md`.
 - **How many stages there are and where they are.** r2c's stage *i* is not Response's
   stage *i* except at stage 0. A comparison of the two programs should match stages by
@@ -110,11 +110,19 @@ the three kinds of line in it. A reader that takes every section for a chart mus
 
 ## Versioning
 
-r2c follows semantic versioning from 1.0.0, with this page as the public interface. A
-change to anything under "Fixed for 1.x" needs 2.0.0; a new header key or a new kind of
-section is a minor version, and readers ignore keys and sections they do not know. A
-change of the framing raises the record format's own number on the first line, as in
-r2x. A release that changes results says so in its notes.
+The record as this page describes it is what r2 builds on from 0.9.0 (owner,
+2026-11-27).
+
+- **Before 1.0.0.** A change to anything under "Fixed" raises the minor version: the
+  first such change makes 0.10.0. A new header key or a new kind of section is a minor
+  version too, and readers ignore keys and sections they do not know. The release notes
+  say which of the two a minor version is.
+- **1.0.0** is reached when r2 is implemented and the owner has signed off validation of
+  the test set through it. It is not a statement about this page. At 1.0.0 the page as
+  it then stands becomes the interface of r2c 1.x: from there a change to anything
+  under "Fixed" needs 2.0.0, and additions stay a minor version.
+- **At any version** a change of the framing raises the record format's own number on
+  the first line, as in r2x, and a release that changes results says so in its notes.
 
 ## What r2x's record carries that r2c's does not
 

@@ -26,8 +26,8 @@ For the developer: what exists now and how to work on it. The owner reads
   `carried-on/stage` (r2c's copy of Response's solve failed and r2c carried on), or
   `ending` (the copy stopped and r2c did not carry on, and why); `Result.carried_stage`,
   `Result.ending`. The names say what r2c knows, not where Response stops (owner,
-  2026-11-27). **The record is r2c's public interface from 1.0.0**: `docs/output.md`
-  says what is fixed for version 1; a change to it is a change of major version. Switches for rules that are written and off are
+  2026-11-27). **The record is r2c's public interface, what r2 builds on from 0.9.0**: `docs/output.md`
+  says what is fixed; until 1.0.0 a change to that raises the minor version (0.10.0), and so does an addition. Switches for rules that are written and off are
   listed in `docs/kernel.md` (`Shear.pass_code`, `Analysis.own_stirrup_history`,
   `Shear.stale_marks`, `Shear.sliver`; each decided at the finish: kept, off; and
   `Shear.code_by_layers`, the state code read again in increment 10, off). A node's transverse strain is solved the way the
@@ -57,21 +57,34 @@ For the developer: what exists now and how to work on it. The owner reads
 
 ## Next
 
-**Version 1.0.0 is handed over to r2** (tag `v1.0.0`; owner, 2026-11-27). Signed off:
+**Version 0.9.0 is handed over to r2** (tag `v0.9.0`; owner, 2026-11-27). Signed off:
 without shear, as a stand-in for Response; with shear, the control curves up to
 Response's peak. Not signed off: strength with shear past Response's last stage. Priority
 1 with shear is held to the uncut reading and is not met (`docs/brief.md`).
 
-**The next job (owner, 2026-11-27): the crushing-web refusal rule**, written and off
+**1.0.0 (owner, 2026-11-27)** is reached when r2 is implemented and the owner has signed
+off validation of the test set through it. Until then versions are 0.x: a change to
+anything `docs/output.md` fixes raises the minor version, as an addition does.
+
+**The first r2c work r2 needs (owner, 2026-11-27): the three gaps in what the record
+carries beside r2x's** (`docs/output.md`, "What r2x's record carries that r2c's does
+not", 1 to 3). They are in `export.py` and not in the kernel: a second line of the Shear
+Stress chart at stage 0 (zero unless the initial load has a shear); that line with its
+values beyond stage 0 under an initial shear with none in the increment; and the lines
+of the Shear Strain and Transverse Strain charts at the second stage of an increment of
+0,0,0. The first changes stage 0 of every record, so the records' hashes are rewritten
+in its own commit (`tools/same.py --write`), and the second's values are a result nobody
+has compared yet: hold them to Response's on the one development case that has it.
+`python tools/carries.py ARCHIVE VERIFY_OUT` shows when the gaps are closed
+(`docs/output-check.md`). This comes **before the crushing-web rule**.
+
+**After that (owner, 2026-11-27): the crushing-web refusal rule**, written and off
 (`Shear.code_by_layers`; "Which nodes are uniaxial" below is where to start). It is the
-first r2c work **after r2's comparison view exists**, and not before; and it needs **a
+first kernel work, **after r2's comparison view exists**, and not before; and it needs **a
 new held-out set first** (`tools/heldout.py build` with a new recipe). Both present sets
 were opened case by case at the finish (`docs/assessment.md`), so neither is held out
 any longer, and their cases must not be tuned against as if they were unseen. Until
-then: no kernel work. What r2 reads is `docs/output.md`; the gaps in what the record
-carries beside r2x's are listed there (`python tools/carries.py ARCHIVE VERIFY_OUT`,
-`docs/output-check.md`), the first of them a second line of the Shear Stress chart at
-stage 0, in `export.py` and not in the kernel.
+then: no kernel work. What r2 reads is `docs/output.md`.
 
 Standing (both sets scored once after the change of increment 10; the first set once more at the end of increment 11, the same): without shear 27
 of 27 and 10 of 10 on each priority. With shear, priority 1 with no case cut 22 of 28
@@ -91,7 +104,7 @@ on a crushing web on 5 cases where the trace shows something else. On the held-o
 the 3 cases with such a trace r2c goes past. Where to start:
 
 - **Which nodes are uniaxial** (`docs/kernel.md`, "The state code, layer by layer";
-  `Shear.code_by_layers`, written, off). **This is the next job.** The binary's scan for web crushing goes layer
+  `Shear.code_by_layers`, written, off). **This is the next kernel job.** The binary's scan for web crushing goes layer
   by layer and a crushing node that carries no shear ends the flexural zone. With
   r2c's uniaxial nodes (`Detail.lone`) counted as carrying none, Newbeam at M/V = 4 m
   and Newbeam with two-leg stirrups at 200 mm at M/V = 3 m end exactly where Response
