@@ -217,7 +217,26 @@ def _curve_record(points, shear=True):
 RISE = [(0, 0), (1, 50), (2, 80), (3, 100)]
 
 
-def test_a_subject_that_carries_on_is_compared_up_to_the_references_last_stage():
+@pytest.fixture
+def traced(monkeypatch):
+    """A trace of Response that shows a give-up on the reference RISE with shear."""
+    compare.trace_end(_curve_record(RISE))      # the committed endings, read once
+    monkeypatch.setitem(compare.TRACE_ENDS, compare.fingerprint(_curve_record(RISE)),
+                        compare.TRACE_GAVE_UP)
+
+
+def test_no_cut_unless_a_trace_of_response_shows_the_give_up(monkeypatch):
+    ref = _curve_record(RISE)
+    sub = _curve_record(RISE[:3] + [(4, 120), (5, 130), (6, 131)])
+    assert "upto" not in compare.compare(ref, sub)                  # no trace
+    for ending in ("refused", "own accord", "not told apart", "not shown"):
+        monkeypatch.setitem(compare.TRACE_ENDS, compare.fingerprint(ref), ending)
+        assert "upto" not in compare.compare(ref, sub)
+    monkeypatch.setitem(compare.TRACE_ENDS, compare.fingerprint(ref), compare.TRACE_GAVE_UP)
+    assert "upto" in compare.compare(ref, sub)
+
+
+def test_a_subject_that_carries_on_is_compared_up_to_the_references_last_stage(traced):
     ref = _curve_record(RISE)
     sub = _curve_record(RISE[:3] + [(4, 120), (5, 130), (6, 131)])
     res = compare.compare(ref, sub)
@@ -228,7 +247,7 @@ def test_a_subject_that_carries_on_is_compared_up_to_the_references_last_stage()
     assert c["shape_same"]
 
 
-def test_no_cut_without_shear_nor_after_a_fall_of_load_nor_when_both_end_together():
+def test_no_cut_without_shear_nor_after_a_fall_of_load_nor_when_both_end_together(traced):
     carried = RISE[:3] + [(4, 120), (5, 130)]
     # without shear: the override is about shear responses
     assert "upto" not in compare.compare(_curve_record(RISE, False), _curve_record(carried, False))

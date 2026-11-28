@@ -1,0 +1,226 @@
+{
+ "column-mv": {
+  "ending": "not shown",
+  "curves": "e582276f1f39c0273aba82afe7c790fb45436c8ba72d87f95d50bff187d294c2"
+ },
+ "igirder-csoft3-m2v": {
+  "ending": "own accord",
+  "curves": "776220b47d77d19b3e2283eca2641dacda8be40e3ac73a45a84a87c3d1bd0847"
+ },
+ "igirder-fc45-m3v": {
+  "ending": "gave up",
+  "curves": "3f4d86136aa8682981ef64c7c4e869203918c0af6a072dd5799d59ad95a26d68"
+ },
+ "igirder-m25v": {
+  "ending": "gave up",
+  "curves": "d2a1f789b7de315b1b9b6098ad435da949cda9e67c936227e7f97f6a61cc79f0"
+ },
+ "igirder-m3v": {
+  "ending": "own accord",
+  "curves": "b8949ab1d8ca7999446bed1d0d94ad167ba1bf16b969d712fa38797b7b85cd2c"
+ },
+ "igirder-m5v": {
+  "ending": "gave up",
+  "curves": "20eb84e6bb4664df15d33ba05c827c22ab8165af9d58b4bcf0508a4502c7f2cc"
+ },
+ "igirder-mv": {
+  "ending": "not shown",
+  "curves": "3b923c1d2cbf667c55430d4a086dbe3166b94ad02b755af6d1a9d78099f52bc1"
+ },
+ "igirder-negm2v": {
+  "ending": "gave up",
+  "curves": "249bd4418986ef985aa19ead9be4caada8625342adb1cb7cb13d4f1c5627f468"
+ },
+ "liping-m25v": {
+  "ending": "gave up",
+  "curves": "a6a8b0ba660cc070a59a2eea5733a7fe0bfa4ea75db12d4a7fc38b0b5552f877"
+ },
+ "marshall-m3v": {
+  "ending": "gave up",
+  "curves": "0b5d04eb91033847b2f672fcc7360d1c253d50182dac59bc1b8697c8ec6217d6"
+ },
+ "marshall-mv": {
+  "ending": "gave up",
+  "curves": "09389d9bdbd9d4699e5564fe43bca8f32a117ccb7070b02ded32009c9438be17"
+ },
+ "newbeam-deep900-m15v": {
+  "ending": "gave up",
+  "curves": "423e66eace8291fc2386273ea50993d74cd34d17946386797e4af60aee741595"
+ },
+ "newbeam-fc30-m25v": {
+  "ending": "gave up",
+  "curves": "2620be6d7700908653239ff44f767b36a06a3f6491f4326522d223f4d309d528"
+ },
+ "newbeam-fc50-m2v": {
+  "ending": "gave up",
+  "curves": "b2b288771ea537221a74b4bf084e6704afa64339fee01d145208d4f8e7d850b6"
+ },
+ "newbeam-fc65-m2v": {
+  "ending": "gave up",
+  "curves": "0a87594853e2b43cf5087e202e524665d8ebbad64096dcd32ecee696c66f1363"
+ },
+ "newbeam-fc80-m3v": {
+  "ending": "gave up",
+  "curves": "e88e1f359626e96f4e87c4ac3612d49e8164ac9c93bfd3ea44813de7bb2237f9"
+ },
+ "newbeam-fc80-mv": {
+  "ending": "gave up",
+  "curves": "7315fe43aca729a2af78e1d782ca928bda220dccc0322b0167f311618ad3215a"
+ },
+ "newbeam-fy600-m2v": {
+  "ending": "gave up",
+  "curves": "161bc3e899dc0459d85c618c17b378007324af063faf3c658963992bddae834c"
+ },
+ "newbeam-heavy2500-negm2v": {
+  "ending": "refused",
+  "curves": "db90daa4010616de0a55ddf4bd5079ea6ebdfce54159efc08a3a2513b42b668d"
+ },
+ "newbeam-light800-mv": {
+  "ending": "gave up",
+  "curves": "8e446ca7ddb4d29e0bb1955d05d984f5fdab9c096db1e1bb524025d40cd25930"
+ },
+ "newbeam-m05v": {
+  "ending": "not shown",
+  "curves": "2a09c48a2a310083869149c3a408a6f077e0fe66b2d061f42e8011eaadbaa566"
+ },
+ "newbeam-m0neg-mv": {
+  "ending": "gave up",
+  "curves": "a68e478cac2daf2b8fdd870a185d122925298d13fea730671ae22933f3519927"
+ },
+ "newbeam-m25v": {
+  "ending": "gave up",
+  "curves": "e51cac39b4c2cc7f8a0915334afe274385681ef6da7b35aeaa04b085cc127f5e"
+ },
+ "newbeam-m2v": {
+  "ending": "gave up",
+  "curves": "7377166bdea704c9ff61ba422b231edc568884c51ff5e861e209e1c3643fc98b"
+ },
+ "newbeam-m4v": {
+  "ending": "refused",
+  "curves": "893774ee41b6bc8ecc10edce95979c60b43e778b9b451c6b6c884e14f7363e3f"
+ },
+ "newbeam-m50-v": {
+  "ending": "own accord",
+  "curves": "148a72df171be32d42418a6b4996b7d1c0f8e9d1d44a44c27f155c848073e872"
+ },
+ "newbeam-mid400-m2v": {
+  "ending": "refused",
+  "curves": "e78017a4d7164dbea25b8f7aae15e66bc2deff9911b783aebb9853df23ff78b3"
+ },
+ "newbeam-mv": {
+  "ending": "own accord",
+  "curves": "20ee96c2aaf9afa376f8993ac38b1ff7b1a4ea885ace3bcfa56d74df8e74795c"
+ },
+ "newbeam-n300-v": {
+  "ending": "own accord",
+  "curves": "702c50bcad70f5d1b13141fc182a3cab371a77b8cfa7fde4b86951ce9770b053"
+ },
+ "newbeam-n500-m2v": {
+  "ending": "gave up",
+  "curves": "5a575d97bc7cbb95db39910fc5e844152107bc6c3618db462a397161ebe2b602"
+ },
+ "newbeam-nmv": {
+  "ending": "gave up",
+  "curves": "b919b154a6cf744097fd417388272190cc158c7007168031d9273c9476a6601a"
+ },
+ "newbeam-nmv-incr": {
+  "ending": "own accord",
+  "curves": "8afc819e1417ec926236bded5f23b990421644377933ab16c2a95880ca891050"
+ },
+ "newbeam-slab200-m2v": {
+  "ending": "gave up",
+  "curves": "2cc518165604e7122b6c44011c7a47ac60238329d9ef977de281f6aaf459ec01"
+ },
+ "newbeam-smx-mv": {
+  "ending": "gave up",
+  "curves": "e60cb03f408ce42e8674fcc94b7b57b27abc08e2609f91ef50b13eaa42dbdebd"
+ },
+ "newbeam-st150-m15v": {
+  "ending": "gave up",
+  "curves": "320f3ae83251199cc85fe1418a7c55dc80653c00854f8c3ec7f100e38438fc2b"
+ },
+ "newbeam-st150-m3v": {
+  "ending": "gave up",
+  "curves": "39a083912ac1be77bdf85b7a35555f34a4796bd867b3206332af4ddf2dcfecfb"
+ },
+ "newbeam-st150-mv": {
+  "ending": "gave up",
+  "curves": "0605c08f28958f1763db7e3c85f213448f236ec5292bfee24dd6583788e117b8"
+ },
+ "newbeam-st150-n200-v": {
+  "ending": "gave up",
+  "curves": "4b335f3c15e56765d2539448ae1e734c0c1c9a8a12549837683288cb1cb8c1e7"
+ },
+ "newbeam-st150-n300-v": {
+  "ending": "own accord",
+  "curves": "3d96d12734b70ebdb45aae58d241283ae7a5f4ce2b3b9b1a1625bb2ec4190fad"
+ },
+ "newbeam-st2leg200-m2v": {
+  "ending": "gave up",
+  "curves": "f1e8baead9915a48ebcf4d53b681c4cc2690b88ba8ac9531c57500b147fc6bcf"
+ },
+ "newbeam-st2leg200-m3v": {
+  "ending": "refused",
+  "curves": "16de38f4d9028dc6e89aaf7bf6d9d00bddf014b98e84eb6d0c3bcf5ca1f3ec1a"
+ },
+ "newbeam-tsfactor-mv": {
+  "ending": "gave up",
+  "curves": "d72768fb67386928cb15e472702f7feb697b9f8bacbd8b063be0a3353fd8bed8"
+ },
+ "newbeam-tstiff3-mv": {
+  "ending": "gave up",
+  "curves": "611687a5c0c56b5babfb52dea3b5783885b068ee5ddc9eea145068515e9795bb"
+ },
+ "newbeam-tstiff4-mv": {
+  "ending": "own accord",
+  "curves": "c8c065cdd0121b4f92e4deb55f605f51b9ebc771f712dc3fb3d5524498ebd235"
+ },
+ "newbeam-tstiff6-mv": {
+  "ending": "gave up",
+  "curves": "130c38dcba8af3c6355656c9643b52036495c7ff7b9488bca5094141d78b2d4c"
+ },
+ "newbeam-us-mv": {
+  "ending": "gave up",
+  "curves": "cf053f08247578c51ce9f0597f648537fa6ec71669dfe076956cf159af7f099e"
+ },
+ "newbeam-usfile-mv": {
+  "ending": "refused",
+  "curves": "15d5f87805ae520fdf323299c5035a3054ab3a31fc6a15d6755bff433dd57949"
+ },
+ "newbeam-v0-m": {
+  "ending": "own accord",
+  "curves": "335f244cb18966c114012cd9999fda895bd197c44447f30213dd3ed86ec196b2"
+ },
+ "newbeam-vonly": {
+  "ending": "not shown",
+  "curves": "78520fe2682210696829b1362c403066f1bdd3fd518517cc9dcc5073154b3eaa"
+ },
+ "se100-m3v": {
+  "ending": "gave up",
+  "curves": "13d1a42df11ce2d5a34709b053a7f631876a53a42e99aec0a8f62690de32d807"
+ },
+ "tbeam-csa-m2v": {
+  "ending": "gave up",
+  "curves": "3142e2c8273fad2f47ef90fb917b2cb5c9f18a77ec70bea6d39bfe53324f01f0"
+ },
+ "tbeam-fc30-negm2v": {
+  "ending": "gave up",
+  "curves": "7494657a986237aaeb578afed48f6543490383febf2b9f2af2d7caabe7a20135"
+ },
+ "tbeam-m4v": {
+  "ending": "gave up",
+  "curves": "c5e09a348bc9eeda9c74fc551e0d61a3a50f3f8a0998368c39aaa47bf54ae6b4"
+ },
+ "tbeam-negm3v": {
+  "ending": "gave up",
+  "curves": "d5126108432b68b2bedba0de70ef1e01b65c7d016fbde5cc363d5866af7100e3"
+ },
+ "tbeam-negm4v": {
+  "ending": "refused",
+  "curves": "9e55bb399ea9733319c610bf4b1abd52df07ee8dc2b698846e9ef4e9d823aa67"
+ },
+ "tbeam-negmv": {
+  "ending": "gave up",
+  "curves": "c768c4c500e878df81a9a0e671e886704a7484437440e3bf6d4a130c947b650a"
+ }
+}

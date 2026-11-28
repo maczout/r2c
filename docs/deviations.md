@@ -14,35 +14,45 @@ measured on the development results (`docs/verification-results.md`) unless mark
   message; on two r2x finds more stages on Response's control curves than in its list.
   r2c cannot know either before solving. Accepted by the owner as known differences
   (2026-11-25): parity is complete except accepted refusals.
+- **r2c's record has lines that r2x's has not.** With shear, where they apply: the
+  header lines `response-last-stage`, `response-peak-stage`, `response-ending` and
+  `ending`, and a section `response/last-stage`, on where Response's own response would
+  stop. Required by the owner (2026-11-27); the parity check leaves them out of what it
+  compares (`tools/parity.py`). A reader of r2x's records that looks sections up by
+  name is not affected; one that takes every section for a chart is.
 - **`define` and `--report` of r2x are not in r2c.** Both work through Response's own
   windows. The owner's decision (2026-11-24): not part of the command line that is
   compared.
-- **With shear, r2c carries on where Response's solve gives up and its response ends.**
-  On sections that fail in flexure with some shear (M/V of 2 to 4 m: the T-beam, the
-  Marshall sample, Newbeam with stronger concrete; several of the parked I-girder cases)
-  the two curves are the same up to Response's last stage; r2c then finds further states
-  and reaches a peak several per cent higher. This is the owner's override (2026-11-25,
-  `docs/brief.md`): r2c keeps carrying on, and such a case is compared up to Response's
-  last stage (`docs/measures.md`, "The overrides"). Since Response's own solve of a stage
-  was turned on, r2c's tries run out where Response's do, and the override is a step of
-  its own: r2c's earlier solve takes over from that stage, and where it finds nothing
-  beyond it either, the response is the one the earlier solve finds from the start, if
-  that one passes the stage and goes on (`docs/kernel.md`, "The global solve with
-  shear"). Of the cases that were compared up to Response's last stage before, all but
-  one still are; on that one (Newbeam with elasto-plastic tension stiffening) neither
-  solve finds a settled state beyond Response's last stage, and r2c now ends there too.
-  **What the finish showed** (the independent assessor, `docs/assessment.md`; counted
-  again with `tools/uncut.py`): the cut is what holds priority 1 with shear on about one
-  held-out case in six, where r2c's whole response peaks well above Response's; r2c's
-  record does not mark where Response stopped; and Response's lower figure is repeatable.
-  Two kinds are cut alike and only the first is the override at work: r2c's copy of
-  Response's solve gives up where Response's does and r2c's earlier solve takes over
-  with a jump in load; or r2c's copy does not fail where Response's does and simply goes
-  on, which is an open difference between the programs. In some of the second kind
-  Response stops because it finds the web crushing with the load still rising, where
-  r2c's state at the same curvature does not crush; the cause is not found. And one
-  development case (Newbeam under shear, then moment) is cut though Response ended of
-  its own accord: a fault of the rule, put to the owner.
+- **With shear, r2c goes past Response's last stage on some cases, and its record marks
+  that stage only on some of them.** On sections that fail in flexure with some shear
+  (M/V of 2 to 4 m: the T-beam, the Marshall sample, Newbeam with stronger concrete) the
+  two curves are the same up to Response's last stage; r2c then finds further states and
+  can reach a peak well above the one Response reports. Response's lower figure is its
+  repeatable answer. What the owner decided (2026-11-25, narrowed 2026-11-27,
+  `docs/brief.md`): r2c carries on only where Response's solve gives up numerically; where
+  Response refuses a state whose web is crushing, or the two cannot be told apart, r2c
+  ends there too and its record says why; and where r2c goes past, its record marks the
+  stage (`response-last-stage` in the header, a section `response/last-stage`). What r2c
+  does (`docs/kernel.md`, "Where Response's response ends and r2c's goes on"): its copy of
+  Response's stage control keeps why each try failed, and when the tries run out it
+  carries on only if every one of them failed numerically; the record then marks that
+  stage. **What is still different, in three kinds** (`python tools/marks.py`):
+  - r2c's copy gives up where Response's does, r2c's own solve takes over with a jump in
+    load, and the record marks the stage: the override at work, as decided.
+  - r2c's copy does not fail where Response's solve gave up: r2c goes on unknowing, and
+    its record has no mark there, or marks a later stage where the copy did give up. The
+    requirement that the record marks the stage is not met on these cases. It is the
+    difference on stages that do not settle (below), seen at the end of a response.
+  - Response refuses a state whose web is crushing and r2c's state at the same curvature
+    is not read as crushing, so r2c does not end there. The cause is found in part: the
+    binary scans for web crushing layer by layer and a crushing node that carries no
+    shear ends the flexural zone; written (`Shear.code_by_layers`) and off, because with
+    r2c's uniaxial nodes it ends two cases exactly where Response does and six others
+    well before (`docs/kernel.md`, "The state code, layer by layer").
+  In the measure a case is now cut at Response's last stage only where a trace of
+  Response shows the numerical give-up, and priority 1 with shear is reported with no
+  case cut first (`docs/measures.md`, "The overrides"). The case where Response ended of
+  its own accord (Newbeam under shear, then moment) is no longer cut.
 - **With shear under axial compression, just after the web cracks, Response's response
   ends on a collapsed state and r2c's does not** (Newbeam with closed stirrups under
   axial compression and shear alone). Both programs hover at the cracking load for ten

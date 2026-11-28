@@ -1930,6 +1930,89 @@ way. *Measured* on the five cases that were whole other responses with the four 
 on: Newbeam under a moment, then shear, comes back inside priority 3; the other four
 do not change side.
 
+### Where Response's response ends and r2c's goes on: the override narrowed, and the mark in the record [B `00418af0`; r2c's own; the owner, 2026-11-27]
+
+Switches: none new (`Shear.carry_on` as before). The stage control keeps why each try
+failed since the last stage kept, by the pass routine's own tests [B `00418af0`], in the
+words `tools/rtrace.py` gives Response's tries: "no solve" (the solve of the global
+strains gave up), "16 passes above" (not settled after 16 passes with the load above the
+largest so far), "code N" (a state code with the multiplier at 0.5 or more), "code 3
+above" (the web crushing with the load above the largest so far), "?" (anything else: a
+state with the loads reversed). When the tries run out (the multiplier under 0.005),
+`shear.stop_kind` reads them, and `Shear.stop` keeps the last stage and the reading:
+
+* *gave up*: every try failed numerically ("no solve" or "16 passes above"). This is
+  the ending that traces of Response show where its solve gives up (35 traced
+  development cases; `python tools/traceend.py read`). Only here does the override act
+  (`Shear._carry_on`, as before: once, with the last stage at 0.8 of the largest load or
+  more).
+* *refused*: one of the tries is a solved state refused on state code 3, the web
+  crushing. The response ends there, as Response's does.
+* *not told apart*: a solved state refused for another reason and none for code 3. The
+  response ends there, as Response's does.
+
+What the record then says (`run._ending`, `Result.header`, `export.flag`):
+
+* where r2c goes past (the override acted and stages follow): the header lines
+  `response-last-stage` (the stage's number, as `peak-stage` counts), `response-peak-stage`
+  (the peak of the stages up to it) and `response-ending` (what happened, in words), and a
+  section `response/last-stage` with the stage's number and its point on each control
+  chart. After More Detail the number is that stage's new one.
+* where r2c ends because the tries ran out: the header line `ending`, with the reason
+  (the web crushing; not told apart; a give-up with the load under 0.8 of the largest;
+  a give-up beyond which r2c's own solve finds nothing either).
+* every other response has none of these lines, and its record is byte for byte what it
+  was.
+
+**What this does not do** [measured, `python tools/marks.py`; `docs/deviations.md`]: the
+mark is where r2c's *copy* of Response's stage control gives up. Where the copy does not
+fail where Response's did (most of the cases where r2c goes past Response's last stage),
+r2c goes on without a mark there, or marks a later stage; and where Response refuses a
+crushing web, r2c's state code mostly does not see it (the next section).
+
+### The state code, layer by layer [B `004204b0`], read again 2026-11-27: written, off (`Shear.code_by_layers`)
+
+Why it was read again: on five traced development cases Response's last tries are solved
+states refused on code 3 with the load still rising, where r2c's stage at the same
+curvature has code 0 and is kept (`docs/assessment.md`, R3). Two of them, Newbeam at
+M/V = 4 m and Newbeam with two-leg stirrups at 200 mm at M/V = 3 m, are refused at the
+same curvature, so the cause is in the flexural compression zone and not in the web.
+
+What the routine does that r2c's writing ("The state code" above) did not say. The scan
+for web crushing does not go node by node but **layer by layer**, each layer with its
+three nodes (top, middle, bottom; a boundary node belongs to both layers). From the face
+that is crushing (the top if it is, else the bottom), a layer keeps the flexural zone
+going only if one of its three nodes is crushing **and carries shear** (the size of the
+node's shear stress above nothing). The first layer that has no such node ends the zone;
+any layer after it that has one gives code 3. The whole depth one zone with shear on the
+section gives 3 from the top only. So a layer at the compressed face whose crushing nodes
+carry no shear ends the zone at once, and the next crushing layer down, which does carry
+shear, is taken for the web. r2c's writing lets any crushing node keep the zone going.
+
+Which nodes carry no shear at a compressed face: taken to be the nodes solved as
+uniaxial ("A node with next to no shear strain": that routine sets the principal
+directions to the member's, so the node's shear stress is nothing) [inferred: the
+routine's store of the shear stress was not read]. r2c has those nodes (`Detail.lone`)
+but leaves their small shear stress in place; with the switch on they count as carrying
+none.
+
+*Measured* with the switch on (2026-11-27, the 78 development cases with shear,
+`python tools/trial.py OUT --set Shear.code_by_layers=1`, against the run before): the
+two Newbeam cases above end where Response's do, stage for stage (63 stages for 63, and
+59 for 58; the last shear strain and the peak to the digits printed), and 16 responses
+in all end on a crushing web. But ten of those are cases where a trace of Response shows
+no such refusal, and six end 6 to 16 stages before Response's last stage (the Liping and
+Marshall samples, Newbeam with heavy bars under negative moment, three more Newbeam
+cases). Priority 1 falls from 73 to 63 of 78 cut and from 67 to 59 uncut, priority 3
+from 69 to 61. **Off for that reason.** What is wrong is which nodes are uniaxial, not
+the scan: in r2c a node at the compressed face falls on one side of that test or the
+other from stage to stage (one node at the bottom of the T-beam under negative moment
+at one stage, three at the next), and the uniaxial routine is applied after the node's
+solve, not in place of it, with the test's third condition (a table over the depth)
+left out. Before turning it on: read what `004a7b60` stores as the node's shear stress,
+write the test of `004a8b20`'s head whole, and hold `Detail.lone` to the Stirrup Stress
+chart of a section with prestrained stirrups, where Response's uniaxial nodes show.
+
 ## What is kept between evaluations, for speed [O], 2026-11-26 (increment 7)
 
 None of this is a rule of the calculation: each gives the numbers the plain routine
@@ -1969,8 +2052,10 @@ node starts, so a node is solved once an evaluation and not kept between them.
 
 ## Rules written and off: what was decided for each (the finish, 2026-11-27)
 
-Four rules are in the kernel behind a switch that is off. Each was looked at again at
-the finish, with no change to the kernel (owner, 2026-11-26: no kernel changes in that
+Five rules are in the kernel behind a switch that is off (the fifth,
+`Shear.code_by_layers`, since increment 10: its own section, "The state code, layer by
+layer", says what was measured and what to read before turning it on). The first four
+were looked at again at the finish, with no change to the kernel (owner, 2026-11-26: no kernel changes in that
 increment). All four are **kept, off**: each is the binary's own rule or an observation
 of the running program, each changes results only at stages that do not settle, and each
 is where work on those stages would start. None is deleted, because the reading behind

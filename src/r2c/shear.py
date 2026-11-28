@@ -17,7 +17,19 @@ import math
 import numpy as np
 
 from r2c import node as nodelib
-from r2c.solver import Analysis, Flexure, SolveError, Stage, _root
+from r2c.solver import GAVE_UP, REFUSED, UNTOLD, Analysis, Flexure, SolveError, Stage, _root
+
+
+# How the tries on a stage ran out (owner, 2026-11-27; docs/kernel.md, "Where Response's
+# response ends and r2c's goes on"), from why each of them failed
+
+
+def stop_kind(whys) -> str:
+    if any(w.startswith("code 3") for w in whys):
+        return REFUSED          # a solved state refused: the web crushing
+    if all(w in ("no solve", "16 passes above") for w in whys):
+        return GAVE_UP          # numerical: no solve, or a stage that does not settle
+    return UNTOLD
 
 
 class Shear(Flexure):
@@ -665,8 +677,14 @@ class Shear(Flexure):
     # tries run out where Response's do; the response is then carried on by r2c's own solve
     # (Newton's method, the nested search, a state nearly in balance), from the last stage
     # kept, with whole steps again. Off: the response ends there, as Response's does.
+    # Narrowed (owner, 2026-11-27): only where the give-up is numerical, as traces of
+    # Response show one (every try after the last stage kept fails in the solve or has not
+    # settled after 16 passes). Where one of those tries is a solved state that Response
+    # refuses because its web is crushing, or is refused for a reason that is neither, the
+    # response ends there as Response's does, and `stop` says which.
     carry_on = True
     carried_from = None      # the number of stages kept when the override took over
+    stop = None              # where the tries ran out: (index of the last stage kept, kind)
     step_share = 1.0         # the share of a step of that solve that is taken
     half_steps = False       # Response's flag that keeps that share at one half
 
@@ -991,6 +1009,8 @@ class Shear(Flexure):
         crush = (np.abs(o.f2 - o.f2max) < 0.015 * np.abs(o.f2max)) | (o.e2 < -e0s)
         shear = np.abs(o.v) > 0.0
         n = len(crush)
+        if self.code_by_layers and n % 2 == 1:
+            return self._web_code(st, crush, shear, e0s)
         if crush[0] or crush[-1]:
             # the crushing zone that starts at that face is flexure's; beyond it, any
             # crushing node that carries shear is the web's
@@ -1004,6 +1024,36 @@ class Shear(Flexure):
             if zone and st.v > 0.0:
                 return 3
         elif (crush & shear).any():
+            return 3
+        far = min(-0.01, -5.0 * float(np.max(e0s)))
+        if o.e2[0] >= far and o.e2[-1] >= far:
+            return 3 if bool(np.all(o.e2 <= -e0s)) else 0
+        return 2
+
+    # The web-crushing code as the routine has it [B 004204b0], read again 2026-11-27
+    # (docs/kernel.md, "The state code, layer by layer"): the scan goes layer by layer, a
+    # layer counts as crushing only where one of its three nodes is crushing and carries
+    # shear, and a node solved as uniaxial (next to no shear strain) carries none. Off:
+    # node by node, with every crushing node keeping the zone going.
+    code_by_layers = False
+
+    def _web_code(self, st: Stage, crush, shear, e0s) -> int:
+        """Codes 3, 2 and 0 of state_code, with the scan layer by layer."""
+        d, o = st.detail, st.detail.out
+        if d.lone is not None:
+            shear = shear & ~np.asarray(d.lone)
+        hit = [bool((crush[i:i + 3] & shear[i:i + 3]).any()) for i in range(0, len(crush) - 1, 2)]
+        if crush[0] or crush[-1]:
+            # from the face that is crushing (the top first): the layers that crush and
+            # carry shear, without a break, are flexure's; one more after a break is the web
+            zone = True
+            for h in (hit if crush[0] else reversed(hit)):
+                if h and not zone:
+                    return 3
+                zone = zone and h
+            if crush[0] and zone and st.v > 0.0:
+                return 3
+        elif any(hit):
             return 3
         far = min(-0.01, -5.0 * float(np.max(e0s)))
         if o.e2[0] >= far and o.e2[-1] >= far:
@@ -1140,6 +1190,7 @@ class Shear(Flexure):
         peak = 0.0
         retries = 0
         solves = 0
+        whys = []       # why each try failed since the last stage kept, as rtrace.py names it
         def grow(at):
             """The base step grows to a tenth of the target [B 00418860]: tested before
             every pass on a stage, with the target as it is then."""
@@ -1158,6 +1209,7 @@ class Shear(Flexure):
             solves += 1
             self.why = ""
             self.tried = 0
+            reversed_ = False
             try:
                 st = self.solve(target, start or prev, dict(
                     mult=mult, peak=peak,
@@ -1167,22 +1219,28 @@ class Shear(Flexure):
                 if st.lam < 0.0 and len(self.stages) > 1:
                     # the loads reversed: not a state of this loading (Response's shear is
                     # never negative, the manual 3-5)
-                    st, ok = None, False
+                    st, ok, reversed_ = None, False, True
             except SolveError:
                 st, ok = None, False
             if self.late_growth and (st.passes if st is not None else self.tried) >= 2:
                 grow(target)    # from the second pass on, against this try's own target
             code = 0
+            said = "no solve" if st is None and not reversed_ else "?"
+            if st is not None and st.failed is not None:
+                said = "code " + st.failed.split()[2]       # refused on a pass's state code
             if ok:
                 st.cmode = self.mode
                 code = self.state_code(st)
                 if st.perr >= self.profile_tol and st.perr > self.profile_accept \
                         and st.lam > peak and not getattr(st, "taken", False):
                     ok = False          # not converged after 16 passes, with the load above
+                    said = "16 passes above"
                 if code != 0 and mult >= 0.5:
                     ok = False
+                    said = f"code {code}"
                 if code == 3 and st.lam > peak:
                     ok = False
+                    said = "code 3 above"
             if self.trace is not None:
                 self.trace.append(dict(
                     n=len(self.stages), mode=self.mode, target=target, mult=mult, kept=ok,
@@ -1192,6 +1250,7 @@ class Shear(Flexure):
                     codes=None if st is None else st.codes,
                     why=self.why if st is None else ""))
             if not ok:
+                whys.append(said)
                 if pending:
                     # a stage put in between that is refused or not solved is dropped; the
                     # stage set aside is taken up as it was found and the event is closed
@@ -1257,7 +1316,11 @@ class Shear(Flexure):
                     mult *= 0.5
                     target = target * 0.5 if n_st == 1 else target - mult * d0
                 if mult < 0.005:
-                    if not self._carry_on(prev, peak):
+                    # the tries have run out: this is where Response's response ends
+                    kind = stop_kind(whys)
+                    if self.stop is None:
+                        self.stop = (len(self.stages) - 1, kind)
+                    if kind != GAVE_UP or not self._carry_on(prev, peak):
                         break
                     # the owner's override: r2c's own solve from the last stage kept
                     mult, retries = 1.0, 0
@@ -1271,6 +1334,7 @@ class Shear(Flexure):
             if retries == 0 and mult < 0.25:
                 mult *= 2.0
             retries = 0
+            whys.clear()
             self.accept(st)
             peak = max(peak, st.lam)
             if len(self.stages) >= 2 and self._ends(st, prev, peak, len(self.stages)):

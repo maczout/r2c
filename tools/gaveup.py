@@ -16,7 +16,9 @@ as measured on the two records, and the verdict:
   beyond      the other record's stages after that point
   ends apart  whether the other record's last stage is somewhere else than Response's
   verdict     "cut at P of N" where all hold (the case is compared up to Response's
-              last stage), else the first condition that fails
+              last stage), else the first condition that fails; "not cut: trace ..."
+              where the two records' conditions hold and a trace of Response does not
+              show a numerical give-up (owner, 2026-11-27; tools/traceend.py)
   carried     where r2c itself says its copy of Response's solve gave up and its own
               carried on (the stage number, from the verify results beside the record;
               blank: it did not), which is r2c's word and not the measure's
@@ -67,8 +69,12 @@ def conditions(ref, sub) -> dict | None:
         out["why"] = "curves apart there"
     elif out["beyond"] <= 1e-9:
         out["why"] = "nothing beyond"
-    elif out["upto"] is None:
+    elif out["apart"] <= max(limit, cmp.FLOOR_DIGITS * float(np.hypot(
+            *(r / s for r, s in zip(cmp.resolution(ref.control(key)), (xs, pk)))))):
         out["why"] = "ends at the same place"
+    elif out["upto"] is None:
+        # all the conditions on the two records hold; the trace does not show a give-up
+        out["why"] = f"not cut: trace {cmp.trace_end(ref) or 'none'}"
     else:
         out["why"] = f"cut at {out['upto']:.1f} of {len(b)}"
     return out
